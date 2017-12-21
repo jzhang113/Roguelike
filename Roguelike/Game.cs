@@ -31,6 +31,7 @@ namespace Roguelike
         public static Player Player { get; private set; }
 
         private static InputHandler InputHandler;
+        private static MessageHandler MessageHandler;
         private static bool _update = true;
 
         static void Main(string[] args)
@@ -42,6 +43,7 @@ namespace Roguelike
             DungeonMap.UpdatePlayerFov();
 
             InputHandler = new InputHandler();
+            MessageHandler = new MessageHandler();
 
             string fontFileName = "terminal8x8.png";
             string consoleTitle = "Roguelike";
@@ -71,7 +73,7 @@ namespace Roguelike
             if (action != null)
             {
                 action.Execute(Player, null);
-                System.Console.WriteLine(action.Message(Player));
+                MessageHandler.AddMessage(action.Message(Player));
                 _update = true;
             }
         }
@@ -82,6 +84,7 @@ namespace Roguelike
             {
                 DungeonMap.Draw(_mapConsole);
                 Player.Draw(_mapConsole, DungeonMap);
+                MessageHandler.Draw(_messageConsole);
 
                 RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, 0);
                 RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _messageHeight);
