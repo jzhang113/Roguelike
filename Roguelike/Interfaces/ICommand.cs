@@ -1,7 +1,10 @@
-﻿namespace Roguelike.Interfaces
+﻿using Roguelike.Core;
+
+namespace Roguelike.Interfaces
 {
     interface ICommand
     {
-        void Execute(Core.Actor actor);
+        void Execute(Actor origin, Actor target);
+        string Message(Actor origin);
     }
 }

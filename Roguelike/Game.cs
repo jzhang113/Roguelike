@@ -70,7 +70,8 @@ namespace Roguelike
 
             if (action != null)
             {
-                action.Execute(Game.Player);
+                action.Execute(Player, null);
+                System.Console.WriteLine(action.Message(Player));
                 _update = true;
             }
         }

@@ -54,7 +54,7 @@
     <Compile Include="Core\Actor.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\DungeonMap.cs" />
-    <Compile Include="Core\InputHandler.cs" />
+    <Compile Include="Systems\InputHandler.cs" />
     <Compile Include="Core\MoveCommand.cs" />
     <Compile Include="Core\Player.cs" />
     <Compile Include="Core\Swatch.cs" />
@@ -70,12 +70,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="arial10x10.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="square12x12_0.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="terminal8x8.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

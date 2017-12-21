@@ -2,35 +2,25 @@
 
 namespace Roguelike.Core
 {
-    class MoveUpCommand : ICommand
+    class MoveCommand : ICommand
     {
-        public void Execute(Actor actor)
-        {
-            Game.DungeonMap.SetActorPosition(actor, actor.X, actor.Y - 1);
-        }
-    }
+        int dx;
+        int dy;
 
-    class MoveDownCommand : ICommand
-    {
-        public void Execute(Actor actor)
+        public MoveCommand(int dx, int dy)
         {
-            Game.DungeonMap.SetActorPosition(actor, actor.X, actor.Y + 1);
+            this.dx = dx;
+            this.dy = dy;
         }
-    }
 
-    class MoveLeftCommand : ICommand
-    {
-        public void Execute(Actor actor)
+        public void Execute(Actor origin, Actor target)
         {
-            Game.DungeonMap.SetActorPosition(actor, actor.X - 1, actor.Y);
+            Game.DungeonMap.SetActorPosition(origin, origin.X + dx, origin.Y + dy);
         }
-    }
 
-    class MoveRightCommand : ICommand
-    {
-        public void Execute(Actor actor)
+        public string Message(Actor origin)
         {
-            Game.DungeonMap.SetActorPosition(actor, actor.X + 1, actor.Y);
+            return string.Format("{0} moved to {1}, {2}", origin.Name, origin.X, origin.Y);
         }
     }
 }
