@@ -2,6 +2,7 @@
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using RogueSharp.Random;
 
 namespace Roguelike
 {
@@ -27,22 +28,15 @@ namespace Roguelike
         private static readonly int _inventoryWidth = 20;
         private static RLConsole _inventoryConsole;
 
-        public static DungeonMap DungeonMap { get; private set; }
+        public static DungeonMap Map { get; private set; }
         public static Player Player { get; private set; }
+        public static IRandom Random { get; private set; }
         
-        private static MessageHandler MessageHandler;
+        private static MessageHandler _messageHandler;
         private static bool _update = true;
 
         static void Main(string[] args)
         {
-            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight);
-            DungeonMap = mapGenerator.CreateMap();
-
-            Player = new Player();
-            DungeonMap.UpdatePlayerFov();
-
-            MessageHandler = new MessageHandler(100, 5);
-
             string fontFileName = "terminal8x8.png";
             string consoleTitle = "Roguelike";
 
@@ -51,11 +45,28 @@ namespace Roguelike
             _messageConsole = new RLConsole(_messageWidth, _messageHeight);
             _statConsole = new RLConsole(_statWidth, _statHeight);
             _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
-            
+
             _statConsole.SetBackColor(0, 0, _statWidth, _statHeight, Swatch.DbOldStone);
             _statConsole.Print(1, 1, "Stats", Colors.TextHeading);
             _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
             _inventoryConsole.Print(1, 1, "Inventory", Colors.TextHeading);
+
+            Random = new DotNetRandom();
+
+            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight);
+            Map = mapGenerator.CreateMap();
+
+            Player = new Player();
+
+            while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
+            {
+                Player.X = Random.Next(0, _mapWidth - 1);
+                Player.Y = Random.Next(0, _mapHeight - 1); 
+            }
+
+            Map.UpdatePlayerFov();
+
+            _messageHandler = new MessageHandler(100, 5);
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
@@ -69,7 +80,7 @@ namespace Roguelike
             if (action != null)
             {
                 action.Execute(Player, null);
-                MessageHandler.AddMessage(action.Message(Player));
+                _messageHandler.AddMessage(action.Message(Player));
                 _update = true;
             }
         }
@@ -80,9 +91,9 @@ namespace Roguelike
             {
                 _messageConsole.Clear(0, Swatch.DbDeepWater, RLColor.Green);
                 
-                DungeonMap.Draw(_mapConsole);
-                Player.Draw(_mapConsole, DungeonMap);
-                MessageHandler.Draw(_messageConsole);
+                Map.Draw(_mapConsole);
+                Player.Draw(_mapConsole, Map);
+                _messageHandler.Draw(_messageConsole);
 
                 RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, 0);
                 RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _messageHeight);

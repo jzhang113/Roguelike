@@ -1,20 +1,10 @@
 ﻿using RLNET;
-using Roguelike.Interfaces;
 using RogueSharp;
 
 namespace Roguelike.Core
 {
     class DungeonMap : Map
     {
-        public void Draw(RLConsole mapConsole)
-        {
-            mapConsole.Clear();
-            foreach (Cell cell in GetAllCells())
-            {
-                DrawCell(mapConsole, cell);
-            }
-        }
-
         public bool SetActorPosition(Actor actor, int x, int y)
         {
             if (GetCell(x, y).IsWalkable)
@@ -50,6 +40,16 @@ namespace Roguelike.Core
                 {
                     SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
                 }
+            }
+        }
+
+        public void Draw(RLConsole mapConsole)
+        {
+            mapConsole.Clear();
+
+            foreach (Cell cell in GetAllCells())
+            {
+                DrawCell(mapConsole, cell);
             }
         }
 

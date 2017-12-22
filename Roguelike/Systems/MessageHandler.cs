@@ -29,7 +29,7 @@ namespace Roguelike.Systems
         public void Draw(RLConsole console)
         {
             int maxCount = Math.Min(messages.Count, _viewSize);
-            int yPos = 9;
+            int yPos = console.Height - 2;
 
             for (int i = 0; i < maxCount; i++)
             {

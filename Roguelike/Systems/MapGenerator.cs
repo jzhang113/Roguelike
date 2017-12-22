@@ -1,10 +1,16 @@
 ﻿using Roguelike.Core;
 using RogueSharp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.Systems
 {
     class MapGenerator
     {
+        private static int _minRoomSize = 5;
+        private static int _maxRoomSize = 15;
+
         private readonly int _width;
         private readonly int _height;
         private readonly DungeonMap _map;
@@ -19,22 +25,84 @@ namespace Roguelike.Systems
         public DungeonMap CreateMap()
         {
             _map.Initialize(_width, _height);
-            foreach(Cell cell in _map.GetAllCells())
+            IList<Rectangle> roomList = new List<Rectangle>();
+            int totalArea = _width * _height;
+            int area = 0;
+            int attempts = 0;
+            int x, y, width, height;
+            Rectangle newRoom;
+            bool intersect;
+
+            while (area < 0.6 * totalArea && attempts++ < 1000)
             {
-                _map.SetCellProperties(cell.X, cell.Y, true, true, true);
+                width = Game.Random.Next(_minRoomSize, _maxRoomSize);
+                height = Game.Random.Next(_minRoomSize, _maxRoomSize);
+                x = Game.Random.Next(0, _width - width);
+                y = Game.Random.Next(0, _height - height);
+
+                newRoom = new Rectangle(x, y, width, height);
+                intersect = roomList.Any(room => newRoom.Intersects(room));
+
+                if (!intersect)
+                {
+                    roomList.Add(newRoom);
+                    area += width * height;
+                }
             }
 
-            foreach (Cell cell in _map.GetCellsInRows(0, _height-1))
+            foreach (Rectangle room in roomList)
             {
-                _map.SetCellProperties(cell.X, cell.Y, false, false, true);
+                CreateRoom(room);
             }
 
-            foreach (Cell cell in _map.GetCellsInColumns(0, _width-1))
+            while (roomList.Count > 1)
             {
-                _map.SetCellProperties(cell.X, cell.Y, false, false, true);
+                int index = Game.Random.Next(roomList.Count - 1);
+                Rectangle a = roomList[index];
+                roomList.RemoveAt(index);
+                index = Game.Random.Next(roomList.Count - 1);
+                Rectangle b = roomList[index];
+                roomList.RemoveAt(index);
+
+                int x1 = Game.Random.Next(a.Width) + a.X;
+                int y1 = Game.Random.Next(a.Height) + a.Y;
+
+                int x2 = Game.Random.Next(b.Width) + b.X;
+                int y2 = Game.Random.Next(b.Height) + b.Y;
+
+                int dx = Math.Abs(x1 - x2);
+                int dy = Math.Abs(y1 - y2);
+
+                if (x1 < x2)
+                    CreateRoom(new Rectangle(x1, y1-1, dx, 3));
+                else
+                    CreateRoom(new Rectangle(x2, y2-1, dx, 3));
+
+                if (y1 < y2)
+                    CreateRoom(new Rectangle(x1-1, y1, 3, dy));
+                else
+                    CreateRoom(new Rectangle(x2-1, y2, 3, dy));
             }
 
             return _map;
+        }
+
+        private int Distance(Point a, Point b)
+        {
+            int dx = a.X - b.X;
+            int dy = a.Y - b.Y;
+            return dx * dx + dy * dy;
+        }
+
+        private void CreateRoom(Rectangle rect)
+        {
+            for (int x = rect.Left + 1; x < rect.Right - 1; x++)
+            {
+                for (int y = rect.Top + 1; y < rect.Bottom - 1; y++)
+                {
+                    _map.SetCellProperties(x, y, true, true, true);
+                }
+            }
         }
     }
 }

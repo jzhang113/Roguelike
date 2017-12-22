@@ -15,7 +15,7 @@ namespace Roguelike.Core
 
         public void Execute(Actor origin, Actor target)
         {
-            Game.DungeonMap.SetActorPosition(origin, origin.X + dx, origin.Y + dy);
+            Game.Map.SetActorPosition(origin, origin.X + dx, origin.Y + dy);
         }
 
         public string Message(Actor origin)
