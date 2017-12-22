@@ -1,7 +1,8 @@
 ﻿using RLNET;
+using Roguelike.Core;
 using Roguelike.Interfaces;
 
-namespace Roguelike.Core
+namespace Roguelike.Systems
 {
     class InputHandler
     {
@@ -14,7 +15,7 @@ namespace Roguelike.Core
         private static ICommand moveW = new MoveCommand(-1, 0);
         private static ICommand moveNW = new MoveCommand(-1, -1);
 
-        public ICommand HandleInput(RLRootConsole console)
+        public static ICommand HandleInput(RLRootConsole console)
         {
             RLKeyPress keyPress = console.Keyboard.GetKeyPress();
 

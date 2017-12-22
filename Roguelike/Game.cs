@@ -15,11 +15,11 @@ namespace Roguelike
         private static readonly int _mapWidth = 60;
         private static RLConsole _mapConsole;
 
-        private static readonly int _messageHeight = 10;
+        private static readonly int _messageHeight = 11;
         private static readonly int _messageWidth = 60;
         private static RLConsole _messageConsole;
 
-        private static readonly int _statHeight = 10;
+        private static readonly int _statHeight = 9;
         private static readonly int _statWidth = 60;
         private static RLConsole _statConsole;
 
@@ -29,8 +29,7 @@ namespace Roguelike
 
         public static DungeonMap DungeonMap { get; private set; }
         public static Player Player { get; private set; }
-
-        private static InputHandler InputHandler;
+        
         private static MessageHandler MessageHandler;
         private static bool _update = true;
 
@@ -42,8 +41,7 @@ namespace Roguelike
             Player = new Player();
             DungeonMap.UpdatePlayerFov();
 
-            InputHandler = new InputHandler();
-            MessageHandler = new MessageHandler();
+            MessageHandler = new MessageHandler(100, 5);
 
             string fontFileName = "terminal8x8.png";
             string consoleTitle = "Roguelike";
@@ -54,8 +52,6 @@ namespace Roguelike
             _statConsole = new RLConsole(_statWidth, _statHeight);
             _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
             
-            _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Swatch.DbDeepWater);
-            _messageConsole.Print(1, 1, "Messages", Colors.TextHeading);
             _statConsole.SetBackColor(0, 0, _statWidth, _statHeight, Swatch.DbOldStone);
             _statConsole.Print(1, 1, "Stats", Colors.TextHeading);
             _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
@@ -82,6 +78,8 @@ namespace Roguelike
         {
             if (_update)
             {
+                _messageConsole.Clear(0, Swatch.DbDeepWater, RLColor.Green);
+                
                 DungeonMap.Draw(_mapConsole);
                 Player.Draw(_mapConsole, DungeonMap);
                 MessageHandler.Draw(_messageConsole);

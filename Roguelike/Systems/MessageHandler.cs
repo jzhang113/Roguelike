@@ -1,27 +1,40 @@
 ﻿using RLNET;
-using System.Collections;
 using Roguelike.Core;
+using System;
+using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
     class MessageHandler
     {
-        Queue messages = new Queue();
-        int maxSize = 5;
+        private readonly int _maxSize;
+        private readonly int _viewSize;
+        private readonly IList<string> messages;
 
-        public void AddMessage(string message)
+        public MessageHandler(int maxSize, int viewSize)
         {
-            messages.Enqueue(message);
+            _maxSize = maxSize;
+            _viewSize = viewSize;
+            messages = new List<string>();
+        }
 
-            if (messages.Count > maxSize)
-                messages.Dequeue();
+        public void AddMessage(string text)
+        {
+            messages.Add(text);
+
+            if (messages.Count > _maxSize)
+                messages.RemoveAt(0);
         }
 
         public void Draw(RLConsole console)
         {
-            foreach (string s in messages)
+            int maxCount = Math.Min(messages.Count, _viewSize);
+            int yPos = 9;
+
+            for (int i = 0; i < maxCount; i++)
             {
-                console.Print(0, 0, s, Colors.TextHeading);
+                console.Print(1, yPos, messages[messages.Count - i - 1], Colors.TextHeading);
+                yPos -= 2;
             }
         }
     }
