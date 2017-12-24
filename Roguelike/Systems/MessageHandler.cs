@@ -8,13 +8,11 @@ namespace Roguelike.Systems
     class MessageHandler
     {
         private readonly int _maxSize;
-        private readonly int _viewSize;
         private readonly IList<string> messages;
 
-        public MessageHandler(int maxSize, int viewSize)
+        public MessageHandler(int maxSize)
         {
             _maxSize = maxSize;
-            _viewSize = viewSize;
             messages = new List<string>();
         }
 
@@ -28,7 +26,8 @@ namespace Roguelike.Systems
 
         public void Draw(RLConsole console)
         {
-            int maxCount = Math.Min(messages.Count, _viewSize);
+            int viewSize = (console.Height - 1) / 2;
+            int maxCount = Math.Min(messages.Count, viewSize);
             int yPos = console.Height - 2;
 
             for (int i = 0; i < maxCount; i++)

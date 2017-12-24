@@ -37,8 +37,8 @@ namespace Roguelike.Systems
             {
                 width = Game.Random.Next(_minRoomSize, _maxRoomSize);
                 height = Game.Random.Next(_minRoomSize, _maxRoomSize);
-                x = Game.Random.Next(0, _width - width);
-                y = Game.Random.Next(0, _height - height);
+                x = Game.Random.Next(1, _width - width - 1);
+                y = Game.Random.Next(1, _height - height - 1);
 
                 newRoom = new Rectangle(x, y, width, height);
                 intersect = roomList.Any(room => newRoom.Intersects(room));
@@ -50,19 +50,22 @@ namespace Roguelike.Systems
                 }
             }
 
+            IList<Rectangle> roomListCopy = new List<Rectangle>(roomList.Count);
+
             foreach (Rectangle room in roomList)
             {
                 CreateRoom(room);
-            }
 
-            while (roomList.Count > 1)
+                roomListCopy.Add(new Rectangle(room.X, room.Y, room.Width, room.Height));
+            }
+          
+            while (roomList.Count > 0)
             {
                 int index = Game.Random.Next(roomList.Count - 1);
                 Rectangle a = roomList[index];
                 roomList.RemoveAt(index);
-                index = Game.Random.Next(roomList.Count - 1);
-                Rectangle b = roomList[index];
-                roomList.RemoveAt(index);
+
+                Rectangle b = roomListCopy[Game.Random.Next(roomListCopy.Count - 1)];
 
                 int x1 = Game.Random.Next(a.Width) + a.X;
                 int y1 = Game.Random.Next(a.Height) + a.Y;
@@ -74,14 +77,14 @@ namespace Roguelike.Systems
                 int dy = Math.Abs(y1 - y2);
 
                 if (x1 < x2)
-                    CreateRoom(new Rectangle(x1, y1-1, dx, 3));
+                    CreateRoom(new Rectangle(x1, y1, dx, 1));
                 else
-                    CreateRoom(new Rectangle(x2, y2-1, dx, 3));
+                    CreateRoom(new Rectangle(x2, y2, dx, 1));
 
                 if (y1 < y2)
-                    CreateRoom(new Rectangle(x1-1, y1, 3, dy));
+                    CreateRoom(new Rectangle(x1, y1, 1, dy));
                 else
-                    CreateRoom(new Rectangle(x2-1, y2, 3, dy));
+                    CreateRoom(new Rectangle(x2, y2, 1, dy));
             }
 
             return _map;
@@ -96,9 +99,9 @@ namespace Roguelike.Systems
 
         private void CreateRoom(Rectangle rect)
         {
-            for (int x = rect.Left + 1; x < rect.Right - 1; x++)
+            for (int x = rect.Left; x < rect.Right; x++)
             {
-                for (int y = rect.Top + 1; y < rect.Bottom - 1; y++)
+                for (int y = rect.Top; y < rect.Bottom; y++)
                 {
                     _map.SetCellProperties(x, y, true, true, true);
                 }

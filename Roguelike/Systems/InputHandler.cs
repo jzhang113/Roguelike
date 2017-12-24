@@ -23,13 +23,21 @@ namespace Roguelike.Systems
 
             switch (keyPress.Key)
             {
+                case RLKey.Keypad4:
                 case RLKey.H: return moveW;
+                case RLKey.Keypad2:
                 case RLKey.J: return moveS;
+                case RLKey.Keypad8:
                 case RLKey.K: return moveN;
+                case RLKey.Keypad6:
                 case RLKey.L: return moveE;
+                case RLKey.Keypad7:
                 case RLKey.Y: return moveNW;
+                case RLKey.Keypad9:
                 case RLKey.U: return moveNE;
+                case RLKey.Keypad1:
                 case RLKey.B: return moveSW;
+                case RLKey.Keypad3:
                 case RLKey.N: return moveSE;
                 case RLKey.Escape:
                     console.Close();

@@ -2,71 +2,66 @@
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using Roguelike.Configurations;
 using RogueSharp.Random;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Roguelike
 {
     class Game
     {
-        private static readonly int _screenHeight = 60;
-        private static readonly int _screenWidth = 80;
-        private static RLRootConsole _rootConsole;
-
-        private static readonly int _mapHeight = 40;
-        private static readonly int _mapWidth = 60;
-        private static RLConsole _mapConsole;
-
-        private static readonly int _messageHeight = 11;
-        private static readonly int _messageWidth = 60;
-        private static RLConsole _messageConsole;
-
-        private static readonly int _statHeight = 9;
-        private static readonly int _statWidth = 60;
-        private static RLConsole _statConsole;
-
-        private static readonly int _inventoryHeight = 80;
-        private static readonly int _inventoryWidth = 20;
-        private static RLConsole _inventoryConsole;
-
+        public static Configuration Config { get; private set; }
         public static DungeonMap Map { get; private set; }
         public static Player Player { get; private set; }
         public static IRandom Random { get; private set; }
+
+        private static RLRootConsole _rootConsole;
+        private static RLConsole _mapConsole;
+        private static RLConsole _messageConsole;
+        private static RLConsole _statConsole;
+        private static RLConsole _inventoryConsole;
         
         private static MessageHandler _messageHandler;
         private static bool _update = true;
 
         static void Main(string[] args)
         {
+            Config = new Configuration();
+            new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("config.json")
+                .Build()
+                .Bind(Config);
+
             string fontFileName = "terminal8x8.png";
-            string consoleTitle = "Roguelike";
+            string consoleTitle = "Roguelike";            
 
-            _rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight, 8, 8, 1, consoleTitle);
-            _mapConsole = new RLConsole(_mapWidth, _mapHeight);
-            _messageConsole = new RLConsole(_messageWidth, _messageHeight);
-            _statConsole = new RLConsole(_statWidth, _statHeight);
-            _inventoryConsole = new RLConsole(_inventoryWidth, _inventoryHeight);
-
-            _statConsole.SetBackColor(0, 0, _statWidth, _statHeight, Swatch.DbOldStone);
+            _rootConsole = new RLRootConsole(fontFileName, Config.Screen.Width, Config.Screen.Height, 8, 8, 1, consoleTitle);
+            _mapConsole = new RLConsole(Config.MapView.Width, Config.MapView.Height);
+            _messageConsole = new RLConsole(Config.MessageView.Width, Config.MessageView.Height);
+            _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
+            _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
+            
             _statConsole.Print(1, 1, "Stats", Colors.TextHeading);
-            _inventoryConsole.SetBackColor(0, 0, _inventoryWidth, _inventoryHeight, Swatch.DbWood);
             _inventoryConsole.Print(1, 1, "Inventory", Colors.TextHeading);
 
             Random = new DotNetRandom();
 
-            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight);
+            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height);
             Map = mapGenerator.CreateMap();
 
             Player = new Player();
 
             while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
             {
-                Player.X = Random.Next(0, _mapWidth - 1);
-                Player.Y = Random.Next(0, _mapHeight - 1); 
+                Player.X = Random.Next(0, Config.Map.Width - 1);
+                Player.Y = Random.Next(0, Config.Map.Height - 1); 
             }
 
             Map.UpdatePlayerFov();
 
-            _messageHandler = new MessageHandler(100, 5);
+            _messageHandler = new MessageHandler(Config.MessageMaxCount);
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
@@ -89,16 +84,19 @@ namespace Roguelike
         {
             if (_update)
             {
-                _messageConsole.Clear(0, Swatch.DbDeepWater, RLColor.Green);
-                
+                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
+                _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
+                _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
+                _mapConsole.Clear();
+
                 Map.Draw(_mapConsole);
                 Player.Draw(_mapConsole, Map);
                 _messageHandler.Draw(_messageConsole);
 
-                RLConsole.Blit(_messageConsole, 0, 0, _messageWidth, _messageHeight, _rootConsole, 0, 0);
-                RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _messageHeight);
-                RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, 0, _messageHeight + _mapHeight);
-                RLConsole.Blit(_inventoryConsole, 0, 0, _inventoryWidth, _inventoryHeight, _rootConsole, _mapWidth, 0);
+                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
+                RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
+                RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
+                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
 
                 _rootConsole.Draw();
                 _update = false;

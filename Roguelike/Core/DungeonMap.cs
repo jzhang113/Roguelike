@@ -45,8 +45,6 @@ namespace Roguelike.Core
 
         public void Draw(RLConsole mapConsole)
         {
-            mapConsole.Clear();
-
             foreach (Cell cell in GetAllCells())
             {
                 DrawCell(mapConsole, cell);
