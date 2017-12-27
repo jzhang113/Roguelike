@@ -3,7 +3,7 @@ using RogueSharp;
 
 namespace Roguelike.Interfaces
 {
-    public interface IDrawable
+    interface IDrawable
     {
         RLColor Color { get; set; }
         char Symbol { get; set; }
