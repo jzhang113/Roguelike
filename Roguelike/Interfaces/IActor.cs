@@ -12,7 +12,7 @@
 
         IAction BasicAttack { get; set; }
 
-        void TakeDamage(int damage);
+        int TakeDamage(int damage);
         bool IsDead();
         void TriggerDeath();
     }

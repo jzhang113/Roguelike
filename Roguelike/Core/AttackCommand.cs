@@ -13,12 +13,12 @@ namespace Roguelike.Core
 
         public void Execute(Actor origin, Actor target)
         {
-            attack.Execute(target);
-        }
+            if (target != null)
+            {
+                Game.MessageHandler.AddMessage(origin.Name + " attacked " + target.Name);
+            }
 
-        public string Message(Actor origin)
-        {
-            return string.Format("{0} attacked {1} for {2} damage", origin.Name, origin.X, origin.Y);
+            attack.Execute(target);
         }
     }
 }

@@ -1,34 +1,59 @@
 ﻿using RLNET;
 using RogueSharp;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.Core
 {
     class DungeonMap : Map
     {
-        public bool[][] highlight;
+        public bool[,] highlight;
+        private ICollection<Actor> _units;
 
         public DungeonMap(int width, int height) : base(width, height)
         {
-            highlight = new bool[width][];
+            highlight = new bool[width, height];
+            _units = new List<Actor>();
+        }
 
-            for (int i = 0; i < width; i++)
+        public bool AddActor(Actor unit)
+        {
+            Cell pos = GetCell(unit.X, unit.Y);
+
+            if (pos.IsWalkable)
             {
-                highlight[i] = new bool[height];
+                SetWalkable(pos, false);
+                _units.Add(unit);
+                return true;
             }
+            else
+            {
+                return false;
+            }
+        }
+
+        public Actor GetActor(Cell cell)
+        {
+            return _units.FirstOrDefault(unit => unit.X == cell.X && unit.Y == cell.Y);
+        }
+
+        public bool RemoveActor(Actor unit)
+        {
+            SetWalkable(unit.X, unit.Y, true);
+            return _units.Remove(unit);
         }
 
         public bool SetActorPosition(Actor actor, int x, int y)
         {
-            if (GetCell(x, y).IsWalkable)
+            Cell newPos = GetCell(x, y);
+
+            if (newPos.IsWalkable)
             {
-                Cell oldCell = GetCell(actor.X, actor.Y);
-                SetCellProperties(oldCell.X, oldCell.Y, oldCell.IsTransparent, true, oldCell.IsExplored);
+                SetWalkable(actor.X, actor.Y, true);
 
                 actor.X = x;
                 actor.Y = y;
-
-                Cell newCell = GetCell(actor.X, actor.Y);
-                SetCellProperties(newCell.X, newCell.Y, newCell.IsTransparent, true, newCell.IsExplored);
+                SetWalkable(newPos, false);
 
                 if (actor is Player)
                 {
@@ -60,6 +85,11 @@ namespace Roguelike.Core
             foreach (Cell cell in GetAllCells())
             {
                 DrawCell(mapConsole, cell);
+            }
+
+            foreach (Actor unit in _units)
+            {
+                unit.Draw(mapConsole, this);
             }
         }
 
@@ -93,10 +123,32 @@ namespace Roguelike.Core
                 }
             }
 
-            if (highlight[cell.X][cell.Y])
+            if (highlight[cell.X, cell.Y])
             {
-                mapConsole.SetColor(cell.X, cell.Y, RLColor.Red);
+                mapConsole.SetBackColor(cell.X, cell.Y, RLColor.Red);
             }
+        }
+
+        internal void ClearHighlight()
+        {
+            for (int i = 0; i < Width; i++)
+            {
+                for (int j = 0; j < Height; j++)
+                {
+                    highlight[i, j] = false;
+                }
+            }
+        }
+
+        private void SetWalkable(Cell cell, bool walkable)
+        {
+            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, walkable, cell.IsExplored);
+        }
+
+        private void SetWalkable(int x, int y, bool walkable)
+        {
+            Cell cell = GetCell(x, y);
+            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, walkable, cell.IsExplored);
         }
     }
 }

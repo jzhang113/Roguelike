@@ -33,16 +33,13 @@ namespace Roguelike.Systems
                     {
                         Path shortest = pathFinder.ShortestPath(source, dest);
 
-                        foreach (Cell cell in Game.Map.GetAllCells())
-                        {
-                            Game.Map.highlight[cell.X][cell.Y] = false;
-                        }
+                        Game.Map.ClearHighlight();
 
                         foreach (Cell cell in shortest.Steps)
                         {
                             if (cell.IsExplored)
                             {
-                                Game.Map.highlight[cell.X][cell.Y] = true;
+                                Game.Map.highlight[cell.X, cell.Y] = true;
                             }
                         }
                     }

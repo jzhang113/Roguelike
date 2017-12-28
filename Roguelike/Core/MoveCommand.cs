@@ -23,17 +23,13 @@ namespace Roguelike.Core
             if (newPos.IsWalkable)
             {
                 Game.Map.SetActorPosition(origin, origin.X + dx, origin.Y + dy);
+                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", origin.Name, origin.X, origin.Y));
             }
             else
             {
                 AttackCommand attack = new AttackCommand(origin.BasicAttack);
                 attack.Execute(origin, Game.Map.GetActor(newPos));
             }
-        }
-
-        public string Message(Actor origin)
-        {
-            return string.Format("{0} moved to {1}, {2}", origin.Name, origin.X, origin.Y);
         }
     }
 }

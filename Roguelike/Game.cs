@@ -15,6 +15,7 @@ namespace Roguelike
         public static DungeonMap Map { get; private set; }
         public static Player Player { get; private set; }
         public static IRandom Random { get; private set; }
+        public static MessageHandler MessageHandler { get; private set; }
 
         private static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
@@ -22,7 +23,7 @@ namespace Roguelike
         private static RLConsole _statConsole;
         private static RLConsole _inventoryConsole;
         
-        private static MessageHandler _messageHandler;
+        private static bool _update = true;
 
         static void Main(string[] args)
         {
@@ -70,7 +71,7 @@ namespace Roguelike
                 Map.AddActor(s);
             }
 
-            _messageHandler = new MessageHandler(Config.MessageMaxCount);
+            MessageHandler = new MessageHandler(Config.MessageMaxCount);
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
@@ -79,7 +80,7 @@ namespace Roguelike
 
         internal static void GameOver()
         {
-            _messageHandler.AddMessage("Game Over");
+            MessageHandler.AddMessage("Game Over");
         }
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
@@ -89,26 +90,33 @@ namespace Roguelike
             if (action != null)
             {
                 action.Execute(Player, null);
-                _messageHandler.AddMessage(action.Message(Player));
+                _update = true;
             }
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
-            _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
-            _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
-            _mapConsole.Clear();
+            if (_update)
+            {
+                Map.ClearHighlight();
+
+                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
+                _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
+                _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
+                _mapConsole.Clear();
+                
+                MessageHandler.Draw(_messageConsole);
+
+                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
+                RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
+                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
+
+                _update = false;
+            }
 
             Map.Draw(_mapConsole);
             Player.Draw(_mapConsole, Map);
-            _messageHandler.Draw(_messageConsole);
-
-            RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-            RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
-            RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
-
             _rootConsole.Draw();
         }
     }

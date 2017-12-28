@@ -24,6 +24,12 @@ namespace Roguelike.Systems
                 messages.RemoveAt(0);
         }
 
+        public void AppendMessage(string text)
+        {
+            int prev = messages.Count - 1;
+            messages[prev] += " " + text;
+        }
+
         public void Draw(RLConsole console)
         {
             int viewSize = (console.Height - 1) / 2;

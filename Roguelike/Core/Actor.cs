@@ -21,9 +21,10 @@ namespace Roguelike.Core
         public int X { get; set; }
         public int Y { get; set; }
 
-        public virtual void TakeDamage(int damage)
+        public virtual int TakeDamage(int power)
         {
-            HP -= damage;
+            HP -= power;
+            return power;
         }
 
         public virtual bool IsDead()
