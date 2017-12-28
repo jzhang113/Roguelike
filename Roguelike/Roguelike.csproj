@@ -85,8 +85,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Actor.cs" />
+    <Compile Include="Core\AttackCommand.cs" />
+    <Compile Include="Core\BumpAttack.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\DungeonMap.cs" />
+    <Compile Include="Core\Skeleton.cs" />
+    <Compile Include="Interfaces\IAction.cs" />
     <Compile Include="Systems\InputHandler.cs" />
     <Compile Include="Core\MoveCommand.cs" />
     <Compile Include="Core\Player.cs" />

@@ -54,16 +54,32 @@ namespace Roguelike
             while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
             {
                 Player.X = Random.Next(0, Config.Map.Width - 1);
-                Player.Y = Random.Next(0, Config.Map.Height - 1); 
+                Player.Y = Random.Next(0, Config.Map.Height - 1);
             }
 
             Map.UpdatePlayerFov();
+
+            for (int i = 0; i < 30; i++)
+            {
+                Skeleton s = new Skeleton();
+                while (!Map.GetCell(s.X, s.Y).IsWalkable)
+                {
+                    s.X = Random.Next(0, Config.Map.Width - 1);
+                    s.Y = Random.Next(0, Config.Map.Height - 1);
+                }
+                Map.AddActor(s);
+            }
 
             _messageHandler = new MessageHandler(Config.MessageMaxCount);
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
             _rootConsole.Run();
+        }
+
+        internal static void GameOver()
+        {
+            _messageHandler.AddMessage("Game Over");
         }
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)

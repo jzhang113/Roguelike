@@ -4,10 +4,20 @@
     {
         public Player()
         {
-            Awareness = 15;
+            Awareness = 100;
             Name = "Player";
             Color = Colors.Player;
             Symbol = '@';
+
+            HP = 100;
+            SP = 50;
+            MP = 50;
+            BasicAttack = new BumpAttack(20);
+        }
+
+        public override void TriggerDeath()
+        {
+            Game.GameOver();
         }
     }
 }
