@@ -5,6 +5,18 @@ namespace Roguelike.Core
 {
     class DungeonMap : Map
     {
+        public bool[][] highlight;
+
+        public DungeonMap(int width, int height) : base(width, height)
+        {
+            highlight = new bool[width][];
+
+            for (int i = 0; i < width; i++)
+            {
+                highlight[i] = new bool[height];
+            }
+        }
+
         public bool SetActorPosition(Actor actor, int x, int y)
         {
             if (GetCell(x, y).IsWalkable)
@@ -16,7 +28,7 @@ namespace Roguelike.Core
                 actor.Y = y;
 
                 Cell newCell = GetCell(actor.X, actor.Y);
-                SetCellProperties(newCell.X, newCell.Y, newCell.IsTransparent, false, newCell.IsExplored);
+                SetCellProperties(newCell.X, newCell.Y, newCell.IsTransparent, true, newCell.IsExplored);
 
                 if (actor is Player)
                 {
@@ -79,6 +91,11 @@ namespace Roguelike.Core
                 {
                     mapConsole.Set(cell.X, cell.Y, Colors.Wall, Colors.WallBackground, '#');
                 }
+            }
+
+            if (highlight[cell.X][cell.Y])
+            {
+                mapConsole.SetColor(cell.X, cell.Y, RLColor.Red);
             }
         }
     }

@@ -23,7 +23,6 @@ namespace Roguelike
         private static RLConsole _inventoryConsole;
         
         private static MessageHandler _messageHandler;
-        private static bool _update = true;
 
         static void Main(string[] args)
         {
@@ -34,10 +33,9 @@ namespace Roguelike
                 .Build()
                 .Bind(Config);
 
-            string fontFileName = "terminal8x8.png";
-            string consoleTitle = "Roguelike";            
+            string consoleTitle = "Roguelike";
 
-            _rootConsole = new RLRootConsole(fontFileName, Config.Screen.Width, Config.Screen.Height, 8, 8, 1, consoleTitle);
+            _rootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
             _mapConsole = new RLConsole(Config.MapView.Width, Config.MapView.Height);
             _messageConsole = new RLConsole(Config.MessageView.Width, Config.MessageView.Height);
             _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
@@ -76,31 +74,26 @@ namespace Roguelike
             {
                 action.Execute(Player, null);
                 _messageHandler.AddMessage(action.Message(Player));
-                _update = true;
             }
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            if (_update)
-            {
-                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
-                _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
-                _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
-                _mapConsole.Clear();
+            _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
+            _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
+            _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
+            _mapConsole.Clear();
 
-                Map.Draw(_mapConsole);
-                Player.Draw(_mapConsole, Map);
-                _messageHandler.Draw(_messageConsole);
+            Map.Draw(_mapConsole);
+            Player.Draw(_mapConsole, Map);
+            _messageHandler.Draw(_messageConsole);
 
-                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
-                RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-                RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
-                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
+            RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
+            RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
+            RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
+            RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
 
-                _rootConsole.Draw();
-                _update = false;
-            }
+            _rootConsole.Draw();
         }
     }
 }

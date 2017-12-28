@@ -2,6 +2,8 @@
 {
     class Configuration
     {
+        public string FontName { get; set; }
+        public int FontSize { get; set; }
         public WindowConfig Screen { get; set; }
         public WindowConfig Map { get; set; }
         public WindowConfig MapView { get; set; }

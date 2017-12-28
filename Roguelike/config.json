@@ -1,4 +1,6 @@
 ﻿{
+	"fontName": "terminal8x8.png",
+	"fontSize": 8,
 	"screen": {
 		"height": 60,
 		"width": 80

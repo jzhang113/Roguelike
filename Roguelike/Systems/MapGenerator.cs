@@ -19,7 +19,7 @@ namespace Roguelike.Systems
         {
             _width = width;
             _height = height;
-            _map = new DungeonMap();
+            _map = new DungeonMap(_width, _height);
         }
 
         public DungeonMap CreateMap()
@@ -33,7 +33,7 @@ namespace Roguelike.Systems
             Rectangle newRoom;
             bool intersect;
 
-            while (area < 0.6 * totalArea && attempts++ < 1000)
+            while (area < 0.8 * totalArea && attempts++ < 1000)
             {
                 width = Game.Random.Next(_minRoomSize, _maxRoomSize);
                 height = Game.Random.Next(_minRoomSize, _maxRoomSize);
@@ -50,41 +50,34 @@ namespace Roguelike.Systems
                 }
             }
 
-            IList<Rectangle> roomListCopy = new List<Rectangle>(roomList.Count);
-
             foreach (Rectangle room in roomList)
             {
                 CreateRoom(room);
-
-                roomListCopy.Add(new Rectangle(room.X, room.Y, room.Width, room.Height));
             }
-          
-            while (roomList.Count > 0)
+            
+            for (int i = _map.Width - 2; i > 0; i--)
             {
-                int index = Game.Random.Next(roomList.Count - 1);
-                Rectangle a = roomList[index];
-                roomList.RemoveAt(index);
+                for (int j = _map.Height - 2; j > 0; j--)
+                {
+                    if (!_map.GetCell(i, j).IsWalkable)
+                    {
+                        if (_map.GetCell(i - 1, j).IsWalkable)
+                        {
+                            if (_map.GetCell(i + 1, j).IsWalkable)
+                            {
+                                _map.SetCellProperties(i, j, true, true);
+                            }
+                        }
 
-                Rectangle b = roomListCopy[Game.Random.Next(roomListCopy.Count - 1)];
-
-                int x1 = Game.Random.Next(a.Width) + a.X;
-                int y1 = Game.Random.Next(a.Height) + a.Y;
-
-                int x2 = Game.Random.Next(b.Width) + b.X;
-                int y2 = Game.Random.Next(b.Height) + b.Y;
-
-                int dx = Math.Abs(x1 - x2);
-                int dy = Math.Abs(y1 - y2);
-
-                if (x1 < x2)
-                    CreateRoom(new Rectangle(x1, y1, dx, 1));
-                else
-                    CreateRoom(new Rectangle(x2, y2, dx, 1));
-
-                if (y1 < y2)
-                    CreateRoom(new Rectangle(x1, y1, 1, dy));
-                else
-                    CreateRoom(new Rectangle(x2, y2, 1, dy));
+                        if (_map.GetCell(i, j - 1).IsWalkable)
+                        {
+                            if (_map.GetCell(i, j + 1).IsWalkable)
+                            {
+                                _map.SetCellProperties(i, j, true, true);
+                            }
+                        }
+                    }
+                }
             }
 
             return _map;
@@ -104,6 +97,39 @@ namespace Roguelike.Systems
                 for (int y = rect.Top; y < rect.Bottom; y++)
                 {
                     _map.SetCellProperties(x, y, true, true, true);
+                }
+            }
+        }
+
+        private void CreateHallway(int x1, int y1, int x2, int y2)
+        {
+            int dx = Math.Abs(x1 - x2);
+            int dy = Math.Abs(y1 - y2);
+
+            if (x1 < x2)
+            {
+                if (y1 < y2)
+                {
+                    CreateRoom(new Rectangle(x2 - dx, y2, dx + 1, 1));
+                    CreateRoom(new Rectangle(x1, y1, 1, dy + 1));
+                }
+                else
+                {
+                    CreateRoom(new Rectangle(x1, y1, dx + 1, 1));
+                    CreateRoom(new Rectangle(x2, y2, 1, dy + 1));
+                }
+            }
+            else
+            {
+                if (y1 < y2)
+                {
+                    CreateRoom(new Rectangle(x2, y2, dx + 1, 1));
+                    CreateRoom(new Rectangle(x1, y1, 1, dy + 1));
+                }
+                else
+                {
+                    CreateRoom(new Rectangle(x1 - dx, y1, dx + 1, 1));
+                    CreateRoom(new Rectangle(x2, y2, 1, dy + 1));
                 }
             }
         }

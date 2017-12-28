@@ -8,8 +8,6 @@
             Name = "Player";
             Color = Colors.Player;
             Symbol = '@';
-            X = 10;
-            Y = 10;
         }
     }
 }

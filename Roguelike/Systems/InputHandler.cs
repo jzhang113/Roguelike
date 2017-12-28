@@ -1,4 +1,5 @@
 ﻿using RLNET;
+using RogueSharp;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 
@@ -17,8 +18,42 @@ namespace Roguelike.Systems
 
         public static ICommand HandleInput(RLRootConsole console)
         {
-            RLKeyPress keyPress = console.Keyboard.GetKeyPress();
+            RLMouse click = console.Mouse;
+            Point square = GetClickPosition(click.X, click.Y);
 
+            if (square != null)
+            {
+                Cell source = Game.Map.GetCell(Game.Player.X, Game.Player.Y);
+                Cell dest = Game.Map.GetCell(square.X, square.Y);
+                PathFinder pathFinder = new PathFinder(Game.Map);
+
+                try
+                {
+                    if (source != dest && dest.IsExplored)
+                    {
+                        Path shortest = pathFinder.ShortestPath(source, dest);
+
+                        foreach (Cell cell in Game.Map.GetAllCells())
+                        {
+                            Game.Map.highlight[cell.X][cell.Y] = false;
+                        }
+
+                        foreach (Cell cell in shortest.Steps)
+                        {
+                            if (cell.IsExplored)
+                            {
+                                Game.Map.highlight[cell.X][cell.Y] = true;
+                            }
+                        }
+                    }
+                }
+                catch (PathNotFoundException)
+                {
+                    // do nothing
+                }
+            }
+
+            RLKeyPress keyPress = console.Keyboard.GetKeyPress();
             if (keyPress == null) return null;
 
             switch (keyPress.Key)
@@ -43,6 +78,25 @@ namespace Roguelike.Systems
                     console.Close();
                     return null;
                 default: return null;
+            }
+        }
+
+        private static Point GetClickPosition(int x, int y)
+        {
+            int mapTop = Game.Config.MessageView.Height;
+            int mapBottom = Game.Config.MessageView.Height + Game.Config.MapView.Height;
+            int mapLeft = 0;
+            int mapRight = Game.Config.MapView.Width;
+            
+            if (x > mapLeft && x < mapRight && y > mapTop && y < mapBottom)
+            {
+                int xPos = (x - mapLeft);
+                int yPos = (y - mapTop);
+                return new Point(xPos, yPos);
+            }
+            else
+            {
+                return null;
             }
         }
     }
