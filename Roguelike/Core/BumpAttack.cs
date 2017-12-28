@@ -2,11 +2,11 @@
 
 namespace Roguelike.Core
 {
-    class Attack : IAction
+    class AttackAction : IAction
     {
         private int power;
 
-        public Attack(int power)
+        public AttackAction(int power)
         {
             this.power = power;
         }

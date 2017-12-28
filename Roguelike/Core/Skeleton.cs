@@ -12,7 +12,7 @@
             HP = 50;
             SP = 20;
             MP = 20;
-            BasicAttack = new Attack(10);
+            BasicAttack = new AttackAction(10);
         }
     }
 }
