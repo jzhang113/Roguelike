@@ -14,21 +14,25 @@ namespace Roguelike.Core
             this.dy = dy;
         }
 
-        public void Execute(Actor origin, Actor target)
+        public IAction Execute(Actor source, Actor target)
         {
-            int newX = origin.X + dx;
-            int newY = origin.Y + dy;
+            int newX = source.X + dx;
+            int newY = source.Y + dy;
             Cell newPos = Game.Map.GetCell(newX, newY);
 
             if (newPos.IsWalkable)
             {
-                Game.Map.SetActorPosition(origin, origin.X + dx, origin.Y + dy);
-                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", origin.Name, origin.X, origin.Y));
+                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", source.Name, source.X, source.Y));
+                return new MoveAction(Game.Player, source.X + dx, source.Y + dy);
             }
             else
             {
-                AttackCommand attack = new AttackCommand(origin.BasicAttack);
-                attack.Execute(origin, Game.Map.GetActor(newPos));
+                target = Game.Map.GetActor(newPos);
+
+                if (target != null)
+                    Game.MessageHandler.AddMessage(source.Name + " attacked " + target.Name);
+
+                return new AttackAction(source, target, 20, 10);
             }
         }
     }

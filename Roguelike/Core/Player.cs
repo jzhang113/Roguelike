@@ -12,7 +12,6 @@
             HP = 100;
             SP = 50;
             MP = 50;
-            BasicAttack = new AttackAction(20);
         }
 
         public override void TriggerDeath()

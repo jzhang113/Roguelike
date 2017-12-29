@@ -1,15 +1,33 @@
 ﻿using Roguelike.Interfaces;
-using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
     class EventScheduler
     {
-        Queue<IAction> eventQueue = new Queue<IAction>();
+        private MinHeap _eventSet;
 
-        public void Schedule(IAction action, double time)
+        public EventScheduler(int size)
         {
-            eventQueue.Enqueue(action);
+            _eventSet = new MinHeap(size);
+        }
+
+        public void Schedule(IAction action)
+        {
+            _eventSet.Add(action);
+        }
+
+        public bool Update()
+        {
+            if (!_eventSet.IsEmpty())
+            {
+                IAction action = _eventSet.GetMin();
+                action.Execute();
+                _eventSet.UpdateAllActions(action.Time);
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

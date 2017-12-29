@@ -85,9 +85,10 @@
   <ItemGroup>
     <Compile Include="Core\Actor.cs" />
     <Compile Include="Core\AttackCommand.cs" />
-    <Compile Include="Core\BumpAttack.cs" />
+    <Compile Include="Core\AttackAction.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\DungeonMap.cs" />
+    <Compile Include="Core\MoveAction.cs" />
     <Compile Include="Core\Skeleton.cs" />
     <Compile Include="Interfaces\IAction.cs" />
     <Compile Include="Systems\EventScheduler.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Systems\MapGenerator.cs" />
     <Compile Include="Systems\MessageHandler.cs" />
     <Compile Include="Configurations\COnfiguration.cs" />
+    <Compile Include="Systems\MinHeap.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -23,7 +23,8 @@ namespace Roguelike
         private static RLConsole _statConsole;
         private static RLConsole _inventoryConsole;
         
-        private static bool _update = true;
+        private static bool _render = true;
+        private static EventScheduler _eventScheduler;
 
         static void Main(string[] args)
         {
@@ -72,6 +73,7 @@ namespace Roguelike
             }
 
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
+            _eventScheduler = new EventScheduler(20);
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
@@ -88,15 +90,15 @@ namespace Roguelike
             ICommand action = InputHandler.HandleInput(_rootConsole);
 
             if (action != null)
-            {
-                action.Execute(Player, null);
-                _update = true;
-            }
+                _eventScheduler.Schedule(action.Execute(Player, null));
+
+            if (_eventScheduler.Update())
+                _render = true;
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            if (_update)
+            if (_render)
             {
                 Map.ClearHighlight();
 
@@ -111,7 +113,7 @@ namespace Roguelike
                 RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
                 RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
 
-                _update = false;
+                _render = false;
             }
 
             Map.Draw(_mapConsole);

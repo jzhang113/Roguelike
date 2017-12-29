@@ -2,6 +2,8 @@
 {
     interface IAction
     {
-        void Execute(IActor target);
+        int Time { get; set; }
+        
+        void Execute();
     }
 }
