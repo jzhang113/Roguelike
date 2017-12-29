@@ -10,7 +10,12 @@
         int SP { get; set; }
         int MP { get; set; }
 
-        IAction BasicAttack { get; set; }
+        int STR { get; set; }
+        int DEX { get; set; }
+        int DEF { get; set; }
+        int INT { get; set; }
+
+        ISkill BasicAttack { get; set; }
 
         int TakeDamage(int damage);
         bool IsDead();

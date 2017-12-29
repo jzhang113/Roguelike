@@ -6,17 +6,22 @@ namespace Roguelike.Core
     {
         private int _power;
         private IActor _target;
+        private ISkill _skill;
+
         public int Time { get; set; }
 
-        public AttackAction(IActor source, IActor target, int power, int time)
+        public AttackAction(IActor source, IActor target, ISkill attack)
         {
-            _power = power;
+            _skill = attack;
+            _power = attack.Power + source.STR;
+            Time = attack.Speed - source.Speed;
             _target = target;
-            Time = time;
         }
 
         public void Execute()
         {
+            _skill.Activate();
+
             if (_target != null)
             {
                 int damage = _target.TakeDamage(_power);

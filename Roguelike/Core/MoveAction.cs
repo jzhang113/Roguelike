@@ -17,9 +17,6 @@ namespace Roguelike.Core
             _actor = source;
         }
 
-        public void Execute()
-        {
-            Game.Map.SetActorPosition(_actor, _newX, _newY);
-        }
+        public void Execute() => Game.Map.SetActorPosition(_actor, _newX, _newY);
     }
 }

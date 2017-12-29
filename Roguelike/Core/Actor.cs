@@ -14,27 +14,25 @@ namespace Roguelike.Core
         public int SP { get; set; }
         public int MP { get; set; }
 
-        public IAction BasicAttack { get; set; }
+        public int STR { get; set; }
+        public int DEX { get; set; }
+        public int DEF { get; set; }
+        public int INT { get; set; }
+
+        public ISkill BasicAttack { get; set; }
 
         public RLColor Color { get; set; }
         public char Symbol { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
 
+        public virtual bool IsDead() => HP < 0;
+        public virtual void TriggerDeath() => Game.Map.RemoveActor(this);
+
         public virtual int TakeDamage(int power)
         {
             HP -= power;
             return power;
-        }
-
-        public virtual bool IsDead()
-        {
-            return (HP < 0) ? true : false;
-        }
-
-        public virtual void TriggerDeath()
-        {
-            Game.Map.RemoveActor(this);
         }
 
         public void Draw(RLConsole console, IMap map)

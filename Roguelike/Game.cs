@@ -6,6 +6,7 @@ using Roguelike.Configurations;
 using RogueSharp.Random;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using System;
 
 namespace Roguelike
 {
@@ -85,12 +86,17 @@ namespace Roguelike
             MessageHandler.AddMessage("Game Over");
         }
 
+        internal static void Exit()
+        {
+            _rootConsole.Close();
+        }
+
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
             ICommand action = InputHandler.HandleInput(_rootConsole);
 
             if (action != null)
-                _eventScheduler.Schedule(action.Execute(Player, null));
+                _eventScheduler.Schedule(action.Resolve(Player, null));
 
             if (_eventScheduler.Update())
                 _render = true;

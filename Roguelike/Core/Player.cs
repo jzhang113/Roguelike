@@ -12,11 +12,9 @@
             HP = 100;
             SP = 50;
             MP = 50;
+            BasicAttack = new DamageSkill();
         }
 
-        public override void TriggerDeath()
-        {
-            Game.GameOver();
-        }
+        public override void TriggerDeath() => Game.GameOver();
     }
 }

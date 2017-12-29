@@ -44,10 +44,7 @@ namespace Roguelike.Systems
             }
         }
 
-        public bool IsEmpty()
-        {
-            return _heapSize == 0;
-        }
+        public bool IsEmpty() => _heapSize == 0;
 
         private void ReheapUp(IAction item)
         {

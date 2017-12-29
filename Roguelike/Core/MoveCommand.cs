@@ -14,7 +14,7 @@ namespace Roguelike.Core
             this.dy = dy;
         }
 
-        public IAction Execute(Actor source, Actor target)
+        public IAction Resolve(Actor source, Actor target)
         {
             int newX = source.X + dx;
             int newY = source.Y + dy;
@@ -32,7 +32,7 @@ namespace Roguelike.Core
                 if (target != null)
                     Game.MessageHandler.AddMessage(source.Name + " attacked " + target.Name);
 
-                return new AttackAction(source, target, 20, 10);
+                return new AttackAction(source, target, source.BasicAttack);
             }
         }
     }

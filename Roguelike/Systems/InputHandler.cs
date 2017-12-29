@@ -72,7 +72,7 @@ namespace Roguelike.Systems
                 case RLKey.Keypad3:
                 case RLKey.N: return moveSE;
                 case RLKey.Escape:
-                    console.Close();
+                    Game.Exit();
                     return null;
                 default: return null;
             }
