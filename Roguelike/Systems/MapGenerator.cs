@@ -1,5 +1,6 @@
 ﻿using Roguelike.Core;
 using RogueSharp;
+using RogueSharp.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Roguelike.Systems
             _map = new DungeonMap(_width, _height);
         }
 
-        public DungeonMap CreateMap()
+        public DungeonMap CreateMap(Random random)
         {
             _map.Initialize(_width, _height);
             IList<Rectangle> roomList = new List<Rectangle>();
@@ -35,10 +36,10 @@ namespace Roguelike.Systems
 
             while (area < 0.8 * totalArea && attempts++ < 1000)
             {
-                width = Game.Random.Next(_minRoomSize, _maxRoomSize);
-                height = Game.Random.Next(_minRoomSize, _maxRoomSize);
-                x = Game.Random.Next(1, _width - width - 1);
-                y = Game.Random.Next(1, _height - height - 1);
+                width = random.Next(_minRoomSize, _maxRoomSize);
+                height = random.Next(_minRoomSize, _maxRoomSize);
+                x = random.Next(1, _width - width - 1);
+                y = random.Next(1, _height - height - 1);
 
                 newRoom = new Rectangle(x, y, width, height);
                 intersect = roomList.Any(room => newRoom.Intersects(room));

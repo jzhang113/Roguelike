@@ -15,7 +15,6 @@ namespace Roguelike
         public static Configuration Config { get; private set; }
         public static DungeonMap Map { get; private set; }
         public static Player Player { get; private set; }
-        public static IRandom Random { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
 
         private static RLRootConsole _rootConsole;
@@ -47,10 +46,24 @@ namespace Roguelike
             _statConsole.Print(1, 1, "Stats", Colors.TextHeading);
             _inventoryConsole.Print(1, 1, "Inventory", Colors.TextHeading);
 
-            Random = new DotNetRandom();
+            //int seed = (int) DateTime.Now.Ticks;
+            int seed = 2127758832;
+            Random Random = new Random(seed);
+            int[] mapSeeds = new int[30];
+
+            using (StreamWriter writer = new StreamWriter("log"))
+            {
+                writer.WriteLine(seed);
+
+                for (int i = 0; i < mapSeeds.Length; i++)
+                {
+                    mapSeeds[i] = Random.Next();
+                    writer.WriteLine(mapSeeds[i]);
+                }
+            }
 
             MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height);
-            Map = mapGenerator.CreateMap();
+            Map = mapGenerator.CreateMap(new Random(mapSeeds[0]));
 
             Player = new Player();
 
