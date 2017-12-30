@@ -3,7 +3,6 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 using Roguelike.Configurations;
-using RogueSharp.Random;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;

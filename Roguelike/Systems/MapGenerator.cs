@@ -9,8 +9,8 @@ namespace Roguelike.Systems
 {
     class MapGenerator
     {
-        private static int _minRoomSize = 5;
-        private static int _maxRoomSize = 15;
+        private readonly int _minRoomSize = 5;
+        private readonly int _maxRoomSize = 15;
 
         private readonly int _width;
         private readonly int _height;

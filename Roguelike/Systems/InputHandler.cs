@@ -7,15 +7,6 @@ namespace Roguelike.Systems
 {
     class InputHandler
     {
-        private static ICommand moveN = new MoveCommand(0, -1);
-        private static ICommand moveNE = new MoveCommand(1, -1);
-        private static ICommand moveE = new MoveCommand(1, 0);
-        private static ICommand moveSE = new MoveCommand(1, 1);
-        private static ICommand moveS = new MoveCommand(0, 1);
-        private static ICommand moveSW = new MoveCommand(-1, 1);
-        private static ICommand moveW = new MoveCommand(-1, 0);
-        private static ICommand moveNW = new MoveCommand(-1, -1);
-
         public static ICommand HandleInput(RLRootConsole console)
         {
             RLMouse click = console.Mouse;
@@ -56,21 +47,21 @@ namespace Roguelike.Systems
             switch (keyPress.Key)
             {
                 case RLKey.Keypad4:
-                case RLKey.H: return moveW;
+                case RLKey.H: return Move.W;
                 case RLKey.Keypad2:
-                case RLKey.J: return moveS;
+                case RLKey.J: return Move.S;
                 case RLKey.Keypad8:
-                case RLKey.K: return moveN;
+                case RLKey.K: return Move.N;
                 case RLKey.Keypad6:
-                case RLKey.L: return moveE;
+                case RLKey.L: return Move.E;
                 case RLKey.Keypad7:
-                case RLKey.Y: return moveNW;
+                case RLKey.Y: return Move.NW;
                 case RLKey.Keypad9:
-                case RLKey.U: return moveNE;
+                case RLKey.U: return Move.NE;
                 case RLKey.Keypad1:
-                case RLKey.B: return moveSW;
+                case RLKey.B: return Move.SW;
                 case RLKey.Keypad3:
-                case RLKey.N: return moveSE;
+                case RLKey.N: return Move.SE;
                 case RLKey.Escape:
                     Game.Exit();
                     return null;
