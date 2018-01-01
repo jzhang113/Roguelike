@@ -2,6 +2,8 @@
 using RogueSharp;
 using Roguelike.Core;
 using Roguelike.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.Systems
 {
@@ -10,34 +12,31 @@ namespace Roguelike.Systems
         public static ICommand HandleInput(RLRootConsole console)
         {
             RLMouse click = console.Mouse;
+            DungeonMap map = Game.Map;
             Point square = GetClickPosition(click.X, click.Y);
 
             if (square != null)
             {
-                Cell source = Game.Map.GetCell(Game.Player.X, Game.Player.Y);
-                Cell dest = Game.Map.GetCell(square.X, square.Y);
-                PathFinder pathFinder = new PathFinder(Game.Map);
+                map.ClearHighlight();
+                Cell current = map.GetCell(square.X, square.Y);
+                IEnumerable<Point> path = map.PathToPlayer(square.X, square.Y);
 
-                try
+                if (current.IsWalkable)
+                    Game.Map.Highlight[square.X, square.Y] = true;
+
+                foreach (Point p in path)
                 {
-                    if (source != dest && dest.IsExplored)
-                    {
-                        Path shortest = pathFinder.ShortestPath(source, dest);
-
-                        Game.Map.ClearHighlight();
-
-                        foreach (Cell cell in shortest.Steps)
-                        {
-                            if (cell.IsExplored)
-                            {
-                                Game.Map.highlight[cell.X, cell.Y] = true;
-                            }
-                        }
-                    }
+                    Game.Map.Highlight[p.X, p.Y] = true;                    
                 }
-                catch (PathNotFoundException)
+
+                if (click.GetLeftClick())
                 {
-                    // do nothing
+                    foreach (Point p in path.Reverse())
+                    {
+                        Game.EventScheduler.Schedule(new MoveAction(Game.Player, p.X, p.Y));
+                        // Game.EventScheduler.Update();
+                        // System.Threading.Thread.Sleep(500);
+                    }
                 }
             }
 
@@ -47,21 +46,21 @@ namespace Roguelike.Systems
             switch (keyPress.Key)
             {
                 case RLKey.Keypad4:
-                case RLKey.H: return Move.W;
+                case RLKey.H: return Move.MoveW;
                 case RLKey.Keypad2:
-                case RLKey.J: return Move.S;
+                case RLKey.J: return Move.MoveS;
                 case RLKey.Keypad8:
-                case RLKey.K: return Move.N;
+                case RLKey.K: return Move.MoveN;
                 case RLKey.Keypad6:
-                case RLKey.L: return Move.E;
+                case RLKey.L: return Move.MoveE;
                 case RLKey.Keypad7:
-                case RLKey.Y: return Move.NW;
+                case RLKey.Y: return Move.MoveNW;
                 case RLKey.Keypad9:
-                case RLKey.U: return Move.NE;
+                case RLKey.U: return Move.MoveNE;
                 case RLKey.Keypad1:
-                case RLKey.B: return Move.SW;
+                case RLKey.B: return Move.MoveSW;
                 case RLKey.Keypad3:
-                case RLKey.N: return Move.SE;
+                case RLKey.N: return Move.MoveSE;
                 case RLKey.Escape:
                     Game.Exit();
                     return null;
@@ -76,7 +75,7 @@ namespace Roguelike.Systems
             int mapLeft = 0;
             int mapRight = Game.Config.MapView.Width;
             
-            if (x > mapLeft && x < mapRight && y > mapTop && y < mapBottom)
+            if (x > mapLeft && x < mapRight - 1 && y > mapTop && y < mapBottom - 1)
             {
                 int xPos = (x - mapLeft);
                 int yPos = (y - mapTop);

@@ -20,6 +20,7 @@ namespace Roguelike.Core
         public int INT { get; set; }
 
         public ISkill BasicAttack { get; set; }
+        public int QueuedTime { get; set; }
 
         public RLColor Color { get; set; }
         public char Symbol { get; set; }

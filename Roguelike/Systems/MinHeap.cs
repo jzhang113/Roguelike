@@ -24,19 +24,31 @@ namespace Roguelike.Systems
                 Resize();
 
             _heap[_heapSize++] = item;
-            ReheapUp(item);
+            ReheapUp();
+        }
+
+        public void Cancel(IActor actor)
+        {
+            for (int i = 0; i < _heapSize; i++)
+            {
+                if (_heap[i].Source == actor)
+                {
+                    _heap[i] = _heap[--_heapSize];
+                    ReheapDown(i);
+                }
+            }
         }
 
         public IAction GetMin()
         {
             IAction item = _heap[0];
             _heap[0] = _heap[--_heapSize];
-            ReheapDown(item);
+            ReheapDown(0);
 
             return item;
         }
 
-        public void UpdateAllActions(int dt)
+        public void UpdateAllActions(int dt, IActor actor)
         {
             for (int i = 0; i < _heapSize; i++)
             {
@@ -46,41 +58,49 @@ namespace Roguelike.Systems
 
         public bool IsEmpty() => _heapSize == 0;
 
-        private void ReheapUp(IAction item)
+        private void ReheapUp()
         {
             int pos = _heapSize - 1;
+            IAction item = _heap[pos];
 
-            while (pos > 1 && _heap[pos].Time > _heap[pos/2].Time)
+            while (pos > 0 && item.Time < _heap[(pos-1)/2].Time)
             {
-                _heap[pos] = _heap[pos / 2];
-                pos /= 2;
+                _heap[pos] = _heap[(pos-1)/2];
+                pos = (pos-1)/2;
             }
 
             _heap[pos] = item;
         }
 
-        private void ReheapDown(IAction item)
+        private void ReheapDown(int initial)
         {
-            int pos = 0;
+            int pos = initial;
+            IAction item = _heap[pos];
 
             while (pos < _heapSize)
             {
                 int left = 2 * pos + 1;
                 int right = 2 * pos + 2;
+                int swap = pos;
+                IAction tempItem = item;
 
-                if (left < _heapSize && _heap[left].Time > _heap[pos].Time)
+                if (left < _heapSize && tempItem.Time > _heap[left].Time)
                 {
-                    _heap[pos] = _heap[left];
-                    pos = left;
+                    swap = left;
+                    tempItem = _heap[swap];
                 }
-                else if (right < _heapSize && _heap[right].Time > _heap[pos].Time)
+
+                if (right < _heapSize && tempItem.Time > _heap[right].Time)
+                    swap = right;
+
+                if (swap == pos)
                 {
-                    _heap[pos] = _heap[right];
-                    pos = right;
+                    break;
                 }
                 else
                 {
-                    break;
+                    _heap[pos] = _heap[swap];
+                    pos = swap;
                 }
             }
 

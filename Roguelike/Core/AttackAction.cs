@@ -4,18 +4,21 @@ namespace Roguelike.Core
 {
     class AttackAction : IAction
     {
+        public IActor Source { get; }
+        public int Time { get; set; }
+
         private int _power;
         private IActor _target;
         private ISkill _skill;
-
-        public int Time { get; set; }
 
         public AttackAction(IActor source, IActor target, ISkill attack)
         {
             _skill = attack;
             _power = attack.Power + source.STR;
-            Time = attack.Speed - source.Speed;
             _target = target;
+
+            Source = source;
+            Time = attack.Speed - source.Speed + source.QueuedTime;
         }
 
         public void Execute()

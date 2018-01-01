@@ -14,7 +14,7 @@ namespace Roguelike.Core
             this.dy = dy;
         }
 
-        public IAction Resolve(Actor source, Actor target)
+        public IAction Resolve(IActor source, IActor target)
         {
             int newX = source.X + dx;
             int newY = source.Y + dy;

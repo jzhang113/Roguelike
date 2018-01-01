@@ -23,7 +23,7 @@ namespace Roguelike
         private static RLConsole _inventoryConsole;
         
         private static bool _render = true;
-        private static EventScheduler _eventScheduler;
+        public static EventScheduler EventScheduler { get; private set; }
 
         static void Main(string[] args)
         {
@@ -65,14 +65,15 @@ namespace Roguelike
             Map = mapGenerator.CreateMap(new Random(mapSeeds[0]));
 
             Player = new Player();
+            int playerX, playerY;
 
-            while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
+            do
             {
-                Player.X = Random.Next(0, Config.Map.Width - 1);
-                Player.Y = Random.Next(0, Config.Map.Height - 1);
-            }
+                playerX = Random.Next(0, Config.Map.Width - 1);
+                playerY = Random.Next(0, Config.Map.Height - 1);
+            } while (!Map.GetCell(playerX, playerY).IsWalkable);
 
-            Map.UpdatePlayerFov();
+            Map.SetActorPosition(Player, playerX, playerY);
 
             for (int i = 0; i < 30; i++)
             {
@@ -86,7 +87,7 @@ namespace Roguelike
             }
 
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
-            _eventScheduler = new EventScheduler(20);
+            EventScheduler = new EventScheduler(20);
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
@@ -108,9 +109,9 @@ namespace Roguelike
             ICommand action = InputHandler.HandleInput(_rootConsole);
 
             if (action != null)
-                _eventScheduler.Schedule(action.Resolve(Player, null));
+                EventScheduler.Schedule(action.Resolve(Player, null));
 
-            if (_eventScheduler.Update())
+            if (EventScheduler.Update())
                 _render = true;
         }
 
@@ -137,7 +138,7 @@ namespace Roguelike
             Map.Draw(_mapConsole);
             Player.Draw(_mapConsole, Map);
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-            _rootConsole.Draw();
+           _rootConsole.Draw();
         }
     }
 }

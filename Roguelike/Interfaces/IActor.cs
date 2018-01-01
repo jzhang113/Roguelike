@@ -5,6 +5,8 @@
         string Name { get; set; }
         int Awareness { get; set; }
         int Speed { get; set; }
+        int X { get; set; }
+        int Y { get; set; }
 
         int HP { get; set; }
         int SP { get; set; }
@@ -16,6 +18,7 @@
         int INT { get; set; }
 
         ISkill BasicAttack { get; set; }
+        int QueuedTime { get; set; }
 
         int TakeDamage(int damage);
         bool IsDead();

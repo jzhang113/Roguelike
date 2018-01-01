@@ -4,19 +4,21 @@ namespace Roguelike.Core
 {
     class MoveAction : IAction
     {
-        private int _newX;
-        private int _newY;
-        private Actor _actor;
-
+        public IActor Source { get; }
         public int Time { get; set; }
 
-        public MoveAction(Actor source, int x, int y)
+        private int _newX;
+        private int _newY;
+
+        public MoveAction(IActor source, int x, int y)
         {
             _newX = x;
             _newY = y;
-            _actor = source;
+            Source = source;
+
+            Time = source.QueuedTime + 50;
         }
 
-        public void Execute() => Game.Map.SetActorPosition(_actor, _newX, _newY);
+        public void Execute() => Game.Map.SetActorPosition(Source, _newX, _newY);
     }
 }

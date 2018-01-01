@@ -4,6 +4,6 @@ namespace Roguelike.Interfaces
 {
     interface ICommand
     {
-        IAction Resolve(Actor origin, Actor target);
+        IAction Resolve(IActor origin, IActor target);
     }
 }

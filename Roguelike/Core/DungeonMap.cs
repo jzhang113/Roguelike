@@ -1,4 +1,6 @@
 ﻿using RLNET;
+using Roguelike.Interfaces;
+using Roguelike.Systems;
 using RogueSharp;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +9,15 @@ namespace Roguelike.Core
 {
     class DungeonMap : Map
     {
-        public bool[,] highlight;
+        public bool[,] Highlight { get; set; }
+        public float[,] PlayerDistance { get; set; }
+
         private ICollection<Actor> _units;
 
         public DungeonMap(int width, int height) : base(width, height)
         {
-            highlight = new bool[width, height];
+            Highlight = new bool[width, height];
+            PlayerDistance = new float[width, height];
             _units = new List<Actor>();
         }
 
@@ -43,7 +48,7 @@ namespace Roguelike.Core
             return _units.Remove(unit);
         }
 
-        public bool SetActorPosition(Actor actor, int x, int y)
+        public bool SetActorPosition(IActor actor, int x, int y)
         {
             Cell newPos = GetCell(x, y);
 
@@ -58,6 +63,7 @@ namespace Roguelike.Core
                 if (actor is Player)
                 {
                     UpdatePlayerFov();
+                    UpdatePlayerMaps();
                 }
 
                 return true;
@@ -66,18 +72,35 @@ namespace Roguelike.Core
             return false;
         }
 
-        public void UpdatePlayerFov()
+        public IEnumerable<Point> PathToPlayer(int x, int y)
         {
-            Player player = Game.Player;
-            ComputeFov(player.X, player.Y, player.Awareness, true);
+            int nextX = x;
+            int nextY = y;
+            float nearest = PlayerDistance[x, y];
 
-            foreach (Cell cell in GetAllCells())
+            do
             {
-                if (IsInFov(cell.X, cell.Y))
+                if (nearest < 1.5f)
+                    break;
+
+                x = nextX;
+                y = nextY;
+
+                foreach (WeightedPoint dir in Move.Directions)
                 {
-                    SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+                    int newX = x + dir.X;
+                    int newY = y + dir.Y;
+
+                    if (PlayerDistance[newX, newY] < nearest)
+                    {
+                        nextX = newX;
+                        nextY = newY;
+                        nearest = PlayerDistance[newX, newY];
+                    }
                 }
-            }
+
+                yield return new Point(nextX, nextY);
+            } while (nearest != PlayerDistance[x, y]);
         }
 
         public void Draw(RLConsole mapConsole)
@@ -105,6 +128,8 @@ namespace Roguelike.Core
                 if (cell.IsWalkable)
                 {
                     mapConsole.Set(cell.X, cell.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
+                    
+                    mapConsole.SetColor(cell.X, cell.Y, new RLColor(PlayerDistance[cell.X, cell.Y], 0, 0));
                 }
                 else
                 {
@@ -123,7 +148,7 @@ namespace Roguelike.Core
                 }
             }
 
-            if (highlight[cell.X, cell.Y])
+            if (Highlight[cell.X, cell.Y])
             {
                 mapConsole.SetBackColor(cell.X, cell.Y, RLColor.Red);
             }
@@ -131,11 +156,59 @@ namespace Roguelike.Core
 
         internal void ClearHighlight()
         {
-            for (int i = 0; i < Width; i++)
+            for (int x = 0; x < Width; x++)
             {
-                for (int j = 0; j < Height; j++)
+                for (int y = 0; y < Height; y++)
                 {
-                    highlight[i, j] = false;
+                    Highlight[x, y] = false;
+                }
+            }
+        }
+
+        private void UpdatePlayerFov()
+        {
+            Player player = Game.Player;
+            ComputeFov(player.X, player.Y, player.Awareness, true);
+
+            foreach (Cell cell in GetAllCells())
+            {
+                if (IsInFov(cell.X, cell.Y))
+                {
+                    SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+                }
+            }
+        }
+
+        private void UpdatePlayerMaps()
+        {
+            Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
+            bool[,] visited = new bool[Width, Height];
+            goals.Enqueue(new WeightedPoint(Game.Player.X, Game.Player.Y));
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    PlayerDistance[x, y] = float.MaxValue;
+                }
+            }
+
+            while (goals.Count > 0)
+            {
+                WeightedPoint p = goals.Dequeue();
+
+                foreach (WeightedPoint dir in Move.Directions)
+                {
+                    int newX = p.X + dir.X;
+                    int newY = p.Y + dir.Y;
+                    float newWeight = p.Weight + dir.Weight;
+
+                    if (GetCell(newX, newY).IsWalkable && (!visited[newX, newY] || newWeight < PlayerDistance[newX, newY]))
+                    {
+                        visited[newX, newY] = true;
+                        PlayerDistance[newX, newY] = newWeight;
+                        goals.Enqueue(new WeightedPoint(newX, newY, newWeight));
+                    }
                 }
             }
         }

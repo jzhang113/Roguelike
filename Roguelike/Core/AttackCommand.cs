@@ -11,7 +11,7 @@ namespace Roguelike.Core
             _attack = attack;
         }
 
-        public IAction Resolve(Actor origin, Actor target)
+        public IAction Resolve(IActor origin, IActor target)
         {
             if (target != null)
             {
