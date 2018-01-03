@@ -22,6 +22,7 @@ namespace Roguelike.Core
 
         public ISkill BasicAttack { get; set; }
         public int QueuedTime { get; set; }
+        public State State { get; set; }
 
         public RLColor Color { get; set; }
         public char Symbol { get; set; }
@@ -55,7 +56,8 @@ namespace Roguelike.Core
             }
             else
             {
-                console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
+                //console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
+                console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
             }
         }
     }

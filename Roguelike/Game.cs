@@ -104,14 +104,31 @@ namespace Roguelike
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            foreach (Actor unit in Map.Units)
+            bool acted = false;
+
+            if (Player.CanAct)
             {
-                if (unit.CanAct)
+                IEnumerable<IAction> actions = Player.Act();
+
+                foreach (IAction act in actions) {
+                    acted = true;
+                    EventScheduler.Schedule(act);
+                }
+            }
+            
+            if (acted)
+            {
+                Map.ClearHighlight();
+
+                foreach (Actor unit in Map.Units)
                 {
-                    IEnumerable<IAction> actions = unit.Act();
-                    
-                    foreach (IAction act in actions)
-                        EventScheduler.Schedule(act);
+                    if (unit.CanAct)
+                    {
+                        IEnumerable<IAction> actions = unit.Act();
+
+                        foreach (IAction act in actions)
+                            EventScheduler.Schedule(act);
+                    }
                 }
             }
 
@@ -121,13 +138,13 @@ namespace Roguelike
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            //_mapConsole.Clear();
+            _mapConsole.Clear();
             Map.Draw(_mapConsole);
             Player.Draw(_mapConsole, Map);
 
             if (_render)
             {
-                Map.ClearHighlight();
+                //Map.ClearHighlight();
 
                 _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
                 _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);

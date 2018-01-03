@@ -22,6 +22,9 @@ namespace Roguelike.Core
 
         public void Execute()
         {
+            if (_newX >= Game.Config.Map.Width || _newY >= Game.Config.Map.Height)
+                return;
+
             Cell cell = Game.Map.GetCell(_newX, _newY);
 
             if (cell.IsWalkable)

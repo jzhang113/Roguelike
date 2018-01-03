@@ -22,6 +22,7 @@ namespace Roguelike.Interfaces
         ISkill BasicAttack { get; set; }
         int QueuedTime { get; set; }
         bool CanAct { get; set; }
+        Core.State State { get; set; }
 
         IEnumerable<IAction> Act();
         int TakeDamage(int damage);

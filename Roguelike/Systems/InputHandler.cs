@@ -20,19 +20,17 @@ namespace Roguelike.Systems
             {
                 map.ClearHighlight();
                 Cell current = map.GetCell(square.X, square.Y);
-                IEnumerable<Point> path = map.PathToPlayer(square.X, square.Y);
+                IEnumerable<WeightedPoint> path = map.PathToPlayer(square.X, square.Y);
 
                 if (current.IsWalkable)
-                    map.Highlight[square.X, square.Y] = true;
+                    map.Highlight[square.X, square.Y] = RLColor.Red;
 
-                foreach (Point p in path)
-                    map.Highlight[p.X, p.Y] = true;
+                foreach (WeightedPoint p in path)
+                    map.Highlight[p.X, p.Y] = RLColor.Red;
 
                 if (click.GetLeftClick())
                 {
-                    System.Console.WriteLine(map.PlayerDistance[square.X, square.Y]);
-
-                    foreach (Point p in path.Reverse())
+                    foreach (WeightedPoint p in path.Reverse())
                         yield return new MoveAction(player, p.X, p.Y);
 
                     if (current.IsWalkable)

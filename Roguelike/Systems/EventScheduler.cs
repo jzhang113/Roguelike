@@ -23,10 +23,14 @@ namespace Roguelike.Systems
             if (!_eventSet.IsEmpty())
             {
                 IAction action = _eventSet.GetMin();
-                action.Execute();
                 action.Source.QueuedTime -= action.Time;
-                action.Source.CanAct = true;
                 _eventSet.UpdateAllActions(action.Time, action.Source);
+
+                if (action.Source.State != Core.State.Dead)
+                {
+                    action.Execute();
+                    action.Source.CanAct = true;
+                }
 
                 return true;
             }
