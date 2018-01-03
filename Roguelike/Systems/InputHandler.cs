@@ -9,10 +9,11 @@ namespace Roguelike.Systems
 {
     class InputHandler
     {
-        public static ICommand HandleInput(RLRootConsole console)
+        public static IEnumerable<IAction> HandleInput(RLRootConsole console)
         {
             RLMouse click = console.Mouse;
             DungeonMap map = Game.Map;
+            Player player = Game.Player;
             Point square = GetClickPosition(click.X, click.Y);
 
             if (square != null)
@@ -22,54 +23,50 @@ namespace Roguelike.Systems
                 IEnumerable<Point> path = map.PathToPlayer(square.X, square.Y);
 
                 if (current.IsWalkable)
-                    Game.Map.Highlight[square.X, square.Y] = true;
+                    map.Highlight[square.X, square.Y] = true;
 
                 foreach (Point p in path)
-                {
-                    Game.Map.Highlight[p.X, p.Y] = true;                    
-                }
+                    map.Highlight[p.X, p.Y] = true;
 
                 if (click.GetLeftClick())
                 {
                     System.Console.WriteLine(map.PlayerDistance[square.X, square.Y]);
 
                     foreach (Point p in path.Reverse())
-                    {
-                        Game.EventScheduler.Schedule(new MoveAction(Game.Player, p.X, p.Y));
-                    }
+                        yield return new MoveAction(player, p.X, p.Y);
 
                     if (current.IsWalkable)
-                        Game.EventScheduler.Schedule(new MoveAction(Game.Player, square.X, square.Y));
+                        yield return new MoveAction(player, square.X, square.Y);
                     else
-                        Game.EventScheduler.Schedule(new AttackAction(Game.Player, map.GetActor(current), Game.Player.BasicAttack));
+                        yield return new AttackAction(player, map.GetActor(current), player.BasicAttack);
                 }
             }
 
             RLKeyPress keyPress = console.Keyboard.GetKeyPress();
-            if (keyPress == null) return null;
+            if (keyPress == null) yield break;
 
             switch (keyPress.Key)
             {
                 case RLKey.Keypad4:
-                case RLKey.H: return Move.MoveW;
+                case RLKey.H: yield return new MoveAction(player, player.X - 1, player.Y); break;
                 case RLKey.Keypad2:
-                case RLKey.J: return Move.MoveS;
+                case RLKey.J: yield return new MoveAction(player, player.X, player.Y + 1); break;
                 case RLKey.Keypad8:
-                case RLKey.K: return Move.MoveN;
+                case RLKey.K: yield return new MoveAction(player, player.X, player.Y - 1); break;
                 case RLKey.Keypad6:
-                case RLKey.L: return Move.MoveE;
+                case RLKey.L: yield return new MoveAction(player, player.X + 1, player.Y); break;
                 case RLKey.Keypad7:
-                case RLKey.Y: return Move.MoveNW;
+                case RLKey.Y: yield return new MoveAction(player, player.X - 1, player.Y - 1); break;
                 case RLKey.Keypad9:
-                case RLKey.U: return Move.MoveNE;
+                case RLKey.U: yield return new MoveAction(player, player.X + 1, player.Y - 1); break;
                 case RLKey.Keypad1:
-                case RLKey.B: return Move.MoveSW;
+                case RLKey.B: yield return new MoveAction(player, player.X - 1, player.Y + 1); break;
                 case RLKey.Keypad3:
-                case RLKey.N: return Move.MoveSE;
+                case RLKey.N: yield return new MoveAction(player, player.X + 1, player.Y + 1); break;
                 case RLKey.Escape:
                     Game.Exit();
-                    return null;
-                default: return null;
+                    yield break;
+                default: yield break;
             }
         }
 

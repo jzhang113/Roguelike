@@ -28,7 +28,7 @@ namespace Roguelike.Core
             if (_target != null)
             {
                 int damage = _target.TakeDamage(_power);
-                Game.MessageHandler.AddMessage(Source.Name + " attacked " + _target.Name + " for " + damage + " damage");
+                Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, _target.Name, damage));
 
                 if (_target.IsDead())
                 {

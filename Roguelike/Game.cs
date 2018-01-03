@@ -6,6 +6,7 @@ using Roguelike.Configurations;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;
+using System.Collections.Generic;
 
 namespace Roguelike
 {
@@ -15,6 +16,7 @@ namespace Roguelike
         public static DungeonMap Map { get; private set; }
         public static Player Player { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
+        public static EventScheduler EventScheduler { get; private set; }
 
         private static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
@@ -23,7 +25,6 @@ namespace Roguelike
         private static RLConsole _inventoryConsole;
         
         private static bool _render = true;
-        public static EventScheduler EventScheduler { get; private set; }
 
         static void Main(string[] args)
         {
@@ -107,10 +108,10 @@ namespace Roguelike
             {
                 if (unit.CanAct)
                 {
-                    ICommand action = unit.Act();
-
-                    if (action != null)
-                        EventScheduler.Schedule(action.Resolve(unit, null));
+                    IEnumerable<IAction> actions = unit.Act();
+                    
+                    foreach (IAction act in actions)
+                        EventScheduler.Schedule(act);
                 }
             }
 

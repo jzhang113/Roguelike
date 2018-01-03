@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using Roguelike.Interfaces;
 using RogueSharp;
+using System.Collections.Generic;
 
 namespace Roguelike.Core
 {
@@ -32,9 +33,9 @@ namespace Roguelike.Core
         public virtual bool IsDead() => HP < 0;
         public virtual void TriggerDeath() => Game.Map.RemoveActor(this);
 
-        public virtual ICommand Act()
+        public virtual IEnumerable<IAction> Act()
         {
-            return null;
+            yield break;
         }
 
         public virtual int TakeDamage(int power)

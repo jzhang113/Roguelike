@@ -44,6 +44,7 @@ namespace Roguelike.Core
         public bool RemoveActor(Actor unit)
         {
             SetWalkable(unit.X, unit.Y, true);
+            UpdatePlayerMaps();
             return Units.Remove(unit);
         }
 

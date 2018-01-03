@@ -1,4 +1,5 @@
 ﻿using Roguelike.Interfaces;
+using RogueSharp;
 
 namespace Roguelike.Core
 {
@@ -19,6 +20,19 @@ namespace Roguelike.Core
             Time = source.QueuedTime + 50;
         }
 
-        public void Execute() => Game.Map.SetActorPosition(Source, _newX, _newY);
+        public void Execute()
+        {
+            Cell cell = Game.Map.GetCell(_newX, _newY);
+
+            if (cell.IsWalkable)
+            {
+                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", Source.Name, _newX, _newY));
+                Game.Map.SetActorPosition(Source, _newX, _newY);
+            }
+            else
+            {
+                Game.EventScheduler.Schedule(new AttackAction(Source, Game.Map.GetActor(cell), Source.BasicAttack));
+            }
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Roguelike.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Roguelike.Interfaces
 {
     interface IActor
     {
@@ -21,7 +23,7 @@
         int QueuedTime { get; set; }
         bool CanAct { get; set; }
 
-        ICommand Act();
+        IEnumerable<IAction> Act();
         int TakeDamage(int damage);
         bool IsDead();
         void TriggerDeath();

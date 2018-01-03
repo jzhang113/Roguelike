@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System.Collections.Generic;
 
 namespace Roguelike.Core
 {
@@ -23,7 +24,7 @@ namespace Roguelike.Core
             BasicAttack = new DamageSkill();
         }
 
-        public override ICommand Act()
+        public override IEnumerable<IAction> Act()
         {
             return InputHandler.HandleInput(_rootConsole);
         }
