@@ -27,8 +27,15 @@ namespace Roguelike.Core
         public int X { get; set; }
         public int Y { get; set; }
 
+        public bool CanAct { get; set; } = true;
+
         public virtual bool IsDead() => HP < 0;
         public virtual void TriggerDeath() => Game.Map.RemoveActor(this);
+
+        public virtual ICommand Act()
+        {
+            return null;
+        }
 
         public virtual int TakeDamage(int power)
         {
@@ -39,9 +46,7 @@ namespace Roguelike.Core
         public void Draw(RLConsole console, IMap map)
         {
             if (!map.GetCell(X, Y).IsExplored)
-            {
                 return;
-            }
 
             if (map.IsInFov(X, Y))
             {

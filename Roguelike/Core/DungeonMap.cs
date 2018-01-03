@@ -10,15 +10,14 @@ namespace Roguelike.Core
     class DungeonMap : Map
     {
         internal bool[,] Highlight { get; set; }
-        internal float[,] PlayerDistance { get; set; }
-
-        private ICollection<Actor> _units;
+        internal float[,] PlayerDistance { get; }
+        internal ICollection<Actor> Units { get; }
 
         public DungeonMap(int width, int height) : base(width, height)
         {
             Highlight = new bool[width, height];
             PlayerDistance = new float[width, height];
-            _units = new List<Actor>();
+            Units = new List<Actor>();
         }
 
         public bool AddActor(Actor unit)
@@ -27,8 +26,8 @@ namespace Roguelike.Core
 
             if (pos.IsWalkable)
             {
-                SetWalkable(pos, false);
-                _units.Add(unit);
+                SetActorPosition(unit, unit.X, unit.Y);
+                Units.Add(unit);
                 return true;
             }
             else
@@ -39,13 +38,13 @@ namespace Roguelike.Core
 
         public Actor GetActor(Cell cell)
         {
-            return _units.FirstOrDefault(unit => unit.X == cell.X && unit.Y == cell.Y);
+            return Units.FirstOrDefault(unit => unit.X == cell.X && unit.Y == cell.Y);
         }
 
         public bool RemoveActor(Actor unit)
         {
             SetWalkable(unit.X, unit.Y, true);
-            return _units.Remove(unit);
+            return Units.Remove(unit);
         }
 
         public bool SetActorPosition(IActor actor, int x, int y)
@@ -110,7 +109,7 @@ namespace Roguelike.Core
                 DrawCell(mapConsole, cell);
             }
 
-            foreach (Actor unit in _units)
+            foreach (Actor unit in Units)
             {
                 unit.Draw(mapConsole, this);
             }

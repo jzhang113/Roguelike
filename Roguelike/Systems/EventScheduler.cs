@@ -14,6 +14,7 @@ namespace Roguelike.Systems
         public void Schedule(IAction action)
         {
             action.Source.QueuedTime = action.Time;
+            action.Source.CanAct = false;
             _eventSet.Add(action);
         }
 
@@ -24,6 +25,7 @@ namespace Roguelike.Systems
                 IAction action = _eventSet.GetMin();
                 action.Execute();
                 action.Source.QueuedTime -= action.Time;
+                action.Source.CanAct = true;
                 _eventSet.UpdateAllActions(action.Time, action.Source);
 
                 return true;

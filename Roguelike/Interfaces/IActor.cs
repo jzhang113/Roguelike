@@ -19,7 +19,9 @@
 
         ISkill BasicAttack { get; set; }
         int QueuedTime { get; set; }
+        bool CanAct { get; set; }
 
+        ICommand Act();
         int TakeDamage(int damage);
         bool IsDead();
         void TriggerDeath();
