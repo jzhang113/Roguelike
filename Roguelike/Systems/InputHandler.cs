@@ -31,12 +31,17 @@ namespace Roguelike.Systems
 
                 if (click.GetLeftClick())
                 {
+                    System.Console.WriteLine(map.PlayerDistance[square.X, square.Y]);
+
                     foreach (Point p in path.Reverse())
                     {
                         Game.EventScheduler.Schedule(new MoveAction(Game.Player, p.X, p.Y));
-                        // Game.EventScheduler.Update();
-                        // System.Threading.Thread.Sleep(500);
                     }
+
+                    if (current.IsWalkable)
+                        Game.EventScheduler.Schedule(new MoveAction(Game.Player, square.X, square.Y));
+                    else
+                        Game.EventScheduler.Schedule(new AttackAction(Game.Player, map.GetActor(current), Game.Player.BasicAttack));
                 }
             }
 

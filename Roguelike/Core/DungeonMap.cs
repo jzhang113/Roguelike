@@ -9,8 +9,8 @@ namespace Roguelike.Core
 {
     class DungeonMap : Map
     {
-        public bool[,] Highlight { get; set; }
-        public float[,] PlayerDistance { get; set; }
+        internal bool[,] Highlight { get; set; }
+        internal float[,] PlayerDistance { get; set; }
 
         private ICollection<Actor> _units;
 
@@ -128,8 +128,7 @@ namespace Roguelike.Core
                 if (cell.IsWalkable)
                 {
                     mapConsole.Set(cell.X, cell.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
-                    
-                    mapConsole.SetColor(cell.X, cell.Y, new RLColor(PlayerDistance[cell.X, cell.Y], 0, 0));
+                    mapConsole.SetColor(cell.X, cell.Y, new RLColor(1, 1 - PlayerDistance[cell.X, cell.Y] / 40, 0));
                 }
                 else
                 {

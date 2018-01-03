@@ -28,10 +28,6 @@ namespace Roguelike.Core
             else
             {
                 target = Game.Map.GetActor(newPos);
-
-                if (target != null)
-                    Game.MessageHandler.AddMessage(source.Name + " attacked " + target.Name);
-
                 return new AttackAction(source, target, source.BasicAttack);
             }
         }

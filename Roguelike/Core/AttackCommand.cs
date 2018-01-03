@@ -13,11 +13,6 @@ namespace Roguelike.Core
 
         public IAction Resolve(IActor origin, IActor target)
         {
-            if (target != null)
-            {
-                Game.MessageHandler.AddMessage(origin.Name + " attacked " + target.Name);
-            }
-
             return new AttackAction(origin, target, _attack);
         }
     }
