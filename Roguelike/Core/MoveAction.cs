@@ -34,7 +34,10 @@ namespace Roguelike.Core
             }
             else
             {
-                Game.EventScheduler.Schedule(new AttackAction(Source, Game.Map.GetActor(cell), Source.BasicAttack));
+                Actor target = Game.Map.GetActor(cell);
+
+                if (target != null)
+                    Game.EventScheduler.Schedule(new AttackAction(Source, target, Source.BasicAttack));
             }
         }
     }

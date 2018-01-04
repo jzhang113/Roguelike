@@ -106,7 +106,7 @@
     <Compile Include="Systems\MapGenerator.cs" />
     <Compile Include="Systems\MessageHandler.cs" />
     <Compile Include="Configurations\COnfiguration.cs" />
-    <Compile Include="Systems\MinHeap.cs" />
+    <Compile Include="Systems\MinActionHeap.cs" />
     <Compile Include="Systems\WeightedPoint.cs" />
   </ItemGroup>
   <ItemGroup>

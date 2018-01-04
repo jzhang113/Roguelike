@@ -3,16 +3,16 @@ using Roguelike.Interfaces;
 
 namespace Roguelike.Systems
 {
-    class MinHeap
+    class MinActionHeap
     {
         private IAction[] _heap;
         private int _heapSize;
 
-        public MinHeap() : this(10)
+        public MinActionHeap() : this(10)
         {
         }
 
-        public MinHeap(int size)
+        public MinActionHeap(int size)
         {
             _heap = new IAction[size];
             _heapSize = 0;
@@ -48,15 +48,17 @@ namespace Roguelike.Systems
             return item;
         }
 
-        public void UpdateAllActions(int dt, IActor actor)
+        public void UpdateAllActions(int dt)
         {
             for (int i = 0; i < _heapSize; i++)
             {
                 _heap[i].Time -= dt;
+                _heap[i].Source.QueuedTime -= dt;
             }
         }
 
         public bool IsEmpty() => _heapSize == 0;
+        public bool HasFreeAction() => (_heapSize > 0) ? _heap[0].Time == 0 : false;
 
         private void ReheapUp()
         {

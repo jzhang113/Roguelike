@@ -12,8 +12,11 @@ namespace Roguelike.Core
         public int Speed { get; set; }
 
         public int HP { get; set; }
+        public int MaxHP { get; set; }
         public int SP { get; set; }
+        public int MaxSP { get; set; }
         public int MP { get; set; }
+        public int MaxMP { get; set; }
 
         public int STR { get; set; }
         public int DEX { get; set; }

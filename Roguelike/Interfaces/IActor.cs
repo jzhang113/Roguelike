@@ -11,8 +11,11 @@ namespace Roguelike.Interfaces
         int Y { get; set; }
 
         int HP { get; set; }
+        int MaxHP { get; set; }
         int SP { get; set; }
+        int MaxSP { get; set; }
         int MP { get; set; }
+        int MaxMP { get; set; }
 
         int STR { get; set; }
         int DEX { get; set; }
