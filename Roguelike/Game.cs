@@ -110,7 +110,8 @@ namespace Roguelike
             {
                 IEnumerable<IAction> actions = Player.Act();
 
-                foreach (IAction act in actions) {
+                foreach (IAction act in actions)
+                {
                     acted = true;
                     EventScheduler.Schedule(act);
                 }
@@ -118,6 +119,7 @@ namespace Roguelike
             
             if (acted)
             {
+                _render = true;
                 Map.ClearHighlight();
 
                 foreach (Actor unit in Map.Units)
@@ -131,19 +133,17 @@ namespace Roguelike
                     }
                 }
             }
-
-            if (EventScheduler.Update())
-                _render = true;
+            
+            while (EventScheduler.Update()) ;
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            _mapConsole.Clear();
-            Map.Draw(_mapConsole);
-            Player.Draw(_mapConsole, Map);
-
             if (_render)
             {
+                _mapConsole.Clear();
+                Map.Draw(_mapConsole);
+                Player.Draw(_mapConsole, Map);
                 //Map.ClearHighlight();
 
                 _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);

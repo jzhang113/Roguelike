@@ -67,6 +67,7 @@ namespace Roguelike.Systems
                             if (_map.GetCell(i + 1, j).IsWalkable)
                             {
                                 _map.SetCellProperties(i, j, true, true);
+                                _map.Field[i, j].IsWalkable = true;
                             }
                         }
 
@@ -75,6 +76,7 @@ namespace Roguelike.Systems
                             if (_map.GetCell(i, j + 1).IsWalkable)
                             {
                                 _map.SetCellProperties(i, j, true, true);
+                                _map.Field[i, j].IsWalkable = true;
                             }
                         }
                     }
@@ -98,6 +100,7 @@ namespace Roguelike.Systems
                 for (int y = rect.Top; y < rect.Bottom; y++)
                 {
                     _map.SetCellProperties(x, y, true, true, true);
+                    _map.Field[x, y].IsWalkable = true;
                 }
             }
         }

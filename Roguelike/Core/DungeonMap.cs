@@ -10,12 +10,14 @@ namespace Roguelike.Core
     class DungeonMap : Map
     {
         internal RLColor[,] Highlight { get; set; }
+        internal Terrain[,] Field { get; set; }
         internal float[,] PlayerDistance { get; }
         internal ICollection<Actor> Units { get; }
 
         public DungeonMap(int width, int height) : base(width, height)
         {
             Highlight = new RLColor[width, height];
+            Field = new Terrain[width, height];
             PlayerDistance = new float[width, height];
             Units = new List<Actor>();
         }
@@ -234,17 +236,13 @@ namespace Roguelike.Core
                     int newX = p.X + dir.X;
                     int newY = p.Y + dir.Y;
                     float newWeight = p.Weight + dir.Weight;
-                    Cell cell = GetCell(newX, newY);
+                    Terrain cell = Field[newX, newY];
 
                     if (cell.IsWalkable && (!visited[newX, newY] || newWeight < PlayerDistance[newX, newY]))
                     {
                         visited[newX, newY] = true;
                         PlayerDistance[newX, newY] = newWeight;
                         goals.Enqueue(new WeightedPoint(newX, newY, newWeight));
-                    }
-                    else if (GetActor(cell) != null)
-                    {
-                        PlayerDistance[newX, newY] = newWeight;
                     }
                 }
             }
@@ -253,12 +251,14 @@ namespace Roguelike.Core
         private void SetWalkable(Cell cell, bool walkable)
         {
             SetCellProperties(cell.X, cell.Y, cell.IsTransparent, walkable, cell.IsExplored);
+            Field[cell.X, cell.Y].IsWalkable = walkable;
         }
 
         private void SetWalkable(int x, int y, bool walkable)
         {
             Cell cell = GetCell(x, y);
             SetCellProperties(cell.X, cell.Y, cell.IsTransparent, walkable, cell.IsExplored);
+            Field[cell.X, cell.Y].IsWalkable = walkable;
         }
     }
 }
