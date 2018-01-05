@@ -6,7 +6,7 @@ namespace Roguelike.Core
     class MoveAction : IAction
     {
         public IActor Source { get; }
-        public int Time { get; set; }
+        public int EnergyCost { get; set; } = 50;
 
         private int _newX;
         private int _newY;
@@ -16,8 +16,6 @@ namespace Roguelike.Core
             _newX = x;
             _newY = y;
             Source = source;
-
-            Time = source.QueuedTime + 50;
         }
 
         public void Execute()
@@ -37,7 +35,7 @@ namespace Roguelike.Core
                 Actor target = Game.Map.GetActor(cell);
 
                 if (target != null)
-                    Game.EventScheduler.Schedule(new AttackAction(Source, target, Source.BasicAttack));
+                    new AttackAction(Source, target, Source.BasicAttack).Execute();
             }
         }
     }

@@ -24,18 +24,14 @@ namespace Roguelike.Core
 
         public bool AddActor(Actor unit)
         {
-            Cell pos = GetCell(unit.X, unit.Y);
-
-            if (pos.IsWalkable)
-            {
-                SetActorPosition(unit, unit.X, unit.Y);
-                Units.Add(unit);
-                return true;
-            }
-            else
-            {
+            if (!GetCell(unit.X, unit.Y).IsWalkable)
                 return false;
-            }
+            
+            SetActorPosition(unit, unit.X, unit.Y);
+            Units.Add(unit);
+            Game.EventScheduler.AddActor(unit);
+
+            return true;
         }
 
         public Actor GetActor(Cell cell)
@@ -46,7 +42,9 @@ namespace Roguelike.Core
         public bool RemoveActor(Actor unit)
         {
             SetWalkable(unit.X, unit.Y, true);
-            unit.State = State.Dead;
+            unit.State = ActorState.Dead;
+            Game.EventScheduler.RemoveActor(unit);
+
             return Units.Remove(unit);
         }
 

@@ -5,7 +5,7 @@ namespace Roguelike.Core
     class AttackAction : IAction
     {
         public IActor Source { get; }
-        public int Time { get; set; }
+        public int EnergyCost { get; set; }
 
         private int _power;
         private IActor _target;
@@ -18,7 +18,7 @@ namespace Roguelike.Core
             _target = target;
 
             Source = source;
-            Time = attack.Speed - source.Speed + source.QueuedTime;
+            EnergyCost = attack.Speed;
         }
 
         public void Execute()

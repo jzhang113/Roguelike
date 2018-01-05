@@ -1,51 +1,43 @@
-﻿using Roguelike.Core;
-using Roguelike.Interfaces;
+﻿using Roguelike.Interfaces;
 
 namespace Roguelike.Systems
 {
     class EventScheduler
     {
-        private MinActionHeap _eventSet;
-        private int _allottedTime;
-
+        private MaxHeap<ISchedulable> _eventSet;
+        private ISchedulable _current;
+        
         public EventScheduler(int size)
         {
-            _eventSet = new MinActionHeap(size);
-            _allottedTime = 0;
+            _eventSet = new MaxHeap<ISchedulable>(size);
         }
 
-        public void Schedule(IAction action)
-        {
-            action.Source.QueuedTime = action.Time;
-            action.Source.CanAct = false;
-            _eventSet.Add(action);
-
-            if (action.Source is Player)
-                _allottedTime = action.Time;
-        }
+        public void AddActor(ISchedulable schedulable) => _eventSet.Add(schedulable);
+        public void RemoveActor(ISchedulable schedulable) => _eventSet.Remove(schedulable);
+        public void RefreshAll() => _eventSet.UpdateAll();
 
         public bool Update()
         {
-            if (!_eventSet.IsEmpty() && _allottedTime > 0)
+            if (_eventSet.IsEmpty())
+                return false;
+
+            _current = _eventSet.Peek();
+
+            //if (_current.Energy < 0)
+            //    return false;
+
+            IAction action = _current.Act();
+            if (action == null)
             {
-                do
-                {
-                    IAction action = _eventSet.GetMin();
-                    action.Source.QueuedTime -= action.Time;
-                    _allottedTime -= action.Time;
-                    _eventSet.UpdateAllActions(action.Time);
-
-                    if (action.Source.State != State.Dead)
-                    {
-                        action.Execute();
-                        action.Source.CanAct = true;
-                    }
-                } while (_eventSet.HasFreeAction());
-
-                return true;
+                return false;
             }
 
-            return false;
+            action.Execute();
+            _current.Energy -= action.EnergyCost;
+            _eventSet.Add(_current);
+            _current = _eventSet.GetMax();
+
+            return true;
         }
     }
 }

@@ -92,7 +92,8 @@
     <Compile Include="Core\MoveAction.cs" />
     <Compile Include="Core\SimpleAI.cs" />
     <Compile Include="Core\Skeleton.cs" />
-    <Compile Include="Core\Terrain.cs" />
+    <Compile Include="Systems\Terrain.cs" />
+    <Compile Include="Interfaces\ISchedulable.cs" />
     <Compile Include="Interfaces\ISkill.cs" />
     <Compile Include="Interfaces\IAction.cs" />
     <Compile Include="Systems\EventScheduler.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="Systems\MapGenerator.cs" />
     <Compile Include="Systems\MessageHandler.cs" />
     <Compile Include="Configurations\COnfiguration.cs" />
-    <Compile Include="Systems\MinActionHeap.cs" />
+    <Compile Include="Systems\MaxHeap.cs" />
     <Compile Include="Systems\WeightedPoint.cs" />
   </ItemGroup>
   <ItemGroup>

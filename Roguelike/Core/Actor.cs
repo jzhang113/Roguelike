@@ -1,11 +1,10 @@
 ﻿using RLNET;
 using Roguelike.Interfaces;
 using RogueSharp;
-using System.Collections.Generic;
 
 namespace Roguelike.Core
 {
-    class Actor : IActor, IDrawable
+    class Actor : IActor, ISchedulable, IDrawable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -24,23 +23,19 @@ namespace Roguelike.Core
         public int INT { get; set; }
 
         public ISkill BasicAttack { get; set; }
-        public int QueuedTime { get; set; }
-        public State State { get; set; }
+        public ActorState State { get; set; }
 
         public RLColor Color { get; set; }
         public char Symbol { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
 
-        public bool CanAct { get; set; } = true;
+        public int Energy { get; set; } = 100;
+        public int RefreshRate { get; set; } = 100;
 
         public virtual bool IsDead() => HP < 0;
         public virtual void TriggerDeath() => Game.Map.RemoveActor(this);
-
-        public virtual IEnumerable<IAction> Act()
-        {
-            yield break;
-        }
+        public virtual IAction Act() => SimpleAI.GetAction(this) ?? null;
 
         public virtual int TakeDamage(int power)
         {
@@ -63,5 +58,7 @@ namespace Roguelike.Core
                 console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
             }
         }
+
+        public int CompareTo(ISchedulable other) => Energy - other.Energy;
     }
 }

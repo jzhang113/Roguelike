@@ -17,15 +17,5 @@ namespace Roguelike.Core
             MP = 20;
             BasicAttack = new DamageSkill();
         }
-
-        public override IEnumerable<IAction> Act()
-        {
-            IAction action = SimpleAI.GetAction(this, new System.Random());
-
-            if (action != null)
-                yield return action;
-
-            yield break;
-        }
     }
 }

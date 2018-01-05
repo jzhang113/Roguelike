@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Roguelike.Interfaces
+﻿namespace Roguelike.Interfaces
 {
     interface IActor
     {
@@ -23,13 +21,12 @@ namespace Roguelike.Interfaces
         int INT { get; set; }
 
         ISkill BasicAttack { get; set; }
-        int QueuedTime { get; set; }
-        bool CanAct { get; set; }
-        Core.State State { get; set; }
+        ActorState State { get; set; }
 
-        IEnumerable<IAction> Act();
         int TakeDamage(int damage);
         bool IsDead();
         void TriggerDeath();
     }
+
+    enum ActorState { Wander, Sleep, Chase, Flee, Dead };
 }

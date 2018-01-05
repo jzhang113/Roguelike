@@ -1,4 +1,4 @@
-﻿namespace Roguelike.Core
+﻿namespace Roguelike.Systems
 {
     public struct Terrain
     {

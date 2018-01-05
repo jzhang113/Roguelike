@@ -17,6 +17,7 @@ namespace Roguelike
         public static Player Player { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
+        public static Random CombatRandom { get; private set; }
 
         private static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
@@ -44,23 +45,27 @@ namespace Roguelike
             _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
 
             //int seed = (int) DateTime.Now.Ticks;
-            int seed = 2127758832;
-            Random Random = new Random(seed);
-            int[] mapSeeds = new int[30];
+            int mainSeed = 2127758832;
+            Random Random = new Random(mainSeed);
+            int[] generatorSeed = new int[31];
 
             using (StreamWriter writer = new StreamWriter("log"))
             {
-                writer.WriteLine(seed);
+                writer.WriteLine(mainSeed);
 
-                for (int i = 0; i < mapSeeds.Length; i++)
+                for (int i = 0; i < generatorSeed.Length; i++)
                 {
-                    mapSeeds[i] = Random.Next();
-                    writer.WriteLine(mapSeeds[i]);
+                    generatorSeed[i] = Random.Next();
+                    writer.WriteLine(generatorSeed[i]);
                 }
             }
 
+            CombatRandom = new Random(generatorSeed[30]);
+            MessageHandler = new MessageHandler(Config.MessageMaxCount);
+            EventScheduler = new EventScheduler(20);
+
             MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height);
-            Map = mapGenerator.CreateMap(new Random(mapSeeds[0]));
+            Map = mapGenerator.CreateMap(new Random(generatorSeed[0]));
 
             Player = new Player(_rootConsole);
 
@@ -84,9 +89,6 @@ namespace Roguelike
                 Map.AddActor(s);
             }
 
-            MessageHandler = new MessageHandler(Config.MessageMaxCount);
-            EventScheduler = new EventScheduler(20);
-
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
             _rootConsole.Run();
@@ -104,42 +106,13 @@ namespace Roguelike
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            bool acted = false;
-
-            if (Player.CanAct)
-            {
-                IEnumerable<IAction> actions = Player.Act();
-
-                foreach (IAction act in actions)
-                {
-                    acted = true;
-                    EventScheduler.Schedule(act);
-                }
-            }
-            
-            if (acted)
-            {
-                _render = true;
-                Map.ClearHighlight();
-
-                foreach (Actor unit in Map.Units)
-                {
-                    if (unit.CanAct)
-                    {
-                        IEnumerable<IAction> actions = unit.Act();
-
-                        foreach (IAction act in actions)
-                            EventScheduler.Schedule(act);
-                    }
-                }
-            }
-            
             while (EventScheduler.Update()) ;
+                //_render = true;
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            if (_render)
+            //if (_render)
             {
                 _mapConsole.Clear();
                 Map.Draw(_mapConsole);

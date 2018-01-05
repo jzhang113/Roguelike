@@ -3,22 +3,22 @@ using Roguelike.Interfaces;
 
 namespace Roguelike.Systems
 {
-    class MinActionHeap
+    class MaxHeap<T> where T : ISchedulable
     {
-        private IAction[] _heap;
+        private T[] _heap;
         private int _heapSize;
 
-        public MinActionHeap() : this(10)
+        public MaxHeap() : this(10)
         {
         }
 
-        public MinActionHeap(int size)
+        public MaxHeap(int size)
         {
-            _heap = new IAction[size];
+            _heap = new T[size];
             _heapSize = 0;
         }
 
-        public void Add(IAction item)
+        public void Add(T item)
         {
             if (_heapSize >= _heap.Length)
                 Resize();
@@ -27,11 +27,11 @@ namespace Roguelike.Systems
             ReheapUp();
         }
 
-        public void Cancel(IActor actor)
+        public void Remove(T item)
         {
             for (int i = 0; i < _heapSize; i++)
             {
-                if (_heap[i].Source == actor)
+                if (_heap[i].Equals(item))
                 {
                     _heap[i] = _heap[--_heapSize];
                     ReheapDown(i);
@@ -39,33 +39,33 @@ namespace Roguelike.Systems
             }
         }
 
-        public IAction GetMin()
+        public void UpdateAll()
         {
-            IAction item = _heap[0];
+            for (int i = 0; i < _heapSize; i++)
+            {
+                _heap[i].Energy += _heap[i].RefreshRate;
+            }
+        }
+
+        public T GetMax()
+        {
+            T item = _heap[0];
             _heap[0] = _heap[--_heapSize];
             ReheapDown(0);
 
             return item;
         }
 
-        public void UpdateAllActions(int dt)
-        {
-            for (int i = 0; i < _heapSize; i++)
-            {
-                _heap[i].Time -= dt;
-                _heap[i].Source.QueuedTime -= dt;
-            }
-        }
-
+        public ISchedulable Peek() => _heap[0];
         public bool IsEmpty() => _heapSize == 0;
-        public bool HasFreeAction() => (_heapSize > 0) ? _heap[0].Time == 0 : false;
+        public int Size() => _heapSize;
 
         private void ReheapUp()
         {
             int pos = _heapSize - 1;
-            IAction item = _heap[pos];
+            T item = _heap[pos];
 
-            while (pos > 0 && item.Time < _heap[(pos-1)/2].Time)
+            while (pos > 0 && item.CompareTo(_heap[(pos - 1) / 2]) > 0)
             {
                 _heap[pos] = _heap[(pos-1)/2];
                 pos = (pos-1)/2;
@@ -77,22 +77,22 @@ namespace Roguelike.Systems
         private void ReheapDown(int initial)
         {
             int pos = initial;
-            IAction item = _heap[pos];
+            T item = _heap[pos];
 
             while (pos < _heapSize)
             {
                 int left = 2 * pos + 1;
                 int right = 2 * pos + 2;
                 int swap = pos;
-                IAction tempItem = item;
+                T tempItem = item;
 
-                if (left < _heapSize && tempItem.Time > _heap[left].Time)
+                if (left < _heapSize && tempItem.CompareTo(_heap[left]) < 0)
                 {
                     swap = left;
                     tempItem = _heap[swap];
                 }
 
-                if (right < _heapSize && tempItem.Time > _heap[right].Time)
+                if (right < _heapSize && tempItem.CompareTo(_heap[right]) < 0)
                     swap = right;
 
                 if (swap == pos)
@@ -111,7 +111,7 @@ namespace Roguelike.Systems
 
         private void Resize()
         {
-            IAction[] newHeap = new IAction[_heap.Length * 2];
+            T[] newHeap = new T[_heap.Length * 2];
 
             for (int i = 0; i < _heapSize; i++)
             {

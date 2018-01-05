@@ -3,7 +3,7 @@
     interface IAction
     {
         IActor Source { get; }
-        int Time { get; set; }
+        int EnergyCost { get; set; }
         
         void Execute();
     }
