@@ -9,11 +9,11 @@ namespace Roguelike.Core
         public static WeightedPoint E { get; } = new WeightedPoint(1, 0, 1);
         public static WeightedPoint S { get; } = new WeightedPoint(0, 1, 1);
         public static WeightedPoint W { get; } = new WeightedPoint(-1, 0, 1);
-        public static WeightedPoint NE { get; } = new WeightedPoint(1, -1, 1.4f);
-        public static WeightedPoint SE { get; } = new WeightedPoint(1, 1, 1.4f);
-        public static WeightedPoint SW { get; } = new WeightedPoint(-1, 1, 1.4f);
-        public static WeightedPoint NW { get; } = new WeightedPoint(-1, -1, 1.4f);
+        public static WeightedPoint NE { get; } = new WeightedPoint(1, -1, 1.5f);
+        public static WeightedPoint SE { get; } = new WeightedPoint(1, 1, 1.5f);
+        public static WeightedPoint SW { get; } = new WeightedPoint(-1, 1, 1.5f);
+        public static WeightedPoint NW { get; } = new WeightedPoint(-1, -1, 1.5f);
 
-        public static IList<WeightedPoint> Directions = new WeightedPoint[]{ N, NE, E, SE, S, SW, W, NW };
+        public static IList<WeightedPoint> Directions = new WeightedPoint[]{ N, E, S, W, NE, SE, SW, NW };
     }
 }

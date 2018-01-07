@@ -22,20 +22,26 @@ namespace Roguelike.Systems
                 return false;
 
             _current = _eventSet.Peek();
-
-            //if (_current.Energy < 0)
-            //    return false;
+            if (_current.Energy < 0)
+            {
+                RefreshAll();
+                _eventSet.Add(_current);
+                _eventSet.GetMax();
+                return false;
+            }
 
             IAction action = _current.Act();
             if (action == null)
             {
+                System.Console.WriteLine(_current);
                 return false;
             }
 
             action.Execute();
             _current.Energy -= action.EnergyCost;
+
             _eventSet.Add(_current);
-            _current = _eventSet.GetMax();
+            _eventSet.GetMax();
 
             return true;
         }

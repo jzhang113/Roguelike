@@ -106,18 +106,25 @@ namespace Roguelike
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            while (EventScheduler.Update()) ;
-                //_render = true;
+            bool update = false;
+
+            while (EventScheduler.Update())
+                update = true;
+
+            if (update)
+            {
+                Console.WriteLine(Game.Player.Energy);
+                _render = true;
+            }
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            //if (_render)
+            if (_render)
             {
                 _mapConsole.Clear();
-                Map.Draw(_mapConsole);
                 Player.Draw(_mapConsole, Map);
-                //Map.ClearHighlight();
+                Map.ClearHighlight();
 
                 _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
                 _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
@@ -132,8 +139,9 @@ namespace Roguelike
                 _render = false;
             }
 
+            Map.Draw(_mapConsole);
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-           _rootConsole.Draw();
+            _rootConsole.Draw();
         }
     }
 }

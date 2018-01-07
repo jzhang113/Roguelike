@@ -11,20 +11,22 @@ namespace Roguelike.Core
     {
         internal RLColor[,] Highlight { get; set; }
         internal Terrain[,] Field { get; set; }
-        internal float[,] PlayerDistance { get; }
+        internal float[,] PlayerMap { get; }
+        internal float[,] FleeMap { get; }
         internal ICollection<Actor> Units { get; }
 
         public DungeonMap(int width, int height) : base(width, height)
         {
             Highlight = new RLColor[width, height];
             Field = new Terrain[width, height];
-            PlayerDistance = new float[width, height];
+            PlayerMap = new float[width, height];
+            FleeMap = new float[width, height];
             Units = new List<Actor>();
         }
 
         public bool AddActor(Actor unit)
         {
-            if (!GetCell(unit.X, unit.Y).IsWalkable)
+            if (!Field[unit.X, unit.Y].IsWalkable)
                 return false;
             
             SetActorPosition(unit, unit.X, unit.Y);
@@ -74,11 +76,11 @@ namespace Roguelike.Core
 
         public IEnumerable<WeightedPoint> PathToPlayer(int x, int y)
         {
-            float nearest = PlayerDistance[x, y];
+            float nearest = PlayerMap[x, y];
 
             while (nearest > 1.5f)
             {
-                WeightedPoint nextMove = MoveTowardsPlayer(x, y);
+                WeightedPoint nextMove = MoveTowardsTarget(x, y, PlayerMap);
                 x = nextMove.X;
                 y = nextMove.Y;
                 nearest = nextMove.Weight;
@@ -87,48 +89,26 @@ namespace Roguelike.Core
             }
         }
 
-        internal WeightedPoint MoveTowardsPlayer(int currentX, int currentY)
+        internal WeightedPoint MoveTowardsTarget(int currentX, int currentY, float[,] goalMap)
         {
             int nextX = currentX;
             int nextY = currentY;
-            float nearest = PlayerDistance[currentX, currentY];
+            float nearest = goalMap[currentX, currentY];
 
             foreach (WeightedPoint dir in Move.Directions)
             {
                 int newX = currentX + dir.X;
                 int newY = currentY + dir.Y;
 
-                if (PlayerDistance[newX, newY] < nearest)
+                if (goalMap[newX, newY] < nearest)
                 {
                     nextX = newX;
                     nextY = newY;
-                    nearest = PlayerDistance[newX, newY];
+                    nearest = goalMap[newX, newY];
                 }
             }
 
             return new WeightedPoint(nextX, nextY, nearest);
-        }
-
-        internal WeightedPoint MoveAwayFromPlayer(int currentX, int currentY)
-        {
-            int nextX = currentX;
-            int nextY = currentY;
-            float farthest = PlayerDistance[currentX, currentY];
-
-            foreach (WeightedPoint dir in Move.Directions)
-            {
-                int newX = currentX + dir.X;
-                int newY = currentY + dir.Y;
-
-                if (PlayerDistance[newX, newY] > farthest)
-                {
-                    nextX = newX;
-                    nextY = newY;
-                    farthest = PlayerDistance[newX, newY];
-                }
-            }
-
-            return new WeightedPoint(nextX, nextY, farthest);
         }
 
         public void Draw(RLConsole mapConsole)
@@ -156,7 +136,7 @@ namespace Roguelike.Core
                 if (cell.IsWalkable)
                 {
                     mapConsole.Set(cell.X, cell.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
-                    mapConsole.SetColor(cell.X, cell.Y, new RLColor(1, 1 - PlayerDistance[cell.X, cell.Y] / 40, 0));
+                    mapConsole.SetColor(cell.X, cell.Y, new RLColor(1, 1 - PlayerMap[cell.X, cell.Y] / 20, 0));
                 }
                 else
                 {
@@ -216,13 +196,13 @@ namespace Roguelike.Core
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    PlayerDistance[x, y] = float.NaN;
+                    PlayerMap[x, y] = float.NaN;
                 }
             }
 
             foreach (WeightedPoint p in goals)
             {
-                PlayerDistance[p.X, p.Y] = 0;
+                PlayerMap[p.X, p.Y] = 0;
             }
 
             while (goals.Count > 0)
@@ -235,13 +215,22 @@ namespace Roguelike.Core
                     int newY = p.Y + dir.Y;
                     float newWeight = p.Weight + dir.Weight;
                     Terrain cell = Field[newX, newY];
+                    Cell lx = GetCell(newX, newY);
 
-                    if (cell.IsWalkable && (!visited[newX, newY] || newWeight < PlayerDistance[newX, newY]))
+                    if (cell.IsWalkable && lx.IsExplored && (!visited[newX, newY] || newWeight < PlayerMap[newX, newY]))
                     {
                         visited[newX, newY] = true;
-                        PlayerDistance[newX, newY] = newWeight;
+                        PlayerMap[newX, newY] = newWeight;
                         goals.Enqueue(new WeightedPoint(newX, newY, newWeight));
                     }
+                }
+            }
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    FleeMap[x, y] = PlayerMap[x, y] * -1.2f;
                 }
             }
         }

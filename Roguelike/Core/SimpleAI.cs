@@ -10,7 +10,7 @@ namespace Roguelike.Core
             switch (monster.State)
             {
                 case ActorState.Wander:
-                    if (Game.Map.PlayerDistance[monster.X, monster.Y] < monster.Awareness)
+                    if (Game.Map.PlayerMap[monster.X, monster.Y] < monster.Awareness)
                     {
                         monster.State = ActorState.Chase;
                         return GetAction(monster);
@@ -28,7 +28,7 @@ namespace Roguelike.Core
                     }
                     else
                     {
-                        WeightedPoint nextMove = Game.Map.MoveTowardsPlayer(monster.X, monster.Y);
+                        WeightedPoint nextMove = Game.Map.MoveTowardsTarget(monster.X, monster.Y, Game.Map.PlayerMap);
                         return new MoveAction(monster, nextMove.X, nextMove.Y);
                     }
                 case ActorState.Flee:
@@ -39,7 +39,7 @@ namespace Roguelike.Core
                     }
                     else
                     {
-                        WeightedPoint nextMove = Game.Map.MoveAwayFromPlayer(monster.X, monster.Y);
+                        WeightedPoint nextMove = Game.Map.MoveTowardsTarget(monster.X, monster.Y, Game.Map.FleeMap);
                         return new MoveAction(monster, nextMove.X, nextMove.Y);
                     }
                 case ActorState.Dead:

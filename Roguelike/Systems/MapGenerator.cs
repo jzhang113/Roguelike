@@ -85,21 +85,16 @@ namespace Roguelike.Systems
 
             return _map;
         }
-
-        private int Distance(Point a, Point b)
-        {
-            int dx = a.X - b.X;
-            int dy = a.Y - b.Y;
-            return dx * dx + dy * dy;
-        }
-
+        
         private void CreateRoom(Rectangle rect)
         {
+            bool explored = true;
+
             for (int x = rect.Left; x < rect.Right; x++)
             {
                 for (int y = rect.Top; y < rect.Bottom; y++)
                 {
-                    _map.SetCellProperties(x, y, true, true, true);
+                    _map.SetCellProperties(x, y, true, true, explored);
                     _map.Field[x, y].IsWalkable = true;
                 }
             }

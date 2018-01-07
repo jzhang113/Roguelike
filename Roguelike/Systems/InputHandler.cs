@@ -20,18 +20,26 @@ namespace Roguelike.Systems
             {
                 map.ClearHighlight();
                 Cell current = map.GetCell(square.X, square.Y);
-                IEnumerable<WeightedPoint> path = map.PathToPlayer(square.X, square.Y);
-
-                if (current.IsWalkable)
-                    map.Highlight[square.X, square.Y] = RLColor.Red;
+                IEnumerable<WeightedPoint> path = map.PathToPlayer(square.X, square.Y).Reverse();
+                bool exploredPath = true;
 
                 foreach (WeightedPoint p in path)
-                    map.Highlight[p.X, p.Y] = RLColor.Red;
+                {
+                    if (!map.GetCell(p.X, p.Y).IsExplored)
+                    {
+                        exploredPath = false;
+                        break;
+                    }
 
+                    map.Highlight[p.X, p.Y] = RLColor.Red;
+                }
+
+                if (current.IsWalkable && exploredPath)
+                    map.Highlight[square.X, square.Y] = RLColor.Red;
                 /*
                 if (click.GetLeftClick())
                 {
-                    foreach (WeightedPoint p in path.Reverse())
+                    foreach (WeightedPoint p in path)
                         yield return new MoveAction(player, p.X, p.Y);
 
                     if (current.IsWalkable)
@@ -48,22 +56,28 @@ namespace Roguelike.Systems
 
             switch (keyPress.Key)
             {
+                case RLKey.Left:
                 case RLKey.Keypad4:
-                case RLKey.H: return new MoveAction(player, player.X - 1, player.Y);
+                case RLKey.H: return new MoveAction(player, player.X + Move.W.X, player.Y);
+                case RLKey.Down:
                 case RLKey.Keypad2:
-                case RLKey.J: return new MoveAction(player, player.X, player.Y + 1);
+                case RLKey.J: return new MoveAction(player, player.X, player.Y + Move.S.Y);
+                case RLKey.Up:
                 case RLKey.Keypad8:
-                case RLKey.K: return new MoveAction(player, player.X, player.Y - 1);
+                case RLKey.K: return new MoveAction(player, player.X, player.Y + Move.N.Y);
+                case RLKey.Right:
                 case RLKey.Keypad6:
-                case RLKey.L: return new MoveAction(player, player.X + 1, player.Y);
+                case RLKey.L: return new MoveAction(player, player.X + Move.E.X, player.Y);
                 case RLKey.Keypad7:
-                case RLKey.Y: return new MoveAction(player, player.X - 1, player.Y - 1);
+                case RLKey.Y: return new MoveAction(player, player.X + Move.NW.X, player.Y + Move.NW.Y);
                 case RLKey.Keypad9:
-                case RLKey.U: return new MoveAction(player, player.X + 1, player.Y - 1);
+                case RLKey.U: return new MoveAction(player, player.X + Move.NE.X, player.Y + Move.NE.Y);
                 case RLKey.Keypad1:
-                case RLKey.B: return new MoveAction(player, player.X - 1, player.Y + 1);
+                case RLKey.B: return new MoveAction(player, player.X + Move.SW.X, player.Y + Move.SW.Y);
                 case RLKey.Keypad3:
-                case RLKey.N: return new MoveAction(player, player.X + 1, player.Y + 1);
+                case RLKey.N: return new MoveAction(player, player.X + Move.SE.X, player.Y + Move.SE.Y);
+                case RLKey.Keypad5:
+                case RLKey.Period: return new MoveAction(player, player.X, player.Y);
                 case RLKey.Escape:
                     Game.Exit();
                     return null;
