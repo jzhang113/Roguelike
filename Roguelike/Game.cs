@@ -113,6 +113,7 @@ namespace Roguelike
 
             if (update)
             {
+                // Map.UpdatePlayerMaps();
                 Console.WriteLine(Game.Player.Energy);
                 _render = true;
             }
@@ -128,19 +129,21 @@ namespace Roguelike
 
                 _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
                 _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
-                _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
                 
                 MessageHandler.Draw(_messageConsole);
 
                 RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
                 RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
-                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
 
                 _render = false;
             }
 
             Map.Draw(_mapConsole);
+            _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
+            LookHandler.Draw(_inventoryConsole);
+
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
+            RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
             _rootConsole.Draw();
         }
     }

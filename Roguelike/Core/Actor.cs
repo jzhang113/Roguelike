@@ -35,7 +35,7 @@ namespace Roguelike.Core
 
         public virtual bool IsDead() => HP < 0;
         public virtual void TriggerDeath() => Game.Map.RemoveActor(this);
-        public virtual IAction Act() => SimpleAI.GetAction(this) ?? null;
+        public virtual IAction Act() => SimpleAI.GetAction(this);
 
         public virtual int TakeDamage(int power)
         {

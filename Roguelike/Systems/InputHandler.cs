@@ -21,20 +21,23 @@ namespace Roguelike.Systems
                 map.ClearHighlight();
                 Cell current = map.GetCell(square.X, square.Y);
                 IEnumerable<WeightedPoint> path = map.PathToPlayer(square.X, square.Y).Reverse();
-                bool exploredPath = true;
+                bool exploredPathExists = false;
 
                 foreach (WeightedPoint p in path)
                 {
+                    if (!exploredPathExists)
+                        exploredPathExists = true;
+
                     if (!map.GetCell(p.X, p.Y).IsExplored)
                     {
-                        exploredPath = false;
+                        exploredPathExists = false;
                         break;
                     }
 
                     map.Highlight[p.X, p.Y] = RLColor.Red;
                 }
 
-                if (current.IsWalkable && exploredPath)
+                if (current.IsWalkable && exploredPathExists)
                     map.Highlight[square.X, square.Y] = RLColor.Red;
                 /*
                 if (click.GetLeftClick())
@@ -48,6 +51,8 @@ namespace Roguelike.Systems
                         yield return new AttackAction(player, map.GetActor(current), player.BasicAttack);
                 }
                 */
+
+                LookHandler.Display(map.GetActor(current), map.Field[square.X, square.Y]);
             }
 
             RLKeyPress keyPress = console.Keyboard.GetKeyPress();

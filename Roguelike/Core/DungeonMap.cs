@@ -95,6 +95,9 @@ namespace Roguelike.Core
             int nextY = currentY;
             float nearest = goalMap[currentX, currentY];
 
+            if (float.IsNaN(nearest))
+                nearest = 1000;
+
             foreach (WeightedPoint dir in Move.Directions)
             {
                 int newX = currentX + dir.X;
@@ -186,7 +189,7 @@ namespace Roguelike.Core
             }
         }
 
-        private void UpdatePlayerMaps()
+        internal void UpdatePlayerMaps()
         {
             Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
             bool[,] visited = new bool[Width, Height];

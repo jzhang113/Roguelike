@@ -92,6 +92,7 @@
     <Compile Include="Core\MoveAction.cs" />
     <Compile Include="Core\SimpleAI.cs" />
     <Compile Include="Core\Skeleton.cs" />
+    <Compile Include="Systems\LookHandler.cs" />
     <Compile Include="Systems\Terrain.cs" />
     <Compile Include="Interfaces\ISchedulable.cs" />
     <Compile Include="Interfaces\ISkill.cs" />

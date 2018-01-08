@@ -25,10 +25,9 @@ namespace Roguelike.Core
         {
             _skill.Activate();
 
-            if (_target != null && _target != Source)
+            System.Diagnostics.Debug.Assert(_target != null);
+            if (_target != Source)
             {
-                Game.Map.Highlight[_target.X, _target.Y] = RLNET.RLColor.Blue;
-                Game.Map.Highlight[Source.X, Source.Y] = RLNET.RLColor.Red;
                 System.Console.WriteLine(_target.X + " " + _target.Y + "\t" + Source.X + " " + Source.Y);
 
                 int damage = _target.TakeDamage(_power);
