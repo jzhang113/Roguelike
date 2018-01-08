@@ -22,7 +22,7 @@ namespace Roguelike.Systems
                 return false;
 
             _current = _eventSet.Peek();
-            if (_current.Energy < 0)
+            if (_current.Energy <= 0)
             {
                 RefreshAll();
                 _eventSet.Add(_current);

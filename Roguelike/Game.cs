@@ -113,8 +113,7 @@ namespace Roguelike
 
             if (update)
             {
-                // Map.UpdatePlayerMaps();
-                Console.WriteLine(Game.Player.Energy);
+                Map.UpdatePlayerMaps();
                 _render = true;
             }
         }

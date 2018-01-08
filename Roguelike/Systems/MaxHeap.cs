@@ -70,10 +70,10 @@ namespace Roguelike.Systems
         private void ReheapUp()
         {
             int pos = _heapSize - 1;
-            int oldOrder = _orderArray[_heapSize - 1];
-            T oldItem = _heap[_heapSize - 1];
+            T oldItem = _heap[pos];
+            int oldOrder = _orderArray[pos];
 
-            while (pos > 0 && CompareItem(pos, (pos - 1) / 2) > 0)
+            while (pos > 0 && CompareItem(_heap[pos], _orderArray[pos], _heap[(pos - 1) / 2], _orderArray[(pos - 1) / 2]) > 0)
             {
                 _orderArray[pos] = _orderArray[(pos - 1) / 2];
                 _heap[pos] = _heap[(pos - 1) / 2];
@@ -87,19 +87,25 @@ namespace Roguelike.Systems
         private void ReheapDown(int initial)
         {
             int pos = initial;
-            int oldOrder = _orderArray[pos];
             T oldItem = _heap[pos];
+            int oldOrder = _orderArray[pos];
 
             while (pos < _heapSize)
             {
                 int left = 2 * pos + 1;
                 int right = 2 * pos + 2;
                 int swap = pos;
+                T tempItem = oldItem;
+                int tempOrder = oldOrder;
 
-                if (left < _heapSize && CompareItem(swap, left) < 0)
+                if (left < _heapSize && CompareItem(tempItem, tempOrder, _heap[left], _orderArray[left]) < 0)
+                {
                     swap = left;
+                    tempItem = _heap[left];
+                    tempOrder = _orderArray[left];
+                }
 
-                if (right < _heapSize && CompareItem(swap, right) < 0)
+                if (right < _heapSize && CompareItem(tempItem, tempOrder, _heap[right], _orderArray[right]) < 0)
                     swap = right;
 
                 if (swap == pos)
@@ -133,16 +139,13 @@ namespace Roguelike.Systems
             _heap = newHeap;
         }
 
-        private int CompareItem(int a, int b)
+        private int CompareItem(T a, int orderA, T b, int orderB)
         {
-            System.Diagnostics.Debug.Assert(a < _heapSize && a >= 0);
-            System.Diagnostics.Debug.Assert(b < _heapSize && b >= 0);
-
-            int result = _heap[a].CompareTo(_heap[b]);
+            int result = a.CompareTo(b);
             if (result != 0)
                 return result;
             else
-                return _orderArray[b] - _orderArray[a];
+                return orderB - orderA;
         }
     }
 }
