@@ -106,16 +106,8 @@ namespace Roguelike
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            bool update = false;
-
             while (EventScheduler.Update())
-                update = true;
-
-            if (update)
-            {
-                Map.UpdatePlayerMaps();
                 _render = true;
-            }
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)

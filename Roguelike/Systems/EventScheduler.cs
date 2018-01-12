@@ -14,7 +14,6 @@ namespace Roguelike.Systems
 
         public void AddActor(ISchedulable schedulable) => _eventSet.Add(schedulable);
         public void RemoveActor(ISchedulable schedulable) => _eventSet.Remove(schedulable);
-        public void RefreshAll() => _eventSet.UpdateAll();
 
         public bool Update()
         {
@@ -22,12 +21,11 @@ namespace Roguelike.Systems
                 return false;
 
             _current = _eventSet.Peek();
-            if (_current.Energy <= 0)
+
+            if (_current.Energy < 0)
             {
                 RefreshAll();
-                _eventSet.Add(_current);
-                _eventSet.GetMax();
-                return false;
+                Update();
             }
 
             IAction action = _current.Act();
@@ -45,5 +43,7 @@ namespace Roguelike.Systems
 
             return true;
         }
+
+        private void RefreshAll() => _eventSet.UpdateAll();
     }
 }
