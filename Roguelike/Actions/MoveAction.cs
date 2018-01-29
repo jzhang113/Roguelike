@@ -1,17 +1,18 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using RogueSharp;
 
 namespace Roguelike.Core
 {
     class MoveAction : IAction
     {
-        public IActor Source { get; }
+        public Actor Source { get; }
         public int EnergyCost { get; set; } = 100;
 
         private int _newX;
         private int _newY;
 
-        public MoveAction(IActor source, int x, int y)
+        public MoveAction(Actor source, int x, int y)
         {
             _newX = x;
             _newY = y;

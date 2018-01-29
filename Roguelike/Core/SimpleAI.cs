@@ -1,11 +1,12 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using Roguelike.Systems;
 
 namespace Roguelike.Core
 {
     class SimpleAI
     {
-        public static IAction GetAction(IActor monster)
+        public static IAction GetAction(Actor monster)
         {
             switch (monster.State)
             {

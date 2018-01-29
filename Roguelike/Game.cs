@@ -1,12 +1,11 @@
 ﻿using RLNET;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using Roguelike.Systems;
 using Roguelike.Configurations;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;
-using System.Collections.Generic;
+using Roguelike.Actors;
 
 namespace Roguelike
 {
@@ -88,6 +87,14 @@ namespace Roguelike
                 }
                 Map.AddActor(s);
             }
+            
+            Items.Spear spear = new Items.Spear(Interfaces.Materials.Wood)
+            {
+                X = Player.X - 1,
+                Y = Player.Y - 1,
+                Color = Swatch.DbStone
+            };
+            Map.AddItem(spear);
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;

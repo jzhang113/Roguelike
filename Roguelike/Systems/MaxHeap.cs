@@ -1,5 +1,4 @@
-﻿using System;
-using Roguelike.Interfaces;
+﻿using Roguelike.Interfaces;
 
 namespace Roguelike.Systems
 {

@@ -1,14 +1,15 @@
 ﻿using RLNET;
+using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 
-namespace Roguelike.Core
+namespace Roguelike.Actors
 {
     class Player : Actor
     {
         private RLRootConsole _rootConsole;
 
-        public Player(RLRootConsole console)
+        public Player(RLRootConsole console) : base()
         {
             _rootConsole = console;
 
@@ -20,7 +21,6 @@ namespace Roguelike.Core
             HP = 100;
             SP = 50;
             MP = 50;
-            BasicAttack = new DamageSkill();
         }
 
         public override IAction Act() => InputHandler.HandleInput(_rootConsole);

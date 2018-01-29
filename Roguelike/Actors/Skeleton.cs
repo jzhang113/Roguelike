@@ -1,11 +1,10 @@
-﻿using Roguelike.Interfaces;
-using System.Collections.Generic;
+﻿using Roguelike.Core;
 
-namespace Roguelike.Core
+namespace Roguelike.Actors
 {
     class Skeleton : Actor
     {
-        public Skeleton()
+        public Skeleton() : base()
         {
             Awareness = 10;
             Name = "Skeleton";
@@ -15,7 +14,6 @@ namespace Roguelike.Core
             HP = 50;
             SP = 20;
             MP = 20;
-            BasicAttack = new DamageSkill();
         }
     }
 }

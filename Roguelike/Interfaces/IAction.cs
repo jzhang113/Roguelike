@@ -1,9 +1,11 @@
-﻿namespace Roguelike.Interfaces
+﻿using Roguelike.Actors;
+
+namespace Roguelike.Interfaces
 {
     interface IAction
     {
-        IActor Source { get; }
-        int EnergyCost { get; set; }
+        Actor Source { get; }
+        int EnergyCost { get; }
         
         void Execute();
     }

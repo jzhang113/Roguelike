@@ -1,17 +1,18 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 
 namespace Roguelike.Core
 {
     class AttackAction : IAction
     {
-        public IActor Source { get; }
-        public int EnergyCost { get; set; }
+        public Actor Source { get; }
+        public int EnergyCost { get; }
 
         private int _power;
-        private IActor _target;
+        private Actor _target;
         private ISkill _skill;
 
-        public AttackAction(IActor source, IActor target, ISkill attack)
+        public AttackAction(Actor source, Actor target, ISkill attack)
         {
             _skill = attack;
             _power = attack.Power + source.STR;
@@ -28,8 +29,6 @@ namespace Roguelike.Core
             System.Diagnostics.Debug.Assert(_target != null);
             if (_target != Source)
             {
-                System.Console.WriteLine(_target.X + " " + _target.Y + "\t" + Source.X + " " + Source.Y);
-
                 int damage = _target.TakeDamage(_power);
                 Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, _target.Name, damage));
 

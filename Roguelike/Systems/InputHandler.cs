@@ -4,6 +4,7 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using Roguelike.Actors;
 
 namespace Roguelike.Systems
 {

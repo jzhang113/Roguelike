@@ -1,4 +1,5 @@
 ﻿using RLNET;
+using Roguelike.Actors;
 using Roguelike.Core;
 
 namespace Roguelike.Systems

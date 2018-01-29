@@ -31,7 +31,6 @@ namespace Roguelike.Systems
             IAction action = _current.Act();
             if (action == null)
             {
-                System.Console.WriteLine(_current);
                 return false;
             }
 

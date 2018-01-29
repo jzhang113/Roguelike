@@ -1,10 +1,14 @@
 ﻿using RLNET;
+using Roguelike.Core;
 using Roguelike.Interfaces;
+using Roguelike.Items;
+using Roguelike.Skills;
 using RogueSharp;
+using System.Collections.Generic;
 
-namespace Roguelike.Core
+namespace Roguelike.Actors
 {
-    class Actor : IActor, ISchedulable, IDrawable
+    class Actor : Drawable, IActor, ISchedulable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -25,13 +29,25 @@ namespace Roguelike.Core
         public ISkill BasicAttack { get; set; }
         public ActorState State { get; set; }
 
-        public RLColor Color { get; set; }
-        public char Symbol { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
+        public override RLColor Color { get; set; }
+        public override char Symbol { get; set; }
+        public override int X { get; set; }
+        public override int Y { get; set; }
 
-        public int Energy { get; set; } = 100;
-        public int RefreshRate { get; set; } = 100;
+        public int Energy { get; set; }
+        public int RefreshRate { get; set; }
+
+        public Weapon Weapon { get; set; }
+        public Armor Armor { get; set; }
+        public List<IObject> Inventory { get; set; }
+
+        public Actor()
+        {
+            Energy = 100;
+            RefreshRate = 100;
+            // TODO 1: Basic attacks should scale with stats.
+            BasicAttack = new DamageSkill(100, 100);
+        }
 
         public virtual bool IsDead() => HP < 0;
         public virtual void TriggerDeath() => Game.Map.RemoveActor(this);
@@ -41,22 +57,6 @@ namespace Roguelike.Core
         {
             HP -= power;
             return power;
-        }
-
-        public void Draw(RLConsole console, IMap map)
-        {
-            if (!map.GetCell(X, Y).IsExplored)
-                return;
-
-            if (map.IsInFov(X, Y))
-            {
-                console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
-            }
-            else
-            {
-                //console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
-                console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
-            }
         }
 
         public int CompareTo(ISchedulable other) => Energy - other.Energy;

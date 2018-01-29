@@ -83,16 +83,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Actor.cs" />
-    <Compile Include="Core\AttackAction.cs" />
+    <Compile Include="Actions\ThrowAction.cs" />
+    <Compile Include="Actors\Actor.cs" />
+    <Compile Include="Actions\AttackAction.cs" />
     <Compile Include="Core\Colors.cs" />
-    <Compile Include="Core\DamageSkill.cs" />
+    <Compile Include="Items\Armor.cs" />
+    <Compile Include="Items\Item.cs" />
+    <Compile Include="Items\Spear.cs" />
+    <Compile Include="Items\Weapon.cs" />
+    <Compile Include="Skills\DamageSkill.cs" />
     <Compile Include="Core\DungeonMap.cs" />
     <Compile Include="Core\Move.cs" />
-    <Compile Include="Core\MoveAction.cs" />
+    <Compile Include="Actions\MoveAction.cs" />
     <Compile Include="Core\SimpleAI.cs" />
-    <Compile Include="Core\Skeleton.cs" />
-    <Compile Include="Interfaces\IEquipable.cs" />
+    <Compile Include="Actors\Skeleton.cs" />
+    <Compile Include="Interfaces\IMaterial.cs" />
+    <Compile Include="Interfaces\IObject.cs" />
     <Compile Include="Systems\LookHandler.cs" />
     <Compile Include="Systems\Terrain.cs" />
     <Compile Include="Interfaces\ISchedulable.cs" />
@@ -100,11 +106,11 @@
     <Compile Include="Interfaces\IAction.cs" />
     <Compile Include="Systems\EventScheduler.cs" />
     <Compile Include="Systems\InputHandler.cs" />
-    <Compile Include="Core\Player.cs" />
+    <Compile Include="Actors\Player.cs" />
     <Compile Include="Core\Swatch.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Interfaces\IActor.cs" />
-    <Compile Include="Interfaces\IDrawable.cs" />
+    <Compile Include="Interfaces\Drawable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\MapGenerator.cs" />
     <Compile Include="Systems\MessageHandler.cs" />

@@ -1,5 +1,7 @@
 ﻿using RLNET;
+using Roguelike.Actors;
 using Roguelike.Interfaces;
+using Roguelike.Items;
 using Roguelike.Systems;
 using RogueSharp;
 using System.Collections.Generic;
@@ -14,6 +16,7 @@ namespace Roguelike.Core
         internal float[,] PlayerMap { get; }
         internal float[,] FleeMap { get; }
         internal ICollection<Actor> Units { get; }
+        internal ICollection<Item> Items { get; }
 
         public DungeonMap(int width, int height) : base(width, height)
         {
@@ -22,6 +25,7 @@ namespace Roguelike.Core
             PlayerMap = new float[width, height];
             FleeMap = new float[width, height];
             Units = new List<Actor>();
+            Items = new List<Item>();
         }
 
         public bool AddActor(Actor unit)
@@ -48,6 +52,15 @@ namespace Roguelike.Core
             Game.EventScheduler.RemoveActor(unit);
 
             return Units.Remove(unit);
+        }
+
+        public bool AddItem(Item item)
+        {
+            if (Items.Contains(item))
+                return false;
+
+            Items.Add(item);
+            return true;
         }
 
         public bool SetActorPosition(IActor actor, int x, int y)
@@ -119,6 +132,12 @@ namespace Roguelike.Core
             foreach (Cell cell in GetAllCells())
             {
                 DrawCell(mapConsole, cell);
+            }
+
+            // TODO 3: Don't draw items that aren't on the map.
+            foreach (Item item in Items)
+            {
+                item.Draw(mapConsole, this);
             }
 
             foreach (Actor unit in Units)
