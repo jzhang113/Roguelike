@@ -6,6 +6,7 @@ namespace Roguelike.Items
     {
         public Spear(IMaterial type)
         {
+            Name = "spear";
             Material = type;
 
             // TODO 2: Allow for variable formulaes.

@@ -4,7 +4,7 @@ using RogueSharp;
 
 namespace Roguelike.Interfaces
 {
-    abstract class Drawable
+    public abstract class Drawable
     {
         public abstract RLColor Color { get; set; }
         public abstract char Symbol { get; set; }

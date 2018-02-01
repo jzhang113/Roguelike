@@ -1,7 +1,8 @@
 ﻿namespace Roguelike.Interfaces
 {
-    interface IObject
+    public interface IObject
     {
+        string Name { get; set; }
         IMaterial Material { get; set; }
         IActor Carrier { get; set; }
         

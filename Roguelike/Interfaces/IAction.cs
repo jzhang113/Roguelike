@@ -2,7 +2,7 @@
 
 namespace Roguelike.Interfaces
 {
-    interface IAction
+    public interface IAction
     {
         Actor Source { get; }
         int EnergyCost { get; }

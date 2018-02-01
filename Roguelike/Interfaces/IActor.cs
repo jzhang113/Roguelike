@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Interfaces
 {
-    interface IActor
+    public interface IActor
     {
         string Name { get; set; }
         int Awareness { get; set; }
@@ -28,5 +28,5 @@
         void TriggerDeath();
     }
 
-    enum ActorState { Wander, Sleep, Chase, Flee, Dead };
+    public enum ActorState { Wander, Sleep, Chase, Flee, Dead };
 }

@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Items
 {
-    abstract class Armor : Item
+    public abstract class Armor : Item
     {
         public override char Symbol { get; set; } = '[';
 

@@ -3,13 +3,14 @@ using Roguelike.Interfaces;
 
 namespace Roguelike.Items
 {
-    class Item : Drawable, IObject
+    public class Item : Drawable, IObject
     {
         public int AttackSpeed { get; set; }
         public int Damage { get; set; }
         public int MeleeRange { get; set; }
         public int ThrowRange { get; set; }
 
+        public string Name { get; set; }
         public IMaterial Material { get; set; }
         public IActor Carrier { get; set; }
         public override RLColor Color { get; set; }

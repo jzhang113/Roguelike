@@ -38,14 +38,14 @@
         };
     }
 
-    class IMaterial
+    public class IMaterial
     {
         public MaterialTypes MaterialType { get; set; }
         public int Strength { get; set; }
         public int Durability { get; set; }
     }
 
-    enum MaterialTypes
+    public enum MaterialTypes
     {
         Wood,
         Glass,

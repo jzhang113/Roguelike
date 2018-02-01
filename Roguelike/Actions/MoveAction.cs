@@ -7,7 +7,7 @@ namespace Roguelike.Core
     class MoveAction : IAction
     {
         public Actor Source { get; }
-        public int EnergyCost { get; set; } = 100;
+        public int EnergyCost { get; } = 100;
 
         private int _newX;
         private int _newY;
@@ -29,6 +29,14 @@ namespace Roguelike.Core
             if (cell.IsWalkable)
             {
                 //Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", Source.Name, _newX, _newY));
+
+                // TODO 3: Handle checking for items better.
+                foreach (Items.Item i in Game.Map.Items)
+                {
+                    if (i.X == _newX && i.Y == _newY && Source is Player)
+                        Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", i.Name));
+                }
+
                 Game.Map.SetActorPosition(Source, _newX, _newY);
             }
             else

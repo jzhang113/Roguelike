@@ -5,6 +5,7 @@ using Roguelike.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using Roguelike.Actors;
+using Roguelike.Actions;
 
 namespace Roguelike.Systems
 {
@@ -84,6 +85,7 @@ namespace Roguelike.Systems
                 case RLKey.N: return new MoveAction(player, player.X + Move.SE.X, player.Y + Move.SE.Y);
                 case RLKey.Keypad5:
                 case RLKey.Period: return new MoveAction(player, player.X, player.Y);
+                case RLKey.Comma: return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);
                 case RLKey.Escape:
                     Game.Exit();
                     return null;

@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\PickupAction.cs" />
     <Compile Include="Actions\ThrowAction.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Actions\AttackAction.cs" />

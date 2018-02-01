@@ -2,7 +2,7 @@
 
 namespace Roguelike.Items
 {
-    abstract class Weapon : Item
+    public abstract class Weapon : Item
     {
         public override char Symbol { get; set; } = '(';
 

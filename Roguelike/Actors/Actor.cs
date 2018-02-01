@@ -3,12 +3,11 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Skills;
-using RogueSharp;
 using System.Collections.Generic;
 
 namespace Roguelike.Actors
 {
-    class Actor : Drawable, IActor, ISchedulable
+    public class Actor : Drawable, IActor, ISchedulable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -39,12 +38,14 @@ namespace Roguelike.Actors
 
         public Weapon Weapon { get; set; }
         public Armor Armor { get; set; }
-        public List<IObject> Inventory { get; set; }
+        public IList<IObject> Inventory { get; set; }
 
         public Actor()
         {
             Energy = 100;
             RefreshRate = 100;
+
+            Inventory = new List<IObject>();
             // TODO 1: Basic attacks should scale with stats.
             BasicAttack = new DamageSkill(100, 100);
         }

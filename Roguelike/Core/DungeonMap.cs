@@ -4,6 +4,7 @@ using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 using RogueSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -56,11 +57,24 @@ namespace Roguelike.Core
 
         public bool AddItem(Item item)
         {
+            System.Diagnostics.Debug.Assert(!Items.Contains(item));
             if (Items.Contains(item))
                 return false;
 
             Items.Add(item);
+
+            if (Field[item.X, item.Y].ItemStack == null)
+                Field[item.X, item.Y].ItemStack = new List<Item>();
+
+            Field[item.X, item.Y].ItemStack.Add(item);
             return true;
+        }
+
+        public void RemoveItem(Item item)
+        {
+            System.Diagnostics.Debug.Assert(Items.Contains(item));
+            Items.Remove(item);
+            Field[item.X, item.Y].ItemStack.Remove(item);
         }
 
         public bool SetActorPosition(IActor actor, int x, int y)
