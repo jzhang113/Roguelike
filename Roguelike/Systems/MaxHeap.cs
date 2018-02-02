@@ -40,6 +40,7 @@ namespace Roguelike.Systems
                     _heap[i] = _heap[--_heapSize];
                     _orderArray[i] = _orderArray[_heapSize];
                     ReheapDown(i);
+                    // Q: Can we just break here? Can actors appear multiple times on the queue?
                 }
             }
         }

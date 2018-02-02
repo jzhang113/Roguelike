@@ -11,6 +11,7 @@
         public WindowConfig MessageView { get; set; }
         public WindowConfig StatView { get; set; }
         public WindowConfig InventoryView { get; set; }
+        public WindowConfig ViewWindow { get; set; }
     }
 
     class WindowConfig

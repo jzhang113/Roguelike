@@ -3,6 +3,7 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Skills;
+using Roguelike.Systems;
 using System.Collections.Generic;
 
 namespace Roguelike.Actors
@@ -38,14 +39,14 @@ namespace Roguelike.Actors
 
         public Weapon Weapon { get; set; }
         public Armor Armor { get; set; }
-        public IList<IObject> Inventory { get; set; }
+        public InventoryHandler Inventory { get; set; }
 
         public Actor()
         {
             Energy = 100;
             RefreshRate = 100;
 
-            Inventory = new List<IObject>();
+            Inventory = new InventoryHandler();
             // TODO 1: Basic attacks should scale with stats.
             BasicAttack = new DamageSkill(100, 100);
         }

@@ -7,12 +7,8 @@ namespace Roguelike.Actors
 {
     class Player : Actor
     {
-        private RLRootConsole _rootConsole;
-
-        public Player(RLRootConsole console) : base()
+        public Player() : base()
         {
-            _rootConsole = console;
-
             Awareness = 100;
             Name = "Player";
             Color = Colors.Player;
@@ -23,7 +19,7 @@ namespace Roguelike.Actors
             MP = 50;
         }
 
-        public override IAction Act() => InputHandler.HandleInput(_rootConsole);
+        public override IAction Act() => InputHandler.HandleInput();
         public override void TriggerDeath() => Game.GameOver();
     }
 }

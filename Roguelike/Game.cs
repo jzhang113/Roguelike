@@ -11,6 +11,8 @@ namespace Roguelike
 {
     class Game
     {
+        public enum Mode { Normal, Inventory };
+
         public static Configuration Config { get; private set; }
         public static DungeonMap Map { get; private set; }
         public static Player Player { get; private set; }
@@ -18,12 +20,15 @@ namespace Roguelike
         public static EventScheduler EventScheduler { get; private set; }
         public static Random CombatRandom { get; private set; }
 
+        public static Mode GameMode { get; set; }
+
         private static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
         private static RLConsole _messageConsole;
         private static RLConsole _statConsole;
         private static RLConsole _inventoryConsole;
-        
+        private static RLConsole _viewConsole;
+
         private static bool _render = true;
 
         static void Main(string[] args)
@@ -42,6 +47,9 @@ namespace Roguelike
             _messageConsole = new RLConsole(Config.MessageView.Width, Config.MessageView.Height);
             _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
             _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
+            _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
+            
+            InputHandler.Initialize(_rootConsole);
 
             //int seed = (int) DateTime.Now.Ticks;
             int mainSeed = 2127758832;
@@ -92,9 +100,19 @@ namespace Roguelike
             {
                 X = Player.X - 1,
                 Y = Player.Y - 1,
-                Color = Swatch.DbStone
+                Color = Swatch.DbBlood
             };
             Map.AddItem(spear);
+
+            Items.HeavyArmor ha = new Items.HeavyArmor(Interfaces.Materials.Iron)
+            {
+                X = Player.X - 2,
+                Y = Player.Y - 3,
+                Color = Swatch.DbMetal
+            };
+            Map.AddItem(ha);
+
+            GameMode = Mode.Normal;
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
@@ -109,6 +127,11 @@ namespace Roguelike
         internal static void Exit()
         {
             _rootConsole.Close();
+        }
+
+        internal static void ForceRender()
+        {
+            _render = true;
         }
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
@@ -137,11 +160,20 @@ namespace Roguelike
             }
 
             Map.Draw(_mapConsole);
-            _inventoryConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
-            LookHandler.Draw(_inventoryConsole);
+            _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
+            LookHandler.Draw(_viewConsole);
+
+            _mapConsole.SetBackColor(50, 80, RLColor.Red);
 
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-            RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width, 0);
+            RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, _rootConsole, Config.Map.Width, 0);
+
+            if (GameMode == Mode.Inventory)
+            {
+                Player.Inventory.Draw(_inventoryConsole);
+                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
+            }
+
             _rootConsole.Draw();
         }
     }

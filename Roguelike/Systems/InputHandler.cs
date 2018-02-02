@@ -11,9 +11,26 @@ namespace Roguelike.Systems
 {
     class InputHandler
     {
-        public static IAction HandleInput(RLRootConsole console)
+        private static RLRootConsole _console;
+
+        public static void Initialize(RLRootConsole console)
         {
-            RLMouse click = console.Mouse;
+            _console = console;
+        }
+
+        public static RLKeyPress GetKeyPress()
+        {
+            RLKeyPress keyPress = null;
+
+            while (keyPress == null)
+                keyPress = _console.Keyboard.GetKeyPress();
+
+            return keyPress;
+        }
+
+        public static IAction HandleInput()
+        {
+            RLMouse click = _console.Mouse;
             DungeonMap map = Game.Map;
             Player player = Game.Player;
             Point square = GetClickPosition(click.X, click.Y);
@@ -57,12 +74,16 @@ namespace Roguelike.Systems
                 LookHandler.Display(map.GetActor(current), map.Field[square.X, square.Y]);
             }
 
-            RLKeyPress keyPress = console.Keyboard.GetKeyPress();
+            RLKeyPress keyPress = _console.Keyboard.GetKeyPress();
             if (keyPress == null)
                 return null;
 
+            if (Game.GameMode == Game.Mode.Inventory)
+                return HandleInventoryInput(keyPress);
+
             switch (keyPress.Key)
             {
+                #region Movement Keys
                 case RLKey.Left:
                 case RLKey.Keypad4:
                 case RLKey.H: return new MoveAction(player, player.X + Move.W.X, player.Y);
@@ -86,8 +107,27 @@ namespace Roguelike.Systems
                 case RLKey.Keypad5:
                 case RLKey.Period: return new MoveAction(player, player.X, player.Y);
                 case RLKey.Comma: return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);
+                #endregion
+                case RLKey.D:
+                    return new DropAction(player);
+                case RLKey.I:
+                    Game.GameMode = Game.Mode.Inventory;
+                    return null;
                 case RLKey.Escape:
                     Game.Exit();
+                    return null;
+                default: return null;
+            }
+        }
+
+        private static IAction HandleInventoryInput(RLKeyPress keyPress)
+        {
+            // TODO: Implement this
+            switch(keyPress.Key)
+            {
+                case RLKey.Escape:
+                    Game.GameMode = Game.Mode.Normal;
+                    Game.ForceRender();
                     return null;
                 default: return null;
             }

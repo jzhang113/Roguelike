@@ -23,7 +23,11 @@
 		"width": 60
 	},
 	"inventoryView": {
-		"height": 80,
+		"height": 60,
+		"width": 30
+	},
+	"viewWindow": {
+		"height": 60,
 		"width": 20
 	}
 }

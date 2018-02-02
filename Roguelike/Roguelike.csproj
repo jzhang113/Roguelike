@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\DropAction.cs" />
     <Compile Include="Actions\PickupAction.cs" />
     <Compile Include="Actions\ThrowAction.cs" />
     <Compile Include="Actors\Actor.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Items\Armor.cs" />
     <Compile Include="Items\Item.cs" />
+    <Compile Include="Items\HeavyArmor.cs" />
     <Compile Include="Items\Spear.cs" />
     <Compile Include="Items\Weapon.cs" />
     <Compile Include="Skills\DamageSkill.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="Actors\Skeleton.cs" />
     <Compile Include="Interfaces\IMaterial.cs" />
     <Compile Include="Interfaces\IObject.cs" />
+    <Compile Include="Systems\InventoryHandler.cs" />
     <Compile Include="Systems\LookHandler.cs" />
     <Compile Include="Systems\Terrain.cs" />
     <Compile Include="Interfaces\ISchedulable.cs" />

@@ -1,0 +1,19 @@
+﻿using Roguelike.Interfaces;
+
+namespace Roguelike.Items
+{
+    class HeavyArmor : Armor
+    {
+        public HeavyArmor(IMaterial type)
+        {
+            Name = "heavy armor";
+            Material = type;
+
+            // TODO 2: Allow for variable formulaes.
+            AttackSpeed = 1000;
+            Damage = 100;
+            MeleeRange = 1;
+            ThrowRange = 3;
+        }
+    }
+}
