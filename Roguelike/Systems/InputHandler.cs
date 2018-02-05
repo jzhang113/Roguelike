@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Roguelike.Actors;
 using Roguelike.Actions;
+using OpenTK.Input;
 
 namespace Roguelike.Systems
 {
@@ -16,16 +17,6 @@ namespace Roguelike.Systems
         public static void Initialize(RLRootConsole console)
         {
             _console = console;
-        }
-
-        public static RLKeyPress GetKeyPress()
-        {
-            RLKeyPress keyPress = null;
-
-            while (keyPress == null)
-                keyPress = _console.Keyboard.GetKeyPress();
-
-            return keyPress;
         }
 
         public static IAction HandleInput()
@@ -79,7 +70,20 @@ namespace Roguelike.Systems
                 return null;
 
             if (Game.GameMode == Game.Mode.Inventory)
-                return HandleInventoryInput(keyPress);
+            {
+                HandleInventoryInput(keyPress);
+                return null;
+            }
+
+            if (Game.GameMode == Game.Mode.Menu)
+            {
+                HandleInventoryInput(keyPress);
+
+                if (keyPress != null)
+                    return new DropAction(player, keyPress.Key);
+                else
+                    return null;
+            }
 
             switch (keyPress.Key)
             {
@@ -109,7 +113,8 @@ namespace Roguelike.Systems
                 case RLKey.Comma: return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);
                 #endregion
                 case RLKey.D:
-                    return new DropAction(player);
+                    Game.GameMode = Game.Mode.Menu;
+                    return null;
                 case RLKey.I:
                     Game.GameMode = Game.Mode.Inventory;
                     return null;
@@ -120,7 +125,7 @@ namespace Roguelike.Systems
             }
         }
 
-        private static IAction HandleInventoryInput(RLKeyPress keyPress)
+        private static RLKeyPress HandleInventoryInput(RLKeyPress keyPress)
         {
             // TODO: Implement this
             switch(keyPress.Key)
@@ -129,7 +134,9 @@ namespace Roguelike.Systems
                     Game.GameMode = Game.Mode.Normal;
                     Game.ForceRender();
                     return null;
-                default: return null;
+                default:
+                    System.Console.WriteLine(keyPress.Key.ToString());
+                    return null;
             }
         }
 

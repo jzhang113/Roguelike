@@ -11,7 +11,7 @@ namespace Roguelike
 {
     class Game
     {
-        public enum Mode { Normal, Inventory };
+        public enum Mode { Normal, Inventory, Menu };
 
         public static Configuration Config { get; private set; }
         public static DungeonMap Map { get; private set; }
@@ -22,7 +22,7 @@ namespace Roguelike
 
         public static Mode GameMode { get; set; }
 
-        private static RLRootConsole _rootConsole;
+        public static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
         private static RLConsole _messageConsole;
         private static RLConsole _statConsole;
@@ -74,7 +74,7 @@ namespace Roguelike
             MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height);
             Map = mapGenerator.CreateMap(new Random(generatorSeed[0]));
 
-            Player = new Player(_rootConsole);
+            Player = new Player();
 
             while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
             {

@@ -25,7 +25,7 @@ namespace Roguelike.Systems
             if (_current.Energy < 0)
             {
                 RefreshAll();
-                Update();
+                return Update();
             }
 
             IAction action = _current.Act();

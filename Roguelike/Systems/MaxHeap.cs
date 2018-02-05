@@ -28,7 +28,7 @@ namespace Roguelike.Systems
 
             _orderArray[_heapSize] = _count++;
             _heap[_heapSize++] = item;
-            ReheapUp();
+            ReheapUp(_heapSize - 1);
         }
 
         public void Remove(T item)
@@ -37,9 +37,20 @@ namespace Roguelike.Systems
             {
                 if (_heap[i].Equals(item))
                 {
+                    T oldItem = _heap[i];
+                    int oldOrder = _orderArray[i];
+
                     _heap[i] = _heap[--_heapSize];
                     _orderArray[i] = _orderArray[_heapSize];
-                    ReheapDown(i);
+
+                    T newItem = _heap[i];
+                    int newOrder = _orderArray[i];
+
+                    if (CompareItem(oldItem, oldOrder, newItem, newOrder) > 0)
+                        ReheapUp(i);
+                    else
+                       ReheapDown(i);
+
                     // Q: Can we just break here? Can actors appear multiple times on the queue?
                 }
             }
@@ -67,9 +78,9 @@ namespace Roguelike.Systems
         public bool IsEmpty() => _heapSize == 0;
         public int Size() => _heapSize;
 
-        private void ReheapUp()
+        private void ReheapUp(int initial)
         {
-            int pos = _heapSize - 1;
+            int pos = initial;
             T oldItem = _heap[pos];
             int oldOrder = _orderArray[pos];
 
