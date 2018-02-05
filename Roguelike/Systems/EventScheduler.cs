@@ -2,10 +2,11 @@
 
 namespace Roguelike.Systems
 {
+    // Effectively the main game loop. Actions are processed until one becomes null, which should
+    // only occur with the Player.
     class EventScheduler
     {
         private MaxHeap<ISchedulable> _eventSet;
-        private ISchedulable _current;
         
         public EventScheduler(int size)
         {
@@ -20,29 +21,48 @@ namespace Roguelike.Systems
             if (_eventSet.IsEmpty())
                 return false;
 
-            _current = _eventSet.Peek();
+            ISchedulable current = _eventSet.Peek();
 
-            if (_current.Energy < 0)
+            // If the current Actor has negative energy, then everyone must have negative energy.
+            // Give everyone some energy and carry on acting.
+            if (current.Energy < 0)
             {
-                RefreshAll();
+                _eventSet.UpdateAll();
                 return Update();
             }
 
-            IAction action = _current.Act();
+            // Break the event loop when there is no Action. Currently, the only situation where
+            // this occurs is in the input handling for the Player's Actions.
+            IAction action = current.Act();
             if (action == null)
+                return false;
+
+            // Check that the action can succeed before executing it. If there are potential
+            // alternative actions, try them as well.
+            RedirectMessage status = action.Validate();
+            while (!status.Success && status.Alternative != null)
             {
+                action = status.Alternative;
+                status = action.Validate();
+            } 
+
+            // If we still don't succeed, the action is bad and should be cancelled. However, we
+            // should be careful that the AI does not give invalid Actions, as this will lead to
+            // an infinite loop.
+            if (!status.Success)
+            {
+                // TODO: cancellation code
                 return false;
             }
 
             action.Execute();
-            _current.Energy -= action.EnergyCost;
+            current.Energy -= action.EnergyCost;
 
-            _eventSet.Add(_current);
+            // Move the current Actor to the bottom of the heap.
+            _eventSet.Add(current);
             _eventSet.GetMax();
 
             return true;
         }
-
-        private void RefreshAll() => _eventSet.UpdateAll();
     }
 }

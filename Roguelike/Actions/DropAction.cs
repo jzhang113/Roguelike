@@ -20,6 +20,11 @@ namespace Roguelike.Actions
             _key = key;
         }
 
+        public RedirectMessage Validate()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Execute()
         {
             _key.ToString();

@@ -2,6 +2,7 @@
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using System.Collections.Generic;
+using Roguelike.Systems;
 
 namespace Roguelike.Actions
 {
@@ -18,19 +19,22 @@ namespace Roguelike.Actions
             _itemStack = itemStack;
         }
 
-        public void Execute()
+        public RedirectMessage Validate()
         {
-            if (_itemStack == null)
+            // Trying to pick up an empty tile.
+            if (_itemStack == null || _itemStack.Count == 0)
             {
                 Game.MessageHandler.AddMessage("There's nothing to pick up here");
-                return;
+                return new RedirectMessage(false);
             }
 
+            return new RedirectMessage(true);
+        }
+
+        public void Execute()
+        {
             switch(_itemStack.Count)
             {
-                case 0:
-                    Game.MessageHandler.AddMessage("There's nothing to pick up here");
-                    break;
                 case 1:
                     Item obj = _itemStack[0];
                     Source.Inventory.Add(obj);

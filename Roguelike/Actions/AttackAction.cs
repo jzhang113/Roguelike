@@ -1,5 +1,6 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Interfaces;
+using Roguelike.Systems;
 
 namespace Roguelike.Core
 {
@@ -22,21 +23,37 @@ namespace Roguelike.Core
             EnergyCost = attack.Speed;
         }
 
+        public RedirectMessage Validate()
+        {
+            if (_target == null)
+            {
+                // TODO: Message handler should probably distinguish when you do stuff vs when enemies do stuff
+                Game.MessageHandler.AddMessage(string.Format("{0} attacks thin air.", Source));
+                return new RedirectMessage(false);
+            }
+
+            if (_target == Source)
+            {
+                // Q: Should this even be allowed?
+                Game.MessageHandler.AddMessage(string.Format("{0} tried to attack itself!", Source));
+                return new RedirectMessage(false);
+            }
+
+            return new RedirectMessage(true);
+        }
+
         public void Execute()
         {
+            // TODO: still gotta work out the relationship between attacks and skill
             _skill.Activate();
+            
+            int damage = _target.TakeDamage(_power);
+            Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, _target.Name, damage));
 
-            System.Diagnostics.Debug.Assert(_target != null);
-            if (_target != Source)
+            if (_target.IsDead())
             {
-                int damage = _target.TakeDamage(_power);
-                Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, _target.Name, damage));
-
-                if (_target.IsDead())
-                {
-                    Game.MessageHandler.AddMessage(_target.Name + " is dead");
-                    _target.TriggerDeath();
-                }
+                Game.MessageHandler.AddMessage(_target.Name + " is dead");
+                _target.TriggerDeath();
             }
         }
     }
