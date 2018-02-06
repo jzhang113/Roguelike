@@ -7,6 +7,8 @@ namespace Roguelike.Systems
 {
     class MessageHandler
     {
+        public bool Redraw { get; private set; }
+
         private readonly int _maxSize;
         private readonly IList<string> messages;
 
@@ -22,12 +24,16 @@ namespace Roguelike.Systems
 
             if (messages.Count > _maxSize)
                 messages.RemoveAt(0);
+
+            Redraw = true;
         }
 
         public void AppendMessage(string text)
         {
             int prev = messages.Count - 1;
             messages[prev] += " " + text;
+
+            Redraw = true;
         }
 
         public void Draw(RLConsole console)
@@ -41,6 +47,8 @@ namespace Roguelike.Systems
                 console.Print(1, yPos, messages[messages.Count - i - 1], Colors.TextHeading);
                 yPos -= 2;
             }
+
+            Redraw = false;
         }
     }
 }

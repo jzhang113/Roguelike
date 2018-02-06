@@ -1,9 +1,7 @@
-﻿using RLNET;
-using Roguelike.Actors;
+﻿using Roguelike.Actors;
 using Roguelike.Interfaces;
+using Roguelike.Items;
 using Roguelike.Systems;
-using System;
-using System.Threading;
 
 namespace Roguelike.Actions
 {
@@ -12,9 +10,9 @@ namespace Roguelike.Actions
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
 
-        private RLKey _key;
+        private char _key;
 
-        public DropAction(Actor source, RLKey key)
+        public DropAction(Actor source, char key)
         {
             Source = source;
             _key = key;
@@ -22,12 +20,24 @@ namespace Roguelike.Actions
 
         public RedirectMessage Validate()
         {
-            throw new NotImplementedException();
+            if (!Source.Inventory.HasKey(_key))
+            {
+                Game.MessageHandler.AddMessage("No such item to drop.");
+                return new RedirectMessage(false);
+            }
+
+            return new RedirectMessage(true);
         }
 
         public void Execute()
         {
-            _key.ToString();
+            Item item = Source.Inventory.GetItem(_key);
+            Source.Inventory.Remove(item);
+
+            item.X = Source.X;
+            item.Y = Source.Y;
+            Game.Map.AddItem(item);
+            Game.MessageHandler.AddMessage(string.Format("You drop a {0}.", item.Name));
         }
     }
 }

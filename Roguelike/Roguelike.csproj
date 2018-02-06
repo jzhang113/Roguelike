@@ -103,6 +103,7 @@
     <Compile Include="Interfaces\IMaterial.cs" />
     <Compile Include="Interfaces\IObject.cs" />
     <Compile Include="Systems\InventoryHandler.cs" />
+    <Compile Include="Systems\ItemInfo.cs" />
     <Compile Include="Systems\LookHandler.cs" />
     <Compile Include="Systems\RedirectMessage.cs" />
     <Compile Include="Systems\Terrain.cs" />

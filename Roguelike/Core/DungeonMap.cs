@@ -57,6 +57,7 @@ namespace Roguelike.Core
 
         public bool AddItem(Item item)
         {
+            // Q: Can we have the exact same item?
             System.Diagnostics.Debug.Assert(!Items.Contains(item));
             if (Items.Contains(item))
                 return false;

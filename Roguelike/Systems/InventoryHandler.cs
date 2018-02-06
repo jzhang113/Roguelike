@@ -1,35 +1,78 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.Items;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
     public class InventoryHandler
     {
-        public IDictionary<Item, int> Inventory { get; }
+        public IList<ItemInfo> Inventory { get; }
 
         public InventoryHandler()
         {
-            Inventory = new Dictionary<Item, int>();
+            Inventory = new List<ItemInfo>();
         }
 
+        // Increments the item stack if it already exists and adds the item to inventory otherwise.
         public void Add(Item item)
         {
-            if (Inventory.ContainsKey(item))
-                Inventory[item]++;
-            else
-                Inventory.Add(item, 1);
+            bool found = false;
+            foreach (ItemInfo info in Inventory)
+            {
+                if (info.Contains(item))
+                {
+                    found = true;
+                    info.Add();
+                    break;
+                }
+            }
+
+            if (!found)
+                Inventory.Add(new ItemInfo(item));
         }
 
+        // Decrements the item stack if there are multiple items or removes the item if there is
+        // only one.
         public void Remove(Item item)
         {
-            System.Diagnostics.Debug.Assert(Inventory.ContainsKey(item));
+            bool found = false;
+            foreach (ItemInfo info in Inventory)
+            {
+                if (info.Contains(item))
+                {
+                    found = true;
+                    info.Remove();
 
-            int itemCount = Inventory[item]--;
+                    // We shouldn't be negative here...
+                    System.Diagnostics.Debug.Assert(info.Count >= 0);
+                    if (info.Count == 0)
+                        Inventory.Remove(info);
 
-            if (itemCount == 0)
-                Inventory.Remove(item);
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                System.Diagnostics.Debug.Assert(false, "Cannot remove non-existant item from inventory");
+                Game.MessageHandler.AddMessage("Stop that.");
+            }
+        }
+    
+        public bool HasKey(char key)
+        {
+            if (key < 'a' || key > 'z')
+                return false;
+            
+            return key - 'a' < Inventory.Count;
+        }
+
+        public Item GetItem(char key)
+        {
+            System.Diagnostics.Debug.Assert(HasKey(key));
+            return Inventory[key - 'a'].Item;
         }
 
         public void Draw(RLConsole console)
@@ -37,14 +80,14 @@ namespace Roguelike.Systems
             int line = 1;
             char letter = 'a';
 
-            foreach (KeyValuePair<Item, int> pair in Inventory)
+            foreach (ItemInfo info in Inventory)
             {
                 string itemString;
 
-                if (pair.Value > 1)
-                    itemString = string.Format("{0}) {1} {2}s", letter, pair.Value, pair.Key.Name);
+                if (info.Count > 1)
+                    itemString = string.Format("{0}) {1} {2}s", letter, info.Count, info.Item.Name);
                 else
-                    itemString = string.Format("{0}) {1}", letter, pair.Key.Name);
+                    itemString = string.Format("{0}) {1}", letter, info.Item.Name);
 
                 console.Print(1, line, itemString, Colors.TextHeading);
                 line++;

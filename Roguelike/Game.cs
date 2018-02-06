@@ -22,7 +22,7 @@ namespace Roguelike
 
         public static Mode GameMode { get; set; }
 
-        public static RLRootConsole _rootConsole;
+        private static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
         private static RLConsole _messageConsole;
         private static RLConsole _statConsole;
@@ -148,28 +148,29 @@ namespace Roguelike
                 Player.Draw(_mapConsole, Map);
                 Map.ClearHighlight();
 
-                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
                 _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
-                
-                MessageHandler.Draw(_messageConsole);
-
-                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
                 RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
 
                 _render = false;
+            }
+
+            if (MessageHandler.Redraw)
+            {
+                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
+                MessageHandler.Draw(_messageConsole);
+                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
             }
 
             Map.Draw(_mapConsole);
             _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
             LookHandler.Draw(_viewConsole);
 
-            _mapConsole.SetBackColor(50, 80, RLColor.Red);
-
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, _rootConsole, Config.Map.Width, 0);
 
-            if (GameMode == Mode.Inventory)
+            if (GameMode == Mode.Inventory || GameMode == Mode.Menu)
             {
+                _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
                 Player.Inventory.Draw(_inventoryConsole);
                 RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
             }
