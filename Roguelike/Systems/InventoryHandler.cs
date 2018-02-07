@@ -1,25 +1,25 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.Items;
-using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
+    // Handles all stacks of items in the game, such as the player inventory and piles of loot.
     public class InventoryHandler
     {
-        public IList<ItemInfo> Inventory { get; }
+        private IList<ItemInfo> _inventory;
 
         public InventoryHandler()
         {
-            Inventory = new List<ItemInfo>();
+            _inventory = new List<ItemInfo>();
         }
 
         // Increments the item stack if it already exists and adds the item to inventory otherwise.
         public void Add(Item item)
         {
             bool found = false;
-            foreach (ItemInfo info in Inventory)
+            foreach (ItemInfo info in _inventory)
             {
                 if (info.Contains(item))
                 {
@@ -30,7 +30,7 @@ namespace Roguelike.Systems
             }
 
             if (!found)
-                Inventory.Add(new ItemInfo(item));
+                _inventory.Add(new ItemInfo(item));
         }
 
         // Decrements the item stack if there are multiple items or removes the item if there is
@@ -38,7 +38,7 @@ namespace Roguelike.Systems
         public void Remove(Item item)
         {
             bool found = false;
-            foreach (ItemInfo info in Inventory)
+            foreach (ItemInfo info in _inventory)
             {
                 if (info.Contains(item))
                 {
@@ -48,7 +48,7 @@ namespace Roguelike.Systems
                     // We shouldn't be negative here...
                     System.Diagnostics.Debug.Assert(info.Count >= 0);
                     if (info.Count == 0)
-                        Inventory.Remove(info);
+                        _inventory.Remove(info);
 
                     break;
                 }
@@ -66,21 +66,28 @@ namespace Roguelike.Systems
             if (key < 'a' || key > 'z')
                 return false;
             
-            return key - 'a' < Inventory.Count;
+            return key - 'a' < _inventory.Count;
         }
 
+        // Returns the item at position key. Does not remove the item from inventory.
         public Item GetItem(char key)
         {
             System.Diagnostics.Debug.Assert(HasKey(key));
-            return Inventory[key - 'a'].Item;
+            return _inventory[key - 'a'].Item;
         }
+
+        // Tells if the current inventory is empty or not.
+        public bool IsEmpty() => _inventory.Count == 0;
+
+        // Returns the number of distinct items in the current inventory.
+        public int Size() => _inventory.Count;
 
         public void Draw(RLConsole console)
         {
             int line = 1;
             char letter = 'a';
 
-            foreach (ItemInfo info in Inventory)
+            foreach (ItemInfo info in _inventory)
             {
                 string itemString;
 

@@ -42,17 +42,24 @@ namespace Roguelike.Core
             {
                 //Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", Source.Name, _newX, _newY));
 
-                // TODO 3: Handle checking for items better.
-                foreach (Items.Item i in Game.Map.Items)
+                if (Source is Player)
                 {
-                    if (i.X == _newX && i.Y == _newY && Source is Player)
-                        Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", i.Name));
+                    InventoryHandler itemStack = Game.Map.Field[_newX, _newY].ItemStack;
+
+                    if (itemStack != null && !itemStack.IsEmpty())
+                    {
+                        if (itemStack.Size() == 1)
+                            Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", itemStack.GetItem('a').Name));
+                        else
+                            Game.MessageHandler.AddMessage("You see several items here.");
+                    }
                 }
 
                 Game.Map.SetActorPosition(Source, _newX, _newY);
             }
             else
             {
+                // HACK: Update maps should probably go somewhere nicer...
                 if (_newX == Source.X && _newY == Source.Y && Source is Player)
                     Game.Map.UpdatePlayerMaps();
             }

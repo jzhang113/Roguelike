@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
+    // Accepts messages from various systems and displays it in the message console. Also keeps a 
+    // rolling history of messages that can be displayed.
     class MessageHandler
     {
         public bool Redraw { get; private set; }
@@ -18,6 +20,7 @@ namespace Roguelike.Systems
             messages = new List<string>();
         }
 
+        // Place a new message onto the message log.
         public void AddMessage(string text)
         {
             messages.Add(text);
@@ -28,6 +31,7 @@ namespace Roguelike.Systems
             Redraw = true;
         }
 
+        // Modify the last message by adding additional text.
         public void AppendMessage(string text)
         {
             int prev = messages.Count - 1;

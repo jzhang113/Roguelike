@@ -22,7 +22,7 @@ namespace Roguelike.Actions
         public RedirectMessage Validate()
         {
             // Trying to pick up an empty tile.
-            if (_itemStack == null || _itemStack.Inventory.Count == 0)
+            if (_itemStack == null || _itemStack.IsEmpty())
             {
                 Game.MessageHandler.AddMessage("There's nothing to pick up here");
                 return new RedirectMessage(false);
@@ -35,7 +35,7 @@ namespace Roguelike.Actions
         {
             Item obj;
 
-            switch(_itemStack.Inventory.Count)
+            switch(_itemStack.Size())
             {
                 case 1:
                     obj = _itemStack.GetItem('a');
@@ -47,6 +47,7 @@ namespace Roguelike.Actions
                     if (Source is Player)
                     {
                         // TODO: handle pickup menu
+                        Game.GameMode = Game.Mode.Menu;
                     }
                     else
                     {
@@ -54,6 +55,8 @@ namespace Roguelike.Actions
                         obj = _itemStack.GetItem('a');
                         Source.Inventory.Add(obj);
                         Game.Map.RemoveItem(obj);
+
+                        // TODO: Tell the player only if they can see / notice this
                         Game.MessageHandler.AddMessage(string.Format("{0} picks up a {1}.", Source, obj.Name));
                     }
                     break;
