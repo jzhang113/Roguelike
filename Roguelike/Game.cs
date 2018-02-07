@@ -14,6 +14,8 @@ namespace Roguelike
         public enum Mode { Normal, Inventory, Menu };
 
         public static Configuration Config { get; private set; }
+        public static OptionHandler Options { get; private set; }
+
         public static DungeonMap Map { get; private set; }
         public static Player Player { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
@@ -40,6 +42,8 @@ namespace Roguelike
                 .Build()
                 .Bind(Config);
 
+            Options = new OptionHandler(args);
+            
             string consoleTitle = "Roguelike";
 
             _rootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
@@ -51,8 +55,17 @@ namespace Roguelike
             
             InputHandler.Initialize(_rootConsole);
 
-            //int seed = (int) DateTime.Now.Ticks;
-            int mainSeed = 2127758832;
+            // Debugging settings
+            Options.FixedSeed = true;
+            Options.Seed = 2127758832;
+            Options.Verbosity = OptionHandler.MessageLevel.Normal;
+
+            int mainSeed;
+            if (Options.FixedSeed)
+                mainSeed = Options.Seed;
+            else
+                mainSeed = (int)DateTime.Now.Ticks;
+
             Random Random = new Random(mainSeed);
             int[] generatorSeed = new int[31];
 
@@ -121,7 +134,7 @@ namespace Roguelike
 
         internal static void GameOver()
         {
-            MessageHandler.AddMessage("Game Over");
+            MessageHandler.AddMessage("Game Over.", OptionHandler.MessageLevel.None);
         }
 
         internal static void Exit()

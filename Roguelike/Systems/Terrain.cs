@@ -1,6 +1,4 @@
 ﻿using Roguelike.Actors;
-using Roguelike.Items;
-using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {

@@ -6,12 +6,12 @@
 
         public override void Equip()
         {
-            Game.MessageHandler.AddMessage("You put on the armor.");
+            Game.MessageHandler.AddMessage("You put on the armor.", Systems.OptionHandler.MessageLevel.Normal);
         }
 
         public override void Unequip()
         {
-            Game.MessageHandler.AddMessage("You take off the armor.");
+            Game.MessageHandler.AddMessage("You take off the armor.", Systems.OptionHandler.MessageLevel.Normal);
         }
     }
 }

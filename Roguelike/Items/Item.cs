@@ -20,7 +20,7 @@ namespace Roguelike.Items
 
         public virtual void Apply()
         {
-            Game.MessageHandler.AddMessage("Nothing happens.");
+            Game.MessageHandler.AddMessage("Nothing happens.", Systems.OptionHandler.MessageLevel.Normal);
         }
 
         public virtual void Attack()
@@ -30,12 +30,12 @@ namespace Roguelike.Items
 
         public virtual void Consume()
         {
-            Game.MessageHandler.AddMessage("That would be unhealthy.");
+            Game.MessageHandler.AddMessage("That would be unhealthy.", Systems.OptionHandler.MessageLevel.Normal);
         }
 
         public virtual void Equip()
         {
-            Game.MessageHandler.AddMessage("You cannot equip this.");
+            Game.MessageHandler.AddMessage("You cannot equip this.", Systems.OptionHandler.MessageLevel.Normal);
         }
 
         public virtual void Throw()
@@ -45,7 +45,7 @@ namespace Roguelike.Items
 
         public virtual void Unequip()
         {
-            Game.MessageHandler.AddMessage("You cannot take it off.");
+            Game.MessageHandler.AddMessage("You cannot take it off.", Systems.OptionHandler.MessageLevel.Normal);
         }
     }
 }

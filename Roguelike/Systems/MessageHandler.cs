@@ -20,15 +20,19 @@ namespace Roguelike.Systems
             messages = new List<string>();
         }
 
-        // Place a new message onto the message log.
-        public void AddMessage(string text)
+        // Place a new message onto the message log if its MessageLevel is lower than the currently
+        // set level.
+        public void AddMessage(string text, OptionHandler.MessageLevel level)
         {
-            messages.Add(text);
+            if (level <= Game.Options.Verbosity)
+            {
+                messages.Add(text);
 
-            if (messages.Count > _maxSize)
-                messages.RemoveAt(0);
+                if (messages.Count > _maxSize)
+                    messages.RemoveAt(0);
 
-            Redraw = true;
+                Redraw = true;
+            }
         }
 
         // Modify the last message by adding additional text.

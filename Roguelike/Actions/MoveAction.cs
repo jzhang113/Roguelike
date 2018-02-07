@@ -40,7 +40,7 @@ namespace Roguelike.Core
         {
             if (_cell.IsWalkable)
             {
-                //Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", Source.Name, _newX, _newY));
+                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", Source.Name, _newX, _newY), OptionHandler.MessageLevel.Verbose);
 
                 if (Source is Player)
                 {
@@ -49,9 +49,9 @@ namespace Roguelike.Core
                     if (itemStack != null && !itemStack.IsEmpty())
                     {
                         if (itemStack.Size() == 1)
-                            Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", itemStack.GetItem('a').Name));
+                            Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", itemStack.GetItem('a').Name), OptionHandler.MessageLevel.Normal);
                         else
-                            Game.MessageHandler.AddMessage("You see several items here.");
+                            Game.MessageHandler.AddMessage("You see several items here.", OptionHandler.MessageLevel.Normal);
                     }
                 }
 

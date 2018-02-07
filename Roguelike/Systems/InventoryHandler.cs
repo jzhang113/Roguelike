@@ -57,7 +57,7 @@ namespace Roguelike.Systems
             if (!found)
             {
                 System.Diagnostics.Debug.Assert(false, "Cannot remove non-existant item from inventory");
-                Game.MessageHandler.AddMessage("Stop that.");
+                Game.MessageHandler.AddMessage("Stop that.", OptionHandler.MessageLevel.Verbose);
             }
         }
     

@@ -28,14 +28,14 @@ namespace Roguelike.Core
             if (_target == null)
             {
                 // TODO: Message handler should probably distinguish when you do stuff vs when enemies do stuff
-                Game.MessageHandler.AddMessage(string.Format("{0} attacks thin air.", Source));
-                return new RedirectMessage(false);
+                Game.MessageHandler.AddMessage(string.Format("{0} attacks thin air.", Source), OptionHandler.MessageLevel.Normal);
+                return new RedirectMessage(true);
             }
 
             if (_target == Source)
             {
                 // Q: Should this even be allowed?
-                Game.MessageHandler.AddMessage(string.Format("{0} tried to attack itself!", Source));
+                Game.MessageHandler.AddMessage(string.Format("{0} tried to attack itself!", Source), OptionHandler.MessageLevel.Normal);
                 return new RedirectMessage(false);
             }
 
@@ -48,11 +48,11 @@ namespace Roguelike.Core
             _skill.Activate();
             
             int damage = _target.TakeDamage(_power);
-            Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, _target.Name, damage));
+            Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, _target.Name, damage), OptionHandler.MessageLevel.Normal);
 
             if (_target.IsDead())
             {
-                Game.MessageHandler.AddMessage(_target.Name + " is dead");
+                Game.MessageHandler.AddMessage(_target.Name + " is dead.", OptionHandler.MessageLevel.Normal);
                 _target.TriggerDeath();
             }
         }

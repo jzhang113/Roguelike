@@ -24,7 +24,7 @@ namespace Roguelike.Actions
             // Trying to pick up an empty tile.
             if (_itemStack == null || _itemStack.IsEmpty())
             {
-                Game.MessageHandler.AddMessage("There's nothing to pick up here");
+                Game.MessageHandler.AddMessage("There's nothing to pick up here.", OptionHandler.MessageLevel.Normal);
                 return new RedirectMessage(false);
             }
 
@@ -41,7 +41,7 @@ namespace Roguelike.Actions
                     obj = _itemStack.GetItem('a');
                     Source.Inventory.Add(obj);
                     Game.Map.RemoveItem(obj);
-                    Game.MessageHandler.AddMessage(string.Format("You pick up a {0}.", obj.Name));
+                    Game.MessageHandler.AddMessage(string.Format("You pick up a {0}.", obj.Name), OptionHandler.MessageLevel.Normal);
                     break;
                 default:
                     if (Source is Player)
@@ -57,7 +57,7 @@ namespace Roguelike.Actions
                         Game.Map.RemoveItem(obj);
 
                         // TODO: Tell the player only if they can see / notice this
-                        Game.MessageHandler.AddMessage(string.Format("{0} picks up a {1}.", Source, obj.Name));
+                        Game.MessageHandler.AddMessage(string.Format("{0} picks up a {1}.", Source, obj.Name), OptionHandler.MessageLevel.Normal);
                     }
                     break;
             }
