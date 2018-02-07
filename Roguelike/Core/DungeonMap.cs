@@ -65,7 +65,7 @@ namespace Roguelike.Core
             Items.Add(item);
 
             if (Field[item.X, item.Y].ItemStack == null)
-                Field[item.X, item.Y].ItemStack = new List<Item>();
+                Field[item.X, item.Y].ItemStack = new InventoryHandler();
 
             Field[item.X, item.Y].ItemStack.Add(item);
             return true;

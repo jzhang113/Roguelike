@@ -142,6 +142,13 @@ namespace Roguelike
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
+            if (MessageHandler.Redraw || _render)
+            {
+                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
+                MessageHandler.Draw(_messageConsole);
+                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
+            }
+
             if (_render)
             {
                 _mapConsole.Clear();
@@ -152,13 +159,6 @@ namespace Roguelike
                 RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
 
                 _render = false;
-            }
-
-            if (MessageHandler.Redraw)
-            {
-                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
-                MessageHandler.Draw(_messageConsole);
-                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
             }
 
             Map.Draw(_mapConsole);
