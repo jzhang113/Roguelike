@@ -12,14 +12,12 @@ namespace Roguelike.Items
 
             // TODO 1: Attacks should scale with stats.
             Carrier.BasicAttack = new DamageSkill(AttackSpeed, Damage);
-            Game.MessageHandler.AddMessage("You wield the weapon.", Systems.OptionHandler.MessageLevel.Normal);
         }
         
         public override void Unequip()
         {
             // HACK: Reset the old basic attack properly.
             Carrier.BasicAttack = new DamageSkill(100, 100);
-            Game.MessageHandler.AddMessage("You unwield the weapon.", Systems.OptionHandler.MessageLevel.Normal);
         }
     }
 }

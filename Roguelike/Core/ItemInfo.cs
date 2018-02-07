@@ -1,7 +1,7 @@
 ﻿using Roguelike.Items;
 using System;
 
-namespace Roguelike.Systems
+namespace Roguelike.Core
 {
     public struct ItemInfo : IEquatable<ItemInfo>
     {

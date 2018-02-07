@@ -6,12 +6,16 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;
 using Roguelike.Actors;
+using Roguelike.Interfaces;
 
 namespace Roguelike
 {
     class Game
     {
-        public enum Mode { Normal, Inventory, Menu };
+        public enum Mode { Normal, Inventory, Drop, Equip };
+
+        public static Mode GameMode { get; set; }
+        public static bool ShowMenu { get; set; }
 
         public static Configuration Config { get; private set; }
         public static OptionHandler Options { get; private set; }
@@ -21,8 +25,6 @@ namespace Roguelike
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
         public static Random CombatRandom { get; private set; }
-
-        public static Mode GameMode { get; set; }
 
         private static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
@@ -181,7 +183,7 @@ namespace Roguelike
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, _rootConsole, Config.Map.Width, 0);
 
-            if (GameMode == Mode.Inventory || GameMode == Mode.Menu)
+            if (ShowMenu)
             {
                 _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
                 Player.Inventory.Draw(_inventoryConsole);

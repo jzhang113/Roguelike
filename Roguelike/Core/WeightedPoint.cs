@@ -1,4 +1,4 @@
-﻿namespace Roguelike.Systems
+﻿namespace Roguelike.Core
 {
     struct WeightedPoint
     {

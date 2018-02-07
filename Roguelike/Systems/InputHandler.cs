@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Roguelike.Actors;
 using Roguelike.Actions;
-using OpenTK.Input;
 
 namespace Roguelike.Systems
 {
@@ -69,20 +68,23 @@ namespace Roguelike.Systems
             if (keyPress == null)
                 return null;
 
-            if (Game.GameMode == Game.Mode.Inventory)
+            if (Game.ShowMenu)
             {
-                HandleInventoryInput(keyPress);
-                return null;
-            }
-
-            if (Game.GameMode == Game.Mode.Menu)
-            {
-                HandleInventoryInput(keyPress);
-
-                if (keyPress != null)
-                    return new DropAction(player, ToChar(keyPress.Key));
-                else
+                if (!HandleMenuInput(keyPress))
                     return null;
+
+                char keyChar = ToChar(keyPress.Key);
+
+                switch (Game.GameMode)
+                {
+                    case Game.Mode.Inventory:
+                        // TODO: implement inventory actions
+                        return null;
+                    case Game.Mode.Drop:
+                        return new DropAction(player, keyChar);
+                    case Game.Mode.Equip:
+                        return new EquipAction(player, keyChar);
+                }
             }
 
             switch (keyPress.Key)
@@ -90,33 +92,49 @@ namespace Roguelike.Systems
                 #region Movement Keys
                 case RLKey.Left:
                 case RLKey.Keypad4:
-                case RLKey.H: return new MoveAction(player, player.X + Move.W.X, player.Y);
+                case RLKey.H:
+                    return new MoveAction(player, player.X + Move.W.X, player.Y);
                 case RLKey.Down:
                 case RLKey.Keypad2:
-                case RLKey.J: return new MoveAction(player, player.X, player.Y + Move.S.Y);
+                case RLKey.J:
+                    return new MoveAction(player, player.X, player.Y + Move.S.Y);
                 case RLKey.Up:
                 case RLKey.Keypad8:
-                case RLKey.K: return new MoveAction(player, player.X, player.Y + Move.N.Y);
+                case RLKey.K:
+                    return new MoveAction(player, player.X, player.Y + Move.N.Y);
                 case RLKey.Right:
                 case RLKey.Keypad6:
-                case RLKey.L: return new MoveAction(player, player.X + Move.E.X, player.Y);
+                case RLKey.L:
+                    return new MoveAction(player, player.X + Move.E.X, player.Y);
                 case RLKey.Keypad7:
-                case RLKey.Y: return new MoveAction(player, player.X + Move.NW.X, player.Y + Move.NW.Y);
+                case RLKey.Y:
+                    return new MoveAction(player, player.X + Move.NW.X, player.Y + Move.NW.Y);
                 case RLKey.Keypad9:
-                case RLKey.U: return new MoveAction(player, player.X + Move.NE.X, player.Y + Move.NE.Y);
+                case RLKey.U:
+                    return new MoveAction(player, player.X + Move.NE.X, player.Y + Move.NE.Y);
                 case RLKey.Keypad1:
-                case RLKey.B: return new MoveAction(player, player.X + Move.SW.X, player.Y + Move.SW.Y);
+                case RLKey.B:
+                    return new MoveAction(player, player.X + Move.SW.X, player.Y + Move.SW.Y);
                 case RLKey.Keypad3:
-                case RLKey.N: return new MoveAction(player, player.X + Move.SE.X, player.Y + Move.SE.Y);
+                case RLKey.N:
+                    return new MoveAction(player, player.X + Move.SE.X, player.Y + Move.SE.Y);
                 case RLKey.Keypad5:
-                case RLKey.Period: return new MoveAction(player, player.X, player.Y);
-                case RLKey.Comma: return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);
+                case RLKey.Period:
+                    return new PassAction(player);
                 #endregion
+                case RLKey.Comma:
+                    return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);
                 case RLKey.D:
-                    Game.GameMode = Game.Mode.Menu;
+                    Game.GameMode = Game.Mode.Drop;
+                    Game.ShowMenu = true;
+                    return null;
+                case RLKey.E:
+                    Game.GameMode = Game.Mode.Equip;
+                    Game.ShowMenu = true;
                     return null;
                 case RLKey.I:
                     Game.GameMode = Game.Mode.Inventory;
+                    Game.ShowMenu = true;
                     return null;
                 case RLKey.Escape:
                     Game.Exit();
@@ -125,18 +143,18 @@ namespace Roguelike.Systems
             }
         }
 
-        private static RLKeyPress HandleInventoryInput(RLKeyPress keyPress)
+        private static bool HandleMenuInput(RLKeyPress keyPress)
         {
-            // TODO: Implement this
+            // TODO: Implement this - Also, please rename it to sth more logical
             switch(keyPress.Key)
             {
                 case RLKey.Escape:
                     Game.GameMode = Game.Mode.Normal;
+                    Game.ShowMenu = false;
                     Game.ForceRender();
-                    return null;
+                    return false;
                 default:
-                    System.Console.WriteLine(keyPress.Key.ToString());
-                    return null;
+                    return true;
             }
         }
 

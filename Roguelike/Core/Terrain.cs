@@ -1,6 +1,7 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Systems;
 
-namespace Roguelike.Systems
+namespace Roguelike.Core
 {
     public struct Terrain
     {
