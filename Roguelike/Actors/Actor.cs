@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.Actors
 {
-    public class Actor : Drawable, IActor, ISchedulable
+    public class Actor : Drawable, ISchedulable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -25,8 +25,7 @@ namespace Roguelike.Actors
         public int DEX { get; set; }
         public int DEF { get; set; }
         public int INT { get; set; }
-
-        public ISkill BasicAttack { get; set; }
+        
         public ActorState State { get; set; }
 
         public override RLColor Color { get; set; }
@@ -47,8 +46,7 @@ namespace Roguelike.Actors
             RefreshRate = 100;
 
             Inventory = new InventoryHandler();
-            // TODO 1: Basic attacks should scale with stats.
-            BasicAttack = new DamageSkill(100, 100);
+            Weapon = new Fists();
         }
 
         public virtual bool IsDead() => HP < 0;

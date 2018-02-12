@@ -1,7 +1,6 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.Systems;
-using Roguelike.Configurations;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;

@@ -1,24 +1,30 @@
 ﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Interfaces;
+using Roguelike.Skills;
+using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
-    public class Item : Drawable, IObject
+    public abstract class Item : Drawable
     {
-        public int AttackSpeed { get; set; }
-        public int Damage { get; set; }
-        public int MeleeRange { get; set; }
-        public int ThrowRange { get; set; }
-
         public string Name { get; set; }
         public IMaterial Material { get; set; }
+
         public override RLColor Color { get; set; }
         public override char Symbol { get; set; }
         public override int X { get; set; }
         public override int Y { get; set; }
-        public object Carrier { get; internal set; }
 
+        protected Actor Carrier { get; set; }
+        protected IList<ISkill> Abilities { get; set; }
+
+        protected int AttackSpeed { get; set; }
+        protected int Damage { get; set; }
+        protected int MeleeRange { get; set; }
+        protected int ThrowRange { get; set; }
+
+        #region virtual methods
         public virtual void Apply(Actor actor)
         {
             Game.MessageHandler.AddMessage("Nothing happens.", Systems.OptionHandler.MessageLevel.Normal);
@@ -44,9 +50,22 @@ namespace Roguelike.Items
             throw new System.NotImplementedException();
         }
 
-        public virtual void Unequip(Actor actor)
+        public virtual void Unequip()
         {
             Game.MessageHandler.AddMessage("You cannot take it off.", Systems.OptionHandler.MessageLevel.Normal);
+        }
+        #endregion
+
+        public ISkill GetBasicAttack()
+        {
+            return new DamageSkill(AttackSpeed, Damage);
+        }
+
+        public ISkill GetAbility(int index)
+        {
+            System.Diagnostics.Debug.Assert(index < Abilities.Count);
+
+            return Abilities[index];
         }
     }
 }

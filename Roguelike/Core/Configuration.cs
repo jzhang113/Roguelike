@@ -1,4 +1,4 @@
-﻿namespace Roguelike.Configurations
+﻿namespace Roguelike.Core
 {
     class Configuration
     {

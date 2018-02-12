@@ -78,7 +78,7 @@ namespace Roguelike.Core
             Field[item.X, item.Y].ItemStack.Remove(item);
         }
 
-        public bool SetActorPosition(IActor actor, int x, int y)
+        public bool SetActorPosition(Actor actor, int x, int y)
         {
             Cell newPos = GetCell(x, y);
 

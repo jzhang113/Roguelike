@@ -107,6 +107,7 @@
     <Compile Include="Actions\AttackAction.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Items\Armor.cs" />
+    <Compile Include="Items\Fists.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\HeavyArmor.cs" />
     <Compile Include="Items\Spear.cs" />
@@ -118,7 +119,6 @@
     <Compile Include="Core\SimpleAI.cs" />
     <Compile Include="Actors\Skeleton.cs" />
     <Compile Include="Interfaces\IMaterial.cs" />
-    <Compile Include="Interfaces\IObject.cs" />
     <Compile Include="Systems\InventoryHandler.cs" />
     <Compile Include="Core\ItemInfo.cs" />
     <Compile Include="Systems\LookHandler.cs" />
@@ -133,12 +133,12 @@
     <Compile Include="Actors\Player.cs" />
     <Compile Include="Core\Swatch.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Interfaces\IActor.cs" />
+    <Compile Include="Core\ActorState.cs" />
     <Compile Include="Interfaces\Drawable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\MapGenerator.cs" />
     <Compile Include="Systems\MessageHandler.cs" />
-    <Compile Include="Configurations\Configuration.cs" />
+    <Compile Include="Core\Configuration.cs" />
     <Compile Include="Systems\MaxHeap.cs" />
     <Compile Include="Core\WeightedPoint.cs" />
   </ItemGroup>

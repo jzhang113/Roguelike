@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using Roguelike.Skills;
 using Roguelike.Systems;
 
@@ -10,18 +11,19 @@ namespace Roguelike.Items
 
         public override void Equip(Actor actor)
         {
-            System.Diagnostics.Debug.Assert(actor != null);
+            System.Diagnostics.Debug.Assert(actor != null && Carrier == null);
 
-            // TODO 1: Attacks should scale with stats.
-            actor.BasicAttack = new DamageSkill(AttackSpeed, Damage);
+            // TODO: ensure carrier is actually null
+            Carrier = actor;
+            Carrier.Weapon = this;
 
             Game.MessageHandler.AddMessage(string.Format("You wield a {0}.", Name), OptionHandler.MessageLevel.Normal);
         }
         
-        public override void Unequip(Actor actor)
+        public override void Unequip()
         {
-            // HACK: Reset the old basic attack properly.
-            actor.BasicAttack = new DamageSkill(100, 100);
+            Carrier.Weapon = null;
+            Carrier = null;
 
             Game.MessageHandler.AddMessage(string.Format("You unwield a {0}.", Name), OptionHandler.MessageLevel.Normal);
         }

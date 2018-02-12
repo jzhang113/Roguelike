@@ -31,7 +31,7 @@ namespace Roguelike.Core
             // Check if the destination is already occupied.
             Actor target = Game.Map.GetActor(_cell);
             if (target != null)
-                return new RedirectMessage(false, new AttackAction(Source, target, Source.BasicAttack));
+                return new RedirectMessage(false, new AttackAction(Source, target, Source.Weapon.GetBasicAttack()));
 
             return new RedirectMessage(true);
         }
