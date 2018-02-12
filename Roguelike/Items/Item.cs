@@ -1,4 +1,5 @@
 ﻿using RLNET;
+using Roguelike.Actors;
 using Roguelike.Interfaces;
 
 namespace Roguelike.Items
@@ -12,13 +13,13 @@ namespace Roguelike.Items
 
         public string Name { get; set; }
         public IMaterial Material { get; set; }
-        public IActor Carrier { get; set; }
         public override RLColor Color { get; set; }
         public override char Symbol { get; set; }
         public override int X { get; set; }
         public override int Y { get; set; }
+        public object Carrier { get; internal set; }
 
-        public virtual void Apply()
+        public virtual void Apply(Actor actor)
         {
             Game.MessageHandler.AddMessage("Nothing happens.", Systems.OptionHandler.MessageLevel.Normal);
         }
@@ -28,12 +29,12 @@ namespace Roguelike.Items
             throw new System.NotImplementedException();
         }
 
-        public virtual void Consume()
+        public virtual void Consume(Actor actor)
         {
             Game.MessageHandler.AddMessage("That would be unhealthy.", Systems.OptionHandler.MessageLevel.Normal);
         }
 
-        public virtual void Equip()
+        public virtual void Equip(Actor actor)
         {
             Game.MessageHandler.AddMessage("You cannot equip this.", Systems.OptionHandler.MessageLevel.Normal);
         }
@@ -43,7 +44,7 @@ namespace Roguelike.Items
             throw new System.NotImplementedException();
         }
 
-        public virtual void Unequip()
+        public virtual void Unequip(Actor actor)
         {
             Game.MessageHandler.AddMessage("You cannot take it off.", Systems.OptionHandler.MessageLevel.Normal);
         }

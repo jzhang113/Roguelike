@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Roguelike.Systems
 {
@@ -13,7 +9,7 @@ namespace Roguelike.Systems
         // How much text to show.
         internal MessageLevel Verbosity { get; set; }
 
-        // Are we using a fixed seed.
+        // Are we using a fixed seed?
         internal bool FixedSeed { get; set; }
 
         // The value of the starting seed, if we are using one.

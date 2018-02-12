@@ -1,4 +1,6 @@
-﻿using Roguelike.Skills;
+﻿using Roguelike.Actors;
+using Roguelike.Skills;
+using Roguelike.Systems;
 
 namespace Roguelike.Items
 {
@@ -6,18 +8,22 @@ namespace Roguelike.Items
     {
         public override char Symbol { get; set; } = '(';
 
-        public override void Equip()
+        public override void Equip(Actor actor)
         {
-            System.Diagnostics.Debug.Assert(Carrier != null);
+            System.Diagnostics.Debug.Assert(actor != null);
 
             // TODO 1: Attacks should scale with stats.
-            Carrier.BasicAttack = new DamageSkill(AttackSpeed, Damage);
+            actor.BasicAttack = new DamageSkill(AttackSpeed, Damage);
+
+            Game.MessageHandler.AddMessage(string.Format("You wield a {0}.", Name), OptionHandler.MessageLevel.Normal);
         }
         
-        public override void Unequip()
+        public override void Unequip(Actor actor)
         {
             // HACK: Reset the old basic attack properly.
-            Carrier.BasicAttack = new DamageSkill(100, 100);
+            actor.BasicAttack = new DamageSkill(100, 100);
+
+            Game.MessageHandler.AddMessage(string.Format("You unwield a {0}.", Name), OptionHandler.MessageLevel.Normal);
         }
     }
 }
