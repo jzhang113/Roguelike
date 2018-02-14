@@ -45,10 +45,7 @@ namespace Roguelike.Core
         public void Execute()
         {
             // TODO: still gotta work out the relationship between attacks and skill
-            _skill.Activate();
-            
-            int damage = _target.TakeDamage(_power);
-            Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, _target.Name, damage), OptionHandler.MessageLevel.Normal);
+            _skill.Activate(_target);
 
             if (_target.IsDead())
             {

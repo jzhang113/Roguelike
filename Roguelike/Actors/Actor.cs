@@ -40,13 +40,16 @@ namespace Roguelike.Actors
         public Armor Armor { get; set; }
         public InventoryHandler Inventory { get; set; }
 
+        public Weapon DefaultWeapon { get; private set; }
+
         public Actor()
         {
             Energy = 100;
             RefreshRate = 100;
 
             Inventory = new InventoryHandler();
-            Weapon = new Fists();
+            DefaultWeapon = new Fists(this);
+            Weapon = DefaultWeapon;
         }
 
         public virtual bool IsDead() => HP < 0;

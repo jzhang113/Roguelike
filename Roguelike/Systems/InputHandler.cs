@@ -21,7 +21,7 @@ namespace Roguelike.Systems
         public static IAction HandleInput()
         {
             RLMouse click = _console.Mouse;
-            DungeonMap map = Game.Map;
+            MapHandler map = Game.Map;
             Player player = Game.Player;
             Point square = GetClickPosition(click.X, click.Y);
 
@@ -68,7 +68,7 @@ namespace Roguelike.Systems
             if (keyPress == null)
                 return null;
 
-            if (Game.ShowMenu)
+            if (Game.ShowInventory)
             {
                 if (!HandleMenuInput(keyPress))
                     return null;
@@ -80,10 +80,14 @@ namespace Roguelike.Systems
                     case Game.Mode.Inventory:
                         // TODO: implement inventory actions
                         return null;
+                    case Game.Mode.Apply:
+                        return new ApplyAction(player, keyChar);
                     case Game.Mode.Drop:
                         return new DropAction(player, keyChar);
                     case Game.Mode.Equip:
                         return new EquipAction(player, keyChar);
+                    case Game.Mode.Unequip:
+                        return new UnequipAction(player, keyChar);
                 }
             }
 
@@ -124,17 +128,25 @@ namespace Roguelike.Systems
                 #endregion
                 case RLKey.Comma:
                     return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);
+                case RLKey.A:
+                    Game.GameMode = Game.Mode.Apply;
+                    Game.ShowInventory = true;
+                    return null;
                 case RLKey.D:
                     Game.GameMode = Game.Mode.Drop;
-                    Game.ShowMenu = true;
+                    Game.ShowInventory = true;
                     return null;
                 case RLKey.E:
                     Game.GameMode = Game.Mode.Equip;
-                    Game.ShowMenu = true;
+                    Game.ShowInventory = true;
                     return null;
                 case RLKey.I:
                     Game.GameMode = Game.Mode.Inventory;
-                    Game.ShowMenu = true;
+                    Game.ShowInventory = true;
+                    return null;
+                case RLKey.T:
+                    Game.GameMode = Game.Mode.Unequip;
+                    Game.ShowEquipment = true;
                     return null;
                 case RLKey.Escape:
                     Game.Exit();
@@ -150,7 +162,8 @@ namespace Roguelike.Systems
             {
                 case RLKey.Escape:
                     Game.GameMode = Game.Mode.Normal;
-                    Game.ShowMenu = false;
+                    Game.ShowInventory = false;
+                    Game.ShowEquipment = false;
                     Game.ForceRender();
                     return false;
                 default:

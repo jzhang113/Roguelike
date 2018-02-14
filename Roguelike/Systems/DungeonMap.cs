@@ -1,16 +1,14 @@
 ﻿using RLNET;
 using Roguelike.Actors;
-using Roguelike.Interfaces;
 using Roguelike.Items;
-using Roguelike.Systems;
+using Roguelike.Core;
 using RogueSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Roguelike.Core
+namespace Roguelike.Systems
 {
-    class DungeonMap : Map
+    class MapHandler : Map
     {
         internal RLColor[,] Highlight { get; set; }
         internal Terrain[,] Field { get; set; }
@@ -19,7 +17,7 @@ namespace Roguelike.Core
         internal ICollection<Actor> Units { get; }
         internal ICollection<Item> Items { get; }
 
-        public DungeonMap(int width, int height) : base(width, height)
+        public MapHandler(int width, int height) : base(width, height)
         {
             Highlight = new RLColor[width, height];
             Field = new Terrain[width, height];

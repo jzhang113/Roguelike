@@ -31,6 +31,7 @@ namespace Roguelike.Systems
 
             if (!found)
                 _inventory.Add(new ItemInfo(item));
+        
         }
 
         // Decrements the item stack if there are multiple items or removes the item if there is

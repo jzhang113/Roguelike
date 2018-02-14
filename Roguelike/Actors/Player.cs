@@ -7,7 +7,7 @@ namespace Roguelike.Actors
 {
     class Player : Actor
     {
-        public Player() : base()
+        public Player()
         {
             Awareness = 100;
             Name = "Player";

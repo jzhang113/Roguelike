@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Roguelike.Actors;
 
 namespace Roguelike.Items
 {
     class Fists : Weapon
     {
-        public Fists()
+        // Default weapon.
+        public Fists(Actor actor)
         {
             Name = "fists";
+            Carrier = actor;
 
             // TODO 2: Allow for variable formulaes.
             AttackSpeed = 100;

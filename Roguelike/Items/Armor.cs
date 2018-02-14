@@ -1,26 +1,25 @@
-﻿using Roguelike.Actors;
+﻿using Roguelike.Interfaces;
 
 namespace Roguelike.Items
 {
-    public abstract class Armor : Item
+    public abstract class Armor : Item, IEquipable
     {
-        public override char Symbol { get; set; } = '[';
-
-        public override void Equip(Actor actor)
+        protected Armor()
         {
-            System.Diagnostics.Debug.Assert(actor != null && Carrier == null);
+            Symbol = '[';
+        }
 
-            // TODO: same as weapons - make sure carrier is null
-            Carrier = actor;
+        public void Equip()
+        {
+            System.Diagnostics.Debug.Assert(Carrier.Armor == null);
             Carrier.Armor = this;
 
             Game.MessageHandler.AddMessage("You put on the armor.", Systems.OptionHandler.MessageLevel.Normal);
         }
 
-        public override void Unequip()
+        public void Unequip()
         {
             Carrier.Armor = null;
-            Carrier = null;
 
             Game.MessageHandler.AddMessage("You take off the armor.", Systems.OptionHandler.MessageLevel.Normal);
         }

@@ -8,15 +8,15 @@ namespace Roguelike.Items
 {
     public abstract class Item : Drawable
     {
-        public string Name { get; set; }
-        public IMaterial Material { get; set; }
+        public string Name { get; protected set; }
+        public IMaterial Material { get; protected set; }
+        public Actor Carrier { get; set; }
 
         public override RLColor Color { get; set; }
         public override char Symbol { get; set; }
         public override int X { get; set; }
         public override int Y { get; set; }
 
-        protected Actor Carrier { get; set; }
         protected IList<ISkill> Abilities { get; set; }
 
         protected int AttackSpeed { get; set; }
@@ -25,9 +25,9 @@ namespace Roguelike.Items
         protected int ThrowRange { get; set; }
 
         #region virtual methods
-        public virtual void Apply(Actor actor)
+        public virtual void Consume(Actor actor)
         {
-            Game.MessageHandler.AddMessage("Nothing happens.", Systems.OptionHandler.MessageLevel.Normal);
+            Game.MessageHandler.AddMessage("That would be unhealthy.", Systems.OptionHandler.MessageLevel.Normal);
         }
 
         public virtual void Attack()
@@ -35,30 +35,15 @@ namespace Roguelike.Items
             throw new System.NotImplementedException();
         }
 
-        public virtual void Consume(Actor actor)
-        {
-            Game.MessageHandler.AddMessage("That would be unhealthy.", Systems.OptionHandler.MessageLevel.Normal);
-        }
-
-        public virtual void Equip(Actor actor)
-        {
-            Game.MessageHandler.AddMessage("You cannot equip this.", Systems.OptionHandler.MessageLevel.Normal);
-        }
-
         public virtual void Throw()
         {
             throw new System.NotImplementedException();
-        }
-
-        public virtual void Unequip()
-        {
-            Game.MessageHandler.AddMessage("You cannot take it off.", Systems.OptionHandler.MessageLevel.Normal);
         }
         #endregion
 
         public ISkill GetBasicAttack()
         {
-            return new DamageSkill(AttackSpeed, Damage);
+            return new DamageSkill(Carrier, AttackSpeed, Damage);
         }
 
         public ISkill GetAbility(int index)

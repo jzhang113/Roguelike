@@ -1,18 +1,18 @@
-﻿using Roguelike.Interfaces;
-using Roguelike.Actors;
-using Roguelike.Systems;
+﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using Roguelike.Items;
+using Roguelike.Systems;
 
 namespace Roguelike.Actions
 {
-    class EquipAction : IAction
+    class ApplyAction : IAction
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 100;
 
         private char _key;
 
-        public EquipAction(Actor source, char key)
+        public ApplyAction(Actor source, char key)
         {
             Source = source;
             _key = key;
@@ -28,13 +28,13 @@ namespace Roguelike.Actions
 
             // TODO: probably should check for equippability in a better manner
             Item item = Source.Inventory.GetItem(_key);
-            if (item is IEquipable)
+            if (item is IUsable)
             {
                 return new RedirectMessage(true);
             }
             else
             {
-                Game.MessageHandler.AddMessage(string.Format("Cannot equip {0}.", item.Name), OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage(string.Format("Cannot apply {0}.", item.Name), OptionHandler.MessageLevel.Normal);
                 return new RedirectMessage(false);
             }
         }
@@ -43,7 +43,7 @@ namespace Roguelike.Actions
         {
             Item item = Source.Inventory.GetItem(_key);
             Source.Inventory.Remove(item);
-            (item as IEquipable).Equip();
+            (item as IUsable).Apply(Source);
         }
     }
 }

@@ -11,15 +11,16 @@ namespace Roguelike
 {
     class Game
     {
-        public enum Mode { Normal, Inventory, Drop, Equip };
+        public enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply};
 
         public static Mode GameMode { get; set; }
-        public static bool ShowMenu { get; set; }
+        public static bool ShowInventory { get; internal set; }
+        public static bool ShowEquipment { get; internal set; }
 
         public static Configuration Config { get; private set; }
         public static OptionHandler Options { get; private set; }
 
-        public static DungeonMap Map { get; private set; }
+        public static MapHandler Map { get; private set; }
         public static Player Player { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
@@ -126,6 +127,13 @@ namespace Roguelike
             };
             Map.AddItem(ha);
 
+            Items.Scroll magicMissile = new Items.Scroll("Scroll of magic missile", new Skills.DamageSkill(null, 100, 100));
+            magicMissile.X = Player.X - 1;
+            magicMissile.Y = Player.Y - 2;
+            magicMissile.Color = Swatch.DbSun;
+
+            Map.AddItem(magicMissile);
+
             GameMode = Mode.Normal;
 
             _rootConsole.Update += RootConsoleUpdate;
@@ -182,7 +190,14 @@ namespace Roguelike
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, _rootConsole, Config.Map.Width, 0);
 
-            if (ShowMenu)
+            if (ShowInventory)
+            {
+                _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
+                Player.Inventory.Draw(_inventoryConsole);
+                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
+            }
+
+            if (ShowEquipment)
             {
                 _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
                 Player.Inventory.Draw(_inventoryConsole);

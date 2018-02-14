@@ -1,6 +1,4 @@
-﻿using Roguelike.Core;
-using RogueSharp;
-using RogueSharp.Random;
+﻿using RogueSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +12,16 @@ namespace Roguelike.Systems
 
         private readonly int _width;
         private readonly int _height;
-        private readonly DungeonMap _map;
+        private readonly MapHandler _map;
 
         public MapGenerator(int width, int height)
         {
             _width = width;
             _height = height;
-            _map = new DungeonMap(_width, _height);
+            _map = new MapHandler(_width, _height);
         }
 
-        public DungeonMap CreateMap(Random random)
+        public MapHandler CreateMap(Random random)
         {
             _map.Initialize(_width, _height);
             IList<Rectangle> roomList = new List<Rectangle>();

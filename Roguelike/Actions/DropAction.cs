@@ -33,6 +33,7 @@ namespace Roguelike.Actions
         {
             Item item = Source.Inventory.GetItem(_key);
             Source.Inventory.Remove(item);
+            item.Carrier = null;
 
             item.X = Source.X;
             item.Y = Source.Y;

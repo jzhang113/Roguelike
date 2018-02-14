@@ -40,6 +40,7 @@ namespace Roguelike.Actions
                 case 1:
                     obj = _itemStack.GetItem('a');
                     Source.Inventory.Add(obj);
+                    obj.Carrier = Source;
 
                     Game.Map.RemoveItem(obj);
                     Game.MessageHandler.AddMessage(string.Format("You pick up a {0}.", obj.Name), OptionHandler.MessageLevel.Normal);
@@ -50,6 +51,7 @@ namespace Roguelike.Actions
                         // HACK: handle pickup menu - this placeholder at least lets you pick up the top item
                         obj = _itemStack.GetItem('a');
                         Source.Inventory.Add(obj);
+                        obj.Carrier = Source;
 
                         Game.Map.RemoveItem(obj);
                         Game.MessageHandler.AddMessage(string.Format("You pick up a {0}.", obj.Name), OptionHandler.MessageLevel.Normal);
@@ -59,6 +61,7 @@ namespace Roguelike.Actions
                         // HACK: Monsters will simply grab the top item off of a pile if they try to pick stuff up.
                         obj = _itemStack.GetItem('a');
                         Source.Inventory.Add(obj);
+                        obj.Carrier = Source;
 
                         Game.Map.RemoveItem(obj);
 
