@@ -1,4 +1,6 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Skills;
+using System;
 
 namespace Roguelike.Interfaces
 {
@@ -6,9 +8,9 @@ namespace Roguelike.Interfaces
     interface IUsable
     {
         // Action to perform.
-        ISkill ApplyAction { get; }
+        Skill ApplySkill { get; }
 
         // Perform the action.
-        void Apply(Actor actor);
+        void Apply();
     }
 }

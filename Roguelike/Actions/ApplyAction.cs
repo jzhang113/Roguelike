@@ -43,7 +43,7 @@ namespace Roguelike.Actions
         {
             Item item = Source.Inventory.GetItem(_key);
             Source.Inventory.Remove(item);
-            (item as IUsable).Apply(Source);
+            (item as IUsable).Apply();
         }
     }
 }

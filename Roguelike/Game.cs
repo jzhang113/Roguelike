@@ -11,7 +11,7 @@ namespace Roguelike
 {
     class Game
     {
-        public enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply};
+        public enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply, Targetting};
 
         public static Mode GameMode { get; set; }
         public static bool ShowInventory { get; internal set; }
@@ -127,12 +127,21 @@ namespace Roguelike
             };
             Map.AddItem(ha);
 
-            Items.Scroll magicMissile = new Items.Scroll("Scroll of magic missile", new Skills.DamageSkill(null, 100, 100));
-            magicMissile.X = Player.X - 1;
-            magicMissile.Y = Player.Y - 2;
-            magicMissile.Color = Swatch.DbSun;
-
+            Items.Scroll magicMissile = new Items.Scroll("scroll of magic missile", new Skills.DamageSkill(null, 100, 100), (s, t) => s != t && s.Distance2(t) < 100, 1)
+            {
+                X = Player.X - 1,
+                Y = Player.Y - 2,
+                Color = Swatch.DbSun
+            };
             Map.AddItem(magicMissile);
+
+            Items.Scroll healing = new Items.Scroll("scroll of healing", new Skills.HealingSkill(null, 100, 100), (s, t) => s == t, 1)
+            {
+                X = Player.X + 1,
+                Y = Player.Y + 1,
+                Color = Swatch.DbGrass
+            };
+            Map.AddItem(healing);
 
             GameMode = Mode.Normal;
 

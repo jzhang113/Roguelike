@@ -1,5 +1,6 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Interfaces;
+using Roguelike.Skills;
 using Roguelike.Systems;
 
 namespace Roguelike.Core
@@ -11,9 +12,9 @@ namespace Roguelike.Core
 
         private int _power;
         private Actor _target;
-        private ISkill _skill;
+        private Skill _skill;
 
-        public AttackAction(Actor source, Actor target, ISkill attack)
+        public AttackAction(Actor source, Actor target, Skill attack)
         {
             _skill = attack;
             _power = attack.Power + source.STR;
@@ -46,12 +47,6 @@ namespace Roguelike.Core
         {
             // TODO: still gotta work out the relationship between attacks and skill
             _skill.Activate(_target);
-
-            if (_target.IsDead())
-            {
-                Game.MessageHandler.AddMessage(_target.Name + " is dead.", OptionHandler.MessageLevel.Normal);
-                _target.TriggerDeath();
-            }
         }
     }
 }

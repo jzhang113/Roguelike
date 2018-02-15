@@ -18,12 +18,12 @@ namespace Roguelike.Interfaces
 
             if (map.IsInFov(X, Y))
             {
-                console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
+                console.Set(X, Y, Color, null, Symbol);
             }
             else
             {
                 //console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
-                console.Set(X, Y, Color, Colors.FloorBackgroundFov, Symbol);
+                console.Set(X, Y, Color, null, Symbol);
             }
         }
     }

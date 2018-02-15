@@ -15,7 +15,7 @@ namespace Roguelike.Systems
         internal float[,] PlayerMap { get; }
         internal float[,] FleeMap { get; }
         internal ICollection<Actor> Units { get; }
-        internal ICollection<Item> Items { get; }
+        internal ICollection<ItemInfo> Items { get; }
 
         public MapHandler(int width, int height) : base(width, height)
         {
@@ -24,7 +24,7 @@ namespace Roguelike.Systems
             PlayerMap = new float[width, height];
             FleeMap = new float[width, height];
             Units = new List<Actor>();
-            Items = new List<Item>();
+            Items = new List<ItemInfo>();
         }
 
         public bool AddActor(Actor unit)
@@ -55,12 +55,19 @@ namespace Roguelike.Systems
 
         public bool AddItem(Item item)
         {
-            // Q: Can we have the exact same item?
-            System.Diagnostics.Debug.Assert(!Items.Contains(item));
-            if (Items.Contains(item))
-                return false;
+            bool found = false;
 
-            Items.Add(item);
+            foreach (ItemInfo stack in Items)
+            {
+                if (stack.Contains(item))
+                {
+                    stack.Add();
+                    found = true;
+                }
+            }
+
+            if (!found)
+                Items.Add(new ItemInfo(item));
 
             if (Field[item.X, item.Y].ItemStack == null)
                 Field[item.X, item.Y].ItemStack = new InventoryHandler();
@@ -71,9 +78,18 @@ namespace Roguelike.Systems
 
         public void RemoveItem(Item item)
         {
-            System.Diagnostics.Debug.Assert(Items.Contains(item));
-            Items.Remove(item);
+            foreach (ItemInfo stack in Items)
+            {
+                if (stack.Contains(item))
+                    stack.Remove();
+            }
+
             Field[item.X, item.Y].ItemStack.Remove(item);
+        }
+
+        public ItemInfo GetItem(Cell cell)
+        {
+            return Items.FirstOrDefault(item => item.Item.X == cell.X && item.Item.Y == cell.Y);
         }
 
         public bool SetActorPosition(Actor actor, int x, int y)
@@ -147,15 +163,15 @@ namespace Roguelike.Systems
                 DrawCell(mapConsole, cell);
             }
 
-            // TODO 3: Don't draw items that aren't on the map.
-            foreach (Item item in Items)
+            foreach (ItemInfo stack in Items)
             {
-                item.Draw(mapConsole, this);
+                stack.Item.Draw(mapConsole, this);
             }
 
             foreach (Actor unit in Units)
             {
-                unit.Draw(mapConsole, this);
+                if (!unit.IsDead)
+                    unit.Draw(mapConsole, this);
             }
         }
 

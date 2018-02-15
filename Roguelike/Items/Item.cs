@@ -17,7 +17,7 @@ namespace Roguelike.Items
         public override int X { get; set; }
         public override int Y { get; set; }
 
-        protected IList<ISkill> Abilities { get; set; }
+        protected IList<Skill> Abilities { get; set; }
 
         protected int AttackSpeed { get; set; }
         protected int Damage { get; set; }
@@ -41,12 +41,12 @@ namespace Roguelike.Items
         }
         #endregion
 
-        public ISkill GetBasicAttack()
+        public Skill GetBasicAttack()
         {
             return new DamageSkill(Carrier, AttackSpeed, Damage);
         }
 
-        public ISkill GetAbility(int index)
+        public Skill GetAbility(int index)
         {
             System.Diagnostics.Debug.Assert(index < Abilities.Count);
 

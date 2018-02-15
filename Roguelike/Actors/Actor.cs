@@ -4,6 +4,7 @@ using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Skills;
 using Roguelike.Systems;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Actors
@@ -41,6 +42,7 @@ namespace Roguelike.Actors
         public InventoryHandler Inventory { get; set; }
 
         public Weapon DefaultWeapon { get; private set; }
+        public bool IsDead { get => HP < 0; }
 
         public Actor()
         {
@@ -52,16 +54,43 @@ namespace Roguelike.Actors
             Weapon = DefaultWeapon;
         }
 
-        public virtual bool IsDead() => HP < 0;
-        public virtual void TriggerDeath() => Game.Map.RemoveActor(this);
+        public virtual void TriggerDeath()
+        {
+            Game.Map.RemoveActor(this);
+            Game.EventScheduler.RemoveActor(this);
+        }
         public virtual IAction Act() => SimpleAI.GetAction(this);
 
-        public virtual int TakeDamage(int power)
+        public int TakeDamage(int power)
         {
             HP -= power;
             return power;
         }
 
+        public int TakeHealing(int power)
+        {
+            int damage = MaxHP - HP;
+
+            if (damage > power)
+            {
+                HP += power;
+                return power;
+            }
+            else
+            {
+                HP += damage;
+                return damage;
+            }
+        }
+
         public int CompareTo(ISchedulable other) => Energy - other.Energy;
+
+        public int Distance2(Actor other)
+        {
+            int dx = X - other.X;
+            int dy = Y - other.Y;
+
+            return dx * dx + dy * dy;
+        }
     }
 }

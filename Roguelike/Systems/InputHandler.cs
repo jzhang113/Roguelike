@@ -61,7 +61,9 @@ namespace Roguelike.Systems
                 }
                 */
 
-                LookHandler.Display(map.GetActor(current), map.Field[square.X, square.Y]);
+                LookHandler.DisplayActor(map.GetActor(current));
+                LookHandler.DisplayItem(map.GetItem(current));
+                LookHandler.DisplayTerrain(map.Field[square.X, square.Y]);
             }
 
             RLKeyPress keyPress = _console.Keyboard.GetKeyPress();

@@ -118,7 +118,8 @@
     <Compile Include="Items\Spear.cs" />
     <Compile Include="Items\Weapon.cs" />
     <Compile Include="Skills\DamageSkill.cs" />
-    <Compile Include="Systems\DungeonMap.cs" />
+    <Compile Include="Skills\HealingSkill.cs" />
+    <Compile Include="Systems\MapHandler.cs" />
     <Compile Include="Core\Move.cs" />
     <Compile Include="Actions\MoveAction.cs" />
     <Compile Include="Core\SimpleAI.cs" />
@@ -131,7 +132,7 @@
     <Compile Include="Systems\RedirectMessage.cs" />
     <Compile Include="Core\Terrain.cs" />
     <Compile Include="Interfaces\ISchedulable.cs" />
-    <Compile Include="Interfaces\ISkill.cs" />
+    <Compile Include="Skills\Skill.cs" />
     <Compile Include="Interfaces\IAction.cs" />
     <Compile Include="Systems\EventScheduler.cs" />
     <Compile Include="Systems\InputHandler.cs" />

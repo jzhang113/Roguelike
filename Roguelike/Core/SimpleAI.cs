@@ -50,7 +50,7 @@ namespace Roguelike.Core
                     }
                 case ActorState.Dead:
                     // Remove dead things if they die before they finish acting.
-                    Game.EventScheduler.RemoveActor(monster);
+                    monster.TriggerDeath();
                     return null;
                 case ActorState.Sleep:
                     return new MoveAction(monster, monster.X, monster.Y);
