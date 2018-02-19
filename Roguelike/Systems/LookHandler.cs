@@ -22,7 +22,7 @@ namespace Roguelike.Systems
         public static void DisplayItem(ItemInfo itemInfo)
         {
             _displayItem = itemInfo;
-            _showItemInfo = (itemInfo.Count > 0);
+            _showItemInfo = (itemInfo != null) && (itemInfo.Count > 0);
         }
 
         internal static void DisplayTerrain(Terrain tile)

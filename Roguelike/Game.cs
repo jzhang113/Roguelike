@@ -16,6 +16,7 @@ namespace Roguelike
         public static Mode GameMode { get; set; }
         public static bool ShowInventory { get; internal set; }
         public static bool ShowEquipment { get; internal set; }
+        public static bool ShowOverlay { get; internal set; }
 
         public static Configuration Config { get; private set; }
         public static OptionHandler Options { get; private set; }
@@ -182,8 +183,6 @@ namespace Roguelike
 
             if (_render)
             {
-                _mapConsole.Clear();
-                Player.Draw(_mapConsole, Map);
                 Map.ClearHighlight();
 
                 _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
@@ -192,7 +191,10 @@ namespace Roguelike
                 _render = false;
             }
 
+            _mapConsole.Clear();
             Map.Draw(_mapConsole);
+            Player.Draw(_mapConsole, Map);
+
             _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
             LookHandler.Draw(_viewConsole);
 

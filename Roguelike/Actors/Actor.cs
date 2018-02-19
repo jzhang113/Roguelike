@@ -2,10 +2,7 @@
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
-using Roguelike.Skills;
 using Roguelike.Systems;
-using System;
-using System.Collections.Generic;
 
 namespace Roguelike.Actors
 {
@@ -83,7 +80,21 @@ namespace Roguelike.Actors
             }
         }
 
-        public int CompareTo(ISchedulable other) => Energy - other.Energy;
+        // Returns the Schedulable with higher energy. If there is a tie with another Actor, the
+        // Actor closer to the Player gets to move first to preserve proper pathing. However, 
+        // since the Player is also an Actor, this does not apply to cases when other is Player.
+        public int CompareTo(ISchedulable other)
+        {
+            int energyDiff = Energy - other.Energy;
+
+            if (energyDiff == 0 && other is Actor && !(other is Player))
+            {
+                Actor otherActor = other as Actor;
+                return (int)(Game.Map.PlayerMap[X, Y] - Game.Map.PlayerMap[otherActor.X, otherActor.Y]);
+            }
+
+            return energyDiff;
+        }
 
         public int Distance2(Actor other)
         {

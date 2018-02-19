@@ -12,6 +12,9 @@ namespace Roguelike.Systems
     class InputHandler
     {
         private static RLRootConsole _console;
+        private static int _holdTimeout = 0;
+        private static bool _holdingKey = false;
+        private static readonly int HOLD_LIMIT = 14;
 
         public static void Initialize(RLRootConsole console)
         {
@@ -65,10 +68,28 @@ namespace Roguelike.Systems
                 LookHandler.DisplayItem(map.GetItem(current));
                 LookHandler.DisplayTerrain(map.Field[square.X, square.Y]);
             }
-
+            
             RLKeyPress keyPress = _console.Keyboard.GetKeyPress();
             if (keyPress == null)
+            {
+                // For some reason, holding a key issues a command, but follows up with nulls.
+                // We resolve this by making holds somewhat sticky.
+                if (_holdingKey)
+                {
+                    if (_holdTimeout < HOLD_LIMIT)
+                    {
+                        _holdTimeout++;
+                    }
+                    else
+                    {
+                        Game.ShowOverlay = false;
+                        _holdingKey = false;
+                        _holdTimeout = 0;
+                    }
+                }
+
                 return null;
+            }
 
             if (Game.ShowInventory)
             {
@@ -92,6 +113,9 @@ namespace Roguelike.Systems
                         return new UnequipAction(player, keyChar);
                 }
             }
+
+            Game.ShowOverlay = (keyPress.Key == RLKey.Tab);
+            _holdingKey = true;
 
             switch (keyPress.Key)
             {

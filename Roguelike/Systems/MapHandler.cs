@@ -89,7 +89,7 @@ namespace Roguelike.Systems
 
         public ItemInfo GetItem(Cell cell)
         {
-            return Items.FirstOrDefault(item => item.Item.X == cell.X && item.Item.Y == cell.Y);
+            return Items.FirstOrDefault(item => item.Item.X == cell.X && item.Item.Y == cell.Y && item.Count > 0);
         }
 
         public bool SetActorPosition(Actor actor, int x, int y)
@@ -98,11 +98,8 @@ namespace Roguelike.Systems
 
             if (newPos.IsWalkable)
             {
-                SetWalkable(actor.X, actor.Y, true);
-
                 actor.X = x;
                 actor.Y = y;
-                SetWalkable(newPos, false);
 
                 if (actor is Player)
                 {
@@ -165,7 +162,8 @@ namespace Roguelike.Systems
 
             foreach (ItemInfo stack in Items)
             {
-                stack.Item.Draw(mapConsole, this);
+                if (stack.Count > 0)
+                    stack.Item.Draw(mapConsole, this);
             }
 
             foreach (Actor unit in Units)
@@ -173,6 +171,14 @@ namespace Roguelike.Systems
                 if (!unit.IsDead)
                     unit.Draw(mapConsole, this);
             }
+
+            // debugging code for dijkstra maps            
+            foreach (Cell cell in GetAllCells())
+            {
+                if (Game.ShowOverlay)
+                    DrawOverlay(mapConsole, cell);
+            }
+            
         }
 
         private void DrawCell(RLConsole mapConsole, Cell cell)
@@ -212,6 +218,22 @@ namespace Roguelike.Systems
             }
         }
 
+        private void DrawOverlay(RLConsole mapConsole, Cell cell)
+        {
+            string display;
+            float distance = PlayerMap[cell.X, cell.Y];
+
+            if (distance < 10 || float.IsNaN(distance))
+                display = distance.ToString();
+            else
+                display = ((char)(distance - 10 + 'a')).ToString();
+
+            if (display == "NaN")
+                mapConsole.Print(cell.X, cell.Y, display, Swatch.DbBlood);
+            else
+                mapConsole.Print(cell.X, cell.Y, display, Swatch.DbWater);
+        }
+
         internal void ClearHighlight()
         {
             for (int x = 0; x < Width; x++)
@@ -240,7 +262,6 @@ namespace Roguelike.Systems
         internal void UpdatePlayerMaps()
         {
             Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
-            bool[,] visited = new bool[Width, Height];
             goals.Enqueue(new WeightedPoint(Game.Player.X, Game.Player.Y));
 
             for (int x = 0; x < Width; x++)
@@ -268,9 +289,8 @@ namespace Roguelike.Systems
                     Terrain cell = Field[newX, newY];
                     Cell lx = GetCell(newX, newY);
 
-                    if (cell.IsWalkable && lx.IsExplored && (!visited[newX, newY] || newWeight < PlayerMap[newX, newY]))
+                    if (cell.IsWalkable && lx.IsExplored && (float.IsNaN(PlayerMap[newX, newY]) || newWeight < PlayerMap[newX, newY]))
                     {
-                        visited[newX, newY] = true;
                         PlayerMap[newX, newY] = newWeight;
                         goals.Enqueue(new WeightedPoint(newX, newY, newWeight));
                     }
