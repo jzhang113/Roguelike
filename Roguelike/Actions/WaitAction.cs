@@ -4,18 +4,18 @@ using Roguelike.Systems;
 
 namespace Roguelike.Actions
 {
-    class PassAction : IAction
+    class WaitAction : IAction
     {
         public Actor Source { get; }
         public int EnergyCost { get; }
 
-        public PassAction(Actor source)
+        public WaitAction(Actor source)
         {
             Source = source;
             EnergyCost = source.RefreshRate;
         }
 
-        public PassAction(int waitTime)
+        public WaitAction(int waitTime)
         {
             EnergyCost = waitTime;
         }

@@ -14,7 +14,7 @@ namespace Roguelike.Systems
         private static RLRootConsole _console;
         private static int _holdTimeout = 0;
         private static bool _holdingKey = false;
-        private static readonly int HOLD_LIMIT = 14;
+        private static readonly int HOLD_LIMIT = 15;
 
         public static void Initialize(RLRootConsole console)
         {
@@ -35,6 +35,7 @@ namespace Roguelike.Systems
                 IEnumerable<WeightedPoint> path = map.PathToPlayer(square.X, square.Y).Reverse();
                 bool exploredPathExists = false;
 
+                // TODO: Path may end up broken because an enemy is in the way.
                 foreach (WeightedPoint p in path)
                 {
                     if (!exploredPathExists)
@@ -64,8 +65,8 @@ namespace Roguelike.Systems
                 }
                 */
 
-                LookHandler.DisplayActor(map.GetActor(current));
-                LookHandler.DisplayItem(map.GetItem(current));
+                LookHandler.DisplayActor(map.GetActor(square.X, square.Y));
+                LookHandler.DisplayItem(map.GetItem(square.X, square.Y));
                 LookHandler.DisplayTerrain(map.Field[square.X, square.Y]);
             }
             
@@ -150,7 +151,7 @@ namespace Roguelike.Systems
                     return new MoveAction(player, player.X + Move.SE.X, player.Y + Move.SE.Y);
                 case RLKey.Keypad5:
                 case RLKey.Period:
-                    return new PassAction(player);
+                    return new WaitAction(player);
                 #endregion
                 case RLKey.Comma:
                     return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);

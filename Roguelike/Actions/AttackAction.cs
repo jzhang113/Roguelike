@@ -3,7 +3,7 @@ using Roguelike.Interfaces;
 using Roguelike.Skills;
 using Roguelike.Systems;
 
-namespace Roguelike.Core
+namespace Roguelike.Actions
 {
     class AttackAction : IAction
     {
@@ -36,8 +36,8 @@ namespace Roguelike.Core
             if (_target == Source)
             {
                 // Q: Should this even be allowed?
-                Game.MessageHandler.AddMessage(string.Format("{0} tried to attack itself!", Source), OptionHandler.MessageLevel.Normal);
-                return new RedirectMessage(false);
+                Game.MessageHandler.AddMessage(string.Format("{0} tried to attack itself!", Source), OptionHandler.MessageLevel.Verbose);
+                return new RedirectMessage(false, new WaitAction(Source));
             }
 
             return new RedirectMessage(true);

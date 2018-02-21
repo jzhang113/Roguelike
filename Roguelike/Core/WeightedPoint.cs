@@ -2,9 +2,9 @@
 {
     struct WeightedPoint
     {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public float Weight { get; set; }
+        public int X { get; }
+        public int Y { get; }
+        public float Weight { get; }
 
         public WeightedPoint(int x, int y)
         {

@@ -3,19 +3,23 @@ using Roguelike.Systems;
 
 namespace Roguelike.Core
 {
-    public struct Terrain
+    class Terrain
     {
-        public bool IsWalkable { get; set; }
+        public bool IsWall { get; set; }
+        public bool IsOccupied { get; set; }
+        public bool IsWalkable { get => !IsWall && !IsOccupied; }
+
         public int MoveCost { get; set; }
         public Actor Unit { get; set; }
         public InventoryHandler ItemStack { get; set; }
 
-        public Terrain(bool walkable, int moveCost)
+        public WeightedPoint Position { get; }
+
+        public Terrain(bool wall, int moveCost, int x, int y)
         {
-            IsWalkable = walkable;
+            IsWall = wall;
             MoveCost = moveCost;
-            Unit = null;
-            ItemStack = new InventoryHandler();
+            Position = new WeightedPoint(x, y);
         }
     }
 }

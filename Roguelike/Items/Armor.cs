@@ -1,27 +1,32 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Core;
+using Roguelike.Interfaces;
+using Roguelike.Systems;
 
 namespace Roguelike.Items
 {
     public abstract class Armor : Item, IEquipable
     {
-        protected Armor()
+        private ArmorType _type;
+
+        protected Armor(ArmorType type)
         {
             Symbol = '[';
+            _type = type;
         }
 
         public void Equip()
         {
-            System.Diagnostics.Debug.Assert(Carrier.Armor == null);
-            Carrier.Armor = this;
+            System.Diagnostics.Debug.Assert(Carrier.Equipment.Armor[_type] == null);
+            Carrier.Equipment.Armor[_type] = this;
 
-            Game.MessageHandler.AddMessage("You put on the armor.", Systems.OptionHandler.MessageLevel.Normal);
+            Game.MessageHandler.AddMessage(string.Format("You put on the {0}.", Name), OptionHandler.MessageLevel.Normal);
         }
 
         public void Unequip()
         {
-            Carrier.Armor = null;
+            Carrier.Equipment.Armor[_type] = null;
 
-            Game.MessageHandler.AddMessage("You take off the armor.", Systems.OptionHandler.MessageLevel.Normal);
+            Game.MessageHandler.AddMessage(string.Format("You take off the {0}.", Name), OptionHandler.MessageLevel.Normal);
         }
     }
 }

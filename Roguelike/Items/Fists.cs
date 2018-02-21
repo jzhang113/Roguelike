@@ -11,7 +11,7 @@ namespace Roguelike.Items
             Carrier = actor;
 
             // TODO 2: Allow for variable formulaes.
-            AttackSpeed = 100;
+            AttackSpeed = 120;
             Damage = 100;
             MeleeRange = 1;
             ThrowRange = 1;

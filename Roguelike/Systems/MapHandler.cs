@@ -11,16 +11,16 @@ namespace Roguelike.Systems
     class MapHandler : Map
     {
         internal RLColor[,] Highlight { get; set; }
-        internal Terrain[,] Field { get; set; }
+        internal Field Field { get; set; }
         internal float[,] PlayerMap { get; }
         internal float[,] FleeMap { get; }
         internal ICollection<Actor> Units { get; }
         internal ICollection<ItemInfo> Items { get; }
-
+        
         public MapHandler(int width, int height) : base(width, height)
         {
+            Field = new Field(width, height);
             Highlight = new RLColor[width, height];
-            Field = new Terrain[width, height];
             PlayerMap = new float[width, height];
             FleeMap = new float[width, height];
             Units = new List<Actor>();
@@ -39,14 +39,19 @@ namespace Roguelike.Systems
             return true;
         }
 
-        public Actor GetActor(Cell cell)
+        public Actor GetActor(WeightedPoint pos)
         {
-            return Units.FirstOrDefault(unit => unit.X == cell.X && unit.Y == cell.Y);
+            return Units.FirstOrDefault(unit => unit.X == pos.X && unit.Y == pos.Y);
+        }
+
+        public Actor GetActor(int x, int y)
+        {
+            return Units.FirstOrDefault(unit => unit.X == x && unit.Y == y);
         }
 
         public bool RemoveActor(Actor unit)
         {
-            SetWalkable(unit.X, unit.Y, true);
+            SetOccupied(unit.X, unit.Y, false);
             unit.State = ActorState.Dead;
             Game.EventScheduler.RemoveActor(unit);
 
@@ -87,9 +92,14 @@ namespace Roguelike.Systems
             Field[item.X, item.Y].ItemStack.Remove(item);
         }
 
-        public ItemInfo GetItem(Cell cell)
+        public ItemInfo GetItem(WeightedPoint pos)
         {
-            return Items.FirstOrDefault(item => item.Item.X == cell.X && item.Item.Y == cell.Y && item.Count > 0);
+            return Items.FirstOrDefault(item => item.Item.X == pos.X && item.Item.Y == pos.Y && item.Count > 0);
+        }
+
+        public ItemInfo GetItem(int x, int y)
+        {
+            return Items.FirstOrDefault(item => item.Item.X == x && item.Item.Y == y && item.Count > 0);
         }
 
         public bool SetActorPosition(Actor actor, int x, int y)
@@ -98,8 +108,10 @@ namespace Roguelike.Systems
 
             if (newPos.IsWalkable)
             {
+                SetOccupied(actor.X, actor.Y, false);
                 actor.X = x;
                 actor.Y = y;
+                SetOccupied(newPos, true);
 
                 if (actor is Player)
                 {
@@ -116,15 +128,24 @@ namespace Roguelike.Systems
         public IEnumerable<WeightedPoint> PathToPlayer(int x, int y)
         {
             float nearest = PlayerMap[x, y];
+            float prev = nearest;
 
-            while (nearest > 1.5f)
+            while (nearest > 0)
             {
                 WeightedPoint nextMove = MoveTowardsTarget(x, y, PlayerMap);
                 x = nextMove.X;
                 y = nextMove.Y;
                 nearest = nextMove.Weight;
 
-                yield return nextMove;
+                if (nearest == prev)
+                {
+                    yield break;
+                }
+                else
+                {
+                    prev = nearest;
+                    yield return nextMove;
+                }
             }
         }
 
@@ -134,15 +155,12 @@ namespace Roguelike.Systems
             int nextY = currentY;
             float nearest = goalMap[currentX, currentY];
 
-            if (float.IsNaN(nearest))
-                nearest = 1000;
-
             foreach (WeightedPoint dir in Move.Directions)
             {
                 int newX = currentX + dir.X;
                 int newY = currentY + dir.Y;
 
-                if (goalMap[newX, newY] < nearest)
+                if (goalMap[newX, newY] < nearest && (Field[newX, newY].IsWalkable || goalMap[newX, newY] == 0))
                 {
                     nextX = newX;
                     nextY = newY;
@@ -172,7 +190,7 @@ namespace Roguelike.Systems
                     unit.Draw(mapConsole, this);
             }
 
-            // debugging code for dijkstra maps            
+            // debugging code for dijkstra maps
             foreach (Cell cell in GetAllCells())
             {
                 if (Game.ShowOverlay)
@@ -190,7 +208,7 @@ namespace Roguelike.Systems
 
             if (IsInFov(cell.X, cell.Y))
             {
-                if (cell.IsWalkable)
+                if (!Field[cell.X, cell.Y].IsWall)
                 {
                     mapConsole.Set(cell.X, cell.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
                     // mapConsole.SetColor(cell.X, cell.Y, new RLColor(1, 1 - PlayerMap[cell.X, cell.Y] / 20, 0));
@@ -202,7 +220,7 @@ namespace Roguelike.Systems
             }
             else
             {
-                if (cell.IsWalkable)
+                if (!Field[cell.X, cell.Y].IsWall)
                 {
                     mapConsole.Set(cell.X, cell.Y, Colors.Floor, Colors.FloorBackground, '.');
                 }
@@ -289,7 +307,8 @@ namespace Roguelike.Systems
                     Terrain cell = Field[newX, newY];
                     Cell lx = GetCell(newX, newY);
 
-                    if (cell.IsWalkable && lx.IsExplored && (float.IsNaN(PlayerMap[newX, newY]) || newWeight < PlayerMap[newX, newY]))
+                    if (cell != null && !cell.IsWall && lx.IsExplored &&
+                        (float.IsNaN(PlayerMap[newX, newY]) || newWeight < PlayerMap[newX, newY]))
                     {
                         PlayerMap[newX, newY] = newWeight;
                         goals.Enqueue(new WeightedPoint(newX, newY, newWeight));
@@ -306,17 +325,17 @@ namespace Roguelike.Systems
             }
         }
 
-        private void SetWalkable(Cell cell, bool walkable)
+        private void SetOccupied(Cell cell, bool occupied)
         {
-            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, walkable, cell.IsExplored);
-            Field[cell.X, cell.Y].IsWalkable = walkable;
+            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, !occupied, cell.IsExplored);
+            Field[cell.X, cell.Y].IsOccupied = occupied;
         }
 
-        private void SetWalkable(int x, int y, bool walkable)
+        private void SetOccupied(int x, int y, bool occupied)
         {
             Cell cell = GetCell(x, y);
-            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, walkable, cell.IsExplored);
-            Field[cell.X, cell.Y].IsWalkable = walkable;
+            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, !occupied, cell.IsExplored);
+            Field[cell.X, cell.Y].IsOccupied = occupied;
         }
     }
 }

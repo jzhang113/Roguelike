@@ -77,6 +77,8 @@ namespace Roguelike.Systems
         public ISchedulable Peek() => _heap[0];
         public bool IsEmpty() => _heapSize == 0;
         public int Size() => _heapSize;
+        internal T[] GetHeap() => _heap;
+        internal int[] GetOrder() => _orderArray;
 
         private void ReheapUp(int initial)
         {
@@ -156,7 +158,7 @@ namespace Roguelike.Systems
             if (result != 0)
                 return result;
             else
-                return orderB - orderA;
+                return orderA - orderB;
         }
     }
 }

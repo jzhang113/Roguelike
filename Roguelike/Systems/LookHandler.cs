@@ -1,5 +1,4 @@
-﻿using System;
-using RLNET;
+﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
 
@@ -12,6 +11,7 @@ namespace Roguelike.Systems
         private static Terrain _displayTile;
         private static bool _showActorInfo;
         private static bool _showItemInfo;
+        private static bool _showTile;
 
         public static void DisplayActor(Actor actor)
         {
@@ -28,10 +28,14 @@ namespace Roguelike.Systems
         internal static void DisplayTerrain(Terrain tile)
         {
             _displayTile = tile;
+            _showTile = (tile != null);
         }
 
         public static void Draw(RLConsole console)
         {
+            if (_showItemInfo)
+                console.Print(1, 1, _displayItem?.Item.Name, Colors.TextHeading);
+
             if (_showActorInfo)
             {
                 console.Print(1, 1, _displayActor.Name, Colors.TextHeading);
@@ -42,12 +46,13 @@ namespace Roguelike.Systems
                 console.Print(1, 6, "State: " + _displayActor.State, Colors.TextHeading);
             }
 
-            if (_showItemInfo)
+            if (_showTile)
             {
-                console.Print(1, 1, _displayItem.Item.Name, Colors.TextHeading);
+                console.Print(1, 8, "Move cost: " + _displayTile.MoveCost.ToString(), Colors.TextHeading);
+                console.Print(1, 9, "Occupied: " + _displayTile.IsOccupied, Colors.TextHeading);
+                console.Print(1, 9, "Walkable: " + _displayTile.IsWalkable, Colors.TextHeading);
+                console.Print(1, 10, "Wall: " + _displayTile.IsWall, Colors.TextHeading);
             }
-            
-            console.Print(1, 8, _displayTile.MoveCost.ToString(), Colors.TextHeading);
         }
     }
 }

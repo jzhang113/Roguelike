@@ -1,37 +1,42 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
-using RogueSharp;
 
-namespace Roguelike.Core
+namespace Roguelike.Actions
 {
     class MoveAction : IAction
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 100;
+        public int EnergyCost { get; } = 120;
 
         private int _newX;
         private int _newY;
-        private Cell _cell;
+        private Terrain _cell;
 
         public MoveAction(Actor source, int x, int y)
         {
             Source = source;
             _newX = x;
             _newY = y;
-            _cell = Game.Map.GetCell(_newX, _newY);
+            _cell = Game.Map.Field[_newX, _newY];
         }
 
         public RedirectMessage Validate()
         {
             // Cancel out of bound moves.
-            if (_newX >= Game.Config.Map.Width || _newY >= Game.Config.Map.Height)
+            if (!Game.Map.Field.IsValid(_newX, _newY))
                 return new RedirectMessage(false);
 
             // Check if the destination is already occupied.
-            Actor target = Game.Map.GetActor(_cell);
+            Actor target = Game.Map.GetActor(_cell.Position);
             if (target != null)
-                return new RedirectMessage(false, new AttackAction(Source, target, Source.Weapon.GetBasicAttack()));
+            {
+                if (target == Source)
+                    return new RedirectMessage(false, new WaitAction(Source));
+                else
+                    return new RedirectMessage(false, new AttackAction(Source, target, Source.Equipment.PrimaryWeapon.GetBasicAttack()));
+            }
 
             return new RedirectMessage(true);
         }
@@ -40,7 +45,7 @@ namespace Roguelike.Core
         {
             if (_cell.IsWalkable)
             {
-                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2}", Source.Name, _newX, _newY), OptionHandler.MessageLevel.Verbose);
+                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2} and is at {3} energy", Source.Name, _newX, _newY, Source.Energy), OptionHandler.MessageLevel.Verbose);
 
                 if (Source is Player)
                 {

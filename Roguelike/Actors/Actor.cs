@@ -34,21 +34,18 @@ namespace Roguelike.Actors
         public int Energy { get; set; }
         public int RefreshRate { get; set; }
 
-        public Weapon Weapon { get; set; }
-        public Armor Armor { get; set; }
-        public InventoryHandler Inventory { get; set; }
+        public InventoryHandler Inventory { get; }
+        public EquipmentHandler Equipment { get; }
 
-        public Weapon DefaultWeapon { get; private set; }
         public bool IsDead { get => HP < 0; }
 
         public Actor()
         {
-            Energy = 100;
-            RefreshRate = 100;
-
+            RefreshRate = 120;
             Inventory = new InventoryHandler();
-            DefaultWeapon = new Fists(this);
-            Weapon = DefaultWeapon;
+
+            Weapon defaultWeapon = new Fists(this);
+            Equipment = new EquipmentHandler(defaultWeapon);
         }
 
         public virtual void TriggerDeath()
@@ -66,17 +63,18 @@ namespace Roguelike.Actors
 
         public int TakeHealing(int power)
         {
-            int damage = MaxHP - HP;
+            int restore = MaxHP - HP;
+            restore = (restore > 0) ? restore : 0;
 
-            if (damage > power)
+            if (restore > power)
             {
                 HP += power;
                 return power;
             }
             else
             {
-                HP += damage;
-                return damage;
+                HP += restore;
+                return restore;
             }
         }
 
@@ -87,7 +85,7 @@ namespace Roguelike.Actors
         {
             int energyDiff = Energy - other.Energy;
 
-            if (energyDiff == 0 && other is Actor && !(other is Player))
+            if (energyDiff == 0 && other is Actor) //&& !(other is Player)) Q: do we need this??
             {
                 Actor otherActor = other as Actor;
                 return (int)(Game.Map.PlayerMap[X, Y] - Game.Map.PlayerMap[otherActor.X, otherActor.Y]);

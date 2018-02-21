@@ -9,7 +9,7 @@ namespace Roguelike.Actions
     class PickupAction : IAction
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 50;
+        public int EnergyCost { get; } = 60;
 
         private InventoryHandler _itemStack;
 

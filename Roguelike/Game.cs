@@ -94,20 +94,21 @@ namespace Roguelike
 
             while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
             {
-                Player.X = Random.Next(0, Config.Map.Width - 1);
-                Player.Y = Random.Next(0, Config.Map.Height - 1);
+                Player.X = 30;
+                Player.Y = 10;
             } 
 
             Map.AddActor(Player);
             // Map.SetActorPosition(Player, playerX, playerY);
 
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 3; i++)
             {
                 Skeleton s = new Skeleton();
                 while (!Map.GetCell(s.X, s.Y).IsWalkable)
                 {
                     s.X = Random.Next(0, Config.Map.Width - 1);
                     s.Y = Random.Next(0, Config.Map.Height - 1);
+                    s.Name = "Mook #" + (i + 1);
                 }
                 Map.AddActor(s);
             }
@@ -211,7 +212,7 @@ namespace Roguelike
             if (ShowEquipment)
             {
                 _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
-                Player.Inventory.Draw(_inventoryConsole);
+                Player.Equipment.Draw(_inventoryConsole);
                 RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
             }
 

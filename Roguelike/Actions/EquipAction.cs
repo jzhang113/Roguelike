@@ -8,7 +8,7 @@ namespace Roguelike.Actions
     class EquipAction : IAction
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 100;
+        public int EnergyCost { get; } = 120;
 
         private char _key;
 

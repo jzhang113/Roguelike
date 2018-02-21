@@ -2,7 +2,7 @@
 	"fontName": "terminal8x8.png",
 	"fontSize": 8,
 	"screen": {
-		"height": 60,
+		"height": 100,
 		"width": 80
 	},
 	"map": {
@@ -15,7 +15,7 @@
 	},
 	"messageMaxCount": 100,
 	"messageView": {
-		"height": 11,
+		"height": 51,
 		"width": 60
 	},
 	"statView": {

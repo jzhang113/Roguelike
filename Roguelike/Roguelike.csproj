@@ -101,13 +101,16 @@
     <Compile Include="Actions\ApplyAction.cs" />
     <Compile Include="Actions\DropAction.cs" />
     <Compile Include="Actions\EquipAction.cs" />
-    <Compile Include="Actions\PassAction.cs" />
+    <Compile Include="Actions\WaitAction.cs" />
     <Compile Include="Actions\PickupAction.cs" />
     <Compile Include="Actions\ThrowAction.cs" />
     <Compile Include="Actions\UnequipAction.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Actions\AttackAction.cs" />
+    <Compile Include="Core\Class1.cs" />
+    <Compile Include="Systems\EquipmentHandler.cs" />
     <Compile Include="Core\Colors.cs" />
+    <Compile Include="Core\Field.cs" />
     <Compile Include="Interfaces\IEquipable.cs" />
     <Compile Include="Interfaces\IUsable.cs" />
     <Compile Include="Items\Armor.cs" />

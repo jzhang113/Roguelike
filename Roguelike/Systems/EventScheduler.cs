@@ -25,10 +25,16 @@ namespace Roguelike.Systems
 
             // If the current Actor has negative energy, then everyone must have negative energy.
             // Give everyone some energy and carry on acting.
-            if (current.Energy < 0)
+            if (current.Energy <= 0)
             {
+                Game.MessageHandler.AddMessage("Energy Refresh", OptionHandler.MessageLevel.Verbose);
+                System.Console.WriteLine("New turn!");
+                System.Console.WriteLine("Turn order");
+                System.Console.WriteLine("----------");
+                for (int i = 0; i < _eventSet.Size(); i++)
+                    System.Console.WriteLine(string.Format("#{0} {1}\t {2} energy", _eventSet.GetOrder()[i], ((Actors.Actor)_eventSet.GetHeap()[i]).Name, _eventSet.GetHeap()[i].Energy));
+
                 _eventSet.UpdateAll();
-                return Update();
             }
 
             // Break the event loop when there is no Action. Currently, the only situation where
@@ -59,8 +65,8 @@ namespace Roguelike.Systems
             current.Energy -= action.EnergyCost;
 
             // Move the current Actor to the bottom of the heap.
-            _eventSet.Add(current);
             _eventSet.GetMax();
+            _eventSet.Add(current);
 
             return true;
         }
