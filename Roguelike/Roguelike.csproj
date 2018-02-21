@@ -107,7 +107,7 @@
     <Compile Include="Actions\UnequipAction.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Actions\AttackAction.cs" />
-    <Compile Include="Core\Class1.cs" />
+    <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Systems\EquipmentHandler.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\Field.cs" />
@@ -162,7 +162,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Ddw10x10.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="design.txt" />
+    <Content Include="Nice_curses_12x12.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="terminal8x8.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

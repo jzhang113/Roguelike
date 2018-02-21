@@ -65,6 +65,24 @@ namespace Roguelike.Systems
                 }
                 */
 
+                IEnumerable<Terrain> path2 = map.StraightPathToPlayer(square.X, square.Y);
+                bool exploredPathExists2 = false;
+
+                // TODO: Path may end up broken because an enemy is in the way.
+                foreach (Terrain t in path2)
+                {
+                    if (!exploredPathExists2)
+                        exploredPathExists2 = true;
+
+                    if (!map.GetCell(t.Position.X, t.Position.Y).IsExplored)
+                    {
+                        exploredPathExists = false;
+                        break;
+                    }
+
+                    map.Highlight[t.Position.X, t.Position.Y] = RLColor.Blue;
+                }
+
                 LookHandler.DisplayActor(map.GetActor(square.X, square.Y));
                 LookHandler.DisplayItem(map.GetItem(square.X, square.Y));
                 LookHandler.DisplayTerrain(map.Field[square.X, square.Y]);

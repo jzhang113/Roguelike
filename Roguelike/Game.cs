@@ -90,13 +90,11 @@ namespace Roguelike
             MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height);
             Map = mapGenerator.CreateMap(new Random(generatorSeed[0]));
 
-            Player = new Player();
-
-            while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
+            Player = new Player
             {
-                Player.X = 30;
-                Player.Y = 10;
-            } 
+                X = 30,
+                Y = 10
+            };
 
             Map.AddActor(Player);
             // Map.SetActorPosition(Player, playerX, playerY);

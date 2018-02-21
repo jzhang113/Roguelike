@@ -5,6 +5,7 @@ using Roguelike.Core;
 using RogueSharp;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Roguelike.Systems
 {
@@ -27,6 +28,7 @@ namespace Roguelike.Systems
             Items = new List<ItemInfo>();
         }
 
+        #region Actor Methods
         public bool AddActor(Actor unit)
         {
             if (!Field[unit.X, unit.Y].IsWalkable)
@@ -34,6 +36,7 @@ namespace Roguelike.Systems
             
             SetActorPosition(unit, unit.X, unit.Y);
             Units.Add(unit);
+            Field[unit.X, unit.Y].Unit = unit;
             Game.EventScheduler.AddActor(unit);
 
             return true;
@@ -41,23 +44,52 @@ namespace Roguelike.Systems
 
         public Actor GetActor(WeightedPoint pos)
         {
-            return Units.FirstOrDefault(unit => unit.X == pos.X && unit.Y == pos.Y);
+            return Field[pos.X, pos.Y].Unit;
         }
 
         public Actor GetActor(int x, int y)
         {
-            return Units.FirstOrDefault(unit => unit.X == x && unit.Y == y);
+            return Field[x, y].Unit;
         }
 
         public bool RemoveActor(Actor unit)
         {
             SetOccupied(unit.X, unit.Y, false);
             unit.State = ActorState.Dead;
+            Field[unit.X, unit.Y].Unit = null;
             Game.EventScheduler.RemoveActor(unit);
 
             return Units.Remove(unit);
         }
 
+        public bool SetActorPosition(Actor actor, int x, int y)
+        {
+            Cell newPos = GetCell(x, y);
+
+            if (newPos.IsWalkable)
+            {
+                SetOccupied(actor.X, actor.Y, false);
+                Field[actor.X, actor.Y].Unit = null;
+
+                actor.X = x;
+                actor.Y = y;
+                SetOccupied(newPos, true);
+                Field[x, y].Unit = actor;
+
+                if (actor is Player)
+                {
+                    UpdatePlayerFov();
+                    UpdatePlayerMaps();
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region Item Methods
         public bool AddItem(Item item)
         {
             bool found = false;
@@ -101,32 +133,11 @@ namespace Roguelike.Systems
         {
             return Items.FirstOrDefault(item => item.Item.X == x && item.Item.Y == y && item.Count > 0);
         }
-
-        public bool SetActorPosition(Actor actor, int x, int y)
-        {
-            Cell newPos = GetCell(x, y);
-
-            if (newPos.IsWalkable)
-            {
-                SetOccupied(actor.X, actor.Y, false);
-                actor.X = x;
-                actor.Y = y;
-                SetOccupied(newPos, true);
-
-                if (actor is Player)
-                {
-                    UpdatePlayerFov();
-                    UpdatePlayerMaps();
-                }
-
-                return true;
-            }
-
-            return false;
-        }
+        #endregion
 
         public IEnumerable<WeightedPoint> PathToPlayer(int x, int y)
         {
+            System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
             float nearest = PlayerMap[x, y];
             float prev = nearest;
 
@@ -171,6 +182,46 @@ namespace Roguelike.Systems
             return new WeightedPoint(nextX, nextY, nearest);
         }
 
+        public IEnumerable<Terrain> StraightPathToPlayer(int x, int y)
+        {
+            System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
+            if (IsInFov(x, y))
+                return StraightLinePath(x, y, Game.Player.X, Game.Player.Y);
+            else
+                return new List<Terrain>();
+        }
+
+        // Returns a straight line from the source to target. Does not check if the path is actually
+        // walkable.
+        internal IEnumerable<Terrain> StraightLinePath(int sourceX, int sourceY, int targetX, int targetY)
+        {
+            int dx = Math.Abs(targetX - sourceX);
+            int dy = Math.Abs(targetY - sourceY);
+            int sx = (targetX < sourceX) ? -1 : 1;
+            int sy = (targetY < sourceY) ? -1 : 1;
+            int D = 2 * dy - dx;
+
+            // Return the initial position.
+            yield return Field[sourceX, sourceY];
+
+            // Take a step towards the target and return the new position.
+            while (sourceX != targetX)
+            {
+                sourceX += sx;
+
+                if (D > 0)
+                {
+                    sourceY += sy;
+                    D -= 2 * dx;
+                }
+
+                D += 2 * dy;
+
+                yield return Field[sourceX, sourceY];
+            } 
+        }
+
+        #region Drawing Methods
         public void Draw(RLConsole mapConsole)
         {
             foreach (Cell cell in GetAllCells())
@@ -262,6 +313,7 @@ namespace Roguelike.Systems
                 }
             }
         }
+        #endregion
 
         private void UpdatePlayerFov()
         {

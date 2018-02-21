@@ -26,12 +26,24 @@ namespace Roguelike.Actions
         {
             // Cancel out of bound moves.
             if (!Game.Map.Field.IsValid(_newX, _newY))
-                return new RedirectMessage(false);
+                return new RedirectMessage(false, new WaitAction(Source));
+
+            // Don't walk into walls.
+            if (_cell.IsWall)
+            {
+                // Don't penalize the player for walking into walls, but monsters should wait if 
+                // they will walk into a wall.
+                if (Source is Player)
+                    return new RedirectMessage(false);
+                else
+                    return new RedirectMessage(false, new WaitAction(Source));
+            }
 
             // Check if the destination is already occupied.
-            Actor target = Game.Map.GetActor(_cell.Position);
-            if (target != null)
+            if (_cell.IsOccupied)
             {
+                Actor target = Game.Map.GetActor(_cell.Position);
+
                 if (target == Source)
                     return new RedirectMessage(false, new WaitAction(Source));
                 else
@@ -43,31 +55,23 @@ namespace Roguelike.Actions
 
         public void Execute()
         {
-            if (_cell.IsWalkable)
-            {
-                Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2} and is at {3} energy", Source.Name, _newX, _newY, Source.Energy), OptionHandler.MessageLevel.Verbose);
+            System.Diagnostics.Debug.Assert(_cell.IsWalkable);
+            Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2} and is at {3} energy", Source.Name, _newX, _newY, Source.Energy), OptionHandler.MessageLevel.Verbose);
 
-                if (Source is Player)
+            if (Source is Player)
+            {
+                InventoryHandler itemStack = Game.Map.Field[_newX, _newY].ItemStack;
+
+                if (itemStack != null && !itemStack.IsEmpty())
                 {
-                    InventoryHandler itemStack = Game.Map.Field[_newX, _newY].ItemStack;
-
-                    if (itemStack != null && !itemStack.IsEmpty())
-                    {
-                        if (itemStack.Size() == 1)
-                            Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", itemStack.GetItem('a').Name), OptionHandler.MessageLevel.Normal);
-                        else
-                            Game.MessageHandler.AddMessage("You see several items here.", OptionHandler.MessageLevel.Normal);
-                    }
+                    if (itemStack.Size() == 1)
+                        Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", itemStack.GetItem('a').Name), OptionHandler.MessageLevel.Normal);
+                    else
+                        Game.MessageHandler.AddMessage("You see several items here.", OptionHandler.MessageLevel.Normal);
                 }
+            }
 
-                Game.Map.SetActorPosition(Source, _newX, _newY);
-            }
-            else
-            {
-                // HACK: Update maps should probably go somewhere nicer...
-                if (_newX == Source.X && _newY == Source.Y && Source is Player)
-                    Game.Map.UpdatePlayerMaps();
-            }
+            Game.Map.SetActorPosition(Source, _newX, _newY);
         }
     }
 }
