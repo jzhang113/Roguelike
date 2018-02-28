@@ -108,6 +108,7 @@
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Actions\AttackAction.cs" />
     <Compile Include="Core\ArmorType.cs" />
+    <Compile Include="Core\Room.cs" />
     <Compile Include="Systems\EquipmentHandler.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\Field.cs" />

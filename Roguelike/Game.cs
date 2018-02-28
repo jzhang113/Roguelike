@@ -87,14 +87,16 @@ namespace Roguelike
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(20);
 
-            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height);
-            Map = mapGenerator.CreateMap(new Random(generatorSeed[0]));
+            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, new Random(generatorSeed[0]));
+            Map = mapGenerator.FillMap();
+            //Map = mapGenerator.CreateMap();
 
-            Player = new Player
+            Player = new Player();
+            while (!Map.GetCell(Player.X, Player.Y).IsWalkable)
             {
-                X = 30,
-                Y = 10
-            };
+                Player.X = Random.Next(0, Config.Map.Width - 1);
+                Player.Y = Random.Next(0, Config.Map.Height - 1);
+            }
 
             Map.AddActor(Player);
             // Map.SetActorPosition(Player, playerX, playerY);
@@ -147,6 +149,7 @@ namespace Roguelike
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
+            _rootConsole.SetWindowState(RLWindowState.Minimized);
             _rootConsole.Run();
         }
 
