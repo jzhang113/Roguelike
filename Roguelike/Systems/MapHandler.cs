@@ -199,7 +199,7 @@ namespace Roguelike.Systems
             int dy = Math.Abs(targetY - sourceY);
             int sx = (targetX < sourceX) ? -1 : 1;
             int sy = (targetY < sourceY) ? -1 : 1;
-            int D = 2 * dy - dx;
+            int err = dx - dy;
 
             // Return the initial position.
             yield return Field[sourceX, sourceY];
@@ -207,15 +207,17 @@ namespace Roguelike.Systems
             // Take a step towards the target and return the new position.
             while (sourceX != targetX)
             {
-                sourceX += sx;
-
-                if (D > 0)
+                int e2 = 2 * err;
+                if (e2 > -dy)
                 {
-                    sourceY += sy;
-                    D -= 2 * dx;
+                    err = err - dy;
+                    sourceX += sx;
                 }
-
-                D += 2 * dy;
+                if (e2 < dx)
+                {
+                    err = err + dx;
+                    sourceY += sy;
+                }                
 
                 yield return Field[sourceX, sourceY];
             } 
@@ -325,6 +327,7 @@ namespace Roguelike.Systems
                 if (IsInFov(cell.X, cell.Y))
                 {
                     SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+                    Field[cell.X, cell.Y].IsExplored = true;
                 }
             }
         }
@@ -357,9 +360,8 @@ namespace Roguelike.Systems
                     int newY = p.Y + dir.Y;
                     float newWeight = p.Weight + dir.Weight;
                     Terrain cell = Field[newX, newY];
-                    Cell lx = GetCell(newX, newY);
 
-                    if (cell != null && !cell.IsWall && lx.IsExplored &&
+                    if (cell != null && !cell.IsWall && cell.IsExplored &&
                         (float.IsNaN(PlayerMap[newX, newY]) || newWeight < PlayerMap[newX, newY]))
                     {
                         PlayerMap[newX, newY] = newWeight;

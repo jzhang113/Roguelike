@@ -1,5 +1,4 @@
 ﻿using RLNET;
-using Roguelike.Core;
 using RogueSharp;
 
 namespace Roguelike.Interfaces

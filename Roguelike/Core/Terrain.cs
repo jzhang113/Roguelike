@@ -5,6 +5,7 @@ namespace Roguelike.Core
 {
     class Terrain
     {
+        public bool IsExplored { get; set; }
         public bool IsWall { get; set; }
         public bool IsOccupied { get; set; }
         public bool IsWalkable { get => !IsWall && !IsOccupied; }
