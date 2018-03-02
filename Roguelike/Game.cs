@@ -86,16 +86,22 @@ namespace Roguelike
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(20);
 
-            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height);
-            //Map = mapGenerator.CreateMap(new Random(generatorSeed[0]));
-            Map = mapGenerator.CreateEmpty();
+            var sw = new System.Diagnostics.Stopwatch();
 
-            Player = new Player
+            sw.Start();
+            MapGenerator mapGenerator = new MapGenerator(300, 300, new Random());
+            Map = mapGenerator.FillMap();
+            sw.Stop();
+
+            Console.WriteLine("300 tiles generated in: " + sw.Elapsed);
+
+            Player = new Player();
+            while (!Map.Field[Player.X, Player.Y].IsWalkable)
             {
-                X = 30,
-                Y = 10
-            };
+                Player.X = Random.Next(0, Config.Map.Width - 1);
+                Player.Y = Random.Next(0, Config.Map.Height - 1);
 
+            }
             Map.AddActor(Player);
             // Map.SetActorPosition(Player, playerX, playerY);
 

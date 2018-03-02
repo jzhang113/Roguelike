@@ -27,76 +27,127 @@ namespace Roguelike.Systems
         public MapHandler FillMap()
         {
             IList<Room> roomsList = new List<Room>();
+            int centerX = _width / 2;
+            int centerY = _height / 2;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 Room room = new Room
                 {
-                    Width = (int)RandNormal(8, 4),
-                    Height = (int)RandNormal(8, 4)
+                    Width = (int)RandNormal(5, 1),
+                    Height = (int)RandNormal(5, 1),
+                    X = _rand.Next(centerX - 5, centerX + 5),
+                    Y = _rand.Next(centerY - 5, centerY + 5)
                 };
 
-                //room.X = _rand.Next(_width - room.Width - 1);
-                //room.Y = _rand.Next(_height - room.Height - 1);
-                room.X = 20;
-                room.Y = 20;
+                bool first = true;
+                bool horiz = false;
+                bool intersects = false;
+                int dx = 0, dy = 0;
+                int iterations = 0;
 
-                foreach (Room rm in roomsList)
+                do
                 {
-                    if (rm.Intersects(room))
+                    intersects = false;
+                    iterations++;
+
+                    if (iterations == 100)
                     {
-                        var (x1, y1) = rm.Center;
-                        var (x2, y2) = room.Center;
-
-                        int dx = x2 - x1;
-                        int dy = y2 - y1;
-
-                        int pushX = (dx > 0) ?
-                            rm.X + rm.Width - room.X :
-                            room.X + room.Width - rm.X;
-                        int pushY = (dy > 0) ?
-                            rm.Y + rm.Height - room.Y :
-                            room.Y + room.Height - rm.Y;
-
-                        double multiplier;
-                        if (Math.Abs(dx) > Math.Abs(dy))
-                        {
-                            multiplier = (double)pushX / dx;
-                        }
-                        else
-                        {
-                            multiplier = (double)pushY / dy;
-                        }
-
-                        room.X = (int)multiplier * dx + room.X;
-                        room.Y = (int)multiplier * dy + room.Y;
+                        Console.WriteLine("Too many iterations:" + i);
                     }
-                }
-                
+
+                    foreach (Room prev in roomsList)
+                    {
+                        if (prev.Intersects(room))
+                        {
+                            intersects = true;
+                            var (x1, y1) = prev.Center;
+                            var (x2, y2) = room.Center;
+
+                            if (first)
+                            {
+                                first = false;
+                                dx = x2 - x1;
+                                dy = y2 - y1;
+
+                                if (dx == 0 && dy == 0)
+                                {
+                                    dx = (_rand.NextDouble() < 0.5) ? -1 : 1;
+                                    dy = (_rand.NextDouble() < 0.5) ? -1 : 1;
+                                }
+                            }
+                            else
+                            {
+                                if (dx > 0)
+                                {
+                                    dx += x2 - x1;
+                                    if (horiz && dx < 1)
+                                        dx = 1;
+                                }
+                                else
+                                {
+                                    dx += x2 - x1;
+                                    if (horiz && dx > -1)
+                                        dx = -1;
+                                }
+
+                                if (dy > 0)
+                                {
+                                    dy += y2 - y1;
+                                    if (!horiz && dy < 1)
+                                        dy = 1;
+                                }
+                                else
+                                {
+                                    dy += y2 - y1;
+                                    if (!horiz && dy > -1)
+                                        dy = -1;
+                                }
+                            }
+
+                            int pushX = (dx > 0) ? prev.X + prev.Width - room.X : prev.X - room.X - room.Width;
+                            int pushY = (dy > 0) ? prev.Y + prev.Height - room.Y : prev.Y - room.Y - room.Height;
+                            double multiplier;
+
+                            if (Math.Abs(dx) > Math.Abs(dy))
+                            {
+                                multiplier = (double)pushX / dx;
+                                horiz = true;
+                            }
+                            else if (Math.Abs(dx) < Math.Abs(dy))
+                            {
+                                multiplier = (double)pushY / dy;
+                                horiz = false;
+                            }
+                            else
+                            {
+                                if (Math.Abs(pushX) <= Math.Abs(pushY))
+                                {
+                                    multiplier = (double)pushX / dx;
+                                    horiz = true;
+                                }
+                                else
+                                {
+                                    multiplier = (double)pushY / dy;
+                                    horiz = false;
+                                }
+                            }
+
+                            room.X = (int)(multiplier * dx) + room.X;
+                            room.Y = (int)(multiplier * dy) + room.Y;
+                        }
+                    }
+                } while (intersects && iterations < 100);
+
                 roomsList.Add(room);
-
                 CreateRoom2(room);
+                //AsciiPrint(roomsList);
 
-                for (int a = 0; a < _height; a++)
-                {
-                    for (int b = 0; b < _width; b++)
-                    {
-                        if (_map.Field[b, a].IsWalkable)
-                        {
-                            Console.Write(".");
-                        }
-                        else
-                        {
-                            Console.Write("#");
-                        }
-                    }
-
-                    Console.WriteLine();
-                }
-
-                Console.WriteLine(room.X + " " + room.Y + " " + room.Width + " " + room.Height); 
+                //Console.WriteLine(i + " " + room.X + " " + room.Y + " " + room.Width + " " + room.Height); 
             }
 
+            AsciiPrint(roomsList);
+            
             return _map;
         }
 
@@ -161,6 +212,29 @@ namespace Roguelike.Systems
             }
 
             return _map;
+        }
+        
+        internal void AsciiPrint(IList<Room> rooms)
+        {
+            using (var writer = new System.IO.StreamWriter("map"))
+            {
+                for (int a = 0; a < _height; a++)
+                {
+                    for (int b = 0; b < _width; b++)
+                    {
+                        if (_map.Field[b, a].IsWalkable)
+                        {
+                            writer.Write(".");
+                        }
+                        else
+                        {
+                            writer.Write("#");
+                        }
+                    }
+
+                    writer.WriteLine();
+                }
+            }
         }
         
         private void CreateRoom(Rectangle rect)
