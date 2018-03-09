@@ -15,14 +15,14 @@ namespace Roguelike.Core
             switch (monster.State)
             {
                 case ActorState.Wander:
-                    if (Game.Map.PlayerMap[monster.X, monster.Y] < monster.Awareness)
+                    if (Game.Map.PlayerMap[monster.X][monster.Y] < monster.Awareness)
                     {
                         monster.State = ActorState.Chase;
                         return GetAction(monster);
                     }
                     else
                     {
-                        WeightedPoint dir = Move.Directions[Game.CombatRandom.Next() % 8];
+                        WeightedPoint dir = Direction.Directions[Game.CombatRandom.Next() % 8];
                         return new MoveAction(monster, monster.X + dir.X, monster.Y + dir.Y);
                     }
                 case ActorState.Chase:

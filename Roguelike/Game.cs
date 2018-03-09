@@ -90,7 +90,7 @@ namespace Roguelike
 
             sw.Start();
             MapGenerator mapGenerator = new MapGenerator(300, 300, new Random());
-            Map = mapGenerator.FillMap();
+            Map = mapGenerator.CreateMap();
             sw.Stop();
 
             Console.WriteLine("300 tiles generated in: " + sw.Elapsed);
@@ -125,6 +125,19 @@ namespace Roguelike
             };
             Map.AddItem(spear);
 
+            System.Collections.Generic.List<Interfaces.ISkill> damageAction = new System.Collections.Generic.List<Interfaces.ISkill>()
+            {
+                new Skills.DamageSkill(100)
+            };
+            System.Collections.Generic.List<Interfaces.ISkill> healAction = new System.Collections.Generic.List<Interfaces.ISkill>()
+            {
+                new Skills.HealingSkill(100)
+            };
+            Skills.Skill damage = new Skills.Skill(200, damageAction);
+            Skills.Skill heal = new Skills.Skill(200, healAction);
+
+            spear.AddAbility(damage);
+
             Items.HeavyArmor ha = new Items.HeavyArmor(Interfaces.Materials.Iron)
             {
                 X = Player.X - 2,
@@ -133,7 +146,7 @@ namespace Roguelike
             };
             Map.AddItem(ha);
 
-            Items.Scroll magicMissile = new Items.Scroll("scroll of magic missile", new Skills.DamageSkill(null, 100, 100), (s, t) => s != t && s.Distance2(t) < 100, 1)
+            Items.Scroll magicMissile = new Items.Scroll("scroll of magic missile", damage, new TargetZone(TargetShape.Area, 10))
             {
                 X = Player.X - 1,
                 Y = Player.Y - 2,
@@ -141,7 +154,7 @@ namespace Roguelike
             };
             Map.AddItem(magicMissile);
 
-            Items.Scroll healing = new Items.Scroll("scroll of healing", new Skills.HealingSkill(null, 100, 100), (s, t) => s == t, 1)
+            Items.Scroll healing = new Items.Scroll("scroll of healing", heal, new TargetZone(TargetShape.Self))
             {
                 X = Player.X + 1,
                 Y = Player.Y + 1,

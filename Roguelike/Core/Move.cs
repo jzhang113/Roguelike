@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Roguelike.Systems;
 
 namespace Roguelike.Core
 {
-    class Move
+    struct Direction
     {
         public static WeightedPoint N { get; } = new WeightedPoint(0, -1, 1);
         public static WeightedPoint E { get; } = new WeightedPoint(1, 0, 1);

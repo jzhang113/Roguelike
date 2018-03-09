@@ -1,22 +1,32 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Core;
+using Roguelike.Interfaces;
 
 namespace Roguelike.Skills
 {
-    class DamageSkill : Skill
+    class DamageSkill : ISkill
     {
-        public DamageSkill(Actor source, int speed, int power) : base(source, speed, power)
+        public int Power { get; }
+
+        public DamageSkill(int power)
         {
+            Power = power;
         }
 
         // Deals tamage to the target.
-        public override void Activate(Actor target)
+        public void Activate(Terrain target)
         {
-            int damage = target.TakeDamage(Power);
+            Actor targetUnit = target.Unit;
 
-            if (target.IsDead)
-                target.State = Core.ActorState.Dead;
+            if (targetUnit != null)
+            {
+                int damage = targetUnit.TakeDamage(Power);
 
-            Game.MessageHandler.AddMessage(string.Format("{0} attacked {1} for {2} damage", Source.Name, target.Name, damage), Systems.OptionHandler.MessageLevel.Normal);
+                if (targetUnit.IsDead)
+                    targetUnit.State = ActorState.Dead;
+
+                Game.MessageHandler.AddMessage(string.Format("{0} takes {1} damage", targetUnit.Name, damage), Systems.OptionHandler.MessageLevel.Normal);
+            }
         }
     }
 }

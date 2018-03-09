@@ -43,7 +43,12 @@ namespace Roguelike.Items
 
         public Skill GetBasicAttack()
         {
-            return new DamageSkill(Carrier, AttackSpeed, Damage);
+            List<ISkill> actions = new List<ISkill>
+            {
+                new DamageSkill(Damage)
+            };
+
+            return new Skill(AttackSpeed, actions);
         }
 
         public Skill GetAbility(int index)
@@ -51,6 +56,12 @@ namespace Roguelike.Items
             System.Diagnostics.Debug.Assert(index < Abilities.Count);
 
             return Abilities[index];
+        }
+
+        public void AddAbility(Skill skill)
+        {
+            // TODO: check that the skill doesn't already exist
+            Abilities.Add(skill);
         }
     }
 }

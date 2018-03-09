@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Skills;
 using System;
@@ -9,22 +10,20 @@ namespace Roguelike.Items
     {
         public Skill ApplySkill { get; private set;}
 
-        private Func<Actor, Actor, bool> _predicate;
-        private int _targetLimit;
+        private TargetZone _area;
 
-        public Scroll(string name, Skill action, Func<Actor, Actor, bool> predicate, int targetLimit)
+        public Scroll(string name, Skill action, TargetZone area)
         {
             Symbol = '!';
             Name = name;
             ApplySkill = action;
-            _predicate = predicate;
-            _targetLimit = targetLimit;
+            _area = area;
         }
 
         public void Apply()
         {
-            ApplySkill.Source = Carrier;
-            ApplySkill.ApplyTargets(_predicate, _targetLimit);
+            ApplySkill.Activate(_area.GetTilesInRange(Carrier, null));
+            // TODO: add a targetting system
         }
     }
 }

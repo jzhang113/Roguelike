@@ -3,7 +3,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Core
 {
-    class Terrain
+    public class Terrain
     {
         public bool IsExplored { get; set; }
         public bool IsWall { get; set; }
@@ -14,13 +14,13 @@ namespace Roguelike.Core
         public Actor Unit { get; set; }
         public InventoryHandler ItemStack { get; set; }
 
-        public WeightedPoint Position { get; }
+        public (int X, int Y) Position { get; }
 
         public Terrain(bool wall, int moveCost, int x, int y)
         {
             IsWall = wall;
             MoveCost = moveCost;
-            Position = new WeightedPoint(x, y);
+            Position = (X: x, Y: y);
         }
     }
 }

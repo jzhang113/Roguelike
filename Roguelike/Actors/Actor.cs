@@ -88,7 +88,7 @@ namespace Roguelike.Actors
             if (energyDiff == 0 && other is Actor) //&& !(other is Player)) Q: do we need this??
             {
                 Actor otherActor = other as Actor;
-                return (int)(Game.Map.PlayerMap[X, Y] - Game.Map.PlayerMap[otherActor.X, otherActor.Y]);
+                return (int)(Game.Map.PlayerMap[X][Y] - Game.Map.PlayerMap[otherActor.X][otherActor.Y]);
             }
 
             return energyDiff;

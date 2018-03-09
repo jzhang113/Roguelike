@@ -47,7 +47,7 @@ namespace Roguelike.Actions
                 if (target == Source)
                     return new RedirectMessage(false, new WaitAction(Source));
                 else
-                    return new RedirectMessage(false, new AttackAction(Source, target, Source.Equipment.PrimaryWeapon.GetBasicAttack()));
+                    return new RedirectMessage(false, new AttackAction(Source, _cell, Source.Equipment.PrimaryWeapon.GetBasicAttack()));
             }
 
             return new RedirectMessage(true);

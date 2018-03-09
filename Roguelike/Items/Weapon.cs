@@ -1,5 +1,6 @@
 ﻿using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
@@ -8,6 +9,7 @@ namespace Roguelike.Items
         protected Weapon()
         {
             Symbol = '(';
+            Abilities = new List<Skills.Skill>();
         }
 
         public void Equip()

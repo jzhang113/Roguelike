@@ -1,19 +1,29 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Core;
+using Roguelike.Interfaces;
 
 namespace Roguelike.Skills
 {
-    internal class HealingSkill : Skill
+    internal class HealingSkill : ISkill
     {
-        public HealingSkill(Actor source, int speed, int power) : base(source, speed, power)
+        public int Power { get; }
+
+        public HealingSkill(int power)
         {
+            Power = power;
         }
 
         // Heals the target by amount up to its maximum health.
-        public override void Activate(Actor target)
+        public void Activate(Terrain target)
         {
-            int healing = target.TakeHealing(Power);
+            Actor targetUnit = target.Unit;
 
-            Game.MessageHandler.AddMessage(string.Format("{0} healed {1} damage", Source.Name, healing), Systems.OptionHandler.MessageLevel.Normal);
+            if (target != null)
+            {
+                int healing = targetUnit.TakeHealing(Power);
+
+                Game.MessageHandler.AddMessage(string.Format("{0} healed {1} damage", targetUnit.Name, healing), Systems.OptionHandler.MessageLevel.Normal);
+            }
         }
     }
 }

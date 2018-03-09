@@ -47,11 +47,11 @@ namespace Roguelike.Systems
                         break;
                     }
 
-                    map.Highlight[p.X, p.Y] = RLColor.Red;
+                    map.Highlight[p.X][p.Y] = RLColor.Red;
                 }
 
                 if (current.IsWalkable && exploredPathExists)
-                    map.Highlight[square.X, square.Y] = RLColor.Red;
+                    map.Highlight[square.X][square.Y] = RLColor.Red;
                 /*
                 if (click.GetLeftClick())
                 {
@@ -118,37 +118,79 @@ namespace Roguelike.Systems
             Game.ShowOverlay = (keyPress.Key == RLKey.Tab);
             _holdingKey = true;
 
+            if (keyPress.Shift)
+            {
+
+                switch (keyPress.Key)
+                {
+                    #region Movement Keys
+                    case RLKey.Left:
+                    case RLKey.Keypad4:
+                    case RLKey.H:
+                        return new AttackAction(player, Game.Map.Field[player.X + Direction.W.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Down:
+                    case RLKey.Keypad2:
+                    case RLKey.J:
+                        return new AttackAction(player, Game.Map.Field[player.X, player.Y + Direction.S.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Up:
+                    case RLKey.Keypad8:
+                    case RLKey.K:
+                        return new AttackAction(player, Game.Map.Field[player.X, player.Y + Direction.N.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Right:
+                    case RLKey.Keypad6:
+                    case RLKey.L:
+                        return new AttackAction(player, Game.Map.Field[player.X + Direction.E.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Keypad7:
+                    case RLKey.Y:
+                        return new AttackAction(player, Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Keypad9:
+                    case RLKey.U:
+                        return new AttackAction(player, Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Keypad1:
+                    case RLKey.B:
+                        return new AttackAction(player, Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Keypad3:
+                    case RLKey.N:
+                        return new AttackAction(player, Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                    case RLKey.Keypad5:
+                    case RLKey.Period:
+                        return new WaitAction(player);
+                    #endregion
+                    default: return null;
+                }
+            }
+
             switch (keyPress.Key)
             {
                 #region Movement Keys
                 case RLKey.Left:
                 case RLKey.Keypad4:
                 case RLKey.H:
-                    return new MoveAction(player, player.X + Move.W.X, player.Y);
+                    return new MoveAction(player, player.X + Direction.W.X, player.Y);
                 case RLKey.Down:
                 case RLKey.Keypad2:
                 case RLKey.J:
-                    return new MoveAction(player, player.X, player.Y + Move.S.Y);
+                    return new MoveAction(player, player.X, player.Y + Direction.S.Y);
                 case RLKey.Up:
                 case RLKey.Keypad8:
                 case RLKey.K:
-                    return new MoveAction(player, player.X, player.Y + Move.N.Y);
+                    return new MoveAction(player, player.X, player.Y + Direction.N.Y);
                 case RLKey.Right:
                 case RLKey.Keypad6:
                 case RLKey.L:
-                    return new MoveAction(player, player.X + Move.E.X, player.Y);
+                    return new MoveAction(player, player.X + Direction.E.X, player.Y);
                 case RLKey.Keypad7:
                 case RLKey.Y:
-                    return new MoveAction(player, player.X + Move.NW.X, player.Y + Move.NW.Y);
+                    return new MoveAction(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
                 case RLKey.Keypad9:
                 case RLKey.U:
-                    return new MoveAction(player, player.X + Move.NE.X, player.Y + Move.NE.Y);
+                    return new MoveAction(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
                 case RLKey.Keypad1:
                 case RLKey.B:
-                    return new MoveAction(player, player.X + Move.SW.X, player.Y + Move.SW.Y);
+                    return new MoveAction(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
                 case RLKey.Keypad3:
                 case RLKey.N:
-                    return new MoveAction(player, player.X + Move.SE.X, player.Y + Move.SE.Y);
+                    return new MoveAction(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
                 case RLKey.Keypad5:
                 case RLKey.Period:
                     return new WaitAction(player);

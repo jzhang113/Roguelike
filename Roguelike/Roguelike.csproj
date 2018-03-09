@@ -109,6 +109,8 @@
     <Compile Include="Actions\AttackAction.cs" />
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\Room.cs" />
+    <Compile Include="Core\TargetZone.cs" />
+    <Compile Include="Interfaces\ISkill.cs" />
     <Compile Include="Systems\EquipmentHandler.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\Field.cs" />
@@ -151,6 +153,7 @@
     <Compile Include="Core\Configuration.cs" />
     <Compile Include="Systems\MaxHeap.cs" />
     <Compile Include="Core\WeightedPoint.cs" />
+    <Compile Include="Systems\TargetHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,36 +1,30 @@
 ﻿using Roguelike.Actors;
-using System;
+using Roguelike.Core;
+using Roguelike.Interfaces;
+using System.Collections.Generic;
 
 namespace Roguelike.Skills
 {
-    public abstract class Skill
+    public class Skill
     {
-        public Actor Source { get; internal set; }
         public int Speed { get; }
         public int Power { get; }
+        
+        private IEnumerable<ISkill> _actions;
 
-        public Skill(Actor source, int speed, int power)
+        public Skill(int speed, IEnumerable<ISkill> actionSequence)
         {
-            Source = source;
             Speed = speed;
-            Power = power;
+            _actions = actionSequence;
         }
 
-        public abstract void Activate(Actor target);
-
-        public void ApplyTargets(Func<Actor, Actor, bool> predicate, int limit)
+        public void Activate(IEnumerable<Terrain> targets)
         {
-            int count = 0;
-
-            foreach (Actor actor in Game.Map.Units)
+            foreach (Terrain tile in targets)
             {
-                if (count >= limit)
-                    return;
-
-                if (predicate.Invoke(Source, actor))
+                foreach (ISkill skill in _actions)
                 {
-                    Activate(actor);
-                    count++;
+                    skill.Activate(tile);
                 }
             }
         }
