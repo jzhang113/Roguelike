@@ -19,7 +19,7 @@ namespace Roguelike.Actors
             MP = 50;
         }
 
-        public override IAction Act() => InputHandler.HandleInput();
+        public override ICommand Act() => InputHandler.HandleInput();
         public override void TriggerDeath() => Game.GameOver();
     }
 }

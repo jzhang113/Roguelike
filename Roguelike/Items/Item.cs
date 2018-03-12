@@ -43,9 +43,9 @@ namespace Roguelike.Items
 
         public Skill GetBasicAttack()
         {
-            List<ISkill> actions = new List<ISkill>
+            List<IAction> actions = new List<IAction>
             {
-                new DamageSkill(Damage)
+                new DamageAction(Damage)
             };
 
             return new Skill(AttackSpeed, actions);

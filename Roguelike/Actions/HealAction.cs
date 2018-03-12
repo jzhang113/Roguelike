@@ -4,11 +4,11 @@ using Roguelike.Interfaces;
 
 namespace Roguelike.Skills
 {
-    internal class HealingSkill : ISkill
+    internal class HealAction : IAction
     {
         public int Power { get; }
 
-        public HealingSkill(int power)
+        public HealAction(int power)
         {
             Power = power;
         }

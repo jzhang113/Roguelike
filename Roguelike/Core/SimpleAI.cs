@@ -10,7 +10,7 @@ namespace Roguelike.Core
     {
         // Monsters will wander randomly if awake and chase the Player if s/he is in their perception
         // range. If their health falls below a certain threshold, they will attempt to flee.
-        public static IAction GetAction(Actor monster)
+        public static ICommand GetAction(Actor monster)
         {
             switch (monster.State)
             {
@@ -23,7 +23,7 @@ namespace Roguelike.Core
                     else
                     {
                         WeightedPoint dir = Direction.Directions[Game.CombatRandom.Next() % 8];
-                        return new MoveAction(monster, monster.X + dir.X, monster.Y + dir.Y);
+                        return new MoveCommand(monster, monster.X + dir.X, monster.Y + dir.Y);
                     }
                 case ActorState.Chase:
                     // TODO: set dynamic threshold
@@ -35,7 +35,7 @@ namespace Roguelike.Core
                     else
                     {
                         WeightedPoint nextMove = Game.Map.MoveTowardsTarget(monster.X, monster.Y, Game.Map.PlayerMap);
-                        return new MoveAction(monster, nextMove.X, nextMove.Y);
+                        return new MoveCommand(monster, nextMove.X, nextMove.Y);
                     }
                 case ActorState.Flee:
                     // TODO: set dynamic threshold
@@ -47,18 +47,18 @@ namespace Roguelike.Core
                     else
                     {
                         WeightedPoint nextMove = Game.Map.MoveTowardsTarget(monster.X, monster.Y, Game.Map.FleeMap);
-                        return new MoveAction(monster, nextMove.X, nextMove.Y);
+                        return new MoveCommand(monster, nextMove.X, nextMove.Y);
                     }
                 case ActorState.Dead:
                     // Remove dead things if they die before they finish acting.
                     monster.TriggerDeath();
                     return null;
                 case ActorState.Sleep:
-                    return new MoveAction(monster, monster.X, monster.Y);
+                    return new MoveCommand(monster, monster.X, monster.Y);
                 default:
                     // We should not be here
                     System.Diagnostics.Debug.Assert(false);
-                    return new MoveAction(monster, monster.X, monster.Y);
+                    return new MoveCommand(monster, monster.X, monster.Y);
             }
         }
     }

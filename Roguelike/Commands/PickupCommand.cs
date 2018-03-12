@@ -1,19 +1,18 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Interfaces;
 using Roguelike.Items;
-using System.Collections.Generic;
 using Roguelike.Systems;
 
 namespace Roguelike.Actions
 {
-    class PickupAction : IAction
+    class PickupCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 60;
 
         private InventoryHandler _itemStack;
 
-        public PickupAction(Actor source, InventoryHandler itemStack)
+        public PickupCommand(Actor source, InventoryHandler itemStack)
         {
             Source = source;
             _itemStack = itemStack;

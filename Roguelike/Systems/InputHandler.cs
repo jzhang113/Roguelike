@@ -21,7 +21,7 @@ namespace Roguelike.Systems
             _console = console;
         }
 
-        public static IAction HandleInput()
+        public static ICommand HandleInput()
         {
             RLMouse click = _console.Mouse;
             MapHandler map = Game.Map;
@@ -56,12 +56,12 @@ namespace Roguelike.Systems
                 if (click.GetLeftClick())
                 {
                     foreach (WeightedPoint p in path)
-                        yield return new MoveAction(player, p.X, p.Y);
+                        yield return new MoveCommand(player, p.X, p.Y);
 
                     if (current.IsWalkable)
-                        yield return new MoveAction(player, square.X, square.Y);
+                        yield return new MoveCommand(player, square.X, square.Y);
                     else
-                        yield return new AttackAction(player, map.GetActor(current), player.BasicAttack);
+                        yield return new AttackCommand(player, map.GetActor(current), player.BasicAttack);
                 }
                 */
                 
@@ -105,13 +105,13 @@ namespace Roguelike.Systems
                         // TODO: implement inventory actions
                         return null;
                     case Game.Mode.Apply:
-                        return new ApplyAction(player, keyChar);
+                        return new ApplyCommand(player, keyChar);
                     case Game.Mode.Drop:
-                        return new DropAction(player, keyChar);
+                        return new DropCommand(player, keyChar);
                     case Game.Mode.Equip:
-                        return new EquipAction(player, keyChar);
+                        return new EquipCommand(player, keyChar);
                     case Game.Mode.Unequip:
-                        return new UnequipAction(player, keyChar);
+                        return new UnequipCommand(player, keyChar);
                 }
             }
 
@@ -127,34 +127,34 @@ namespace Roguelike.Systems
                     case RLKey.Left:
                     case RLKey.Keypad4:
                     case RLKey.H:
-                        return new AttackAction(player, Game.Map.Field[player.X + Direction.W.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.W.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Down:
                     case RLKey.Keypad2:
                     case RLKey.J:
-                        return new AttackAction(player, Game.Map.Field[player.X, player.Y + Direction.S.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X, player.Y + Direction.S.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Up:
                     case RLKey.Keypad8:
                     case RLKey.K:
-                        return new AttackAction(player, Game.Map.Field[player.X, player.Y + Direction.N.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X, player.Y + Direction.N.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Right:
                     case RLKey.Keypad6:
                     case RLKey.L:
-                        return new AttackAction(player, Game.Map.Field[player.X + Direction.E.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.E.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Keypad7:
                     case RLKey.Y:
-                        return new AttackAction(player, Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Keypad9:
                     case RLKey.U:
-                        return new AttackAction(player, Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Keypad1:
                     case RLKey.B:
-                        return new AttackAction(player, Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Keypad3:
                     case RLKey.N:
-                        return new AttackAction(player, Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
                     case RLKey.Keypad5:
                     case RLKey.Period:
-                        return new WaitAction(player);
+                        return new WaitCommand(player);
                     #endregion
                     default: return null;
                 }
@@ -166,37 +166,37 @@ namespace Roguelike.Systems
                 case RLKey.Left:
                 case RLKey.Keypad4:
                 case RLKey.H:
-                    return new MoveAction(player, player.X + Direction.W.X, player.Y);
+                    return new MoveCommand(player, player.X + Direction.W.X, player.Y);
                 case RLKey.Down:
                 case RLKey.Keypad2:
                 case RLKey.J:
-                    return new MoveAction(player, player.X, player.Y + Direction.S.Y);
+                    return new MoveCommand(player, player.X, player.Y + Direction.S.Y);
                 case RLKey.Up:
                 case RLKey.Keypad8:
                 case RLKey.K:
-                    return new MoveAction(player, player.X, player.Y + Direction.N.Y);
+                    return new MoveCommand(player, player.X, player.Y + Direction.N.Y);
                 case RLKey.Right:
                 case RLKey.Keypad6:
                 case RLKey.L:
-                    return new MoveAction(player, player.X + Direction.E.X, player.Y);
+                    return new MoveCommand(player, player.X + Direction.E.X, player.Y);
                 case RLKey.Keypad7:
                 case RLKey.Y:
-                    return new MoveAction(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
+                    return new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
                 case RLKey.Keypad9:
                 case RLKey.U:
-                    return new MoveAction(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
+                    return new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
                 case RLKey.Keypad1:
                 case RLKey.B:
-                    return new MoveAction(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
+                    return new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
                 case RLKey.Keypad3:
                 case RLKey.N:
-                    return new MoveAction(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
+                    return new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
                 case RLKey.Keypad5:
                 case RLKey.Period:
-                    return new WaitAction(player);
+                    return new WaitCommand(player);
                 #endregion
                 case RLKey.Comma:
-                    return new PickupAction(player, Game.Map.Field[player.X, player.Y].ItemStack);
+                    return new PickupCommand(player, Game.Map.Field[player.X, player.Y].ItemStack);
                 case RLKey.A:
                     Game.GameMode = Game.Mode.Apply;
                     Game.ShowInventory = true;

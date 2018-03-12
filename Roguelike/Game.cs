@@ -125,13 +125,13 @@ namespace Roguelike
             };
             Map.AddItem(spear);
 
-            System.Collections.Generic.List<Interfaces.ISkill> damageAction = new System.Collections.Generic.List<Interfaces.ISkill>()
+            System.Collections.Generic.List<Interfaces.IAction> damageAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
-                new Skills.DamageSkill(100)
+                new Skills.DamageAction(100)
             };
-            System.Collections.Generic.List<Interfaces.ISkill> healAction = new System.Collections.Generic.List<Interfaces.ISkill>()
+            System.Collections.Generic.List<Interfaces.IAction> healAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
-                new Skills.HealingSkill(100)
+                new Skills.HealAction(100)
             };
             Skills.Skill damage = new Skills.Skill(200, damageAction);
             Skills.Skill heal = new Skills.Skill(200, healAction);

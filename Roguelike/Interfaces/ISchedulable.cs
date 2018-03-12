@@ -12,6 +12,6 @@ namespace Roguelike.Interfaces
         int RefreshRate { get; set; }
 
         // The Action to be scheduled.
-        IAction Act();
+        ICommand Act();
     }
 }

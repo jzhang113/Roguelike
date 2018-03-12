@@ -10,7 +10,7 @@ namespace Roguelike.Systems
         public bool Success { get; }
 
         // The alternative Action to attempt if the current one failed.
-        public IAction Alternative { get; }
+        public ICommand Alternative { get; }
 
         public RedirectMessage(bool success)
         {
@@ -18,7 +18,7 @@ namespace Roguelike.Systems
             Alternative = null;
         }
 
-        public RedirectMessage(bool success, IAction alternative)
+        public RedirectMessage(bool success, ICommand alternative)
         {
             Success = success;
             Alternative = alternative;

@@ -98,19 +98,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\ApplyAction.cs" />
-    <Compile Include="Actions\DropAction.cs" />
-    <Compile Include="Actions\EquipAction.cs" />
-    <Compile Include="Actions\WaitAction.cs" />
-    <Compile Include="Actions\PickupAction.cs" />
-    <Compile Include="Actions\ThrowAction.cs" />
-    <Compile Include="Actions\UnequipAction.cs" />
+    <Compile Include="Commands\ApplyCommand.cs" />
+    <Compile Include="Commands\DropCommand.cs" />
+    <Compile Include="Commands\EquipCommand.cs" />
+    <Compile Include="Commands\WaitCommand.cs" />
+    <Compile Include="Commands\PickupCommand.cs" />
+    <Compile Include="Commands\ThrowCommand.cs" />
+    <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
-    <Compile Include="Actions\AttackAction.cs" />
+    <Compile Include="Commands\AttackCommand.cs" />
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\Room.cs" />
     <Compile Include="Core\TargetZone.cs" />
-    <Compile Include="Interfaces\ISkill.cs" />
+    <Compile Include="Interfaces\IAction.cs" />
     <Compile Include="Systems\EquipmentHandler.cs" />
     <Compile Include="Core\Colors.cs" />
     <Compile Include="Core\Field.cs" />
@@ -123,11 +123,11 @@
     <Compile Include="Items\Scroll.cs" />
     <Compile Include="Items\Spear.cs" />
     <Compile Include="Items\Weapon.cs" />
-    <Compile Include="Skills\DamageSkill.cs" />
-    <Compile Include="Skills\HealingSkill.cs" />
+    <Compile Include="Actions\DamageAction.cs" />
+    <Compile Include="Actions\HealAction.cs" />
     <Compile Include="Systems\MapHandler.cs" />
     <Compile Include="Core\Move.cs" />
-    <Compile Include="Actions\MoveAction.cs" />
+    <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Core\SimpleAI.cs" />
     <Compile Include="Actors\Skeleton.cs" />
     <Compile Include="Interfaces\IMaterial.cs" />
@@ -138,8 +138,8 @@
     <Compile Include="Systems\RedirectMessage.cs" />
     <Compile Include="Core\Terrain.cs" />
     <Compile Include="Interfaces\ISchedulable.cs" />
-    <Compile Include="Skills\Skill.cs" />
-    <Compile Include="Interfaces\IAction.cs" />
+    <Compile Include="Actions\Skill.cs" />
+    <Compile Include="Interfaces\ICommand.cs" />
     <Compile Include="Systems\EventScheduler.cs" />
     <Compile Include="Systems\InputHandler.cs" />
     <Compile Include="Actors\Player.cs" />

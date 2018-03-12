@@ -5,7 +5,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Actions
 {
-    class MoveAction : IAction
+    class MoveCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;
@@ -14,7 +14,7 @@ namespace Roguelike.Actions
         private int _newY;
         private Terrain _cell;
 
-        public MoveAction(Actor source, int x, int y)
+        public MoveCommand(Actor source, int x, int y)
         {
             Source = source;
             _newX = x;
@@ -26,7 +26,7 @@ namespace Roguelike.Actions
         {
             // Cancel out of bound moves.
             if (!Game.Map.Field.IsValid(_newX, _newY))
-                return new RedirectMessage(false, new WaitAction(Source));
+                return new RedirectMessage(false, new WaitCommand(Source));
 
             // Don't walk into walls.
             if (_cell.IsWall)
@@ -36,7 +36,7 @@ namespace Roguelike.Actions
                 if (Source is Player)
                     return new RedirectMessage(false);
                 else
-                    return new RedirectMessage(false, new WaitAction(Source));
+                    return new RedirectMessage(false, new WaitCommand(Source));
             }
 
             // Check if the destination is already occupied.
@@ -45,9 +45,9 @@ namespace Roguelike.Actions
                 Actor target = Game.Map.GetActor(_cell.Position);
 
                 if (target == Source)
-                    return new RedirectMessage(false, new WaitAction(Source));
+                    return new RedirectMessage(false, new WaitCommand(Source));
                 else
-                    return new RedirectMessage(false, new AttackAction(Source, _cell, Source.Equipment.PrimaryWeapon.GetBasicAttack()));
+                    return new RedirectMessage(false, new AttackCommand(Source, _cell, Source.Equipment.PrimaryWeapon.GetBasicAttack()));
             }
 
             return new RedirectMessage(true);

@@ -4,11 +4,11 @@ using Roguelike.Interfaces;
 
 namespace Roguelike.Skills
 {
-    class DamageSkill : ISkill
+    class DamageAction : IAction
     {
         public int Power { get; }
 
-        public DamageSkill(int power)
+        public DamageAction(int power)
         {
             Power = power;
         }

@@ -53,7 +53,7 @@ namespace Roguelike.Actors
             Game.Map.RemoveActor(this);
             Game.EventScheduler.RemoveActor(this);
         }
-        public virtual IAction Act() => SimpleAI.GetAction(this);
+        public virtual ICommand Act() => SimpleAI.GetAction(this);
 
         public int TakeDamage(int power)
         {

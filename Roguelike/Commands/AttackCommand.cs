@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.Actions
 {
-    class AttackAction : IAction
+    class AttackCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; }
@@ -16,7 +16,7 @@ namespace Roguelike.Actions
         private IEnumerable<Terrain> _target;
         private Skill _skill;
 
-        public AttackAction(Actor source, IEnumerable<Terrain> target, Skill attack)
+        public AttackCommand(Actor source, IEnumerable<Terrain> target, Skill attack)
         {
             _skill = attack;
             _power = attack.Power + source.STR;
@@ -26,7 +26,7 @@ namespace Roguelike.Actions
             EnergyCost = attack.Speed;
         }
 
-        public AttackAction(Actor source, Terrain target, Skill attack)
+        public AttackCommand(Actor source, Terrain target, Skill attack)
         {
             _skill = attack;
             _power = attack.Power + source.STR;

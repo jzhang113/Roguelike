@@ -1,33 +1,28 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System;
 
 namespace Roguelike.Actions
 {
-    class WaitAction : IAction
+    class UnequipCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; }
+        public int EnergyCost { get; } = 120;
 
-        public WaitAction(Actor source)
+        public UnequipCommand(Actor source, char key)
         {
             Source = source;
-            EnergyCost = source.RefreshRate;
-        }
-
-        public WaitAction(int waitTime)
-        {
-            EnergyCost = waitTime;
         }
 
         public RedirectMessage Validate()
         {
-            return new RedirectMessage(true);
+            throw new NotImplementedException();
         }
 
         public void Execute()
         {
-            return;
+            throw new NotImplementedException();
         }
     }
 }

@@ -5,14 +5,14 @@ using Roguelike.Systems;
 
 namespace Roguelike.Actions
 {
-    class ApplyAction : IAction
+    class ApplyCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;
 
         private char _key;
 
-        public ApplyAction(Actor source, char key)
+        public ApplyCommand(Actor source, char key)
         {
             Source = source;
             _key = key;

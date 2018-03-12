@@ -39,7 +39,7 @@ namespace Roguelike.Systems
 
             // Break the event loop when there is no Action. Currently, the only situation where
             // this occurs is in the input handling for the Player's Actions.
-            IAction action = current.Act();
+            ICommand action = current.Act();
             if (action == null)
                 return false;
 

@@ -10,9 +10,9 @@ namespace Roguelike.Skills
         public int Speed { get; }
         public int Power { get; }
         
-        private IEnumerable<ISkill> _actions;
+        private IEnumerable<IAction> _actions;
 
-        public Skill(int speed, IEnumerable<ISkill> actionSequence)
+        public Skill(int speed, IEnumerable<IAction> actionSequence)
         {
             Speed = speed;
             _actions = actionSequence;
@@ -22,7 +22,7 @@ namespace Roguelike.Skills
         {
             foreach (Terrain tile in targets)
             {
-                foreach (ISkill skill in _actions)
+                foreach (IAction skill in _actions)
                 {
                     skill.Activate(tile);
                 }
