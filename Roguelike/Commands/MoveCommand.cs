@@ -3,7 +3,7 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 
-namespace Roguelike.Actions
+namespace Roguelike.Commands
 {
     class MoveCommand : ICommand
     {
@@ -47,7 +47,7 @@ namespace Roguelike.Actions
                 if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
                 else
-                    return new RedirectMessage(false, new AttackCommand(Source, _cell, Source.Equipment.PrimaryWeapon.GetBasicAttack()));
+                    return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(), _cell));
             }
 
             return new RedirectMessage(true);

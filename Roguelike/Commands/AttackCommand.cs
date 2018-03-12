@@ -1,11 +1,11 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Interfaces;
-using Roguelike.Skills;
+using Roguelike.Actions;
 using Roguelike.Systems;
 using System.Collections.Generic;
 
-namespace Roguelike.Actions
+namespace Roguelike.Commands
 {
     class AttackCommand : ICommand
     {
@@ -16,17 +16,17 @@ namespace Roguelike.Actions
         private IEnumerable<Terrain> _target;
         private Skill _skill;
 
-        public AttackCommand(Actor source, IEnumerable<Terrain> target, Skill attack)
+        public AttackCommand(Actor source, Skill attack, IEnumerable<Terrain> targets = null)
         {
             _skill = attack;
             _power = attack.Power + source.STR;
-            _target = target;
+            _target = targets;
 
             Source = source;
             EnergyCost = attack.Speed;
         }
 
-        public AttackCommand(Actor source, Terrain target, Skill attack)
+        public AttackCommand(Actor source, Skill attack, Terrain target)
         {
             _skill = attack;
             _power = attack.Power + source.STR;
@@ -41,21 +41,23 @@ namespace Roguelike.Actions
 
         public RedirectMessage Validate()
         {
-            // TODO: redo validation
-            /*
-            if (_target.Unit == null)
-            {
-                Game.MessageHandler.AddMessage(string.Format("{0} attacks thin air.", Source), OptionHandler.MessageLevel.Normal);
-                return new RedirectMessage(true);
-            }
+            System.Diagnostics.Debug.Assert(_skill != null);
+            if (_skill == null)
+                return new RedirectMessage(false);
 
-            if (_target.Unit == Source)
+            if (_skill.Area.Aimed)
             {
-                // Q: Should this even be allowed?
-                Game.MessageHandler.AddMessage(string.Format("{0} tried to attack itself!", Source), OptionHandler.MessageLevel.Verbose);
-                return new RedirectMessage(false, new WaitAction(Source));
+                if (_target == null)
+                {
+                    InputHandler.BeginTargetting(this, _skill);
+                    return new RedirectMessage(false);
+                }
             }
-            */
+            else
+            {
+                if (_target == null)
+                    _target = _skill.Area.GetTilesInRange(Source);
+            }
 
             return new RedirectMessage(true);
         }

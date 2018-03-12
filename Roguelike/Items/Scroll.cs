@@ -1,29 +1,24 @@
-﻿using Roguelike.Actors;
-using Roguelike.Core;
+﻿using Roguelike.Core;
 using Roguelike.Interfaces;
-using Roguelike.Skills;
-using System;
+using Roguelike.Actions;
+using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
     class Scroll : Item, IUsable
     {
-        public Skill ApplySkill { get; private set;}
-
-        private TargetZone _area;
-
-        public Scroll(string name, Skill action, TargetZone area)
+        public Skill ApplySkill { get; }
+        
+        public Scroll(string name, Skill action)
         {
-            Symbol = '!';
+            Symbol = '?';
             Name = name;
             ApplySkill = action;
-            _area = area;
         }
 
-        public void Apply()
+        public void Apply(IEnumerable<Terrain> targets)
         {
-            ApplySkill.Activate(_area.GetTilesInRange(Carrier, null));
-            // TODO: add a targetting system
+            ApplySkill.Activate(targets);
         }
     }
 }

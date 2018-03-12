@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Roguelike.Systems
 {
     // Handles all stacks of items in the game, such as the player inventory and piles of loot.
-    public class InventoryHandler
+    class InventoryHandler
     {
         private IList<ItemInfo> _inventory;
 

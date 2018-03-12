@@ -1,4 +1,4 @@
-﻿using Roguelike.Actions;
+﻿using Roguelike.Commands;
 using Roguelike.Actors;
 using Roguelike.Interfaces;
 using Roguelike.Systems;

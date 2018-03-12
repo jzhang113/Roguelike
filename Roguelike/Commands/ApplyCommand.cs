@@ -1,9 +1,11 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
+using System.Collections.Generic;
 
-namespace Roguelike.Actions
+namespace Roguelike.Commands
 {
     class ApplyCommand : ICommand
     {
@@ -11,6 +13,7 @@ namespace Roguelike.Actions
         public int EnergyCost { get; } = 120;
 
         private char _key;
+        private IEnumerable<Terrain> _target;
 
         public ApplyCommand(Actor source, char key)
         {
@@ -22,14 +25,32 @@ namespace Roguelike.Actions
         {
             if (!Source.Inventory.HasKey(_key))
             {
-                Game.MessageHandler.AddMessage("No such item to equip.", OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage("No such item to apply.", OptionHandler.MessageLevel.Normal);
                 return new RedirectMessage(false);
             }
-
-            // TODO: probably should check for equippability in a better manner
+            
             Item item = Source.Inventory.GetItem(_key);
             if (item is IUsable)
             {
+                var skill = (item as IUsable).ApplySkill;
+
+                if (skill.Area.Aimed)
+                {
+                    if (_target == null)
+                    {
+                        InputHandler.BeginTargetting(this, skill);
+                        Source.Inventory.Remove(item);
+                        // TODO: Handle targetted items to allow cancelling
+
+                        return new RedirectMessage(false);
+                    }
+                }
+                else
+                {
+                    if (_target == null)
+                        _target = skill.Area.GetTilesInRange(Source);
+                }
+
                 return new RedirectMessage(true);
             }
             else
@@ -43,7 +64,7 @@ namespace Roguelike.Actions
         {
             Item item = Source.Inventory.GetItem(_key);
             Source.Inventory.Remove(item);
-            (item as IUsable).Apply();
+            (item as IUsable).Apply(_target);
         }
     }
 }

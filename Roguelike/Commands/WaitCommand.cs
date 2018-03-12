@@ -2,7 +2,7 @@
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 
-namespace Roguelike.Actions
+namespace Roguelike.Commands
 {
     class WaitCommand : ICommand
     {

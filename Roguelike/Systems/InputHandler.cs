@@ -5,6 +5,7 @@ using Roguelike.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using Roguelike.Actors;
+using Roguelike.Commands;
 using Roguelike.Actions;
 
 namespace Roguelike.Systems
@@ -16,6 +17,9 @@ namespace Roguelike.Systems
         private static bool _holdingKey = false;
         private static readonly int HOLD_LIMIT = 15;
 
+        private static ICommand _prevCommand;
+        private static Skill _targettingSkill;
+
         public static void Initialize(RLRootConsole console)
         {
             _console = console;
@@ -23,16 +27,17 @@ namespace Roguelike.Systems
 
         public static ICommand HandleInput()
         {
-            RLMouse click = _console.Mouse;
             MapHandler map = Game.Map;
             Player player = Game.Player;
-            Point square = GetClickPosition(click.X, click.Y);
+            var mousePos = GetHoverPosition();
 
-            if (square != null)
+            if (mousePos != null)
             {
+                var (mouseX, mouseY) = mousePos.Value;
+
                 map.ClearHighlight();
-                Cell current = map.GetCell(square.X, square.Y);
-                IEnumerable<WeightedPoint> path = map.PathToPlayer(square.X, square.Y).Reverse();
+                Cell current = map.GetCell(mouseX, mouseY);
+                IEnumerable<WeightedPoint> path = map.PathToPlayer(mouseX, mouseY).Reverse();
                 bool exploredPathExists = false;
 
                 // TODO: Path may end up broken because an enemy is in the way.
@@ -51,7 +56,7 @@ namespace Roguelike.Systems
                 }
 
                 if (current.IsWalkable && exploredPathExists)
-                    map.Highlight[square.X][square.Y] = RLColor.Red;
+                    map.Highlight[mouseX][mouseY] = RLColor.Red;
                 /*
                 if (click.GetLeftClick())
                 {
@@ -65,12 +70,21 @@ namespace Roguelike.Systems
                 }
                 */
                 
-                LookHandler.DisplayActor(map.GetActor(square.X, square.Y));
-                LookHandler.DisplayItem(map.GetItem(square.X, square.Y));
-                LookHandler.DisplayTerrain(map.Field[square.X, square.Y]);
+                LookHandler.DisplayActor(map.GetActor(mouseX, mouseY));
+                LookHandler.DisplayItem(map.GetItem(mouseX, mouseY));
+                LookHandler.DisplayTerrain(map.Field[mouseX, mouseY]);
             }
             
             RLKeyPress keyPress = _console.Keyboard.GetKeyPress();
+
+            if (Game.GameMode == Game.Mode.Targetting)
+            {
+                if (keyPress != null)
+                    HandleTargettingInput(keyPress);
+
+                return ResolveTargetting();
+            }
+
             if (keyPress == null)
             {
                 // For some reason, holding a key issues a command, but follows up with nulls.
@@ -118,47 +132,52 @@ namespace Roguelike.Systems
             Game.ShowOverlay = (keyPress.Key == RLKey.Tab);
             _holdingKey = true;
 
+            #region Attack Move
+            Actions.Skill ability = null;
             if (keyPress.Shift)
-            {
+                ability = player.Equipment.PrimaryWeapon.GetAbility(0);
+            else if (keyPress.Alt)
+                ability = player.Equipment.PrimaryWeapon.GetAbility(1);
+            else if (keyPress.Control)
+                ability = player.Equipment.PrimaryWeapon.GetAbility(2);
 
+            if (ability != null)
+            {
                 switch (keyPress.Key)
                 {
-                    #region Movement Keys
                     case RLKey.Left:
                     case RLKey.Keypad4:
                     case RLKey.H:
-                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.W.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.W.X, player.Y]);
                     case RLKey.Down:
                     case RLKey.Keypad2:
                     case RLKey.J:
-                        return new AttackCommand(player, Game.Map.Field[player.X, player.Y + Direction.S.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.Y]);
                     case RLKey.Up:
                     case RLKey.Keypad8:
                     case RLKey.K:
-                        return new AttackCommand(player, Game.Map.Field[player.X, player.Y + Direction.N.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.Y]);
                     case RLKey.Right:
                     case RLKey.Keypad6:
                     case RLKey.L:
-                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.E.X, player.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.E.X, player.Y]);
                     case RLKey.Keypad7:
                     case RLKey.Y:
-                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y]);
                     case RLKey.Keypad9:
                     case RLKey.U:
-                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y]);
                     case RLKey.Keypad1:
                     case RLKey.B:
-                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y]);
                     case RLKey.Keypad3:
                     case RLKey.N:
-                        return new AttackCommand(player, Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y], player.Equipment.PrimaryWeapon.GetAbility(0));
+                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y]);
                     case RLKey.Keypad5:
-                    case RLKey.Period:
-                        return new WaitCommand(player);
-                    #endregion
                     default: return null;
                 }
             }
+            #endregion
 
             switch (keyPress.Key)
             {
@@ -240,24 +259,75 @@ namespace Roguelike.Systems
             }
         }
 
-        private static Point GetClickPosition(int x, int y)
+        private static void HandleTargettingInput(RLKeyPress keyPress)
         {
+            switch (keyPress.Key)
+            {
+                case RLKey.Escape:
+                    Game.GameMode = Game.Mode.Normal;
+                    Game.ShowInventory = false;
+                    Game.ShowEquipment = false;
+                    break;
+            }
+        }
+
+        #region Mouse Input
+        public static (int X, int Y)? GetHoverPosition()
+        {
+            RLMouse mouse = _console.Mouse;
             int mapTop = Game.Config.MessageView.Height;
             int mapBottom = Game.Config.MessageView.Height + Game.Config.MapView.Height;
             int mapLeft = 0;
             int mapRight = Game.Config.MapView.Width;
             
-            if (x > mapLeft && x < mapRight - 1 && y > mapTop && y < mapBottom - 1)
+            if (mouse.X > mapLeft && mouse.X < mapRight - 1 && mouse.Y > mapTop && mouse.Y < mapBottom - 1)
             {
-                int xPos = (x - mapLeft);
-                int yPos = (y - mapTop);
-                return new Point(xPos, yPos);
+                int xPos = (mouse.X - mapLeft);
+                int yPos = (mouse.Y - mapTop);
+                return (xPos, yPos);
             }
             else
             {
                 return null;
             }
         }
+
+        public static (int X, int Y)? GetClickPosition()
+        {
+            if (_console.Mouse.GetLeftClick())
+                return GetHoverPosition();
+            else
+                return null;
+        }
+        #endregion
+
+        #region Target Handling
+        public static void BeginTargetting(ICommand command, Skill skill)
+        {
+            Game.GameMode = Game.Mode.Targetting;
+            Game.ShowInventory = false;
+            Game.ForceRender();
+
+            _prevCommand = command;
+            _targettingSkill = skill;
+            ResolveTargetting();
+        }
+
+        private static ICommand ResolveTargetting()
+        {
+            var clickPos = GetClickPosition();
+
+            if (clickPos != null)
+            {
+                Game.GameMode = Game.Mode.Normal;
+                // Q: Do we need to reset prevCommand and targettingSkill?
+
+                return new AttackCommand(_prevCommand.Source, _targettingSkill, _targettingSkill.Area.GetTilesInRange(_prevCommand.Source, clickPos.Value));
+            }
+
+            return null;
+        }
+        #endregion
 
         private static char ToChar(RLKey key)
         {

@@ -3,7 +3,7 @@ using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System;
 
-namespace Roguelike.Actions
+namespace Roguelike.Commands
 {
     class UnequipCommand : ICommand
     {

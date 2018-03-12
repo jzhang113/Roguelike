@@ -3,7 +3,7 @@ using Roguelike.Actors;
 using Roguelike.Systems;
 using Roguelike.Items;
 
-namespace Roguelike.Actions
+namespace Roguelike.Commands
 {
     class EquipCommand : ICommand
     {

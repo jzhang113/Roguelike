@@ -1,12 +1,12 @@
 ﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Interfaces;
-using Roguelike.Skills;
+using Roguelike.Actions;
 using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
-    public abstract class Item : Drawable
+    abstract class Item : Drawable
     {
         public string Name { get; protected set; }
         public IMaterial Material { get; protected set; }
@@ -48,14 +48,15 @@ namespace Roguelike.Items
                 new DamageAction(Damage)
             };
 
-            return new Skill(AttackSpeed, actions);
+            return new Skill(AttackSpeed, actions, new Core.TargetZone(Core.TargetShape.Ray));
         }
 
         public Skill GetAbility(int index)
         {
-            System.Diagnostics.Debug.Assert(index < Abilities.Count);
-
-            return Abilities[index];
+            if (index >= Abilities.Count)
+                return null;
+            else
+                return Abilities[index];
         }
 
         public void AddAbility(Skill skill)

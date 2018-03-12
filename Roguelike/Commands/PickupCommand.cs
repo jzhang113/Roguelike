@@ -3,7 +3,7 @@ using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 
-namespace Roguelike.Actions
+namespace Roguelike.Commands
 {
     class PickupCommand : ICommand
     {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
-    public class EquipmentHandler
+    class EquipmentHandler
     {
         public Weapon DefaultWeapon { get; internal set; }
         public Weapon PrimaryWeapon { get; internal set; }

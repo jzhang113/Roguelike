@@ -127,14 +127,15 @@ namespace Roguelike
 
             System.Collections.Generic.List<Interfaces.IAction> damageAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
-                new Skills.DamageAction(100)
+                new Actions.DamageAction(100)
             };
             System.Collections.Generic.List<Interfaces.IAction> healAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
-                new Skills.HealAction(100)
+                new Actions.HealAction(100)
             };
-            Skills.Skill damage = new Skills.Skill(200, damageAction);
-            Skills.Skill heal = new Skills.Skill(200, healAction);
+            Actions.Skill rangedDamage = new Actions.Skill(200, damageAction, new TargetZone(TargetShape.Ray, 10));
+            Actions.Skill damage = new Actions.Skill(200, damageAction, new TargetZone(TargetShape.Ray));
+            Actions.Skill heal = new Actions.Skill(200, healAction, new TargetZone(TargetShape.Self));
 
             spear.AddAbility(damage);
 
@@ -146,7 +147,7 @@ namespace Roguelike
             };
             Map.AddItem(ha);
 
-            Items.Scroll magicMissile = new Items.Scroll("scroll of magic missile", damage, new TargetZone(TargetShape.Area, 10))
+            Items.Scroll magicMissile = new Items.Scroll("scroll of magic missile", rangedDamage)
             {
                 X = Player.X - 1,
                 Y = Player.Y - 2,
@@ -154,7 +155,7 @@ namespace Roguelike
             };
             Map.AddItem(magicMissile);
 
-            Items.Scroll healing = new Items.Scroll("scroll of healing", heal, new TargetZone(TargetShape.Self))
+            Items.Scroll healing = new Items.Scroll("scroll of healing", heal)
             {
                 X = Player.X + 1,
                 Y = Player.Y + 1,

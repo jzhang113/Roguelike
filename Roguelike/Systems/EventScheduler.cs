@@ -32,7 +32,10 @@ namespace Roguelike.Systems
                 System.Console.WriteLine("Turn order");
                 System.Console.WriteLine("----------");
                 for (int i = 0; i < _eventSet.Size(); i++)
-                    System.Console.WriteLine(string.Format("#{0} {1}\t {2} energy", _eventSet.GetOrder()[i], ((Actors.Actor)_eventSet.GetHeap()[i]).Name, _eventSet.GetHeap()[i].Energy));
+                    System.Console.WriteLine(string.Format("#{0} {1}\t {2} energy",
+                        _eventSet.GetOrder()[i],
+                        ((Actors.Actor)_eventSet.GetHeap()[i]).Name,
+                        _eventSet.GetHeap()[i].Energy));
 
                 _eventSet.UpdateAll();
             }
@@ -50,19 +53,29 @@ namespace Roguelike.Systems
             {
                 action = status.Alternative;
                 status = action.Validate();
-            } 
-
-            // If we still don't succeed, the action is bad and should be cancelled. However, we
-            // should be careful that the AI does not give invalid Actions, as this will lead to
-            // an infinite loop.
-            if (!status.Success)
-            {
-                // TODO: cancellation code
-                return false;
             }
 
-            action.Execute();
-            current.Energy -= action.EnergyCost;
+            // If we still don't succeed, the action is bad and should be cancelled. Otherwise,
+            // we can execute the action which should succeed at this point.
+            if (!status.Success)
+            {
+                // Let the Player pick another move. Otherwise, if the AI made an invalid move,
+                // perform a wait action to prevent an infinite loop.
+                if (current is Actors.Player)
+                {
+                    return false;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.Assert(false, "monster made invalid move");
+                    current.Energy = 0;
+                }
+            }
+            else
+            {
+                action.Execute();
+                current.Energy -= action.EnergyCost;
+            }
 
             // Move the current Actor to the bottom of the heap.
             _eventSet.GetMax();

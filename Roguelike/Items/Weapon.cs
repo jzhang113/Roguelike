@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
-    public abstract class Weapon : Item, IEquipable
+    abstract class Weapon : Item, IEquipable
     {
         protected Weapon()
         {
             Symbol = '(';
-            Abilities = new List<Skills.Skill>();
+            Abilities = new List<Actions.Skill>();
         }
 
         public void Equip()

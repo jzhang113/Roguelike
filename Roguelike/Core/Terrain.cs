@@ -3,7 +3,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Core
 {
-    public class Terrain
+    class Terrain
     {
         public bool IsExplored { get; set; }
         public bool IsWall { get; set; }

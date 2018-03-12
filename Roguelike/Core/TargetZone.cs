@@ -5,25 +5,38 @@ namespace Roguelike.Core
 {
     struct TargetZone
     {
-        TargetShape Shape { get; }
-        int Range { get; }
+        public TargetShape Shape { get; }
+        public int Range { get; }
+        public bool Aimed { get; }
 
         public TargetZone(TargetShape shape, int range = 1)
         {
             Shape = shape;
             Range = range;
-        }
-
-        public IEnumerable<Terrain> GetTilesInRange(Actor current, Terrain endPoint)
-        {
-            ICollection<Terrain> inRange = new List<Terrain>();
-            //// TODO: replace placeholder with targetting system
-            (int xTarget, int yTarget) = endPoint?.Position ?? (0, 0);
 
             switch (Shape)
             {
+                case TargetShape.Self:
+                case TargetShape.Area:
+                    Aimed = false;
+                    break;
                 case TargetShape.Range:
-                    inRange.Add(endPoint);
+                case TargetShape.Ray:
+                    Aimed = true;
+                    break;
+                default:
+                    throw new System.ArgumentException("unknown skill shape");
+            }
+        }
+
+        public IEnumerable<Terrain> GetTilesInRange(Actor current)
+        {
+            ICollection<Terrain> inRange = new List<Terrain>();
+
+            switch (Shape)
+            {
+                case TargetShape.Self:
+                    inRange.Add(Game.Map.Field[current.X, current.Y]);
                     return inRange;
                 case TargetShape.Area:
                     foreach (Terrain cell in Game.Map.Field)
@@ -37,13 +50,24 @@ namespace Roguelike.Core
                         }
                     }
                     return inRange;
-                case TargetShape.Ray:
-                    return Game.Map.StraightLinePath(current.X, current.Y, xTarget, yTarget);
-                case TargetShape.Self:
-                    inRange.Add(Game.Map.Field[current.X, current.Y]);
-                    return inRange;
                 default:
+                    throw new System.ArgumentException("unknown unaimed skill shape");
+            }
+        }
+
+        public IEnumerable<Terrain> GetTilesInRange(Actor current, (int X, int Y) target)
+        {
+            ICollection<Terrain> inRange = new List<Terrain>();
+
+            switch (Shape)
+            {
+                case TargetShape.Range:
+                    inRange.Add(Game.Map.Field[target.X, target.Y]);
                     return inRange;
+                case TargetShape.Ray:
+                    return Game.Map.StraightLinePath(current.X, current.Y, target.X, target.Y);
+                default:
+                    throw new System.ArgumentException("unknown aimed skill shape");
             }
         }
     }

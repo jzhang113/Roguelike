@@ -2,7 +2,7 @@
 using Roguelike.Core;
 using Roguelike.Interfaces;
 
-namespace Roguelike.Skills
+namespace Roguelike.Actions
 {
     internal class HealAction : IAction
     {

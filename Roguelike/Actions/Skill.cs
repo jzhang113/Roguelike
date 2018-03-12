@@ -1,20 +1,21 @@
-﻿using Roguelike.Actors;
-using Roguelike.Core;
+﻿using Roguelike.Core;
 using Roguelike.Interfaces;
 using System.Collections.Generic;
 
-namespace Roguelike.Skills
+namespace Roguelike.Actions
 {
-    public class Skill
+    class Skill
     {
         public int Speed { get; }
         public int Power { get; }
+        public TargetZone Area { get; }
         
         private IEnumerable<IAction> _actions;
 
-        public Skill(int speed, IEnumerable<IAction> actionSequence)
+        public Skill(int speed, IEnumerable<IAction> actionSequence, TargetZone area)
         {
             Speed = speed;
+            Area = area;
             _actions = actionSequence;
         }
 

@@ -4,7 +4,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Items
 {
-    public abstract class Armor : Item, IEquipable
+    abstract class Armor : Item, IEquipable
     {
         private ArmorType _type;
 

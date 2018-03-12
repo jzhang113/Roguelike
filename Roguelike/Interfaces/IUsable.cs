@@ -1,6 +1,6 @@
-﻿using Roguelike.Actors;
-using Roguelike.Skills;
-using System;
+﻿using Roguelike.Actions;
+using Roguelike.Core;
+using System.Collections.Generic;
 
 namespace Roguelike.Interfaces
 {
@@ -11,6 +11,6 @@ namespace Roguelike.Interfaces
         Skill ApplySkill { get; }
 
         // Perform the action.
-        void Apply();
+        void Apply(IEnumerable<Terrain> targets);
     }
 }

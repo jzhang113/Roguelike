@@ -6,7 +6,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Actors
 {
-    public class Actor : Drawable, ISchedulable
+    class Actor : Drawable, ISchedulable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
