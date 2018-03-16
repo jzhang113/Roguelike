@@ -7,14 +7,16 @@ namespace Roguelike.Actions
     class DamageAction : IAction
     {
         public int Power { get; }
+        public TargetZone Area { get; }
 
-        public DamageAction(int power)
+        public DamageAction(int power, TargetZone targetZone)
         {
             Power = power;
+            Area = targetZone;
         }
 
         // Deals tamage to the target.
-        public void Activate(Terrain target)
+        public void Activate(Actor source, Terrain target)
         {
             Actor targetUnit = target.Unit;
 
@@ -25,7 +27,7 @@ namespace Roguelike.Actions
                 if (targetUnit.IsDead)
                     targetUnit.State = ActorState.Dead;
 
-                Game.MessageHandler.AddMessage(string.Format("{0} takes {1} damage", targetUnit.Name, damage), Systems.OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage(string.Format("{0} hits {1} for {2} damage", source.Name, targetUnit.Name, damage), Systems.OptionHandler.MessageLevel.Normal);
             }
         }
     }

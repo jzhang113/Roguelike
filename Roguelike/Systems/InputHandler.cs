@@ -17,8 +17,9 @@ namespace Roguelike.Systems
         private static bool _holdingKey = false;
         private static readonly int HOLD_LIMIT = 15;
 
-        private static ICommand _prevCommand;
-        private static Skill _targettingSkill;
+        private static ActionCommand _prevCommand;
+        private static IAction _targettingAction;
+        internal static (int X, int Y)? PrevTarget { get; set; }
 
         public static void Initialize(RLRootConsole console)
         {
@@ -133,7 +134,7 @@ namespace Roguelike.Systems
             _holdingKey = true;
 
             #region Attack Move
-            Actions.Skill ability = null;
+            ActionSequence ability = null;
             if (keyPress.Shift)
                 ability = player.Equipment.PrimaryWeapon.GetAbility(0);
             else if (keyPress.Alt)
@@ -265,8 +266,7 @@ namespace Roguelike.Systems
             {
                 case RLKey.Escape:
                     Game.GameMode = Game.Mode.Normal;
-                    Game.ShowInventory = false;
-                    Game.ShowEquipment = false;
+                    Game.ForceRender();
                     break;
             }
         }
@@ -302,14 +302,14 @@ namespace Roguelike.Systems
         #endregion
 
         #region Target Handling
-        public static void BeginTargetting(ICommand command, Skill skill)
+        public static void BeginTargetting(ActionCommand command, IAction action)
         {
             Game.GameMode = Game.Mode.Targetting;
             Game.ShowInventory = false;
             Game.ForceRender();
 
             _prevCommand = command;
-            _targettingSkill = skill;
+            _targettingAction = action;
             ResolveTargetting();
         }
 
@@ -319,10 +319,11 @@ namespace Roguelike.Systems
 
             if (clickPos != null)
             {
+                PrevTarget = clickPos.Value;
                 Game.GameMode = Game.Mode.Normal;
-                // Q: Do we need to reset prevCommand and targettingSkill?
 
-                return new AttackCommand(_prevCommand.Source, _targettingSkill, _targettingSkill.Area.GetTilesInRange(_prevCommand.Source, clickPos.Value));
+                _prevCommand.Target = _targettingAction.Area.GetTilesInRange(_prevCommand.Source, clickPos.Value);
+                return _prevCommand;
             }
 
             return null;

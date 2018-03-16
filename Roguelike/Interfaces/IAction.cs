@@ -1,4 +1,5 @@
-﻿using Roguelike.Core;
+﻿using Roguelike.Actors;
+using Roguelike.Core;
 
 namespace Roguelike.Interfaces
 {
@@ -7,7 +8,9 @@ namespace Roguelike.Interfaces
     // has a total time cost.
     interface IAction
     {
+        TargetZone Area { get; }
+
         // Execute the Action. This takes a Terrain as it may have additional environmental effects.
-        void Activate(Terrain target);
+        void Activate(Actor source, Terrain target);
     }
 }

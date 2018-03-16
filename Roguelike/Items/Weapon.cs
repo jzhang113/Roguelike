@@ -9,7 +9,7 @@ namespace Roguelike.Items
         protected Weapon()
         {
             Symbol = '(';
-            Abilities = new List<Actions.Skill>();
+            Abilities = new List<Actions.ActionSequence>();
         }
 
         public void Equip()

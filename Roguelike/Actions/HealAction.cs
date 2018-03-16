@@ -4,17 +4,19 @@ using Roguelike.Interfaces;
 
 namespace Roguelike.Actions
 {
-    internal class HealAction : IAction
+    class HealAction : IAction
     {
         public int Power { get; }
+        public TargetZone Area { get; }
 
-        public HealAction(int power)
+        public HealAction(int power, TargetZone targetZone)
         {
             Power = power;
+            Area = targetZone;
         }
 
         // Heals the target by amount up to its maximum health.
-        public void Activate(Terrain target)
+        public void Activate(Actor source, Terrain target)
         {
             Actor targetUnit = target.Unit;
 
@@ -22,7 +24,7 @@ namespace Roguelike.Actions
             {
                 int healing = targetUnit.TakeHealing(Power);
 
-                Game.MessageHandler.AddMessage(string.Format("{0} healed {1} damage", targetUnit.Name, healing), Systems.OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage(string.Format("{0} healed {1} by {2} damage", source.Name, targetUnit.Name, healing), Systems.OptionHandler.MessageLevel.Normal);
             }
         }
     }

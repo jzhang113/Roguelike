@@ -127,17 +127,22 @@ namespace Roguelike
 
             System.Collections.Generic.List<Interfaces.IAction> damageAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
-                new Actions.DamageAction(100)
+                new Actions.DamageAction(100, new TargetZone(TargetShape.Ray, 10))
             };
             System.Collections.Generic.List<Interfaces.IAction> healAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
-                new Actions.HealAction(100)
+                new Actions.HealAction(100, new TargetZone(TargetShape.Self))
             };
-            Actions.Skill rangedDamage = new Actions.Skill(200, damageAction, new TargetZone(TargetShape.Ray, 10));
-            Actions.Skill damage = new Actions.Skill(200, damageAction, new TargetZone(TargetShape.Ray));
-            Actions.Skill heal = new Actions.Skill(200, healAction, new TargetZone(TargetShape.Self));
+            Actions.ActionSequence rangedDamage = new Actions.ActionSequence(200, damageAction);
+            Actions.ActionSequence heal = new Actions.ActionSequence(200, healAction);
 
-            spear.AddAbility(damage);
+            var lungeSkill = new System.Collections.Generic.List<Interfaces.IAction>()
+            {
+                new Actions.MoveAction(new TargetZone(TargetShape.Directional)),
+                new Actions.DamageAction(100, new TargetZone(TargetShape.Directional))
+            };
+            var lungeAction = new Actions.ActionSequence(150, lungeSkill);
+            spear.AddAbility(lungeAction);
 
             Items.HeavyArmor ha = new Items.HeavyArmor(Interfaces.Materials.Iron)
             {

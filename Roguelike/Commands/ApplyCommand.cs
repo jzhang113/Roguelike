@@ -32,25 +32,6 @@ namespace Roguelike.Commands
             Item item = Source.Inventory.GetItem(_key);
             if (item is IUsable)
             {
-                var skill = (item as IUsable).ApplySkill;
-
-                if (skill.Area.Aimed)
-                {
-                    if (_target == null)
-                    {
-                        InputHandler.BeginTargetting(this, skill);
-                        Source.Inventory.Remove(item);
-                        // TODO: Handle targetted items to allow cancelling
-
-                        return new RedirectMessage(false);
-                    }
-                }
-                else
-                {
-                    if (_target == null)
-                        _target = skill.Area.GetTilesInRange(Source);
-                }
-
                 return new RedirectMessage(true);
             }
             else

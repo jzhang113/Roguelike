@@ -8,18 +8,21 @@ namespace Roguelike.Core
         public TargetShape Shape { get; }
         public int Range { get; }
         public bool Aimed { get; }
+        public bool Continued { get; }
 
-        public TargetZone(TargetShape shape, int range = 1)
+        public TargetZone(TargetShape shape, int range = 1, bool continued = false)
         {
             Shape = shape;
             Range = range;
+            Continued = continued;
 
             switch (Shape)
             {
-                case TargetShape.Self:
                 case TargetShape.Area:
+                case TargetShape.Self:
                     Aimed = false;
                     break;
+                case TargetShape.Directional:
                 case TargetShape.Range:
                 case TargetShape.Ray:
                     Aimed = true;
@@ -66,6 +69,17 @@ namespace Roguelike.Core
                     return inRange;
                 case TargetShape.Ray:
                     return Game.Map.StraightLinePath(current.X, current.Y, target.X, target.Y);
+                case TargetShape.Directional:
+                    int dx = current.X - target.X;
+                    int dy = current.Y - target.Y;
+                    int sx = dx / System.Math.Abs(dx);
+                    int sy = dy / System.Math.Abs(dy);
+                    int limit = System.Math.Abs(dx);
+
+                    for (int i = 0; i < limit; i++)
+                        inRange.Add(Game.Map.Field[target.X + i * sx, target.Y + i * sy]);
+
+                    return inRange;
                 default:
                     throw new System.ArgumentException("unknown aimed skill shape");
             }
@@ -74,8 +88,9 @@ namespace Roguelike.Core
 
     enum TargetShape
     {
-        Range,
         Area,
+        Directional,
+        Range,
         Ray,
         Self
     }

@@ -1,4 +1,5 @@
 ﻿using RLNET;
+using Roguelike.Actions;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
@@ -19,8 +20,8 @@ namespace Roguelike.Actors
         public int MP { get; set; }
         public int MaxMP { get; set; }
 
-        public int STR { get; set; }
-        public int DEX { get; set; }
+        public int STR { get; }
+        public int DEX { get; }
         public int DEF { get; set; }
         public int INT { get; set; }
         
@@ -33,6 +34,9 @@ namespace Roguelike.Actors
 
         public int Energy { get; set; }
         public int RefreshRate { get; set; }
+
+        public bool ActiveSequence { get; internal set; }
+        public ActionSequence ActionSequence { get; internal set; }
 
         public InventoryHandler Inventory { get; }
         public EquipmentHandler Equipment { get; }

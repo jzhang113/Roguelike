@@ -98,6 +98,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\MoveAction.cs" />
+    <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\ApplyCommand.cs" />
     <Compile Include="Commands\DropCommand.cs" />
     <Compile Include="Commands\EquipCommand.cs" />
@@ -138,7 +140,7 @@
     <Compile Include="Systems\RedirectMessage.cs" />
     <Compile Include="Core\Terrain.cs" />
     <Compile Include="Interfaces\ISchedulable.cs" />
-    <Compile Include="Actions\Skill.cs" />
+    <Compile Include="Actions\ActionSequence.cs" />
     <Compile Include="Interfaces\ICommand.cs" />
     <Compile Include="Systems\EventScheduler.cs" />
     <Compile Include="Systems\InputHandler.cs" />
