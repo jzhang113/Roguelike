@@ -156,7 +156,7 @@ namespace Roguelike.Systems
                 y = nextMove.Y;
                 nearest = nextMove.Weight;
 
-                if (nearest == prev)
+                if (nearest == prev || nearest == 0)
                 {
                     yield break;
                 }

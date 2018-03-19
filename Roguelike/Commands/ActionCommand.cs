@@ -31,8 +31,15 @@ namespace Roguelike.Commands
             {
                 if (Target == null)
                 {
-                    InputHandler.BeginTargetting(this, _action);
-                    return new RedirectMessage(false);
+                    if (_action.Area.Target != null)
+                    {
+                        Target = _action.Area.GetTilesInRange(Source);
+                    }
+                    else
+                    {
+                        InputHandler.BeginTargetting(this, _action);
+                        return new RedirectMessage(false);
+                    }
                 }
             }
             else

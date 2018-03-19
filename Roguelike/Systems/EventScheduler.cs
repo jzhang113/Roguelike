@@ -7,6 +7,8 @@ namespace Roguelike.Systems
     class EventScheduler
     {
         private MaxHeap<ISchedulable> _eventSet;
+
+        public ISchedulable Current => _eventSet.Peek();
         
         public EventScheduler(int size)
         {

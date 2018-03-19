@@ -47,7 +47,7 @@ namespace Roguelike.Commands
                 if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
                 else
-                    return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(), _cell));
+                    return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(_cell.Position)));
             }
 
             return new RedirectMessage(true);

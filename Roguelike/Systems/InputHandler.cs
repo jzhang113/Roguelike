@@ -58,18 +58,16 @@ namespace Roguelike.Systems
 
                 if (current.IsWalkable && exploredPathExists)
                     map.Highlight[mouseX][mouseY] = RLColor.Red;
-                /*
-                if (click.GetLeftClick())
+                
+                if (_console.Mouse.GetLeftClick())
                 {
-                    foreach (WeightedPoint p in path)
-                        yield return new MoveCommand(player, p.X, p.Y);
+                    List<IAction> moves = new List<IAction>();
 
-                    if (current.IsWalkable)
-                        yield return new MoveCommand(player, square.X, square.Y);
-                    else
-                        yield return new AttackCommand(player, map.GetActor(current), player.BasicAttack);
+                    foreach (WeightedPoint p in path)
+                        moves.Add(new MoveAction(new TargetZone(TargetShape.Range, (p.X, p.Y))));
+
+                    return new AttackCommand(player, new ActionSequence(100, moves));
                 }
-                */
                 
                 LookHandler.DisplayActor(map.GetActor(mouseX, mouseY));
                 LookHandler.DisplayItem(map.GetItem(mouseX, mouseY));

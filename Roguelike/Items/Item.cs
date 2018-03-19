@@ -41,11 +41,11 @@ namespace Roguelike.Items
         }
         #endregion
 
-        public ActionSequence GetBasicAttack()
+        public ActionSequence GetBasicAttack((int X, int Y) target)
         {
             List<IAction> actions = new List<IAction>
             {
-                new DamageAction(Damage, new Core.TargetZone(Core.TargetShape.Ray))
+                new DamageAction(Damage, new Core.TargetZone(Core.TargetShape.Directional, target))
             };
 
             return new ActionSequence(AttackSpeed, actions);

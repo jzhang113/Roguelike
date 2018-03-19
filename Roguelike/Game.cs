@@ -89,7 +89,7 @@ namespace Roguelike
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
-            MapGenerator mapGenerator = new MapGenerator(300, 300, new Random());
+            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, new Random());
             Map = mapGenerator.CreateMap();
             sw.Stop();
 
@@ -98,8 +98,8 @@ namespace Roguelike
             Player = new Player();
             while (!Map.Field[Player.X, Player.Y].IsWalkable)
             {
-                Player.X = Random.Next(0, Config.Map.Width - 1);
-                Player.Y = Random.Next(0, Config.Map.Height - 1);
+                Player.X = Random.Next(1, Config.Map.Width - 1);
+                Player.Y = Random.Next(1, Config.Map.Height - 1);
 
             }
             Map.AddActor(Player);
@@ -110,8 +110,8 @@ namespace Roguelike
                 Skeleton s = new Skeleton();
                 while (!Map.GetCell(s.X, s.Y).IsWalkable)
                 {
-                    s.X = Random.Next(0, Config.Map.Width - 1);
-                    s.Y = Random.Next(0, Config.Map.Height - 1);
+                    s.X = Random.Next(1, Config.Map.Width - 1);
+                    s.Y = Random.Next(1, Config.Map.Height - 1);
                     s.Name = "Mook #" + (i + 1);
                 }
                 Map.AddActor(s);
@@ -127,7 +127,7 @@ namespace Roguelike
 
             System.Collections.Generic.List<Interfaces.IAction> damageAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
-                new Actions.DamageAction(100, new TargetZone(TargetShape.Ray, 10))
+                new Actions.DamageAction(100, new TargetZone(TargetShape.Ray, range: 10))
             };
             System.Collections.Generic.List<Interfaces.IAction> healAction = new System.Collections.Generic.List<Interfaces.IAction>()
             {
@@ -193,7 +193,14 @@ namespace Roguelike
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
             while (EventScheduler.Update())
+            {
                 _render = true;
+
+                if (EventScheduler.Current is Player)
+                {
+                    break;
+                }
+            }
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
