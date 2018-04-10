@@ -1,5 +1,6 @@
 ﻿using RLNET;
 using Roguelike.Actions;
+using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
@@ -57,7 +58,25 @@ namespace Roguelike.Actors
             Game.Map.RemoveActor(this);
             Game.EventScheduler.RemoveActor(this);
         }
-        public virtual ICommand Act() => SimpleAI.GetAction(this);
+
+        public virtual ICommand Act()
+        {
+            System.Diagnostics.Debug.Assert(Game.GameMode != Game.Mode.Targetting);
+
+            if (ActiveSequence)
+            {
+                if (ActionSequence.HasAction())
+                {
+                    return new ActionCommand(this, ActionSequence.GetAction());
+                }
+                else
+                {
+                    ActiveSequence = false;
+                }
+            }
+
+            return SimpleAI.GetAction(this);
+        }
 
         public int TakeDamage(int power)
         {

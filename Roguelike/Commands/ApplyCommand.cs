@@ -45,7 +45,9 @@ namespace Roguelike.Commands
         {
             Item item = Source.Inventory.GetItem(_key);
             Source.Inventory.Remove(item);
-            (item as IUsable).Apply(_target);
+
+            Source.ActiveSequence = true;
+            Source.ActionSequence = (item as IUsable).ApplySkill;
         }
     }
 }

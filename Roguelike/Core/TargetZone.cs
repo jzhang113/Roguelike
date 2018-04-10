@@ -1,9 +1,10 @@
 ﻿using Roguelike.Actors;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Core
 {
-    struct TargetZone
+    class TargetZone
     {
         public TargetShape Shape { get; }
         public int Range { get; }
@@ -28,7 +29,7 @@ namespace Roguelike.Core
                     Aimed = true;
                     break;
                 default:
-                    throw new System.ArgumentException("unknown skill shape");
+                    throw new ArgumentException("unknown skill shape");
             }
         }
 
@@ -42,7 +43,7 @@ namespace Roguelike.Core
                 else if (target != null)
                     (X, Y) = target.Value;
                 else
-                    throw new System.ArgumentException("aimed target destination not supplied");
+                    throw new ArgumentException("aimed target destination not supplied");
             }
 
             ICollection<Terrain> inRange = new List<Terrain>();
@@ -70,16 +71,16 @@ namespace Roguelike.Core
                 case TargetShape.Directional:
                     int dx = current.X - X;
                     int dy = current.Y - Y;
-                    int sx = dx / System.Math.Abs(dx);
-                    int sy = dy / System.Math.Abs(dy);
-                    int limit = System.Math.Abs(dx);
+                    int sx = (dx == 0) ? 0 : dx / Math.Abs(dx);
+                    int sy = (dy == 0) ? 0 : dy / Math.Abs(dy);
+                    int limit = Math.Max(Math.Abs(dx), Math.Abs(dy));
 
                     for (int i = 0; i < limit; i++)
                         inRange.Add(Game.Map.Field[X + i * sx, Y + i * sy]);
 
                     return inRange;
                 default:
-                    throw new System.ArgumentException("unknown skill shape");
+                    throw new ArgumentException("unknown skill shape");
             }
         }
     }
