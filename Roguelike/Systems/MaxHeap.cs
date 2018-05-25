@@ -80,7 +80,7 @@ namespace Roguelike.Systems
         internal T[] GetHeap() => _heap;
         internal int[] GetOrder() => _orderArray;
 
-        private void ReheapUp(int initial)
+        internal void ReheapUp(int initial)
         {
             int pos = initial;
             T oldItem = _heap[pos];
@@ -97,7 +97,7 @@ namespace Roguelike.Systems
             _heap[pos] = oldItem;
         }
 
-        private void ReheapDown(int initial)
+        internal void ReheapDown(int initial)
         {
             int pos = initial;
             T oldItem = _heap[pos];

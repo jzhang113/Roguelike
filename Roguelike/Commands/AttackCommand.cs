@@ -10,7 +10,7 @@ namespace Roguelike.Commands
     class AttackCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 0;
+        public int EnergyCost { get; }
 
         private IAction _skill;
         private IEnumerable<Terrain> _targets;
@@ -19,7 +19,7 @@ namespace Roguelike.Commands
         {
             _skill = attack;
             Source = source;
-            // EnergyCost = attack.Speed;
+            EnergyCost = attack.Speed;
         }
 
         public AttackCommand(Actor source, IAction attack, Terrain target)

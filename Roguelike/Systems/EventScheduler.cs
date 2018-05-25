@@ -80,8 +80,7 @@ namespace Roguelike.Systems
             }
 
             // Move the current Actor to the bottom of the heap.
-            _eventSet.GetMax();
-            _eventSet.Add(current);
+            _eventSet.ReheapDown(0);
 
             return true;
         }
