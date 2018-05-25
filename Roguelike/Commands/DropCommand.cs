@@ -22,7 +22,7 @@ namespace Roguelike.Commands
         {
             if (!Source.Inventory.HasKey(_key))
             {
-                Game.MessageHandler.AddMessage("No such item to drop.", OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage("No such item to drop.");
                 return new RedirectMessage(false);
             }
 
@@ -38,7 +38,7 @@ namespace Roguelike.Commands
             item.X = Source.X;
             item.Y = Source.Y;
             Game.Map.AddItem(item);
-            Game.MessageHandler.AddMessage(string.Format("You drop a {0}.", item.Name), OptionHandler.MessageLevel.Normal);
+            Game.MessageHandler.AddMessage($"You drop a {item.Name}.");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.Items;
+using Roguelike.Enums;
 using System.Collections.Generic;
 
 namespace Roguelike.Systems

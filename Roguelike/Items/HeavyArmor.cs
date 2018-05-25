@@ -4,7 +4,7 @@ namespace Roguelike.Items
 {
     class HeavyArmor : Armor
     {
-        public HeavyArmor(IMaterial type) : base(Core.ArmorType.Armor)
+        public HeavyArmor(IMaterial type) : base(Enums.ArmorType.Armor)
         {
             Name = "heavy armor";
             Material = type;

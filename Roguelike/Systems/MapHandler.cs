@@ -63,7 +63,7 @@ namespace Roguelike.Systems
         public bool RemoveActor(Actor unit)
         {
             SetOccupied(unit.X, unit.Y, false);
-            unit.State = ActorState.Dead;
+            unit.State = Enums.ActorState.Dead;
             Field[unit.X, unit.Y].Unit = null;
             Game.EventScheduler.RemoveActor(unit);
 

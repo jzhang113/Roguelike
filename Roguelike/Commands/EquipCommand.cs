@@ -22,7 +22,7 @@ namespace Roguelike.Commands
         {
             if (!Source.Inventory.HasKey(_key))
             {
-                Game.MessageHandler.AddMessage("No such item to equip.", OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage("No such item to equip.");
                 return new RedirectMessage(false);
             }
 
@@ -34,7 +34,7 @@ namespace Roguelike.Commands
             }
             else
             {
-                Game.MessageHandler.AddMessage(string.Format("Cannot equip {0}.", item.Name), OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage($"Cannot equip {item.Name}.");
                 return new RedirectMessage(false);
             }
         }

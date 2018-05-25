@@ -29,7 +29,7 @@ namespace Roguelike.Systems
             // Give everyone some energy and carry on acting.
             if (current.Energy <= 0)
             {
-                Game.MessageHandler.AddMessage("Energy Refresh", OptionHandler.MessageLevel.Verbose);
+                Game.MessageHandler.AddMessage("Energy Refresh", Enums.MessageLevel.Verbose);
                 System.Console.WriteLine("New turn!");
                 System.Console.WriteLine("Turn order");
                 System.Console.WriteLine("----------");

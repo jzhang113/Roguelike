@@ -12,14 +12,12 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
 
-        private IEnumerable<Terrain> _target;
         private IAction _skill;
+        private IEnumerable<Terrain> _targets;
 
-        public AttackCommand(Actor source, IAction attack, IEnumerable<Terrain> targets = null)
+        public AttackCommand(Actor source, IAction attack)
         {
             _skill = attack;
-            _target = targets;
-
             Source = source;
             // EnergyCost = attack.Speed;
         }
@@ -27,13 +25,18 @@ namespace Roguelike.Commands
         public AttackCommand(Actor source, IAction attack, Terrain target)
         {
             _skill = attack;
-            _target = new List<Terrain>
+            _targets = new List<Terrain>()
             {
                 target
             };
-
             Source = source;
-            // EnergyCost = attack.Speed;
+        }
+
+        public AttackCommand(Actor source, IAction attack, IEnumerable<Terrain> targets)
+        {
+            _skill = attack;
+            _targets = targets;
+            Source = source;
         }
 
         public RedirectMessage Validate()
@@ -42,14 +45,30 @@ namespace Roguelike.Commands
             if (_skill == null)
                 return new RedirectMessage(false);
 
+            if (_skill.Area.Aimed && _skill.Area.Target == null)
+                System.Diagnostics.Debug.Assert(_targets != null);
+
             return new RedirectMessage(true);
         }
 
         public void Execute()
         {
-            foreach (Terrain tile in _target)
+            if (_targets != null)
             {
-                _skill.Activate(Source, tile);
+                foreach (Terrain aimedLoc in _targets)
+                {
+                    foreach (Terrain tile in _skill.Area.GetTilesInRange(Source, aimedLoc.Position))
+                    {
+                        _skill.Activate(Source, tile);
+                    }
+                }
+            }
+            else
+            {
+                foreach (Terrain tile in _skill.Area.GetTilesInRange(Source))
+                {
+                    _skill.Activate(Source, tile);
+                }
             }
         }
     }

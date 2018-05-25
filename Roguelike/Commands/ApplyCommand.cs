@@ -24,7 +24,7 @@ namespace Roguelike.Commands
         {
             if (!Source.Inventory.HasKey(_key))
             {
-                Game.MessageHandler.AddMessage("No such item to apply.", OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage("No such item to apply.");
                 return new RedirectMessage(false);
             }
 
@@ -35,7 +35,7 @@ namespace Roguelike.Commands
             }
             else
             {
-                Game.MessageHandler.AddMessage(string.Format("Don't know how to apply {0}.", item.Name), OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage($"Don't know how to apply {item.Name}.");
                 return new RedirectMessage(false);
             }
         }

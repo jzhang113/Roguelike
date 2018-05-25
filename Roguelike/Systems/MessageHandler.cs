@@ -1,5 +1,6 @@
 ﻿using RLNET;
 using Roguelike.Core;
+using Roguelike.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -22,9 +23,9 @@ namespace Roguelike.Systems
 
         // Place a new message onto the message log if its MessageLevel is lower than the currently
         // set level.
-        public void AddMessage(string text, OptionHandler.MessageLevel level)
+        public void AddMessage(string text, MessageLevel level = MessageLevel.Normal)
         {
-            if (level <= Game.Options.Verbosity)
+            if (level <= Game.Option.Verbosity)
             {
                 messages.Add(text);
 

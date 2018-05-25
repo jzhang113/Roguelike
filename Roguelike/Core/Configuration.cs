@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Core
 {
-    class Configuration
+    internal class Configuration
     {
         public string FontName { get; set; }
         public int FontSize { get; set; }

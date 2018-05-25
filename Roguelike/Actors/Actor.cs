@@ -25,7 +25,7 @@ namespace Roguelike.Actors
         public int DEF { get; set; }
         public int INT { get; set; }
         
-        public ActorState State { get; set; }
+        public Enums.ActorState State { get; set; }
 
         public override RLColor Color { get; set; }
         public override char Symbol { get; set; }

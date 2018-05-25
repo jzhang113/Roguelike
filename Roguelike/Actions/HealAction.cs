@@ -24,7 +24,7 @@ namespace Roguelike.Actions
             {
                 int healing = targetUnit.TakeHealing(Power);
 
-                Game.MessageHandler.AddMessage(string.Format("{0} healed {1} by {2} damage", source.Name, targetUnit.Name, healing), Systems.OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage($"{source.Name} healed {targetUnit.Name} by {healing} damage");
             }
         }
     }

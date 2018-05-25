@@ -27,7 +27,7 @@ namespace Roguelike.Items
         #region virtual methods
         public virtual void Consume(Actor actor)
         {
-            Game.MessageHandler.AddMessage("That would be unhealthy.", Systems.OptionHandler.MessageLevel.Normal);
+            Game.MessageHandler.AddMessage("That would be unhealthy.");
         }
 
         public virtual void Attack()
@@ -43,7 +43,7 @@ namespace Roguelike.Items
 
         public IAction GetBasicAttack((int X, int Y) target)
         {
-            return new DamageAction(Damage, new Core.TargetZone(Core.TargetShape.Directional, target));
+            return new DamageAction(Damage, new Core.TargetZone(Enums.TargetShape.Directional, target));
         }
 
         public IAction GetAbility(int index)

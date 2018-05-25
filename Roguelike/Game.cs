@@ -20,7 +20,7 @@ namespace Roguelike
         public static bool ShowOverlay { get; internal set; }
 
         public static Configuration Config { get; private set; }
-        public static OptionHandler Options { get; private set; }
+        public static Options Option { get; private set; }
 
         public static MapHandler Map { get; private set; }
         public static Player Player { get; private set; }
@@ -37,17 +37,14 @@ namespace Roguelike
 
         private static bool _render = true;
 
-        static void Main(string[] args)
+        public Game(Configuration configs, Options options)
         {
-            Config = new Configuration();
-            new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("config.json")
-                .Build()
-                .Bind(Config);
+            Config = configs;
+            Option = options;
+        }
 
-            Options = new OptionHandler(args);
-            
+        public void Initialize()
+        {
             string consoleTitle = "Roguelike";
 
             _rootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
@@ -56,17 +53,12 @@ namespace Roguelike
             _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
             _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
-            
+
             InputHandler.Initialize(_rootConsole);
 
-            // Debugging settings
-            Options.FixedSeed = true;
-            Options.Seed = 2127758832;
-            Options.Verbosity = OptionHandler.MessageLevel.Normal;
-
             int mainSeed;
-            if (Options.FixedSeed)
-                mainSeed = Options.Seed;
+            if (Option.FixedSeed)
+                mainSeed = Option.Seed;
             else
                 mainSeed = (int)DateTime.Now.Ticks;
 
@@ -102,7 +94,6 @@ namespace Roguelike
             {
                 Player.X = Random.Next(1, Config.Map.Width - 1);
                 Player.Y = Random.Next(1, Config.Map.Height - 1);
-
             }
             Map.AddActor(Player);
             // Map.SetActorPosition(Player, playerX, playerY);
@@ -118,7 +109,7 @@ namespace Roguelike
                 }
                 Map.AddActor(s);
             }
-            
+
             Items.Spear spear = new Items.Spear(Materials.Wood)
             {
                 X = Player.X - 1,
@@ -127,14 +118,14 @@ namespace Roguelike
             };
             Map.AddItem(spear);
 
-            IAction rangedDamage = new DamageAction(200, new TargetZone(TargetShape.Ray, range: 10));
-            IAction heal = new HealAction(100, new TargetZone(TargetShape.Self));
+            IAction rangedDamage = new DamageAction(200, new TargetZone(Enums.TargetShape.Ray, range: 10));
+            IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
 
-            var lungeSkill = new System.Collections.Generic.List<IAction>()
-            {
-                new MoveAction(new TargetZone(TargetShape.Directional)),
-                new DamageAction(100, new TargetZone(TargetShape.Directional))
-            };
+            //var lungeSkill = new System.Collections.Generic.List<IAction>()
+            //{
+            //    new MoveAction(new TargetZone(Enums.TargetShape.Directional)),
+            //    new DamageAction(100, new TargetZone(Enums.TargetShape.Directional))
+            //};
             //var lungeAction = new Actions.ActionSequence(150, lungeSkill);
             //spear.AddAbility(lungeAction);
 
@@ -168,10 +159,10 @@ namespace Roguelike
             _rootConsole.Render += RootConsoleRender;
             _rootConsole.Run();
         }
-
+        
         internal static void GameOver()
         {
-            MessageHandler.AddMessage("Game Over.", OptionHandler.MessageLevel.None);
+            MessageHandler.AddMessage("Game Over.", Enums.MessageLevel.Minimal);
         }
 
         internal static void Exit()
@@ -192,7 +183,7 @@ namespace Roguelike
 
                 if (EventScheduler.Current is Player)
                 {
-                    break;
+                    // break;
                 }
             }
         }

@@ -17,14 +17,14 @@ namespace Roguelike.Items
             System.Diagnostics.Debug.Assert(Carrier.Equipment.IsDefaultWeapon());
             Carrier.Equipment.PrimaryWeapon = this;
 
-            Game.MessageHandler.AddMessage(string.Format("You wield a {0}.", Name), OptionHandler.MessageLevel.Normal);
+            Game.MessageHandler.AddMessage($"You wield a {Name}.");
         }
         
         public void Unequip()
         {
             Carrier.Equipment.PrimaryWeapon = Carrier.Equipment.DefaultWeapon;
 
-            Game.MessageHandler.AddMessage(string.Format("You unwield a {0}.", Name), OptionHandler.MessageLevel.Normal);
+            Game.MessageHandler.AddMessage($"You unwield a {Name}.");
         }
     }
 }

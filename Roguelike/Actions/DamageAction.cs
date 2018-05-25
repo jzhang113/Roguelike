@@ -25,9 +25,9 @@ namespace Roguelike.Actions
                 int damage = targetUnit.TakeDamage(Power);
 
                 if (targetUnit.IsDead)
-                    targetUnit.State = ActorState.Dead;
+                    targetUnit.State = Enums.ActorState.Dead;
 
-                Game.MessageHandler.AddMessage(string.Format("{0} hits {1} for {2} damage", source.Name, targetUnit.Name, damage), Systems.OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage($"{source.Name} hits {targetUnit.Name} for {damage} damage");
             }
         }
     }

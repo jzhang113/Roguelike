@@ -1,4 +1,6 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Core
@@ -28,7 +30,7 @@ namespace Roguelike.Core
                     Aimed = true;
                     break;
                 default:
-                    throw new System.ArgumentException("unknown skill shape");
+                    throw new ArgumentException("unknown skill shape");
             }
         }
 
@@ -42,7 +44,7 @@ namespace Roguelike.Core
                 else if (target != null)
                     (X, Y) = target.Value;
                 else
-                    throw new System.ArgumentException("aimed target destination not supplied");
+                    throw new ArgumentException("aimed target destination not supplied");
             }
 
             ICollection<Terrain> inRange = new List<Terrain>();
@@ -56,40 +58,35 @@ namespace Roguelike.Core
                     foreach (Terrain cell in Game.Map.Field)
                     {
                         (X, Y) = cell.Position;
-                        int distance = Field.Distance2(current.X, current.Y, X, Y);
-
-                        if (distance > 0 && distance <= Range * Range)
-                            inRange.Add(cell);
+                        AddCellInRange(current, X, Y, inRange);
                     }
                     return inRange;
                 case TargetShape.Range:
-                    inRange.Add(Game.Map.Field[X, Y]);
+                    AddCellInRange(current, X, Y, inRange);
                     return inRange;
                 case TargetShape.Ray:
                     return Game.Map.StraightLinePath(current.X, current.Y, X, Y);
                 case TargetShape.Directional:
                     int dx = current.X - X;
                     int dy = current.Y - Y;
-                    int sx = dx / System.Math.Abs(dx);
-                    int sy = dy / System.Math.Abs(dy);
-                    int limit = System.Math.Max(System.Math.Abs(dx), System.Math.Abs(dy));
+                    int sx = (dx == 0) ? 0 : dx / Math.Abs(dx);
+                    int sy = (dy == 0) ? 0 : dy / Math.Abs(dy);
+                    int limit = Math.Max(Math.Abs(dx), Math.Abs(dy));
 
                     for (int i = 0; i < limit; i++)
-                        inRange.Add(Game.Map.Field[X + i * sx, Y + i * sy]);
+                        AddCellInRange(current, X + i * sx, Y + i * sy, inRange);
 
                     return inRange;
                 default:
-                    throw new System.ArgumentException("unknown skill shape");
+                    throw new ArgumentException("unknown skill shape");
             }
         }
-    }
 
-    enum TargetShape
-    {
-        Area,
-        Directional,
-        Range,
-        Ray,
-        Self
+        public void AddCellInRange(Actor actor, int x, int y, ICollection<Terrain> tiles)
+        {
+            int distance = Utils.Distance.EuclideanDistanceSquared(actor.X, actor.Y, x, y);
+            if (distance > 0 && distance <= Range * Range)
+                tiles.Add(Game.Map.Field[x, y]);
+        }
     }
 }

@@ -56,7 +56,7 @@ namespace Roguelike.Commands
         public void Execute()
         {
             System.Diagnostics.Debug.Assert(_cell.IsWalkable);
-            Game.MessageHandler.AddMessage(string.Format("{0} moved to {1}, {2} and is at {3} energy", Source.Name, _newX, _newY, Source.Energy), OptionHandler.MessageLevel.Verbose);
+            Game.MessageHandler.AddMessage($"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy", Enums.MessageLevel.Verbose);
 
             if (Source is Player)
             {
@@ -65,9 +65,9 @@ namespace Roguelike.Commands
                 if (itemStack != null && !itemStack.IsEmpty())
                 {
                     if (itemStack.Size() == 1)
-                        Game.MessageHandler.AddMessage(string.Format("You see a {0} here.", itemStack.GetItem('a').Name), OptionHandler.MessageLevel.Normal);
+                        Game.MessageHandler.AddMessage($"You see a {itemStack.GetItem('a').Name} here.");
                     else
-                        Game.MessageHandler.AddMessage("You see several items here.", OptionHandler.MessageLevel.Normal);
+                        Game.MessageHandler.AddMessage("You see several items here.");
                 }
             }
 

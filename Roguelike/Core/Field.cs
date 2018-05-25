@@ -30,13 +30,6 @@ namespace Roguelike.Core
 
         public bool IsValid(int i, int j) => i >= 0 && i < _width && j >= 0 && j < _height;
 
-        public static int Distance2(int x1, int y1, int x2, int y2)
-        {
-            int dx = x1 - x2;
-            int dy = y1 - y2;
-            return dx * dx + dy * dy;
-        }
-
         public IEnumerator<Terrain> GetEnumerator()
         {
             foreach (Terrain[] row in _field)
