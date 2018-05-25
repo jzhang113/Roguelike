@@ -1,5 +1,4 @@
-﻿using Roguelike.Actions;
-using Roguelike.Actors;
+﻿using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
@@ -48,7 +47,6 @@ namespace Roguelike.Commands
                     Target = _action.Area.GetTilesInRange(Source);
             }
 
-            Source.ActionSequence.Advance();
             return new RedirectMessage(true);
         }
 

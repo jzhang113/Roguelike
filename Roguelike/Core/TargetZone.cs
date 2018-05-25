@@ -72,7 +72,7 @@ namespace Roguelike.Core
                     int dy = current.Y - Y;
                     int sx = dx / System.Math.Abs(dx);
                     int sy = dy / System.Math.Abs(dy);
-                    int limit = System.Math.Abs(dx);
+                    int limit = System.Math.Max(System.Math.Abs(dx), System.Math.Abs(dy));
 
                     for (int i = 0; i < limit; i++)
                         inRange.Add(Game.Map.Field[X + i * sx, Y + i * sy]);

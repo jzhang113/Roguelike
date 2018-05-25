@@ -7,9 +7,9 @@ namespace Roguelike.Items
 {
     class Scroll : Item, IUsable
     {
-        public ActionSequence ApplySkill { get; }
-        
-        public Scroll(string name, ActionSequence action)
+        public IAction ApplySkill { get; }
+
+        public Scroll(string name, IAction action)
         {
             Symbol = '?';
             Name = name;
@@ -18,12 +18,9 @@ namespace Roguelike.Items
 
         public void Apply(IEnumerable<Terrain> targets)
         {
-            foreach (IAction action in ApplySkill.Actions)
+            foreach (Terrain tile in targets)
             {
-                foreach (Terrain tile in targets)
-                {
-                    action.Activate(Carrier, tile);
-                }
+                ApplySkill.Activate(Carrier, tile);
             }
         }
     }

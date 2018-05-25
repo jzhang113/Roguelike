@@ -59,15 +59,15 @@ namespace Roguelike.Systems
                 if (current.IsWalkable && exploredPathExists)
                     map.Highlight[mouseX][mouseY] = RLColor.Red;
                 
-                if (_console.Mouse.GetLeftClick())
-                {
-                    List<IAction> moves = new List<IAction>();
+                //if (_console.Mouse.GetLeftClick())
+                //{
+                //    List<IAction> moves = new List<IAction>();
 
-                    foreach (WeightedPoint p in path)
-                        moves.Add(new MoveAction(new TargetZone(TargetShape.Range, (p.X, p.Y))));
+                //    foreach (WeightedPoint p in path)
+                //        moves.Add(new MoveAction(new TargetZone(TargetShape.Range, (p.X, p.Y))));
 
-                    return new AttackCommand(player, new ActionSequence(100, moves));
-                }
+                //    return new AttackCommand(player, new ActionSequence(100, moves));
+                //}
                 
                 LookHandler.DisplayActor(map.GetActor(mouseX, mouseY));
                 LookHandler.DisplayItem(map.GetItem(mouseX, mouseY));
@@ -132,7 +132,7 @@ namespace Roguelike.Systems
             _holdingKey = true;
 
             #region Attack Move
-            ActionSequence ability = null;
+            IAction ability = null;
             if (keyPress.Shift)
                 ability = player.Equipment.PrimaryWeapon.GetAbility(0);
             else if (keyPress.Alt)

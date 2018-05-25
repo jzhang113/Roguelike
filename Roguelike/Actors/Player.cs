@@ -19,25 +19,7 @@ namespace Roguelike.Actors
             MP = 50;
         }
 
-        public override ICommand Act()
-        {
-            if (Game.GameMode == Game.Mode.Targetting)
-                return InputHandler.HandleInput();
-
-            if (ActiveSequence)
-            {
-                if (ActionSequence.HasAction())
-                {
-                    return new ActionCommand(this, ActionSequence.GetAction());
-                }
-                else
-                {
-                    ActiveSequence = false;
-                }
-            }
-
-            return InputHandler.HandleInput();
-        }
+        public override ICommand Act() => InputHandler.HandleInput();
 
         public override void TriggerDeath() => Game.GameOver();
     }

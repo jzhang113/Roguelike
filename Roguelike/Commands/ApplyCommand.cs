@@ -13,7 +13,6 @@ namespace Roguelike.Commands
         public int EnergyCost { get; } = 120;
 
         private char _key;
-        private IEnumerable<Terrain> _target;
 
         public ApplyCommand(Actor source, char key)
         {
@@ -28,7 +27,7 @@ namespace Roguelike.Commands
                 Game.MessageHandler.AddMessage("No such item to apply.", OptionHandler.MessageLevel.Normal);
                 return new RedirectMessage(false);
             }
-            
+
             Item item = Source.Inventory.GetItem(_key);
             if (item is IUsable)
             {
@@ -36,7 +35,7 @@ namespace Roguelike.Commands
             }
             else
             {
-                Game.MessageHandler.AddMessage(string.Format("Cannot apply {0}.", item.Name), OptionHandler.MessageLevel.Normal);
+                Game.MessageHandler.AddMessage(string.Format("Don't know how to apply {0}.", item.Name), OptionHandler.MessageLevel.Normal);
                 return new RedirectMessage(false);
             }
         }
@@ -45,7 +44,9 @@ namespace Roguelike.Commands
         {
             Item item = Source.Inventory.GetItem(_key);
             Source.Inventory.Remove(item);
-            (item as IUsable).Apply(_target);
+
+            IUsable usableItem = item as IUsable;
+            usableItem.Apply(usableItem.ApplySkill.Area.GetTilesInRange(Source));
         }
     }
 }

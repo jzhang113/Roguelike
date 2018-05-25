@@ -13,9 +13,9 @@ namespace Roguelike.Commands
         public int EnergyCost { get; } = 0;
 
         private IEnumerable<Terrain> _target;
-        private ActionSequence _skill;
+        private IAction _skill;
 
-        public AttackCommand(Actor source, ActionSequence attack, IEnumerable<Terrain> targets = null)
+        public AttackCommand(Actor source, IAction attack, IEnumerable<Terrain> targets = null)
         {
             _skill = attack;
             _target = targets;
@@ -24,7 +24,7 @@ namespace Roguelike.Commands
             // EnergyCost = attack.Speed;
         }
 
-        public AttackCommand(Actor source, ActionSequence attack, Terrain target)
+        public AttackCommand(Actor source, IAction attack, Terrain target)
         {
             _skill = attack;
             _target = new List<Terrain>
@@ -47,8 +47,10 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            Source.ActiveSequence = true;
-            Source.ActionSequence = _skill;
+            foreach (Terrain tile in _target)
+            {
+                _skill.Activate(Source, tile);
+            }
         }
     }
 }

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;
 using Roguelike.Actors;
+using Roguelike.Interfaces;
+using Roguelike.Actions;
 
 namespace Roguelike
 {
@@ -117,7 +119,7 @@ namespace Roguelike
                 Map.AddActor(s);
             }
             
-            Items.Spear spear = new Items.Spear(Interfaces.Materials.Wood)
+            Items.Spear spear = new Items.Spear(Materials.Wood)
             {
                 X = Player.X - 1,
                 Y = Player.Y - 1,
@@ -125,24 +127,16 @@ namespace Roguelike
             };
             Map.AddItem(spear);
 
-            System.Collections.Generic.List<Interfaces.IAction> damageAction = new System.Collections.Generic.List<Interfaces.IAction>()
-            {
-                new Actions.DamageAction(100, new TargetZone(TargetShape.Ray, range: 10))
-            };
-            System.Collections.Generic.List<Interfaces.IAction> healAction = new System.Collections.Generic.List<Interfaces.IAction>()
-            {
-                new Actions.HealAction(100, new TargetZone(TargetShape.Self))
-            };
-            Actions.ActionSequence rangedDamage = new Actions.ActionSequence(200, damageAction);
-            Actions.ActionSequence heal = new Actions.ActionSequence(200, healAction);
+            IAction rangedDamage = new DamageAction(200, new TargetZone(TargetShape.Ray, range: 10));
+            IAction heal = new HealAction(100, new TargetZone(TargetShape.Self));
 
-            var lungeSkill = new System.Collections.Generic.List<Interfaces.IAction>()
+            var lungeSkill = new System.Collections.Generic.List<IAction>()
             {
-                new Actions.MoveAction(new TargetZone(TargetShape.Directional)),
-                new Actions.DamageAction(100, new TargetZone(TargetShape.Directional))
+                new MoveAction(new TargetZone(TargetShape.Directional)),
+                new DamageAction(100, new TargetZone(TargetShape.Directional))
             };
-            var lungeAction = new Actions.ActionSequence(150, lungeSkill);
-            spear.AddAbility(lungeAction);
+            //var lungeAction = new Actions.ActionSequence(150, lungeSkill);
+            //spear.AddAbility(lungeAction);
 
             Items.HeavyArmor ha = new Items.HeavyArmor(Interfaces.Materials.Iron)
             {
@@ -225,6 +219,9 @@ namespace Roguelike
             _mapConsole.Clear();
             Map.Draw(_mapConsole);
             Player.Draw(_mapConsole, Map);
+
+            if (GameMode == Mode.Targetting)
+                _mapConsole.Print(1, 1, "targetting mode", Colors.TextHeading);
 
             _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
             LookHandler.Draw(_viewConsole);

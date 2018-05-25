@@ -8,7 +8,7 @@ namespace Roguelike.Interfaces
     interface IUsable
     {
         // Action to perform.
-        ActionSequence ApplySkill { get; }
+        IAction ApplySkill { get; }
 
         // Perform the action.
         void Apply(IEnumerable<Terrain> targets);

@@ -17,7 +17,7 @@ namespace Roguelike.Items
         public override int X { get; set; }
         public override int Y { get; set; }
 
-        protected IList<ActionSequence> Abilities { get; set; }
+        protected IList<IAction> Abilities { get; set; }
 
         protected int AttackSpeed { get; set; }
         protected int Damage { get; set; }
@@ -41,17 +41,12 @@ namespace Roguelike.Items
         }
         #endregion
 
-        public ActionSequence GetBasicAttack((int X, int Y) target)
+        public IAction GetBasicAttack((int X, int Y) target)
         {
-            List<IAction> actions = new List<IAction>
-            {
-                new DamageAction(Damage, new Core.TargetZone(Core.TargetShape.Directional, target))
-            };
-
-            return new ActionSequence(AttackSpeed, actions);
+            return new DamageAction(Damage, new Core.TargetZone(Core.TargetShape.Directional, target));
         }
 
-        public ActionSequence GetAbility(int index)
+        public IAction GetAbility(int index)
         {
             if (index >= Abilities.Count)
                 return null;
@@ -59,7 +54,7 @@ namespace Roguelike.Items
                 return Abilities[index];
         }
 
-        public void AddAbility(ActionSequence skill)
+        public void AddAbility(IAction skill)
         {
             // TODO: check that the skill doesn't already exist
             Abilities.Add(skill);

@@ -35,9 +35,6 @@ namespace Roguelike.Actors
         public int Energy { get; set; }
         public int RefreshRate { get; set; }
 
-        public bool ActiveSequence { get; internal set; }
-        public ActionSequence ActionSequence { get; internal set; }
-
         public InventoryHandler Inventory { get; }
         public EquipmentHandler Equipment { get; }
 
@@ -96,14 +93,6 @@ namespace Roguelike.Actors
             }
 
             return energyDiff;
-        }
-
-        public int Distance2(Actor other)
-        {
-            int dx = X - other.X;
-            int dy = Y - other.Y;
-
-            return dx * dx + dy * dy;
         }
     }
 }
