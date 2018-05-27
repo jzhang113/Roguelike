@@ -13,7 +13,7 @@ namespace Roguelike.Commands
         public int EnergyCost { get; }
 
         private IAction _skill;
-        private IEnumerable<Terrain> _targets;
+        private readonly IEnumerable<Terrain> _targets;
 
         public AttackCommand(Actor source, IAction attack)
         {
@@ -55,12 +55,9 @@ namespace Roguelike.Commands
         {
             if (_targets != null)
             {
-                foreach (Terrain aimedLoc in _targets)
+                foreach (Terrain tile in _targets)
                 {
-                    foreach (Terrain tile in _skill.Area.GetTilesInRange(Source, aimedLoc.Position))
-                    {
-                        _skill.Activate(Source, tile);
-                    }
+                    _skill.Activate(Source, tile);
                 }
             }
             else

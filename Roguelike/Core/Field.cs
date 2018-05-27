@@ -5,9 +5,9 @@ namespace Roguelike.Core
 {
     class Field : IEnumerable<Terrain>
     {
-        private Terrain[][] _field;
-        private int _width;
-        private int _height;
+        private readonly Terrain[][] _field;
+        private readonly int _width;
+        private readonly int _height;
 
         public Field(int width, int height)
         {

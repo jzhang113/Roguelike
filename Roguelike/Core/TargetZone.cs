@@ -8,11 +8,11 @@ namespace Roguelike.Core
     struct TargetZone
     {
         public TargetShape Shape { get; }
-        public int Range { get; }
+        public float Range { get; }
         public bool Aimed { get; }
         public (int X, int Y)? Target { get; }
 
-        public TargetZone(TargetShape shape, (int X, int Y)? target = null, int range = 1)
+        public TargetZone(TargetShape shape, (int X, int Y)? target = null, float range = 1.5f)
         {
             Shape = shape;
             Range = range;

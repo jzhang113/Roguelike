@@ -8,11 +8,13 @@ namespace Roguelike.Actions
     {
         public int Power { get; }
         public TargetZone Area { get; }
+        public int Speed { get; }
 
         public HealAction(int power, TargetZone targetZone)
         {
             Power = power;
             Area = targetZone;
+            Speed = Utils.Constants.FULL_TURN;
         }
 
         // Heals the target by amount up to its maximum health.

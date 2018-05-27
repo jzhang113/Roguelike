@@ -1,4 +1,5 @@
 ﻿using Roguelike.Interfaces;
+using Roguelike.Utils;
 
 namespace Roguelike.Systems
 {
@@ -33,20 +34,22 @@ namespace Roguelike.Systems
                 System.Console.WriteLine("New turn!");
                 System.Console.WriteLine("Turn order");
                 System.Console.WriteLine("----------");
-                for (int i = 0; i < _eventSet.Size(); i++)
-                    System.Console.WriteLine(string.Format("#{0} {1}\t {2} energy",
-                        _eventSet.GetOrder()[i],
+                for (int i = 0; i < _eventSet.Count; i++)
+                    System.Console.WriteLine(string.Format("{0}\t {1} energy",
                         ((Actors.Actor)_eventSet.GetHeap()[i]).Name,
                         _eventSet.GetHeap()[i].Energy));
 
-                _eventSet.UpdateAll();
+                UpdateAll();
             }
 
             // Break the event loop when there is no Action. Currently, the only situation where
             // this occurs is in the input handling for the Player's Actions.
             ICommand action = current.Act();
             if (action == null)
+            {
+                System.Diagnostics.Debug.Assert(current is Actors.Player);
                 return false;
+            }
 
             // Check that the action can succeed before executing it. If there are potential
             // alternative actions, try them as well.
@@ -83,6 +86,16 @@ namespace Roguelike.Systems
             _eventSet.ReheapDown(0);
 
             return true;
+        }
+
+        private void UpdateAll()
+        {
+            ISchedulable[] heap = _eventSet.GetHeap();
+
+            for (int i = 0; i < _eventSet.Count; i++)
+            {
+                heap[i].Energy += heap[i].RefreshRate;
+            }
         }
     }
 }

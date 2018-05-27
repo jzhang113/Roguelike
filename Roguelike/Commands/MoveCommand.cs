@@ -10,8 +10,8 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;
 
-        private int _newX;
-        private int _newY;
+        private readonly int _newX;
+        private readonly int _newY;
         private Terrain _cell;
 
         public MoveCommand(Actor source, int x, int y)

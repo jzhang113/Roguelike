@@ -6,7 +6,7 @@ namespace Roguelike.Items
 {
     abstract class Armor : Item, IEquipable
     {
-        private Enums.ArmorType _type;
+        private readonly Enums.ArmorType _type;
 
         protected Armor(Enums.ArmorType type)
         {

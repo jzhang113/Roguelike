@@ -52,13 +52,13 @@ namespace Roguelike.Core
                 case ActorState.Dead:
                     // Remove dead things if they die before they finish acting.
                     monster.TriggerDeath();
-                    return null;
+                    return new WaitCommand(monster);
                 case ActorState.Sleep:
-                    return new MoveCommand(monster, monster.X, monster.Y);
+                    return new WaitCommand(monster);
                 default:
                     // We should not be here
                     System.Diagnostics.Debug.Assert(false);
-                    return new MoveCommand(monster, monster.X, monster.Y);
+                    return new WaitCommand(monster);
             }
         }
     }

@@ -21,8 +21,8 @@ namespace Roguelike.Items
 
         protected int AttackSpeed { get; set; }
         protected int Damage { get; set; }
-        protected int MeleeRange { get; set; }
-        protected int ThrowRange { get; set; }
+        protected float MeleeRange { get; set; }
+        protected float ThrowRange { get; set; }
 
         #region virtual methods
         public virtual void Consume(Actor actor)

@@ -17,7 +17,7 @@ namespace Roguelike.Systems
         private static bool _holdingKey = false;
         private static readonly int HOLD_LIMIT = 15;
 
-        private static ActionCommand _prevCommand;
+        private static ICommand _prevCommand;
         private static IAction _targettingAction;
         internal static (int X, int Y)? PrevTarget { get; set; }
 
@@ -300,7 +300,7 @@ namespace Roguelike.Systems
         #endregion
 
         #region Target Handling
-        public static void BeginTargetting(ActionCommand command, IAction action)
+        public static void BeginTargetting(ICommand command, IAction action)
         {
             Game.GameMode = Game.Mode.Targetting;
             Game.ShowInventory = false;
@@ -320,7 +320,8 @@ namespace Roguelike.Systems
                 PrevTarget = clickPos.Value;
                 Game.GameMode = Game.Mode.Normal;
 
-                _prevCommand.Target = _targettingAction.Area.GetTilesInRange(_prevCommand.Source, clickPos.Value);
+                // TODO: FIX THIS
+                //_prevCommand.Target = _targettingAction.Area.GetTilesInRange(_prevCommand.Source, clickPos.Value);
                 return _prevCommand;
             }
 
@@ -366,7 +367,7 @@ namespace Roguelike.Systems
                 case 81:
                 case 127: charValue = '.'; break;
                 case 119: charValue = '~'; break;
-                case 122: charValue = '['; break;                    
+                case 122: charValue = '['; break;
                 case 123: charValue = ']'; break;
                 case 124: charValue = ';'; break;
                 case 125: charValue = '\''; break;

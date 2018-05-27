@@ -1,6 +1,4 @@
 ﻿using RLNET;
-using Roguelike.Actions;
-using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
@@ -43,7 +41,7 @@ namespace Roguelike.Actors
 
         public Actor()
         {
-            RefreshRate = 120;
+            RefreshRate = Utils.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
 
             Weapon defaultWeapon = new Fists(this);
@@ -59,19 +57,6 @@ namespace Roguelike.Actors
         public virtual ICommand Act()
         {
             System.Diagnostics.Debug.Assert(Game.GameMode != Game.Mode.Targetting);
-
-            if (ActiveSequence)
-            {
-                if (ActionSequence.HasAction())
-                {
-                    return new ActionCommand(this, ActionSequence.GetAction());
-                }
-                else
-                {
-                    ActiveSequence = false;
-                }
-            }
-
             return SimpleAI.GetAction(this);
         }
 

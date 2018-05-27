@@ -8,6 +8,9 @@ namespace Roguelike.Interfaces
     // has a total time cost.
     interface IAction
     {
+        // Energy cost to perform
+        int Speed { get; }
+
         TargetZone Area { get; }
 
         // Execute the Action. This takes a Terrain as it may have additional environmental effects.

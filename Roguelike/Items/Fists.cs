@@ -13,7 +13,7 @@ namespace Roguelike.Items
             // TODO 2: Allow for variable formulaes.
             AttackSpeed = 120;
             Damage = 100;
-            MeleeRange = 1;
+            MeleeRange = 1.5f;
             ThrowRange = 1;
         }
     }

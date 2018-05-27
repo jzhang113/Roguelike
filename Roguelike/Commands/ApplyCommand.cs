@@ -12,7 +12,7 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;
 
-        private char _key;
+        private readonly char _key;
 
         public ApplyCommand(Actor source, char key)
         {
@@ -31,6 +31,14 @@ namespace Roguelike.Commands
             Item item = Source.Inventory.GetItem(_key);
             if (item is IUsable)
             {
+                IAction action = (item as IUsable).ApplySkill;
+
+                if (action.Area.Aimed && action.Area.Target == null)
+                {
+                    InputHandler.BeginTargetting(this, action);
+                    return new RedirectMessage(false);
+                }
+
                 return new RedirectMessage(true);
             }
             else
