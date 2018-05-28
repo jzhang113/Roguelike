@@ -17,7 +17,8 @@ namespace Roguelike.Systems
         private static bool _holdingKey = false;
         private static readonly int HOLD_LIMIT = 15;
 
-        private static ICommand _prevCommand;
+        private static ITargettable _targettingCommand;
+        private static Actor _targettingSource;
         private static IAction _targettingAction;
         internal static (int X, int Y)? PrevTarget { get; set; }
 
@@ -38,26 +39,43 @@ namespace Roguelike.Systems
 
                 map.ClearHighlight();
                 Cell current = map.GetCell(mouseX, mouseY);
-                IEnumerable<WeightedPoint> path = map.PathToPlayer(mouseX, mouseY).Reverse();
-                bool exploredPathExists = false;
 
-                // TODO: Path may end up broken because an enemy is in the way.
-                foreach (WeightedPoint p in path)
+                if (Game.GameMode == Game.Mode.Targetting)
                 {
-                    if (!exploredPathExists)
-                        exploredPathExists = true;
-
-                    if (!map.Field[p.X, p.Y].IsExplored)
+                    IEnumerable<Terrain> path =Game.Map.StraightLinePath(player.X, player.Y, mouseX, mouseY);
+                    foreach (Terrain tile in path)
                     {
-                        exploredPathExists = false;
-                        break;
+                        if (!map.Field[tile.Position.X, tile.Position.Y].IsExplored)
+                        {
+                            break;
+                        }
+
+                        map.Highlight[tile.Position.X][tile.Position.Y] = RLColor.Red;
+                    }
+                }
+                else
+                {
+                    // TODO: Path may end up broken because an enemy is in the way.
+                    IEnumerable<WeightedPoint> path = map.PathToPlayer(mouseX, mouseY).Reverse();
+                    bool exploredPathExists = false;
+
+                    foreach (WeightedPoint p in path)
+                    {
+                        if (!exploredPathExists)
+                            exploredPathExists = true;
+
+                        if (!map.Field[p.X, p.Y].IsExplored)
+                        {
+                            exploredPathExists = false;
+                            break;
+                        }
+
+                        map.Highlight[p.X][p.Y] = RLColor.Red;
                     }
 
-                    map.Highlight[p.X][p.Y] = RLColor.Red;
+                    if (current.IsWalkable && exploredPathExists)
+                        map.Highlight[mouseX][mouseY] = RLColor.Red;
                 }
-
-                if (current.IsWalkable && exploredPathExists)
-                    map.Highlight[mouseX][mouseY] = RLColor.Red;
                 
                 //if (_console.Mouse.GetLeftClick())
                 //{
@@ -300,13 +318,14 @@ namespace Roguelike.Systems
         #endregion
 
         #region Target Handling
-        public static void BeginTargetting(ICommand command, IAction action)
+        public static void BeginTargetting(ITargettable command, Actor source, IAction action)
         {
             Game.GameMode = Game.Mode.Targetting;
             Game.ShowInventory = false;
             Game.ForceRender();
 
-            _prevCommand = command;
+            _targettingCommand = command;
+            _targettingSource = source;
             _targettingAction = action;
             ResolveTargetting();
         }
@@ -320,9 +339,8 @@ namespace Roguelike.Systems
                 PrevTarget = clickPos.Value;
                 Game.GameMode = Game.Mode.Normal;
 
-                // TODO: FIX THIS
-                //_prevCommand.Target = _targettingAction.Area.GetTilesInRange(_prevCommand.Source, clickPos.Value);
-                return _prevCommand;
+                _targettingCommand.Target = _targettingAction.Area.GetTilesInRange(_targettingSource, clickPos.Value);
+                return _targettingCommand as ICommand;
             }
 
             return null;

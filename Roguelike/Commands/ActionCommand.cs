@@ -6,17 +6,20 @@ using System.Collections.Generic;
 
 namespace Roguelike.Commands
 {
-    class ActionCommand : ICommand
+    class ActionCommand : ICommand, ITargettable
     {
         public Actor Source { get; }
-        public int EnergyCost => 0;
-        public IEnumerable<Terrain> Target { get; internal set; }
+        public int EnergyCost { get; }
+        public IEnumerable<Terrain> Target { get; set; }
 
         private IAction _action;
 
-        public ActionCommand(Actor source, IAction action)
+        public ActionCommand(Actor source, IAction action, IEnumerable<Terrain> targets = null)
         {
             Source = source;
+            EnergyCost = action.Speed;
+            Target = targets;
+
             _action = action;
         }
 
@@ -36,7 +39,7 @@ namespace Roguelike.Commands
                     }
                     else
                     {
-                        InputHandler.BeginTargetting(this, _action);
+                        InputHandler.BeginTargetting(this, Source, _action);
                         return new RedirectMessage(false);
                     }
                 }

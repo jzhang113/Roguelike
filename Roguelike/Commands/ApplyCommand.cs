@@ -7,16 +7,19 @@ using System.Collections.Generic;
 
 namespace Roguelike.Commands
 {
-    class ApplyCommand : ICommand
+    class ApplyCommand : ICommand, ITargettable
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;
+        public IEnumerable<Terrain> Target { get; set; }
 
         private readonly char _key;
 
-        public ApplyCommand(Actor source, char key)
+        public ApplyCommand(Actor source, char key, IEnumerable<Terrain> targets = null)
         {
             Source = source;
+            Target = targets;
+
             _key = key;
         }
 
@@ -33,10 +36,25 @@ namespace Roguelike.Commands
             {
                 IAction action = (item as IUsable).ApplySkill;
 
-                if (action.Area.Aimed && action.Area.Target == null)
+                if (action.Area.Aimed)
                 {
-                    InputHandler.BeginTargetting(this, action);
-                    return new RedirectMessage(false);
+                    if (Target == null)
+                    {
+                        if (action.Area.Target != null)
+                        {
+                            Target = action.Area.GetTilesInRange(Source);
+                        }
+                        else
+                        {
+                            InputHandler.BeginTargetting(this, Source, action);
+                            return new RedirectMessage(false);
+                        }
+                    }
+                }
+                else
+                {
+                    if (Target == null)
+                        Target = action.Area.GetTilesInRange(Source);
                 }
 
                 return new RedirectMessage(true);
@@ -54,7 +72,7 @@ namespace Roguelike.Commands
             Source.Inventory.Remove(item);
 
             IUsable usableItem = item as IUsable;
-            usableItem.Apply(usableItem.ApplySkill.Area.GetTilesInRange(Source));
+            usableItem.Apply(Target);
         }
     }
 }

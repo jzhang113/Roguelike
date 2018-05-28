@@ -39,6 +39,8 @@ namespace Roguelike.Systems
                         ((Actors.Actor)_eventSet.GetHeap()[i]).Name,
                         _eventSet.GetHeap()[i].Energy));
 
+                _eventSet.Apply(actor => { System.Console.WriteLine(actor.Energy); } );
+
                 UpdateAll();
             }
 
@@ -90,12 +92,7 @@ namespace Roguelike.Systems
 
         private void UpdateAll()
         {
-            ISchedulable[] heap = _eventSet.GetHeap();
-
-            for (int i = 0; i < _eventSet.Count; i++)
-            {
-                heap[i].Energy += heap[i].RefreshRate;
-            }
+            _eventSet.Apply(actor => { actor.Energy += actor.RefreshRate; });
         }
     }
 }

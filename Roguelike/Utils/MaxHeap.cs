@@ -26,18 +26,7 @@ namespace Roguelike.Utils
             Count = 0;
             _count = 0;
         }
-
-        public void Add(T item)
-        {
-            if (Count >= _heap.Length)
-                Resize();
-            
-            _orderArray[Count] = _count++;
-            _heap[Count] = item;
-            Count++;
-            ReheapUp(Count - 1);
-        }
-
+        
         public T Peek()
         {
             if (Count > 0)
@@ -63,6 +52,17 @@ namespace Roguelike.Utils
         public void Clear()
         {
             Count = 0;
+        }
+
+        public void Add(T item)
+        {
+            if (Count >= _heap.Length)
+                Resize();
+
+            _orderArray[Count] = _count++;
+            _heap[Count] = item;
+            Count++;
+            ReheapUp(Count - 1);
         }
 
         public bool Contains(T item)
@@ -134,6 +134,14 @@ namespace Roguelike.Utils
             return GetEnumerator();
         }
 
+        internal void Apply(Action<T> func)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                func(_heap[i]);
+            }
+        }
+
         internal void ReheapUp(int initial)
         {
             int pos = initial;
@@ -171,7 +179,7 @@ namespace Roguelike.Utils
                 if (left < Count && CompareItem(_heap[swap], _heap[left], _orderArray[swap], _orderArray[left]) < 0)
                     swap = left;
 
-                if (right < Count && CompareItem(_heap[swap], _heap[left], _orderArray[swap], _orderArray[left]) < 0)
+                if (right < Count && CompareItem(_heap[swap], _heap[right], _orderArray[swap], _orderArray[right]) < 0)
                     swap = right;
 
                 if (swap == pos)
