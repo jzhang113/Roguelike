@@ -56,7 +56,8 @@ namespace Roguelike
 
             InputHandler.Initialize(_rootConsole);
 
-            Option.Seed = -2094099453;
+            // Option.FixedSeed = false;
+            Option.Seed = 554560867;
 
             int mainSeed;
             if (Option.FixedSeed)
@@ -86,17 +87,19 @@ namespace Roguelike
 
             sw.Start();
             MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, Random);
-            Map = mapGenerator.CreateMap();
+            Map = mapGenerator.CreateMapBSP();
             sw.Stop();
 
-            Console.WriteLine("300 tiles generated in: " + sw.Elapsed);
+            Console.WriteLine("Map generated in: " + sw.Elapsed);
 
             Player = new Player();
-            while (!Map.Field[Player.X, Player.Y].IsWalkable)
+            do
             {
                 Player.X = Random.Next(1, Config.Map.Width - 1);
                 Player.Y = Random.Next(1, Config.Map.Height - 1);
             }
+            while (!Map.Field[Player.X, Player.Y].IsWalkable);
+
             Map.AddActor(Player);
             // Map.SetActorPosition(Player, playerX, playerY);
 
@@ -182,11 +185,6 @@ namespace Roguelike
             while (EventScheduler.Update())
             {
                 _render = true;
-
-                if (EventScheduler.Current is Player)
-                {
-                    // break;
-                }
             }
         }
 
@@ -211,7 +209,6 @@ namespace Roguelike
 
             _mapConsole.Clear();
             Map.Draw(_mapConsole);
-            Player.Draw(_mapConsole, Map);
 
             if (GameMode == Mode.Targetting)
                 _mapConsole.Print(1, 1, "targetting mode", Colors.TextHeading);

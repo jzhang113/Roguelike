@@ -327,20 +327,34 @@ namespace Roguelike.Systems
             _targettingCommand = command;
             _targettingSource = source;
             _targettingAction = action;
+
             ResolveTargetting();
         }
 
         private static ICommand ResolveTargetting()
         {
-            var clickPos = GetClickPosition();
+            foreach (Cell cell in Game.Map.GetCellsInRadius(_targettingSource.X, _targettingSource.Y, (int)_targettingAction.Area.Range))
+            {
+                Game.Map.Highlight[cell.X][cell.Y] = Swatch.DbGrass;
+            }
 
+            var clickPos = GetClickPosition();
             if (clickPos != null)
             {
-                PrevTarget = clickPos.Value;
-                Game.GameMode = Game.Mode.Normal;
+                var (clickX, clickY) = clickPos.Value;
+                int distance = Utils.Distance.EuclideanDistanceSquared(_targettingSource.X, _targettingSource.Y, clickX, clickY);
+                float maxRange = _targettingAction.Area.Range * _targettingAction.Area.Range;
 
-                _targettingCommand.Target = _targettingAction.Area.GetTilesInRange(_targettingSource, clickPos.Value);
-                return _targettingCommand as ICommand;
+                if (distance <= maxRange)
+                {
+                    Game.GameMode = Game.Mode.Normal;
+                    _targettingCommand.Target = _targettingAction.Area.GetTilesInRange(_targettingSource, clickPos.Value);
+                    return _targettingCommand as ICommand;
+                }
+                else
+                {
+                    Game.MessageHandler.AddMessage("Target out of range.");
+                }
             }
 
             return null;

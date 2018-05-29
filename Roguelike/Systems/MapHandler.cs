@@ -9,25 +9,34 @@ using System;
 
 namespace Roguelike.Systems
 {
+    // TODO: remove dependence on Map - implement FOV
     class MapHandler : Map
     {
+        public new int Width { get; }
+        public new int Height { get; }
+
         internal RLColor[][] Highlight { get; set; }
         internal Field Field { get; set; }
         internal float[][] PlayerMap { get; }
         internal float[][] FleeMap { get; }
         internal ICollection<Actor> Units { get; }
         internal ICollection<ItemInfo> Items { get; }
-        
+
         public MapHandler(int width, int height) : base(width, height)
         {
+            Width = width;
+            Height = height;
+
             Field = new Field(width, height);
             Highlight = new RLColor[width][];
+            PermHighlight = new RLColor[width][];
             PlayerMap = new float[width][];
             FleeMap = new float[width][];
 
             for (int i = 0; i < width; i++)
             {
                 Highlight[i] = new RLColor[height];
+                PermHighlight[i] = new RLColor[height];
                 PlayerMap[i] = new float[height];
                 FleeMap[i] = new float[height];
             }
@@ -41,7 +50,7 @@ namespace Roguelike.Systems
         {
             if (!Field[unit.X, unit.Y].IsWalkable)
                 return false;
-            
+
             SetActorPosition(unit, unit.X, unit.Y);
             Units.Add(unit);
             Field[unit.X, unit.Y].Unit = unit;
@@ -72,16 +81,14 @@ namespace Roguelike.Systems
 
         public bool SetActorPosition(Actor actor, int x, int y)
         {
-            Cell newPos = GetCell(x, y);
-
-            if (newPos.IsWalkable)
+            if (Field[x, y].IsWalkable)
             {
                 SetOccupied(actor.X, actor.Y, false);
                 Field[actor.X, actor.Y].Unit = null;
 
                 actor.X = x;
                 actor.Y = y;
-                SetOccupied(newPos, true);
+                SetOccupied(x, y, true);
                 Field[x, y].Unit = actor;
 
                 if (actor is Player)
@@ -225,10 +232,10 @@ namespace Roguelike.Systems
                 {
                     err = err + dx;
                     sourceY += sy;
-                }                
+                }
 
                 yield return Field[sourceX, sourceY];
-            } 
+            }
         }
 
         #region Drawing Methods
@@ -257,7 +264,7 @@ namespace Roguelike.Systems
                 if (Game.ShowOverlay)
                     DrawOverlay(mapConsole, cell);
             }
-            
+
         }
 
         private void DrawCell(RLConsole mapConsole, Cell cell)
@@ -385,12 +392,6 @@ namespace Roguelike.Systems
                     FleeMap[x][y] = PlayerMap[x][y] * -1.2f;
                 }
             }
-        }
-
-        private void SetOccupied(Cell cell, bool occupied)
-        {
-            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, !occupied, cell.IsExplored);
-            Field[cell.X, cell.Y].IsOccupied = occupied;
         }
 
         private void SetOccupied(int x, int y, bool occupied)

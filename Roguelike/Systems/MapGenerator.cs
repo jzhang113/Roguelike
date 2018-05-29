@@ -1,4 +1,5 @@
 ﻿using Roguelike.Core;
+using Roguelike.Utils;
 using RogueSharp;
 using System;
 using System.Collections.Generic;
@@ -147,73 +148,146 @@ namespace Roguelike.Systems
             }
 
             AsciiPrint(roomsList);
-            
+
             return _map;
         }
 
-        public MapHandler CreateMap()
+        public MapHandler CreateMapBSP()
         {
-            _map.Initialize(_width, _height);
-            IList<Rectangle> roomList = new List<Rectangle>();
-            int totalArea = _width * _height;
-            int area = 0;
-            int attempts = 0;
-            int x, y, width, height;
-            Rectangle newRoom;
-            bool intersect;
-
-            while (area < 0.8 * totalArea && attempts++ < 1000)
+            TreeNode<Room> root = new TreeNode<Room>(new Room
             {
-                width = _rand.Next(_minRoomSize, _maxRoomSize);
-                height = _rand.Next(_minRoomSize, _maxRoomSize);
-                x = _rand.Next(1, _width - width - 1);
-                y = _rand.Next(1, _height - height - 1);
+                X = 0,
+                Y = 0,
+                Width = _width,
+                Height = _height
+            });
 
-                newRoom = new Rectangle(x, y, width, height);
-                intersect = roomList.Any(room => newRoom.Intersects(room));
+            var roomsTree = PartitionMapBSP(root, 15, 15);
+            MakeRoomsBSP(roomsTree);
 
-                if (!intersect)
+            return _map;
+        }
+
+        private TreeNode<Room> PartitionMapBSP(TreeNode<Room> current, int minWidth, int minHeight, int dir = -1)
+        {
+            Room room = current.Value;
+            if (dir == -1) dir = _rand.Next(2);
+
+            if (dir % 2 == 0)
+            {
+                if (room.Width < minWidth)
                 {
-                    roomList.Add(newRoom);
-                    area += width * height;
+                    if (_rand.Next(room.Height) > minHeight)
+                        return PartitionMapBSP(current, minWidth, minHeight, 1);
+                    else
+                        return current;
+                }
+
+                int split = _rand.Next(4, room.Width - 3);
+                Room left = new Room
+                {
+                    X = room.X,
+                    Y = room.Y,
+                    Width = split,
+                    Height = room.Height
+                };
+                var leftChild = PartitionMapBSP(new TreeNode<Room>(current, left), minWidth, minHeight);
+                current.AddChild(leftChild);
+
+                Room right = new Room
+                {
+                    X = room.X + split,
+                    Y = room.Y,
+                    Width = room.Width - split,
+                    Height = room.Height
+                };
+                var rightChild = PartitionMapBSP(new TreeNode<Room>(current, right), minWidth, minHeight);
+                current.AddChild(rightChild);
+            }
+            else
+            {
+                if (room.Height < minHeight)
+                {
+                    if (_rand.Next(room.Width) > minWidth)
+                        return PartitionMapBSP(current, minWidth, minHeight, 0);
+                    else
+                        return current;
+                }
+
+                int split = _rand.Next(4, room.Height - 3);
+                Room top = new Room
+                {
+                    X = room.X,
+                    Y = room.Y,
+                    Width = room.Width,
+                    Height = split
+                };
+                var topChild = PartitionMapBSP(new TreeNode<Room>(current, top), minWidth, minHeight);
+                current.AddChild(topChild);
+
+                Room bottom = new Room
+                {
+                    X = room.X,
+                    Y = room.Y + split,
+                    Width = room.Width,
+                    Height = room.Height - split
+                };
+                var bottomChild = PartitionMapBSP(new TreeNode<Room>(current, bottom), minWidth, minHeight);
+                current.AddChild(bottomChild);
+            }
+
+            return current;
+        }
+
+        private IList<(int X, int Y)> MakeRoomsBSP(TreeNode<Room> root)
+        {
+            IList<(int X, int Y)> allocated = new List<(int X, int Y)>();
+            IList<(int X, int Y)> connections = new List<(int X, int Y)>();
+
+            foreach (var child in root.Children)
+            {
+                var suballocated = MakeRoomsBSP(child);
+
+                if (suballocated.Count > 0)
+                {
+                    var point = suballocated[_rand.Next(suballocated.Count)];
+
+                    connections.Add(point);
+                    allocated = allocated.Concat(suballocated).ToList();
                 }
             }
 
-            foreach (Rectangle room in roomList)
+            if (root.Children.Count == 0)
             {
-                CreateRoom(room);
-            }
-            
-            for (int i = _map.Width - 2; i > 0; i--)
-            {
-                for (int j = _map.Height - 2; j > 0; j--)
+                Room boundary = root.Value;
+                Room space = new Room
                 {
-                    if (!_map.GetCell(i, j).IsWalkable)
-                    {
-                        if (_map.GetCell(i - 1, j).IsWalkable)
-                        {
-                            if (_map.GetCell(i + 1, j).IsWalkable)
-                            {
-                                _map.SetCellProperties(i, j, true, true);
-                                _map.Field[i, j].IsWall = false;
-                            }
-                        }
+                    Width = _rand.Next(4, boundary.Width),
+                    Height = _rand.Next(4, boundary.Height)
+                };
+                space.X = _rand.Next(boundary.X, boundary.X + boundary.Width - space.Width);
+                space.Y = _rand.Next(boundary.Y, boundary.Y + boundary.Height - space.Height);
 
-                        if (_map.GetCell(i, j - 1).IsWalkable)
-                        {
-                            if (_map.GetCell(i, j + 1).IsWalkable)
-                            {
-                                _map.SetCellProperties(i, j, true, true);
-                                _map.Field[i, j].IsWall = false;
-                            }
-                        }
+                CreateRoom2(space);
+
+                for (int i = 0; i < space.Width; i++)
+                {
+                    for (int j = 0; j < space.Height; j++)
+                    {
+                        allocated.Add((space.X + i, space.Y + j));
                     }
                 }
             }
+            else
+            {
+                var (x1, y1) = connections[0];
+                var (x2, y2) = connections[1];
+                CreateHallway(x1, y1, x2, y2);
+            }
 
-            return _map;
+            return allocated;
         }
-        
+
         internal void AsciiPrint(IList<Room> rooms)
         {
             using (var writer = new System.IO.StreamWriter("map"))
@@ -236,7 +310,7 @@ namespace Roguelike.Systems
                 }
             }
         }
-        
+
         private void CreateRoom(Rectangle rect)
         {
             bool explored = true;
