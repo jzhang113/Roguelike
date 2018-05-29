@@ -7,12 +7,9 @@ namespace Roguelike.Utils
     class MaxHeap<T> : ICollection<T> where T : IComparable<T>
     {
         private T[] _heap;
-        private int[] _orderArray;
-        private int _count;
 
         public int Count { get; private set; }
         public bool IsReadOnly => false;
-        public bool IsEmpty() => Count == 0;
         internal T[] GetHeap() => _heap;
 
         public MaxHeap() : this(16)
@@ -22,9 +19,7 @@ namespace Roguelike.Utils
         public MaxHeap(int size)
         {
             _heap = new T[size];
-            _orderArray = new int[size];
             Count = 0;
-            _count = 0;
         }
         
         public T Peek()
@@ -42,7 +37,6 @@ namespace Roguelike.Utils
                 T item = _heap[0];
                 --Count;
                 _heap[0] = _heap[Count];
-                _orderArray[0] = _orderArray[Count];
                 ReheapDown(0);
                 return item;
             }
@@ -59,7 +53,6 @@ namespace Roguelike.Utils
             if (Count >= _heap.Length)
                 Resize();
 
-            _orderArray[Count] = _count++;
             _heap[Count] = item;
             Count++;
             ReheapUp(Count - 1);
@@ -103,15 +96,12 @@ namespace Roguelike.Utils
                 if (_heap[i].Equals(item))
                 {
                     T oldItem = _heap[i];
-                    int oldOrder = _orderArray[i];
 
                     --Count;
                     T newItem = _heap[Count];
-                    int newOrder = _orderArray[Count];
                     _heap[i] = _heap[Count];
-                    _orderArray[i] = _orderArray[Count];
 
-                    if (CompareItem(oldItem, newItem, oldOrder, newOrder) > 0)
+                    if (CompareItem(oldItem, newItem) > 0)
                         ReheapUp(i);
                     else
                         ReheapDown(i);
@@ -134,33 +124,20 @@ namespace Roguelike.Utils
             return GetEnumerator();
         }
 
-        internal void Apply(Action<T> func)
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                func(_heap[i]);
-            }
-        }
-
         internal void ReheapUp(int initial)
         {
             int pos = initial;
             T oldItem = _heap[pos];
-            int oldOrder = _orderArray[pos];
             T newItem = _heap[(pos - 1) / 2];
-            int newOrder = _orderArray[(pos - 1) / 2];
 
-            while (pos > 0 && CompareItem(oldItem, newItem, oldOrder, newOrder) > 0)
+            while (pos > 0 && CompareItem(oldItem, newItem) > 0)
             {
-                _orderArray[pos] = newOrder;
                 _heap[pos] = newItem;
 
                 pos = (pos - 1) / 2;
                 newItem = _heap[(pos - 1) / 2];
-                newOrder = _orderArray[(pos - 1) / 2];
             }
 
-            _orderArray[pos] = oldOrder;
             _heap[pos] = oldItem;
         }
 
@@ -168,7 +145,6 @@ namespace Roguelike.Utils
         {
             int pos = initial;
             T oldItem = _heap[pos];
-            int oldOrder = _orderArray[pos];
 
             while (pos < Count)
             {
@@ -176,10 +152,10 @@ namespace Roguelike.Utils
                 int right = 2 * pos + 2;
                 int swap = pos;
 
-                if (left < Count && CompareItem(_heap[swap], _heap[left], _orderArray[swap], _orderArray[left]) < 0)
+                if (left < Count && CompareItem(_heap[swap], _heap[left]) < 0)
                     swap = left;
 
-                if (right < Count && CompareItem(_heap[swap], _heap[right], _orderArray[swap], _orderArray[right]) < 0)
+                if (right < Count && CompareItem(_heap[swap], _heap[right]) < 0)
                     swap = right;
 
                 if (swap == pos)
@@ -188,13 +164,11 @@ namespace Roguelike.Utils
                 }
                 else
                 {
-                    _orderArray[pos] = _orderArray[swap];
                     _heap[pos] = _heap[swap];
                     pos = swap;
                 }
             }
 
-            _orderArray[pos] = oldOrder;
             _heap[pos] = oldItem;
         }
 
@@ -205,21 +179,15 @@ namespace Roguelike.Utils
 
             for (int i = 0; i < Count; i++)
             {
-                newOrder[i] = _orderArray[i];
                 newHeap[i] = _heap[i];
             }
 
-            _orderArray = newOrder;
             _heap = newHeap;
         }
 
-        private int CompareItem(T a, T b, int orderA, int orderB)
+        private int CompareItem(T a, T b)
         {
-            int result = a.CompareTo(b);
-            if (result != 0)
-                return result;
-            else
-                return orderA - orderB;
+            return a.CompareTo(b);
         }
     }
 }

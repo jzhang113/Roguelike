@@ -56,6 +56,8 @@ namespace Roguelike
 
             InputHandler.Initialize(_rootConsole);
 
+            Option.Seed = -2094099453;
+
             int mainSeed;
             if (Option.FixedSeed)
                 mainSeed = Option.Seed;
@@ -83,7 +85,7 @@ namespace Roguelike
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
-            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, new Random());
+            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, Random);
             Map = mapGenerator.CreateMap();
             sw.Stop();
 
