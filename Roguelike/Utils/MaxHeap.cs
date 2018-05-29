@@ -12,7 +12,6 @@ namespace Roguelike.Utils
 
         public int Count { get; private set; }
         public bool IsReadOnly => false;
-        public bool IsEmpty() => Count == 0;
         internal T[] GetHeap() => _heap;
 
         public MaxHeap() : this(16)
@@ -132,14 +131,6 @@ namespace Roguelike.Utils
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        internal void Apply(Action<T> func)
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                func(_heap[i]);
-            }
         }
 
         internal void ReheapUp(int initial)

@@ -1,5 +1,6 @@
 ﻿using Roguelike.Interfaces;
 using Roguelike.Utils;
+using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
@@ -7,92 +8,100 @@ namespace Roguelike.Systems
     // only occur with the Player.
     class EventScheduler
     {
+        private ICollection<ISchedulable> _entities;
         private MaxHeap<ISchedulable> _eventSet;
 
         public ISchedulable Current => _eventSet.Peek();
-        
+
         public EventScheduler(int size)
         {
+            _entities = new HashSet<ISchedulable>();
             _eventSet = new MaxHeap<ISchedulable>(size);
         }
 
-        public void AddActor(ISchedulable schedulable) => _eventSet.Add(schedulable);
+        public void AddActor(ISchedulable schedulable) => _entities.Add(schedulable);
         public void RemoveActor(ISchedulable schedulable) => _eventSet.Remove(schedulable);
 
         public bool Update()
         {
-            if (_eventSet.IsEmpty())
+            if (_entities.Count == 0)
                 return false;
 
-            ISchedulable current = _eventSet.Peek();
-
-            // If the current Actor has negative energy, then everyone must have negative energy.
-            // Give everyone some energy and carry on acting.
-            if (current.Energy <= 0)
+            _eventSet.Clear();
+            
+            // Check if any actor is already ready to act
+            foreach (ISchedulable entity in _entities)
             {
-                Game.MessageHandler.AddMessage("Energy Refresh", Enums.MessageLevel.Verbose);
-                System.Console.WriteLine("New turn!");
-                System.Console.WriteLine("Turn order");
-                System.Console.WriteLine("----------");
-                for (int i = 0; i < _eventSet.Count; i++)
-                    System.Console.WriteLine(string.Format("{0}\t {1} energy",
-                        ((Actors.Actor)_eventSet.GetHeap()[i]).Name,
-                        _eventSet.GetHeap()[i].Energy));
-
-                _eventSet.Apply(actor => { System.Console.WriteLine(actor.Energy); } );
-
-                UpdateAll();
-            }
-
-            // Break the event loop when there is no Action. Currently, the only situation where
-            // this occurs is in the input handling for the Player's Actions.
-            ICommand action = current.Act();
-            if (action == null)
-            {
-                System.Diagnostics.Debug.Assert(current is Actors.Player);
-                return false;
-            }
-
-            // Check that the action can succeed before executing it. If there are potential
-            // alternative actions, try them as well.
-            RedirectMessage status = action.Validate();
-            while (!status.Success && status.Alternative != null)
-            {
-                action = status.Alternative;
-                status = action.Validate();
-            }
-
-            // If we still don't succeed, the action is bad and should be cancelled. Otherwise,
-            // we can execute the action which should succeed at this point.
-            if (!status.Success)
-            {
-                // Let the Player pick another move. Otherwise, if the AI made an invalid move,
-                // perform a wait action to prevent an infinite loop.
-                if (current is Actors.Player)
+                if (entity.Energy >= Constants.MIN_TURN_ENERGY)
                 {
+                    _eventSet.Add(entity);
+                }
+            }
+
+            // No one is currently ready, so continually apply energy recovery to all entities in the
+            // system, until the queue has at least one entity to execute
+            while (_eventSet.Count == 0)
+            {
+                foreach (ISchedulable entity in _entities)
+                {
+                    entity.Energy += entity.RefreshRate;
+
+                    // Once the entity has enough energy, it can be added to the turn queue
+                    // The queue will prioritize entities by their energy ratings, so the entities
+                    // with the most amount of energy will execute their turn first
+                    if (entity.Energy >= Constants.MIN_TURN_ENERGY)
+                    {
+                        _eventSet.Add(entity);
+                    }
+                }
+            }
+
+            // Dequeue and execute the handler for each entities in the turn queue until empty
+            foreach (ISchedulable current in _eventSet)
+            {
+                // Break the event loop when there is no Action.
+                // This should only happen with input handling for the Player's Actions.
+                ICommand action = current.Act();
+                if (action == null)
+                {
+                    System.Diagnostics.Debug.Assert(current is Actors.Player);
                     return false;
+                }
+
+                // Check that the action can succeed before executing it. If there are potential
+                // alternative actions, try them as well.
+                RedirectMessage status = action.Validate();
+                while (!status.Success && status.Alternative != null)
+                {
+                    action = status.Alternative;
+                    status = action.Validate();
+                }
+
+                // If we still don't succeed, the action is bad and should be cancelled. Otherwise,
+                // we can execute the action which should succeed at this point.
+                if (!status.Success)
+                {
+                    // Let the Player pick another move. Otherwise, if the AI made an invalid move,
+                    // perform a wait action to prevent an infinite loop.
+                    if (current is Actors.Player)
+                    {
+                        Game.MessageHandler.AddMessage("Can't do that.");
+                        return false;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.Assert(false, "monster made invalid move");
+                        current.Energy = 0;
+                    }
                 }
                 else
                 {
-                    System.Diagnostics.Debug.Assert(false, "monster made invalid move");
-                    current.Energy = 0;
+                    action.Execute();
+                    current.Energy -= action.EnergyCost;
                 }
             }
-            else
-            {
-                action.Execute();
-                current.Energy -= action.EnergyCost;
-            }
-
-            // Move the current Actor to the bottom of the heap.
-            _eventSet.ReheapDown(0);
 
             return true;
-        }
-
-        private void UpdateAll()
-        {
-            _eventSet.Apply(actor => { actor.Energy += actor.RefreshRate; });
         }
     }
 }
