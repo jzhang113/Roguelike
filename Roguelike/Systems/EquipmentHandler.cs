@@ -8,10 +8,10 @@ namespace Roguelike.Systems
 {
     class EquipmentHandler
     {
-        public Weapon DefaultWeapon { get; internal set; }
-        public Weapon PrimaryWeapon { get; internal set; }
-        public Weapon OffhandWeapon { get; internal set; }
-        public IDictionary<ArmorType, Armor> Armor {get; private set;}
+        public Weapon DefaultWeapon { get; private set; }
+        public Weapon PrimaryWeapon { get; private set; }
+        public Weapon OffhandWeapon { get; private set; }
+        public IDictionary<ArmorType, Armor> Armor { get; }
 
         public EquipmentHandler(Weapon defaultWeapon)
         {
@@ -30,6 +30,26 @@ namespace Roguelike.Systems
         }
 
         public bool IsDefaultWeapon() => PrimaryWeapon == DefaultWeapon && OffhandWeapon == null;
+
+        public void Equip(Weapon weapon)
+        {
+            PrimaryWeapon = weapon;
+        }
+
+        public void Equip(Armor armor)
+        {
+            Armor[armor.Type] = armor;
+        }
+
+        public void Unequip(Weapon weapon)
+        {
+            PrimaryWeapon = DefaultWeapon;
+        }
+
+        public void Unequip(Armor armor)
+        {
+            Armor[armor.Type] = null;
+        }
 
         public void Draw(RLConsole console)
         {

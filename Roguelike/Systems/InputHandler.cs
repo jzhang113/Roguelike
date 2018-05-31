@@ -50,7 +50,7 @@ namespace Roguelike.Systems
                             break;
                         }
 
-                        map.Highlight[tile.Position.X][tile.Position.Y] = RLColor.Red;
+                        map.Highlight[tile.Position.X, tile.Position.Y] = RLColor.Red;
                     }
                 }
                 else
@@ -70,11 +70,11 @@ namespace Roguelike.Systems
                             break;
                         }
 
-                        map.Highlight[p.X][p.Y] = RLColor.Red;
+                        map.Highlight[p.X, p.Y] = RLColor.Red;
                     }
 
                     if (current.IsWalkable && exploredPathExists)
-                        map.Highlight[mouseX][mouseY] = RLColor.Red;
+                        map.Highlight[mouseX, mouseY] = RLColor.Red;
                 }
                 
                 //if (_console.Mouse.GetLeftClick())
@@ -335,7 +335,7 @@ namespace Roguelike.Systems
         {
             foreach (Cell cell in Game.Map.GetCellsInRadius(_targettingSource.X, _targettingSource.Y, (int)_targettingAction.Area.Range))
             {
-                Game.Map.Highlight[cell.X][cell.Y] = Swatch.DbGrass;
+                Game.Map.Highlight[cell.X, cell.Y] = Swatch.DbGrass;
             }
 
             var clickPos = GetClickPosition();

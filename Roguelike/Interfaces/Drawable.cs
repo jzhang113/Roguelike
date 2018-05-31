@@ -5,8 +5,9 @@ namespace Roguelike.Interfaces
 {
     public abstract class Drawable
     {
-        public abstract RLColor Color { get; set; }
-        public abstract char Symbol { get; set; }
+        public abstract RLColor Color { get; internal protected set; }
+        public abstract char Symbol { get; internal protected set; }
+
         public abstract int X { get; set; }
         public abstract int Y { get; set; }
 

@@ -57,7 +57,7 @@ namespace Roguelike
             InputHandler.Initialize(_rootConsole);
 
             // Option.FixedSeed = false;
-            Option.Seed = 554560867;
+            Option.Seed = 10;
 
             int mainSeed;
             if (Option.FixedSeed)

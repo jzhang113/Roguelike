@@ -12,8 +12,9 @@ namespace Roguelike.Items
         public IMaterial Material { get; protected set; }
         public Actor Carrier { get; set; }
 
-        public override RLColor Color { get; set; }
-        public override char Symbol { get; set; }
+        public override RLColor Color { get; internal protected set; }
+        public override char Symbol { get; internal protected set;}
+
         public override int X { get; set; }
         public override int Y { get; set; }
 

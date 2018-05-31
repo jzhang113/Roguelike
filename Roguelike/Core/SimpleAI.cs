@@ -15,7 +15,7 @@ namespace Roguelike.Core
             switch (monster.State)
             {
                 case ActorState.Wander:
-                    if (Game.Map.PlayerMap[monster.X][monster.Y] < monster.Awareness)
+                    if (Game.Map.PlayerMap[monster.X, monster.Y] < monster.Awareness)
                     {
                         monster.State = ActorState.Chase;
                         return GetAction(monster);
@@ -46,8 +46,9 @@ namespace Roguelike.Core
                     }
                     else
                     {
-                        WeightedPoint nextMove = Game.Map.MoveTowardsTarget(monster.X, monster.Y, Game.Map.FleeMap);
-                        return new MoveCommand(monster, nextMove.X, nextMove.Y);
+                        // implement fleeing?
+                        WeightedPoint dir = Direction.Directions[Game.CombatRandom.Next() % 8];
+                        return new MoveCommand(monster, monster.X + dir.X, monster.Y + dir.Y);
                     }
                 case ActorState.Dead:
                     // Remove dead things if they die before they finish acting.

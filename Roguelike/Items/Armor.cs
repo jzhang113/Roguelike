@@ -6,26 +6,24 @@ namespace Roguelike.Items
 {
     abstract class Armor : Item, IEquipable
     {
-        private readonly Enums.ArmorType _type;
+        public Enums.ArmorType Type { get; }
 
         protected Armor(Enums.ArmorType type)
         {
             Symbol = '[';
-            _type = type;
+            Type = type;
         }
 
         public void Equip()
         {
-            System.Diagnostics.Debug.Assert(Carrier.Equipment.Armor[_type] == null);
-            Carrier.Equipment.Armor[_type] = this;
-
+            System.Diagnostics.Debug.Assert(Carrier.Equipment.Armor[Type] == null);
+            Carrier.Equipment.Equip(this);
             Game.MessageHandler.AddMessage($"You put on the {Name}.");
         }
 
         public void Unequip()
         {
-            Carrier.Equipment.Armor[_type] = null;
-
+            Carrier.Equipment.Unequip(this);
             Game.MessageHandler.AddMessage($"You take off the {Name}.");
         }
     }

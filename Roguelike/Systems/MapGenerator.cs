@@ -9,7 +9,7 @@ namespace Roguelike.Systems
 {
     class MapGenerator
     {
-        private readonly int _minRoomSize = 5;
+        private readonly int _minRoomSize = 4;
         private readonly int _maxRoomSize = 15;
 
         private readonly int _width;
@@ -33,13 +33,11 @@ namespace Roguelike.Systems
 
             for (int i = 0; i < 1000; i++)
             {
-                Room room = new Room
-                {
-                    Width = (int)RandNormal(5, 1),
-                    Height = (int)RandNormal(5, 1),
-                    X = _rand.Next(centerX - 5, centerX + 5),
-                    Y = _rand.Next(centerY - 5, centerY + 5)
-                };
+                Room room = new Room(
+                    x: _rand.Next(centerX - 5, centerX + 5),
+                    y: _rand.Next(centerY - 5, centerY + 5),
+                    width: (int)RandNormal(5, 1),
+                    height: (int)RandNormal(5, 1));
 
                 bool first = true;
                 bool horiz = false;
@@ -134,14 +132,13 @@ namespace Roguelike.Systems
                                 }
                             }
 
-                            room.X = (int)(multiplier * dx) + room.X;
-                            room.Y = (int)(multiplier * dy) + room.Y;
+                            room.Offset((int)(multiplier * dx), (int)(multiplier * dy));
                         }
                     }
                 } while (intersects && iterations < 100);
 
                 roomsList.Add(room);
-                CreateRoom2(room);
+                CreateRoom(room);
                 //AsciiPrint(roomsList);
 
                 //Console.WriteLine(i + " " + room.X + " " + room.Y + " " + room.Width + " " + room.Height); 
@@ -154,16 +151,15 @@ namespace Roguelike.Systems
 
         public MapHandler CreateMapBSP()
         {
-            TreeNode<Room> root = new TreeNode<Room>(new Room
-            {
-                X = 0,
-                Y = 0,
-                Width = _width,
-                Height = _height
-            });
+            TreeNode<Room> root = new TreeNode<Room>(new Room(0, 0, _width, _height));
+            TreeNode<Room> roomsPartition = PartitionMapBSP(root, _maxRoomSize, _maxRoomSize);
+            ICollection<Room> roomsList = new List<Room>();
 
-            var roomsTree = PartitionMapBSP(root, 15, 15);
-            MakeRoomsBSP(roomsTree);
+            MakeRoomsBSP(roomsPartition, ref roomsList);
+            foreach (Room r in roomsList)
+            {
+                PlaceDoors(r);
+            }
 
             return _map;
         }
@@ -183,24 +179,12 @@ namespace Roguelike.Systems
                         return current;
                 }
 
-                int split = _rand.Next(4, room.Width - 3);
-                Room left = new Room
-                {
-                    X = room.X,
-                    Y = room.Y,
-                    Width = split,
-                    Height = room.Height
-                };
+                int split = _rand.Next(_minRoomSize, room.Width - _minRoomSize + 1);
+                Room left = new Room(room.X, room.Y, split, room.Height);
                 var leftChild = PartitionMapBSP(new TreeNode<Room>(current, left), minWidth, minHeight);
                 current.AddChild(leftChild);
 
-                Room right = new Room
-                {
-                    X = room.X + split,
-                    Y = room.Y,
-                    Width = room.Width - split,
-                    Height = room.Height
-                };
+                Room right = new Room(room.X + split, room.Y, room.Width - split, room.Height);
                 var rightChild = PartitionMapBSP(new TreeNode<Room>(current, right), minWidth, minHeight);
                 current.AddChild(rightChild);
             }
@@ -214,24 +198,12 @@ namespace Roguelike.Systems
                         return current;
                 }
 
-                int split = _rand.Next(4, room.Height - 3);
-                Room top = new Room
-                {
-                    X = room.X,
-                    Y = room.Y,
-                    Width = room.Width,
-                    Height = split
-                };
+                int split = _rand.Next(_minRoomSize, room.Height - _minRoomSize + 1);
+                Room top = new Room(room.X, room.Y, room.Width, split);
                 var topChild = PartitionMapBSP(new TreeNode<Room>(current, top), minWidth, minHeight);
                 current.AddChild(topChild);
 
-                Room bottom = new Room
-                {
-                    X = room.X,
-                    Y = room.Y + split,
-                    Width = room.Width,
-                    Height = room.Height - split
-                };
+                Room bottom = new Room(room.X, room.Y + split, room.Width, room.Height - split);
                 var bottomChild = PartitionMapBSP(new TreeNode<Room>(current, bottom), minWidth, minHeight);
                 current.AddChild(bottomChild);
             }
@@ -239,14 +211,14 @@ namespace Roguelike.Systems
             return current;
         }
 
-        private IList<(int X, int Y)> MakeRoomsBSP(TreeNode<Room> root)
+        private IList<(int X, int Y)> MakeRoomsBSP(TreeNode<Room> root, ref ICollection<Room> roomsList)
         {
             IList<(int X, int Y)> allocated = new List<(int X, int Y)>();
             IList<(int X, int Y)> connections = new List<(int X, int Y)>();
 
             foreach (var child in root.Children)
             {
-                var suballocated = MakeRoomsBSP(child);
+                var suballocated = MakeRoomsBSP(child, ref roomsList);
 
                 if (suballocated.Count > 0)
                 {
@@ -260,22 +232,26 @@ namespace Roguelike.Systems
             if (root.Children.Count == 0)
             {
                 Room boundary = root.Value;
-                Room space = new Room
-                {
-                    Width = _rand.Next(4, boundary.Width),
-                    Height = _rand.Next(4, boundary.Height)
-                };
+                Room space = new Room(
+                    width: _rand.Next(4, boundary.Width),
+                    height: _rand.Next(4, boundary.Height));
                 space.X = _rand.Next(boundary.X, boundary.X + boundary.Width - space.Width);
                 space.Y = _rand.Next(boundary.Y, boundary.Y + boundary.Height - space.Height);
 
-                CreateRoom2(space);
+                CreateRoom(space);
+                roomsList.Add(space);
 
-                for (int i = 0; i < space.Width; i++)
+                // Add the tiles on the walls which can become doors
+                for (int i = space.Left; i < space.Right - 1; i++)
                 {
-                    for (int j = 0; j < space.Height; j++)
-                    {
-                        allocated.Add((space.X + i, space.Y + j));
-                    }
+                    allocated.Add((i, space.Top + 1));
+                    allocated.Add((i, space.Bottom - 1));
+                }
+
+                for (int j = space.Top; j < space.Bottom - 1; j++)
+                {
+                    allocated.Add((space.Left + 1, j));
+                    allocated.Add((space.Right - 1, j));
                 }
             }
             else
@@ -311,33 +287,16 @@ namespace Roguelike.Systems
             }
         }
 
-        private void CreateRoom(Rectangle rect)
+        private void CreateRoom(Room room)
         {
-            bool explored = true;
-
-            for (int x = rect.Left; x < rect.Right; x++)
+            for (int i = room.Left; i < room.Right; i++)
             {
-                for (int y = rect.Top; y < rect.Bottom; y++)
+                for (int j = room.Top; j < room.Bottom; j++)
                 {
-                    _map.SetCellProperties(x, y, true, true, explored);
-                    _map.Field[x, y].IsWall = false;
-                }
-            }
-        }
-
-        private void CreateRoom2(Room room)
-        {
-            int x = room.X;
-            int y = room.Y;
-
-            for (int i = 1; i < room.Width; i++)
-            {
-                for (int j = 1; j < room.Height; j++)
-                {
-                    if (_map.Field.IsValid(x + i, y + j))
+                    if (_map.Field.IsValid(i, j))
                     {
-                        _map.SetCellProperties(x + i, y + j, true, true, true);
-                        _map.Field[x + i, y + j].IsWall = false;
+                        _map.SetCellProperties(i, j, true, true, true);
+                        _map.Field[i, j].IsWall = false;
                     }
                 }
             }
@@ -352,28 +311,99 @@ namespace Roguelike.Systems
             {
                 if (y1 < y2)
                 {
-                    CreateRoom(new Rectangle(x2 - dx, y2, dx + 1, 1));
-                    CreateRoom(new Rectangle(x1, y1, 1, dy + 1));
+                    CreateRoom(new Room(x2 - dx, y2, dx + 1, 1));
+                    CreateRoom(new Room(x1, y1, 1, dy + 1));
                 }
                 else
                 {
-                    CreateRoom(new Rectangle(x1, y1, dx + 1, 1));
-                    CreateRoom(new Rectangle(x2, y2, 1, dy + 1));
+                    CreateRoom(new Room(x1, y1, dx + 1, 1));
+                    CreateRoom(new Room(x2, y2, 1, dy + 1));
                 }
             }
             else
             {
                 if (y1 < y2)
                 {
-                    CreateRoom(new Rectangle(x2, y2, dx + 1, 1));
-                    CreateRoom(new Rectangle(x1, y1, 1, dy + 1));
+                    CreateRoom(new Room(x2, y2, dx + 1, 1));
+                    CreateRoom(new Room(x1, y1, 1, dy + 1));
                 }
                 else
                 {
-                    CreateRoom(new Rectangle(x1 - dx, y1, dx + 1, 1));
-                    CreateRoom(new Rectangle(x2, y2, 1, dy + 1));
+                    CreateRoom(new Room(x1 - dx, y1, dx + 1, 1));
+                    CreateRoom(new Room(x2, y2, 1, dy + 1));
                 }
             }
+        }
+
+        private void PlaceDoors(Room room)
+        {
+            for (int i = room.Left; i < room.Right; i++)
+            {
+                if (i <= 0 || i >= _width - 1)
+                    continue;
+
+                if (room.Top > 1 && IsDoorLocation(i, room.Top - 1))
+                {
+                    _map.AddActor(new Door()
+                    {
+                        X = i,
+                        Y = room.Top - 1
+                    });
+                }
+
+                if (room.Bottom < _height - 1 && IsDoorLocation(i, room.Bottom))
+                {
+                    _map.AddActor(new Door()
+                    {
+                        X = i,
+                        Y = room.Bottom
+                    });
+                }
+            }
+
+            for (int j = room.Top; j < room.Bottom; j++)
+            {
+                if (j <= 0 || j >= _height - 1)
+                    continue;
+
+                if (room.Left > 1 && IsDoorLocation(room.Left - 1, j))
+                {
+                    _map.AddActor(new Door()
+                    {
+                        X = room.Left - 1,
+                        Y = j
+                    });
+                }
+
+                if (room.Right < _width - 1 && IsDoorLocation(room.Right, j))
+                {
+                    _map.AddActor(new Door()
+                    {
+                        X = room.Right,
+                        Y = j
+                    });
+                }
+            }
+        }
+
+        private bool IsDoorLocation(int x, int y)
+        {
+            bool current = _map.Field[x, y].IsWall;
+            bool left = _map.Field[x - 1, y].IsWall;
+            bool right = _map.Field[x + 1, y].IsWall;
+            bool up = _map.Field[x, y - 1].IsWall;
+            bool down = _map.Field[x, y + 1].IsWall;
+
+            if (current)
+                return false;
+
+            if (left && right && !up && !down)
+                return true;
+
+            if (!left && !right && up && down)
+                return true;
+
+            return false;
         }
 
         private double RandNormal(double mean, double stdDev)

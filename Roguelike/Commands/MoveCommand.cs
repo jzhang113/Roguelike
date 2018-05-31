@@ -42,7 +42,8 @@ namespace Roguelike.Commands
             // Check if the destination is already occupied.
             if (_cell.IsOccupied)
             {
-                Actor target = Game.Map.GetActor(_cell.Position);
+                var (x, y) = _cell.Position;
+                Actor target = Game.Map.GetActor(x, y);
 
                 if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));

@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using Roguelike.Systems;
 
 namespace Roguelike.Core
@@ -7,7 +8,7 @@ namespace Roguelike.Core
     {
         public bool IsExplored { get; set; }
         public bool IsWall { get; set; }
-        public bool IsOccupied { get; set; }
+        public bool IsOccupied { get => Unit != null; }
         public bool IsWalkable { get => !IsWall && !IsOccupied; }
 
         public int MoveCost { get; set; }

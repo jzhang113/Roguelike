@@ -52,6 +52,7 @@ namespace Roguelike.Systems
                 console.Print(1, 9, "Occupied: " + _displayTile.IsOccupied, Colors.TextHeading);
                 console.Print(1, 9, "Walkable: " + _displayTile.IsWalkable, Colors.TextHeading);
                 console.Print(1, 10, "Wall: " + _displayTile.IsWall, Colors.TextHeading);
+                console.Print(1, 11, $"Position: {_displayTile.Position}", Colors.TextHeading);
             }
         }
     }
