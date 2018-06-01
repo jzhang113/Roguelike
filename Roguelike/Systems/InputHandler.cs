@@ -40,7 +40,7 @@ namespace Roguelike.Systems
                 map.ClearHighlight();
                 Cell current = map.GetCell(mouseX, mouseY);
 
-                if (Game.GameMode == Game.Mode.Targetting)
+                if (Game.GameMode == Enums.Mode.Targetting)
                 {
                     IEnumerable<Terrain> path =Game.Map.StraightLinePath(player.X, player.Y, mouseX, mouseY);
                     foreach (Terrain tile in path)
@@ -94,7 +94,7 @@ namespace Roguelike.Systems
             
             RLKeyPress keyPress = _console.Keyboard.GetKeyPress();
 
-            if (Game.GameMode == Game.Mode.Targetting)
+            if (Game.GameMode == Enums.Mode.Targetting)
             {
                 if (keyPress != null)
                     HandleTargettingInput(keyPress);
@@ -132,16 +132,16 @@ namespace Roguelike.Systems
 
                 switch (Game.GameMode)
                 {
-                    case Game.Mode.Inventory:
+                    case Enums.Mode.Inventory:
                         // TODO: implement inventory actions
                         return null;
-                    case Game.Mode.Apply:
+                    case Enums.Mode.Apply:
                         return new ApplyCommand(player, keyChar);
-                    case Game.Mode.Drop:
+                    case Enums.Mode.Drop:
                         return new DropCommand(player, keyChar);
-                    case Game.Mode.Equip:
+                    case Enums.Mode.Equip:
                         return new EquipCommand(player, keyChar);
-                    case Game.Mode.Unequip:
+                    case Enums.Mode.Unequip:
                         return new UnequipCommand(player, keyChar);
                 }
             }
@@ -234,23 +234,23 @@ namespace Roguelike.Systems
                 case RLKey.Comma:
                     return new PickupCommand(player, Game.Map.Field[player.X, player.Y].ItemStack);
                 case RLKey.A:
-                    Game.GameMode = Game.Mode.Apply;
+                    Game.GameMode = Enums.Mode.Apply;
                     Game.ShowInventory = true;
                     return null;
                 case RLKey.D:
-                    Game.GameMode = Game.Mode.Drop;
+                    Game.GameMode = Enums.Mode.Drop;
                     Game.ShowInventory = true;
                     return null;
                 case RLKey.E:
-                    Game.GameMode = Game.Mode.Equip;
+                    Game.GameMode = Enums.Mode.Equip;
                     Game.ShowInventory = true;
                     return null;
                 case RLKey.I:
-                    Game.GameMode = Game.Mode.Inventory;
+                    Game.GameMode = Enums.Mode.Inventory;
                     Game.ShowInventory = true;
                     return null;
                 case RLKey.T:
-                    Game.GameMode = Game.Mode.Unequip;
+                    Game.GameMode = Enums.Mode.Unequip;
                     Game.ShowEquipment = true;
                     return null;
                 case RLKey.Escape:
@@ -266,7 +266,7 @@ namespace Roguelike.Systems
             switch(keyPress.Key)
             {
                 case RLKey.Escape:
-                    Game.GameMode = Game.Mode.Normal;
+                    Game.GameMode = Enums.Mode.Normal;
                     Game.ShowInventory = false;
                     Game.ShowEquipment = false;
                     Game.ForceRender();
@@ -281,7 +281,7 @@ namespace Roguelike.Systems
             switch (keyPress.Key)
             {
                 case RLKey.Escape:
-                    Game.GameMode = Game.Mode.Normal;
+                    Game.GameMode = Enums.Mode.Normal;
                     Game.ForceRender();
                     break;
             }
@@ -320,7 +320,7 @@ namespace Roguelike.Systems
         #region Target Handling
         public static void BeginTargetting(ITargettable command, Actor source, IAction action)
         {
-            Game.GameMode = Game.Mode.Targetting;
+            Game.GameMode = Enums.Mode.Targetting;
             Game.ShowInventory = false;
             Game.ForceRender();
 
@@ -347,7 +347,7 @@ namespace Roguelike.Systems
 
                 if (distance <= maxRange)
                 {
-                    Game.GameMode = Game.Mode.Normal;
+                    Game.GameMode = Enums.Mode.Normal;
                     _targettingCommand.Target = _targettingAction.Area.GetTilesInRange(_targettingSource, clickPos.Value);
                     return _targettingCommand as ICommand;
                 }

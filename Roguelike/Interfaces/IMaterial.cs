@@ -1,5 +1,8 @@
-﻿namespace Roguelike.Interfaces
+﻿using System;
+
+namespace Roguelike.Interfaces
 {
+    [Serializable]
     static class Materials
     {
         public static IMaterial Wood = new IMaterial
@@ -38,6 +41,7 @@
         };
     }
 
+    [Serializable]
     public class IMaterial
     {
         public MaterialTypes MaterialType { get; set; }
@@ -45,6 +49,7 @@
         public int Durability { get; set; }
     }
 
+    [Serializable]
     public enum MaterialTypes
     {
         Wood,

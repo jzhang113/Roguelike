@@ -6,11 +6,13 @@ using RogueSharp;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Systems
 {
     // TODO: remove dependence on Map - implement FOV
-    class MapHandler : Map
+    [Serializable]
+    public class MapHandler : Map, ISerializable
     {
         public new int Width { get; }
         public new int Height { get; }
@@ -22,6 +24,11 @@ namespace Roguelike.Systems
         private ICollection<Actor> Units { get; }
         private ICollection<ItemInfo> Items { get; }
         private ICollection<Door> Doors { get; }
+        
+        public MapHandler()
+        {
+
+        }
 
         public MapHandler(int width, int height) : base(width, height)
         {
@@ -35,6 +42,22 @@ namespace Roguelike.Systems
             Units = new List<Actor>();
             Items = new List<ItemInfo>();
             Doors = new List<Door>();
+        }
+
+        protected MapHandler(SerializationInfo info, StreamingContext context)
+        {
+            Width = (int)info.GetValue(nameof(Width), typeof(int));
+            Height = (int)info.GetValue(nameof(Height), typeof(int));
+            Field = (Field)info.GetValue(nameof(Field), typeof(Field));
+            Units = (ICollection<Actor>)info.GetValue(nameof(Units), typeof(ICollection<Actor>));
+            Items = (ICollection<ItemInfo>)info.GetValue(nameof(Items), typeof(ICollection<ItemInfo>));
+            Doors = (ICollection<Door>)info.GetValue(nameof(Doors), typeof(ICollection<Door>));
+
+            Highlight = new RLColor[Width, Height];
+            PlayerMap = new float[Width, Height];
+
+            UpdatePlayerFov();
+            UpdatePlayerMaps();
         }
 
         #region Actor Methods
@@ -399,6 +422,16 @@ namespace Roguelike.Systems
         {
             Cell cell = GetCell(x, y);
             SetCellProperties(cell.X, cell.Y, cell.IsTransparent, !occupied, cell.IsExplored);
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(Width), Width);
+            info.AddValue(nameof(Height), Height);
+            info.AddValue(nameof(Field), Field);
+            info.AddValue(nameof(Units), Units);
+            info.AddValue(nameof(Items), Items);
+            info.AddValue(nameof(Doors), Doors);
         }
     }
 }

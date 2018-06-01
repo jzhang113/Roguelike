@@ -1,7 +1,9 @@
 ﻿using Roguelike.Interfaces;
+using System;
 
 namespace Roguelike.Items
 {
+    [Serializable]
     class Spear : Weapon
     {
         public Spear(IMaterial type)

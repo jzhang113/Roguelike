@@ -1,10 +1,12 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System;
 
 namespace Roguelike.Core
 {
-    class Terrain
+    [Serializable]
+    public class Terrain
     {
         public bool IsExplored { get; set; }
         public bool IsWall { get; set; }
@@ -15,13 +17,19 @@ namespace Roguelike.Core
         public Actor Unit { get; set; }
         public InventoryHandler ItemStack { get; set; }
 
-        public (int X, int Y) Position { get; }
+        public int X { get; }
+        public int Y { get; }
+
+        [field: NonSerialized]
+        private (int X, int Y) _position;
+
+        public (int X, int Y) Position { get => _position; }
 
         public Terrain(bool wall, int moveCost, int x, int y)
         {
             IsWall = wall;
             MoveCost = moveCost;
-            Position = (X: x, Y: y);
+            _position = (X: x, Y: y);
         }
     }
 }

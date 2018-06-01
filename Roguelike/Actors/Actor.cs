@@ -3,10 +3,12 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
+using System;
 
 namespace Roguelike.Actors
 {
-    class Actor : Drawable, ISchedulable
+    [Serializable]
+    public class Actor : Drawable, ISchedulable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -25,9 +27,6 @@ namespace Roguelike.Actors
         public int INT { get; set; }
         
         public Enums.ActorState State { get; set; }
-
-        public override RLColor Color { get; internal protected set; }
-        public override char Symbol { get; internal protected set; }
 
         public override int X { get; set; }
         public override int Y { get; set; }
@@ -57,7 +56,7 @@ namespace Roguelike.Actors
 
         public virtual ICommand Act()
         {
-            System.Diagnostics.Debug.Assert(Game.GameMode != Game.Mode.Targetting);
+            System.Diagnostics.Debug.Assert(Game.GameMode != Enums.Mode.Targetting);
             return SimpleAI.GetAction(this);
         }
 

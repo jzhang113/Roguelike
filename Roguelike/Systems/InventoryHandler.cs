@@ -1,12 +1,14 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.Items;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
     // Handles all stacks of items in the game, such as the player inventory and piles of loot.
-    class InventoryHandler
+    [Serializable]
+    public class InventoryHandler
     {
         private IList<ItemInfo> _inventory;
 

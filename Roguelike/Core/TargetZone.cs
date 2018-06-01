@@ -5,7 +5,8 @@ using System.Collections.Generic;
 
 namespace Roguelike.Core
 {
-    struct TargetZone
+    [Serializable]
+    public struct TargetZone
     {
         public TargetShape Shape { get; }
         public float Range { get; }

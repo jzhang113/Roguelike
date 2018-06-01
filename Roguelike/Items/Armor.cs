@@ -1,10 +1,12 @@
 ﻿using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System;
 
 namespace Roguelike.Items
 {
-    abstract class Armor : Item, IEquipable
+    [Serializable]
+    public abstract class Armor : Item, IEquipable
     {
         public Enums.ArmorType Type { get; }
 

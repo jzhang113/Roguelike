@@ -3,7 +3,8 @@ using System;
 
 namespace Roguelike.Core
 {
-    class ItemInfo : IEquatable<ItemInfo>
+    [Serializable]
+    public class ItemInfo : IEquatable<ItemInfo>
     {
         public Item Item { get; }
         public int Count { get; private set; }

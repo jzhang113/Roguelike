@@ -5,7 +5,7 @@ namespace Roguelike.Interfaces
 {
     // Describes most possible in game actions that take time. Actions that do not take time, such
     // as opening the inventory, are not Actions.
-    interface ICommand
+    public interface ICommand
     {
         // The Actor performing the Action.
         Actor Source { get; }

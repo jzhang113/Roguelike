@@ -1,10 +1,12 @@
 ﻿using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
-    abstract class Weapon : Item, IEquipable
+    [Serializable]
+    public abstract class Weapon : Item, IEquipable
     {
         protected Weapon()
         {

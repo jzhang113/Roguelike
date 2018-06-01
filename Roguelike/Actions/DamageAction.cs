@@ -1,9 +1,11 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Interfaces;
+using System;
 
 namespace Roguelike.Actions
 {
+    [Serializable]
     class DamageAction : IAction
     {
         public int Power { get; }

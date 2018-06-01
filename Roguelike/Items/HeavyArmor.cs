@@ -1,7 +1,9 @@
 ﻿using Roguelike.Interfaces;
+using System;
 
 namespace Roguelike.Items
 {
+    [Serializable]
     class HeavyArmor : Armor
     {
         public HeavyArmor(IMaterial type) : base(Enums.ArmorType.Armor)

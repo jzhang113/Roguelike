@@ -1,10 +1,12 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Interfaces;
+using System;
 
 namespace Roguelike.Core
 {
-    class Door : Actor
+    [Serializable]
+    public class Door : Actor
     {
         public Door()
         {

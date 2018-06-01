@@ -1,11 +1,13 @@
 ﻿// A collection of the enums used
 namespace Roguelike.Enums
 {
-    enum ActorState { Wander, Chase, Flee, Sleep, Dead }
+    public enum ActorState { Wander, Chase, Flee, Sleep, Dead }
 
-    enum ArmorType { Helmet, Armor, Gloves, Boots, RingLeft, RingRight }
+    public enum ArmorType { Helmet, Armor, Gloves, Boots, RingLeft, RingRight }
 
     enum MessageLevel { Minimal, Normal, Verbose }
 
-    enum TargetShape { Area, Directional, Range, Ray, Self }
+    enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply, Targetting };
+
+    public enum TargetShape { Area, Directional, Range, Ray, Self }
 }

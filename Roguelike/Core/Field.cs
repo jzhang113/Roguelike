@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Roguelike.Core
 {
+    [Serializable]
     class Field : IEnumerable<Terrain>
     {
         private readonly Terrain[][] _field;

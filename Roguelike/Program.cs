@@ -17,8 +17,7 @@ namespace Roguelike
                 .Build()
                 .Bind(configs);
 
-            Game game = new Game(configs, OptionHandler.ParseOptions(args));
-            game.Initialize();
+            Game.Initialize(configs, OptionHandler.ParseOptions(args));
         }
     }
 }

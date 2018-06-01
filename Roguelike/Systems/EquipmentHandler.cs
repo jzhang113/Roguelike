@@ -3,10 +3,12 @@ using Roguelike.Core;
 using Roguelike.Items;
 using Roguelike.Enums;
 using System.Collections.Generic;
+using System;
 
 namespace Roguelike.Systems
 {
-    class EquipmentHandler
+    [Serializable]
+    public class EquipmentHandler
     {
         public Weapon DefaultWeapon { get; private set; }
         public Weapon PrimaryWeapon { get; private set; }

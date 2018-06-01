@@ -1,20 +1,22 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.Systems;
-using Microsoft.Extensions.Configuration;
 using System.IO;
 using System;
 using Roguelike.Actors;
 using Roguelike.Interfaces;
 using Roguelike.Actions;
+using System.ComponentModel;
+using Roguelike.Utils;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
+using System.Runtime.Serialization;
 
 namespace Roguelike
 {
-    class Game
+    static class Game
     {
-        public enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply, Targetting};
-
-        public static Mode GameMode { get; set; }
+        public static Enums.Mode GameMode { get; set; }
         public static bool ShowInventory { get; internal set; }
         public static bool ShowEquipment { get; internal set; }
         public static bool ShowOverlay { get; internal set; }
@@ -37,14 +39,11 @@ namespace Roguelike
 
         private static bool _render = true;
 
-        public Game(Configuration configs, Options options)
+        public static void Initialize(Configuration configs, Options options)
         {
             Config = configs;
             Option = options;
-        }
 
-        public void Initialize()
-        {
             string consoleTitle = "Roguelike";
 
             _rootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
@@ -55,7 +54,18 @@ namespace Roguelike
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
 
             InputHandler.Initialize(_rootConsole);
+            MessageHandler = new MessageHandler(Config.MessageMaxCount);
+            EventScheduler = new EventScheduler(20);
 
+            _rootConsole.Update += RootConsoleUpdate;
+            _rootConsole.Render += RootConsoleRender;
+            _rootConsole.OnLoad += StartGame;
+            _rootConsole.OnClosing += SaveGame;
+            _rootConsole.Run();
+        }
+
+        private static void NewGame()
+        {
             // Option.FixedSeed = false;
             Option.Seed = 10;
 
@@ -80,8 +90,6 @@ namespace Roguelike
             }
 
             CombatRandom = new Random(generatorSeed[30]);
-            MessageHandler = new MessageHandler(Config.MessageMaxCount);
-            EventScheduler = new EventScheduler(20);
 
             var sw = new System.Diagnostics.Stopwatch();
 
@@ -158,13 +166,45 @@ namespace Roguelike
             };
             Map.AddItem(healing);
 
-            GameMode = Mode.Normal;
-
-            _rootConsole.Update += RootConsoleUpdate;
-            _rootConsole.Render += RootConsoleRender;
-            _rootConsole.Run();
+            GameMode = Enums.Mode.Normal;
         }
-        
+
+        private static void SaveGame(object sender, CancelEventArgs e)
+        {
+            using (Stream stream = File.OpenWrite(Constants.SAVE_FILE))
+            {
+                BinaryFormatter serializer = new BinaryFormatter();
+                serializer.Serialize(stream, Map);
+            }
+        }
+
+        private static void StartGame(object sender, EventArgs e)
+        {
+            if (File.Exists(Constants.SAVE_FILE))
+            {
+                Console.WriteLine("Reading saved file");
+
+                try
+                {
+                    using (Stream stream = File.OpenRead(Constants.SAVE_FILE))
+                    {
+                        BinaryFormatter deserializer = new BinaryFormatter();
+                        Map = (MapHandler)deserializer.Deserialize(stream);
+                        // NewGame();
+                    }
+                }
+                catch (SerializationException)
+                {
+                    Console.Error.WriteLine("Load failed");
+                    NewGame();
+                }
+            }
+            else
+            {
+                NewGame();
+            }
+        }
+
         internal static void GameOver()
         {
             MessageHandler.AddMessage("Game Over.", Enums.MessageLevel.Minimal);
@@ -210,7 +250,7 @@ namespace Roguelike
             _mapConsole.Clear();
             Map.Draw(_mapConsole);
 
-            if (GameMode == Mode.Targetting)
+            if (GameMode == Enums.Mode.Targetting)
                 _mapConsole.Print(1, 1, "targetting mode", Colors.TextHeading);
 
             _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);

@@ -1,12 +1,17 @@
 ﻿using RLNET;
 using RogueSharp;
+using System;
 
 namespace Roguelike.Interfaces
 {
+    [Serializable]
     public abstract class Drawable
     {
-        public abstract RLColor Color { get; internal protected set; }
-        public abstract char Symbol { get; internal protected set; }
+        [field: NonSerialized]
+        private RLColor _color;
+
+        public RLColor Color { get => _color; internal protected set => _color = value; }
+        public char Symbol { get; internal protected set; }
 
         public abstract int X { get; set; }
         public abstract int Y { get; set; }

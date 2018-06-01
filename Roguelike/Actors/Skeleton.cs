@@ -1,7 +1,9 @@
 ﻿using Roguelike.Core;
+using System;
 
 namespace Roguelike.Actors
 {
+    [Serializable]
     class Skeleton : Actor
     {
         public Skeleton()

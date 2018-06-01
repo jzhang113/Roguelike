@@ -1,7 +1,9 @@
 ﻿using Roguelike.Actors;
+using System;
 
 namespace Roguelike.Items
 {
+    [Serializable]
     class Fists : Weapon
     {
         // Default weapon.

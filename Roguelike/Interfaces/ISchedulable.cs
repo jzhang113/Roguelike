@@ -3,7 +3,7 @@
 namespace Roguelike.Interfaces
 {
     // Describes things that may be scheduled by the EventScheduler, such as Actors or Effects.
-    interface ISchedulable : IComparable<ISchedulable>
+    public interface ISchedulable : IComparable<ISchedulable>
     {
         // How much energy the Actor has. Actors may act when energy >= 0.
         int Energy { get; set; }

@@ -2,9 +2,11 @@
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System;
 
 namespace Roguelike.Actors
 {
+    [Serializable]
     class Player : Actor
     {
         public Player()

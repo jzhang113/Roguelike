@@ -3,17 +3,16 @@ using Roguelike.Actors;
 using Roguelike.Interfaces;
 using Roguelike.Actions;
 using System.Collections.Generic;
+using System;
 
 namespace Roguelike.Items
 {
-    abstract class Item : Drawable
+    [Serializable]
+    public abstract class Item : Drawable
     {
         public string Name { get; protected set; }
         public IMaterial Material { get; protected set; }
         public Actor Carrier { get; set; }
-
-        public override RLColor Color { get; internal protected set; }
-        public override char Symbol { get; internal protected set;}
 
         public override int X { get; set; }
         public override int Y { get; set; }

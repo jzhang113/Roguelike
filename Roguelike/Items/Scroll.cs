@@ -2,9 +2,11 @@
 using Roguelike.Interfaces;
 using Roguelike.Actions;
 using System.Collections.Generic;
+using System;
 
 namespace Roguelike.Items
 {
+    [Serializable]
     class Scroll : Item, IUsable
     {
         public IAction ApplySkill { get; }
