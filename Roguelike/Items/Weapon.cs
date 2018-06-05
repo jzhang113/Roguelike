@@ -6,12 +6,11 @@ using System.Collections.Generic;
 namespace Roguelike.Items
 {
     [Serializable]
-    public abstract class Weapon : Item, IEquipable
+    public class Weapon : Item, IEquipable
     {
-        protected Weapon()
+        public Weapon(string name, IMaterial material) : base(name, material)
         {
             Symbol = '(';
-            Abilities = new List<IAction>();
         }
 
         public void Equip()

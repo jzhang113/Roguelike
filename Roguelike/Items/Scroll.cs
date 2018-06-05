@@ -11,10 +11,9 @@ namespace Roguelike.Items
     {
         public IAction ApplySkill { get; }
 
-        public Scroll(string name, IAction action)
+        public Scroll(string name, IAction action) : base(name, Materials.Paper)
         {
             Symbol = '?';
-            Name = name;
             ApplySkill = action;
         }
 

@@ -39,6 +39,20 @@ namespace Roguelike.Interfaces
             Strength = 100,
             Durability = 100
         };
+
+        public static IMaterial Paper = new IMaterial
+        {
+            MaterialType = MaterialTypes.Paper,
+            Strength = 1,
+            Durability = 10
+        };
+
+        public static IMaterial Flesh = new IMaterial
+        {
+            MaterialType = MaterialTypes.Flesh,
+            Strength = 8,
+            Durability = 100
+        };
     }
 
     [Serializable]
@@ -56,6 +70,8 @@ namespace Roguelike.Interfaces
         Glass,
         Iron,
         Steel,
-        Diamond
+        Diamond,
+        Paper,
+        Flesh
     }
 }

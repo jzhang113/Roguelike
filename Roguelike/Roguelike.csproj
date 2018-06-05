@@ -123,11 +123,8 @@
     <Compile Include="Interfaces\IEquipable.cs" />
     <Compile Include="Interfaces\IUsable.cs" />
     <Compile Include="Items\Armor.cs" />
-    <Compile Include="Items\Fists.cs" />
     <Compile Include="Items\Item.cs" />
-    <Compile Include="Items\HeavyArmor.cs" />
     <Compile Include="Items\Scroll.cs" />
-    <Compile Include="Items\Spear.cs" />
     <Compile Include="Items\Weapon.cs" />
     <Compile Include="Actions\DamageAction.cs" />
     <Compile Include="Actions\HealAction.cs" />

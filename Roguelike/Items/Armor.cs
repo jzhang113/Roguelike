@@ -6,11 +6,11 @@ using System;
 namespace Roguelike.Items
 {
     [Serializable]
-    public abstract class Armor : Item, IEquipable
+    public class Armor : Item, IEquipable
     {
         public Enums.ArmorType Type { get; }
 
-        protected Armor(Enums.ArmorType type)
+        public Armor(string name, IMaterial material, Enums.ArmorType type) : base(name, material)
         {
             Symbol = '[';
             Type = type;

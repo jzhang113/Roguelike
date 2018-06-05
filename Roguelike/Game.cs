@@ -123,8 +123,12 @@ namespace Roguelike
                 Map.AddActor(s);
             }
 
-            Items.Spear spear = new Items.Spear(Materials.Wood)
+            Items.Weapon spear = new Items.Weapon("spear", Materials.Wood)
             {
+                AttackSpeed = 240,
+                Damage = 200,
+                MeleeRange = 1.5f,
+                ThrowRange = 7,
                 X = Player.X - 1,
                 Y = Player.Y - 1,
                 Color = Swatch.DbBlood
@@ -142,8 +146,12 @@ namespace Roguelike
             //var lungeAction = new Actions.ActionSequence(150, lungeSkill);
             //spear.AddAbility(lungeAction);
 
-            Items.HeavyArmor ha = new Items.HeavyArmor(Interfaces.Materials.Iron)
+            Items.Armor ha = new Items.Armor("heavy armor", Materials.Iron, Enums.ArmorType.Armor)
             {
+                AttackSpeed = 1000,
+                Damage = 100,
+                MeleeRange = 1,
+                ThrowRange = 3,
                 X = Player.X - 2,
                 Y = Player.Y - 3,
                 Color = Swatch.DbMetal
@@ -190,7 +198,7 @@ namespace Roguelike
                     {
                         BinaryFormatter deserializer = new BinaryFormatter();
                         Map = (MapHandler)deserializer.Deserialize(stream);
-                        // NewGame();
+                        NewGame();
                     }
                 }
                 catch (SerializationException)
