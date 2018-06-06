@@ -21,8 +21,7 @@ namespace Roguelike.Actions
         {
             if (target.IsWalkable)
             {
-                var (targetX, targetY) = target.Position;
-                Game.Map.SetActorPosition(source, targetX, targetY);
+                Game.Map.SetActorPosition(source, target.X, target.Y);
             }
         }
     }

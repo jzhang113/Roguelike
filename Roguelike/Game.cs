@@ -114,7 +114,7 @@ namespace Roguelike
             for (int i = 0; i < 3; i++)
             {
                 Skeleton s = new Skeleton();
-                while (!Map.GetCell(s.X, s.Y).IsWalkable)
+                while (!Map.Field[s.X, s.Y].IsWalkable)
                 {
                     s.X = Random.Next(1, Config.Map.Width - 1);
                     s.Y = Random.Next(1, Config.Map.Height - 1);
@@ -182,6 +182,10 @@ namespace Roguelike
             using (Stream stream = File.OpenWrite(Constants.SAVE_FILE))
             {
                 BinaryFormatter serializer = new BinaryFormatter();
+
+                Stream stream2 = File.OpenWrite(Constants.SAVE_FILE + "_player");
+                serializer.Serialize(stream2, Player);
+
                 serializer.Serialize(stream, Map);
             }
         }
@@ -197,11 +201,49 @@ namespace Roguelike
                     using (Stream stream = File.OpenRead(Constants.SAVE_FILE))
                     {
                         BinaryFormatter deserializer = new BinaryFormatter();
+                        Stream stream2 = File.OpenRead(Constants.SAVE_FILE + "_player");
+                        Stream stream3 = File.OpenRead(Constants.SAVE_FILE + "_events");
+
+                        Player = (Player)deserializer.Deserialize(stream2);
                         Map = (MapHandler)deserializer.Deserialize(stream);
+<<<<<<< Updated upstream
+=======
+
+                        foreach (Actor actor in Map.Units)
+                            EventScheduler.AddActor(actor);
+
+                        // Option.FixedSeed = false;
+                        Option.Seed = 10;
+
+                        int mainSeed;
+                        if (Option.FixedSeed)
+                            mainSeed = Option.Seed;
+                        else
+                            mainSeed = (int)DateTime.Now.Ticks;
+
+                        Random Random = new Random(mainSeed);
+                        int[] generatorSeed = new int[31];
+
+                        using (StreamWriter writer = new StreamWriter("log"))
+                        {
+                            writer.WriteLine(mainSeed);
+
+                            for (int i = 0; i < generatorSeed.Length; i++)
+                            {
+                                generatorSeed[i] = Random.Next();
+                                writer.WriteLine(generatorSeed[i]);
+                            }
+                        }
+
+                        CombatRandom = new Random(generatorSeed[30]);
+
+                        GameMode = Enums.Mode.Normal;
+
+>>>>>>> Stashed changes
                         NewGame();
                     }
                 }
-                catch (SerializationException)
+                catch (Exception)
                 {
                     Console.Error.WriteLine("Load failed");
                     NewGame();

@@ -12,25 +12,20 @@ namespace Roguelike.Systems
 {
     // TODO: remove dependence on Map - implement FOV
     [Serializable]
-    public class MapHandler : Map, ISerializable
+    public class MapHandler : ISerializable
     {
-        public new int Width { get; }
-        public new int Height { get; }
+        public int Width { get; }
+        public int Height { get; }
 
         internal RLColor[,] Highlight { get; set; }
         internal Field Field { get; set; }
         internal float[,] PlayerMap { get; }
 
-        private ICollection<Actor> Units { get; }
+        internal ICollection<Actor> Units { get; }
         private ICollection<ItemInfo> Items { get; }
         private ICollection<Door> Doors { get; }
         
-        public MapHandler()
-        {
-
-        }
-
-        public MapHandler(int width, int height) : base(width, height)
+        public MapHandler(int width, int height)
         {
             Width = width;
             Height = height;
@@ -79,26 +74,25 @@ namespace Roguelike.Systems
             return Field[x, y].Unit;
         }
 
-        public bool RemoveActor(Actor unit)
+        public void RemoveActor(Actor unit)
         {
-            SetOccupied(unit.X, unit.Y, false);
-            unit.State = Enums.ActorState.Dead;
-            Field[unit.X, unit.Y].Unit = null;
-            Game.EventScheduler.RemoveActor(unit);
-
-            return Units.Remove(unit);
+            bool success = Units.Remove(unit);
+            if (success)
+            {
+                unit.State = Enums.ActorState.Dead;
+                Field[unit.X, unit.Y].Unit = null;
+                Game.EventScheduler.RemoveActor(unit);
+            }
         }
 
         public bool SetActorPosition(Actor actor, int x, int y)
         {
             if (Field[x, y].IsWalkable)
             {
-                SetOccupied(actor.X, actor.Y, false);
                 Field[actor.X, actor.Y].Unit = null;
 
                 actor.X = x;
                 actor.Y = y;
-                SetOccupied(x, y, true);
                 Field[x, y].Unit = actor;
 
                 if (actor is Player)
@@ -164,9 +158,6 @@ namespace Roguelike.Systems
             Doors.Add(door);
             Field[door.X, door.Y].Unit = door;
 
-            Cell cell = GetCell(door.X, door.Y);
-            SetCellProperties(cell.X, cell.Y, false, true, cell.IsExplored);
-
             return true;
         }
 
@@ -174,13 +165,11 @@ namespace Roguelike.Systems
         {
             door.Symbol = '-';
             Doors.Remove(door);
-            
-            Cell cell = GetCell(door.X, door.Y);
-            SetCellProperties(cell.X, cell.Y, true, false, cell.IsExplored);
         }
         #endregion
 
-        public IEnumerable<WeightedPoint> PathToPlayer(int x, int y)
+        #region Tile Selection Methods
+        public IEnumerable<WeightedPoint> GetPathToPlayer(int x, int y)
         {
             System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
             float nearest = PlayerMap[x, y];
@@ -227,18 +216,18 @@ namespace Roguelike.Systems
             return new WeightedPoint(nextX, nextY, nearest);
         }
 
-        public IEnumerable<Terrain> StraightPathToPlayer(int x, int y)
+        public IEnumerable<Terrain> GetStraightPathToPlayer(int x, int y)
         {
             System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
-            if (IsInFov(x, y))
-                return StraightLinePath(x, y, Game.Player.X, Game.Player.Y);
+            if (Field[x, y].IsVisible)
+                return GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y);
             else
                 return new List<Terrain>();
         }
 
         // Returns a straight line from the source to target. Does not check if the path is actually
         // walkable.
-        internal IEnumerable<Terrain> StraightLinePath(int sourceX, int sourceY, int targetX, int targetY)
+        public IEnumerable<Terrain> GetStraightLinePath(int sourceX, int sourceY, int targetX, int targetY)
         {
             int dx = Math.Abs(targetX - sourceX);
             int dy = Math.Abs(targetY - sourceY);
@@ -267,13 +256,49 @@ namespace Roguelike.Systems
                 yield return Field[sourceX, sourceY];
             }
         }
+        
+        public IEnumerable<Terrain> GetTilesInRadius(int x, int y, int radius)
+        {
+            // NOTE: lazy implementation - replace if needed
+            for (int i = x - radius; i <= x + radius; i++)
+            {
+                for (int j = y - radius; j <= y + radius; j++)
+                {
+                    if (Field[i, j] != null && Utils.Distance.EuclideanDistanceSquared(i, j, x, y) <= radius * radius)
+                        yield return Field[i, j];
+                }
+            }
+        }
+        #endregion
+
+        #region FOV Methods
+        public void ComputeFov(int x, int y, int radius)
+        {
+            // NOTE: slow implementation of fov - replace if needed
+            foreach(Terrain tile in GetTilesInRadius(x, y, radius))
+            {
+                bool visible = true;
+                foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y))
+                {
+                    if (tt.IsWall)
+                    {
+                        visible = false;
+                        break;
+                    }
+                }
+
+                tile.IsVisible = visible;
+            }
+        }
+
+        #endregion
 
         #region Drawing Methods
         public void Draw(RLConsole mapConsole)
         {
-            foreach (Cell cell in GetAllCells())
+            foreach (Terrain tile in Field)
             {
-                DrawCell(mapConsole, cell);
+                DrawTile(mapConsole, tile);
             }
 
             foreach (ItemInfo stack in Items)
@@ -294,52 +319,52 @@ namespace Roguelike.Systems
             }
 
             // debugging code for dijkstra maps
-            foreach (Cell cell in GetAllCells())
+            foreach (Terrain tile in Field)
             {
                 if (Game.ShowOverlay)
-                    DrawOverlay(mapConsole, cell);
+                    DrawOverlay(mapConsole, tile);
             }
 
         }
 
-        private void DrawCell(RLConsole mapConsole, Cell cell)
+        private void DrawTile(RLConsole mapConsole, Terrain tile)
         {
-            if (!cell.IsExplored)
+            if (!tile.IsExplored)
             {
                 return;
             }
 
-            if (IsInFov(cell.X, cell.Y))
+            if (Field[tile.X, tile.Y].IsVisible)
             {
-                if (!Field[cell.X, cell.Y].IsWall)
+                if (!Field[tile.X, tile.Y].IsWall)
                 {
-                    mapConsole.Set(cell.X, cell.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
-                    // mapConsole.SetColor(cell.X, cell.Y, new RLColor(1, 1 - PlayerMap[cell.X, cell.Y] / 20, 0));
+                    mapConsole.Set(tile.X, tile.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
+                    // mapConsole.SetColor(tile.X, tile.Y, new RLColor(1, 1 - PlayerMap[tile.X, tile.Y] / 20, 0));
                 }
                 else
                 {
-                    mapConsole.Set(cell.X, cell.Y, Colors.WallFov, Colors.WallBackgroundFov, '#');
+                    mapConsole.Set(tile.X, tile.Y, Colors.WallFov, Colors.WallBackgroundFov, '#');
                 }
             }
             else
             {
-                if (!Field[cell.X, cell.Y].IsWall)
+                if (!Field[tile.X, tile.Y].IsWall)
                 {
-                    mapConsole.Set(cell.X, cell.Y, Colors.Floor, Colors.FloorBackground, '.');
+                    mapConsole.Set(tile.X, tile.Y, Colors.Floor, Colors.FloorBackground, '.');
                 }
                 else
                 {
-                    mapConsole.Set(cell.X, cell.Y, Colors.Wall, Colors.WallBackground, '#');
+                    mapConsole.Set(tile.X, tile.Y, Colors.Wall, Colors.WallBackground, '#');
                 }
             }
 
-            mapConsole.SetBackColor(cell.X, cell.Y, Highlight[cell.X, cell.Y]);
+            mapConsole.SetBackColor(tile.X, tile.Y, Highlight[tile.X, tile.Y]);
         }
 
-        private void DrawOverlay(RLConsole mapConsole, Cell cell)
+        private void DrawOverlay(RLConsole mapConsole, Terrain tile)
         {
             string display;
-            float distance = PlayerMap[cell.X, cell.Y];
+            float distance = PlayerMap[tile.X, tile.Y];
 
             if (distance < 10 || float.IsNaN(distance))
                 display = distance.ToString();
@@ -347,9 +372,9 @@ namespace Roguelike.Systems
                 display = ((char)(distance - 10 + 'a')).ToString();
 
             if (display == "NaN")
-                mapConsole.Print(cell.X, cell.Y, display, Swatch.DbBlood);
+                mapConsole.Print(tile.X, tile.Y, display, Swatch.DbBlood);
             else
-                mapConsole.Print(cell.X, cell.Y, display, Swatch.DbWater);
+                mapConsole.Print(tile.X, tile.Y, display, Swatch.DbWater);
         }
 
         internal void ClearHighlight()
@@ -367,14 +392,13 @@ namespace Roguelike.Systems
         private void UpdatePlayerFov()
         {
             Player player = Game.Player;
-            ComputeFov(player.X, player.Y, player.Awareness, true);
+            ComputeFov(player.X, player.Y, player.Awareness);
 
-            foreach (Cell cell in GetAllCells())
+            foreach (Terrain tile in Field)
             {
-                if (IsInFov(cell.X, cell.Y))
+                if (Field[tile.X, tile.Y].IsVisible)
                 {
-                    SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
-                    Field[cell.X, cell.Y].IsExplored = true;
+                    tile.IsExplored = true;
                 }
             }
         }
@@ -406,9 +430,9 @@ namespace Roguelike.Systems
                     int newX = p.X + dir.X;
                     int newY = p.Y + dir.Y;
                     float newWeight = p.Weight + dir.Weight;
-                    Terrain cell = Field[newX, newY];
+                    Terrain tile = Field[newX, newY];
 
-                    if (cell != null && !cell.IsWall && cell.IsExplored &&
+                    if (tile != null && !tile.IsWall && tile.IsExplored &&
                         (float.IsNaN(PlayerMap[newX, newY]) || newWeight < PlayerMap[newX, newY]))
                     {
                         PlayerMap[newX, newY] = newWeight;
@@ -416,12 +440,6 @@ namespace Roguelike.Systems
                     }
                 }
             }
-        }
-
-        private void SetOccupied(int x, int y, bool occupied)
-        {
-            Cell cell = GetCell(x, y);
-            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, !occupied, cell.IsExplored);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)

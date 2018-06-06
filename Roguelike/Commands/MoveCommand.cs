@@ -12,14 +12,14 @@ namespace Roguelike.Commands
 
         private readonly int _newX;
         private readonly int _newY;
-        private Terrain _cell;
+        private Terrain _tile;
 
         public MoveCommand(Actor source, int x, int y)
         {
             Source = source;
             _newX = x;
             _newY = y;
-            _cell = Game.Map.Field[_newX, _newY];
+            _tile = Game.Map.Field[_newX, _newY];
         }
 
         public RedirectMessage Validate()
@@ -29,7 +29,7 @@ namespace Roguelike.Commands
                 return new RedirectMessage(false, new WaitCommand(Source));
 
             // Don't walk into walls.
-            if (_cell.IsWall)
+            if (_tile.IsWall)
             {
                 // Don't penalize the player for walking into walls, but monsters should wait if 
                 // they will walk into a wall.
@@ -40,15 +40,14 @@ namespace Roguelike.Commands
             }
 
             // Check if the destination is already occupied.
-            if (_cell.IsOccupied)
+            if (_tile.IsOccupied)
             {
-                var (x, y) = _cell.Position;
-                Actor target = Game.Map.GetActor(x, y);
+                Actor target = Game.Map.GetActor(_tile.X, _tile.Y);
 
                 if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
                 else
-                    return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(_cell.Position)));
+                    return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(_tile.X, _tile.Y)));
             }
 
             return new RedirectMessage(true);
@@ -56,7 +55,7 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            System.Diagnostics.Debug.Assert(_cell.IsWalkable);
+            System.Diagnostics.Debug.Assert(_tile.IsWalkable);
             Game.MessageHandler.AddMessage($"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy", Enums.MessageLevel.Verbose);
 
             if (Source is Player)

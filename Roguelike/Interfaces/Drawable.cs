@@ -1,5 +1,5 @@
 ﻿using RLNET;
-using RogueSharp;
+using Roguelike.Systems;
 using System;
 
 namespace Roguelike.Interfaces
@@ -7,7 +7,6 @@ namespace Roguelike.Interfaces
     [Serializable]
     public abstract class Drawable
     {
-        [field: NonSerialized]
         private RLColor _color;
 
         public RLColor Color { get => _color; internal protected set => _color = value; }
@@ -16,12 +15,12 @@ namespace Roguelike.Interfaces
         public abstract int X { get; set; }
         public abstract int Y { get; set; }
 
-        public void Draw(RLConsole console, IMap map)
+        public void Draw(RLConsole console, MapHandler map)
         {
-            if (!map.GetCell(X, Y).IsExplored)
-                return;
+            //if (!map.Field[X, Y].IsExplored)
+            //    return;
 
-            if (map.IsInFov(X, Y))
+            if (map.Field[X, Y].IsVisible)
             {
                 console.Set(X, Y, Color, null, Symbol);
             }

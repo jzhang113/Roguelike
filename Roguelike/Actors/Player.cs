@@ -11,7 +11,7 @@ namespace Roguelike.Actors
     {
         public Player()
         {
-            Awareness = 100;
+            Awareness = 10;
             Name = "Player";
             Color = Colors.Player;
             Symbol = '@';

@@ -295,7 +295,6 @@ namespace Roguelike.Systems
                 {
                     if (_map.Field.IsValid(i, j))
                     {
-                        _map.SetCellProperties(i, j, true, true, true);
                         _map.Field[i, j].IsWall = false;
                     }
                 }

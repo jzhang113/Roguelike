@@ -38,25 +38,25 @@ namespace Roguelike.Systems
                 var (mouseX, mouseY) = mousePos.Value;
 
                 map.ClearHighlight();
-                Cell current = map.GetCell(mouseX, mouseY);
+                Terrain current = map.Field[mouseX, mouseY];
 
                 if (Game.GameMode == Enums.Mode.Targetting)
                 {
-                    IEnumerable<Terrain> path =Game.Map.StraightLinePath(player.X, player.Y, mouseX, mouseY);
+                    IEnumerable<Terrain> path =Game.Map.GetStraightLinePath(player.X, player.Y, mouseX, mouseY);
                     foreach (Terrain tile in path)
                     {
-                        if (!map.Field[tile.Position.X, tile.Position.Y].IsExplored)
+                        if (!map.Field[tile.X, tile.Y].IsExplored)
                         {
                             break;
                         }
 
-                        map.Highlight[tile.Position.X, tile.Position.Y] = RLColor.Red;
+                        map.Highlight[tile.X, tile.Y] = RLColor.Red;
                     }
                 }
                 else
                 {
                     // TODO: Path may end up broken because an enemy is in the way.
-                    IEnumerable<WeightedPoint> path = map.PathToPlayer(mouseX, mouseY).Reverse();
+                    IEnumerable<WeightedPoint> path = map.GetPathToPlayer(mouseX, mouseY).Reverse();
                     bool exploredPathExists = false;
 
                     foreach (WeightedPoint p in path)
@@ -333,9 +333,9 @@ namespace Roguelike.Systems
 
         private static ICommand ResolveTargetting()
         {
-            foreach (Cell cell in Game.Map.GetCellsInRadius(_targettingSource.X, _targettingSource.Y, (int)_targettingAction.Area.Range))
+            foreach (Terrain tile in Game.Map.GetTilesInRadius(_targettingSource.X, _targettingSource.Y, (int)_targettingAction.Area.Range))
             {
-                Game.Map.Highlight[cell.X, cell.Y] = Swatch.DbGrass;
+                Game.Map.Highlight[tile.X, tile.Y] = Swatch.DbGrass;
             }
 
             var clickPos = GetClickPosition();

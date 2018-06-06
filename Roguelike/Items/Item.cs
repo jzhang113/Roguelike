@@ -49,9 +49,9 @@ namespace Roguelike.Items
         }
         #endregion
 
-        public IAction GetBasicAttack((int X, int Y) target)
+        public IAction GetBasicAttack(int targetX, int targetY)
         {
-            return new DamageAction(Damage, new Core.TargetZone(Enums.TargetShape.Directional, target));
+            return new DamageAction(Damage, new Core.TargetZone(Enums.TargetShape.Directional, (targetX, targetY)));
         }
 
         public IAction GetAbility(int index)

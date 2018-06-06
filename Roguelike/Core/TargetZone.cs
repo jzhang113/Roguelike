@@ -56,17 +56,16 @@ namespace Roguelike.Core
                     inRange.Add(Game.Map.Field[current.X, current.Y]);
                     return inRange;
                 case TargetShape.Area:
-                    foreach (Terrain cell in Game.Map.Field)
+                    foreach (Terrain tile in Game.Map.Field)
                     {
-                        (X, Y) = cell.Position;
-                        AddCellInRange(current, X, Y, inRange);
+                        AddTilesInRange(current, tile.X, tile.Y, inRange);
                     }
                     return inRange;
                 case TargetShape.Range:
-                    AddCellInRange(current, X, Y, inRange);
+                    AddTilesInRange(current, X, Y, inRange);
                     return inRange;
                 case TargetShape.Ray:
-                    return Game.Map.StraightLinePath(current.X, current.Y, X, Y);
+                    return Game.Map.GetStraightLinePath(current.X, current.Y, X, Y);
                 case TargetShape.Directional:
                     int dx = current.X - X;
                     int dy = current.Y - Y;
@@ -75,7 +74,7 @@ namespace Roguelike.Core
                     int limit = Math.Max(Math.Abs(dx), Math.Abs(dy));
 
                     for (int i = 0; i < limit; i++)
-                        AddCellInRange(current, X + i * sx, Y + i * sy, inRange);
+                        AddTilesInRange(current, X + i * sx, Y + i * sy, inRange);
 
                     return inRange;
                 default:
@@ -83,7 +82,7 @@ namespace Roguelike.Core
             }
         }
 
-        public void AddCellInRange(Actor actor, int x, int y, ICollection<Terrain> tiles)
+        public void AddTilesInRange(Actor actor, int x, int y, ICollection<Terrain> tiles)
         {
             int distance = Utils.Distance.EuclideanDistanceSquared(actor.X, actor.Y, x, y);
             if (distance > 0 && distance <= Range * Range)
