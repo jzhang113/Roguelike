@@ -31,7 +31,7 @@ namespace Roguelike.Commands
                 return new RedirectMessage(false);
             }
 
-            Item item = Source.Inventory.GetItem(_key);
+            Item item = Source.Inventory.GetItem(_key).Item;
             if (item is IUsable)
             {
                 IAction action = (item as IUsable).ApplySkill;
@@ -68,10 +68,10 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            Item item = Source.Inventory.GetItem(_key);
-            Source.Inventory.Remove(item);
+            ItemInfo itemGroup = Source.Inventory.GetItem(_key);
+            Source.Inventory.Remove(itemGroup);
 
-            IUsable usableItem = item as IUsable;
+            IUsable usableItem = itemGroup.Item as IUsable;
             usableItem.Apply(Target);
         }
     }

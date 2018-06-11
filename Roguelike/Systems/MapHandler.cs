@@ -2,7 +2,6 @@
 using Roguelike.Actors;
 using Roguelike.Items;
 using Roguelike.Core;
-using RogueSharp;
 using System.Collections.Generic;
 using System.Linq;
 using System;
@@ -110,38 +109,38 @@ namespace Roguelike.Systems
         #endregion
 
         #region Item Methods
-        public bool AddItem(Item item)
+        public bool AddItem(ItemInfo itemGroup)
         {
             bool found = false;
 
             foreach (ItemInfo stack in Items)
             {
-                if (stack.Contains(item))
+                if (stack.Equals(itemGroup))
                 {
-                    stack.Add();
+                    stack.Add(itemGroup.Count);
                     found = true;
                 }
             }
 
             if (!found)
-                Items.Add(new ItemInfo(item));
+                Items.Add(itemGroup);
 
-            if (Field[item.X, item.Y].ItemStack == null)
-                Field[item.X, item.Y].ItemStack = new InventoryHandler();
+            if (Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack == null)
+                Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack = new InventoryHandler();
 
-            Field[item.X, item.Y].ItemStack.Add(item);
+            Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack.Add(itemGroup);
             return true;
         }
 
-        public void RemoveItem(Item item)
+        public void RemoveItem(ItemInfo itemGroup)
         {
             foreach (ItemInfo stack in Items)
             {
-                if (stack.Contains(item))
-                    stack.Remove();
+                if (stack.Equals(itemGroup))
+                    stack.Remove(itemGroup.Count);
             }
 
-            Field[item.X, item.Y].ItemStack.Remove(item);
+            Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack.Remove(itemGroup);
         }
 
         public ItemInfo GetItem(int x, int y)

@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
+using Roguelike.Items;
 
 namespace Roguelike.Systems
 {
@@ -19,10 +20,10 @@ namespace Roguelike.Systems
             _showActorInfo = (actor != null);
         }
 
-        public static void DisplayItem(ItemInfo itemInfo)
+        public static void DisplayItem(ItemInfo itemGroup)
         {
-            _displayItem = itemInfo;
-            _showItemInfo = (itemInfo != null) && (itemInfo.Count > 0);
+            _displayItem = itemGroup;
+            _showItemInfo = (itemGroup != null) && (itemGroup.Count > 0);
         }
 
         internal static void DisplayTerrain(Terrain tile)

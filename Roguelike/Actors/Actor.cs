@@ -13,6 +13,7 @@ namespace Roguelike.Actors
         public string Name { get; set; }
         public int Awareness { get; set; }
         public int Speed { get; set; }
+        public bool BlocksLight { get; set; }
 
         public int HP { get; set; }
         public int MaxHP { get; set; }
@@ -25,7 +26,7 @@ namespace Roguelike.Actors
         public int DEX { get; }
         public int DEF { get; set; }
         public int INT { get; set; }
-        
+
         public Enums.ActorState State { get; set; }
 
         public override int X { get; set; }
@@ -41,11 +42,14 @@ namespace Roguelike.Actors
 
         public Actor()
         {
+            Energy = 0;
             RefreshRate = Utils.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
 
             Weapon defaultWeapon = new Weapon("fists", Materials.Flesh);
             Equipment = new EquipmentHandler(defaultWeapon);
+
+            BlocksLight = true;
         }
 
         public virtual void TriggerDeath()

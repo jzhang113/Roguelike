@@ -13,6 +13,7 @@ namespace Roguelike.Items
     {
         public string Name { get; }
         public IMaterial Material { get; }
+        public bool BlocksLight { get; }
 
         public Actor Carrier { get; set; }
         public override int X { get; set; }
@@ -23,13 +24,15 @@ namespace Roguelike.Items
         internal float MeleeRange { get; set; } = Constants.DEFAULT_MELEE_RANGE;
         internal float ThrowRange { get; set; } = Constants.DEFAULT_THROW_RANGE;
 
-        private IList<IAction> Abilities { get; }
+        private IList<IAction> _abilities { get; }
 
-        public Item(string name, IMaterial material)
+        public Item(string name, IMaterial material, bool blocksLight = false)
         {
             Name = name;
             Material = material;
-            Abilities = new List<IAction>();
+            BlocksLight = blocksLight;
+
+            _abilities = new List<IAction>();
         }
 
         #region virtual methods
@@ -56,16 +59,16 @@ namespace Roguelike.Items
 
         public IAction GetAbility(int index)
         {
-            if (index >= Abilities.Count)
+            if (index >= _abilities.Count)
                 return null;
             else
-                return Abilities[index];
+                return _abilities[index];
         }
 
         public void AddAbility(IAction skill)
         {
             // TODO: check that the skill doesn't already exist
-            Abilities.Add(skill);
+            _abilities.Add(skill);
         }
     }
 }

@@ -135,7 +135,7 @@
     <Compile Include="Actors\Skeleton.cs" />
     <Compile Include="Interfaces\IMaterial.cs" />
     <Compile Include="Systems\InventoryHandler.cs" />
-    <Compile Include="Core\ItemInfo.cs" />
+    <Compile Include="Items\ItemInfo.cs" />
     <Compile Include="Systems\LookHandler.cs" />
     <Compile Include="Systems\OptionHandler.cs" />
     <Compile Include="Core\Options.cs" />
@@ -168,6 +168,8 @@
       <Generator>MSDataSetGenerator</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Data\materials.json" />
+    <None Include="Data\weapons.json" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>

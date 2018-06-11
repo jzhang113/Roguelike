@@ -11,6 +11,7 @@ using Roguelike.Utils;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
+using Roguelike.Items;
 
 namespace Roguelike
 {
@@ -123,7 +124,7 @@ namespace Roguelike
                 Map.AddActor(s);
             }
 
-            Items.Weapon spear = new Items.Weapon("spear", Materials.Wood)
+            Weapon spear = new Weapon("spear", Materials.Wood)
             {
                 AttackSpeed = 240,
                 Damage = 200,
@@ -133,7 +134,7 @@ namespace Roguelike
                 Y = Player.Y - 1,
                 Color = Swatch.DbBlood
             };
-            Map.AddItem(spear);
+            Map.AddItem(new ItemInfo(spear));
 
             IAction rangedDamage = new DamageAction(200, new TargetZone(Enums.TargetShape.Ray, range: 10));
             IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
@@ -146,7 +147,7 @@ namespace Roguelike
             //var lungeAction = new Actions.ActionSequence(150, lungeSkill);
             //spear.AddAbility(lungeAction);
 
-            Items.Armor ha = new Items.Armor("heavy armor", Materials.Iron, Enums.ArmorType.Armor)
+            Armor ha = new Armor("heavy armor", Materials.Iron, Enums.ArmorType.Armor)
             {
                 AttackSpeed = 1000,
                 Damage = 100,
@@ -156,23 +157,23 @@ namespace Roguelike
                 Y = Player.Y - 3,
                 Color = Swatch.DbMetal
             };
-            Map.AddItem(ha);
+            Map.AddItem(new ItemInfo(ha));
 
-            Items.Scroll magicMissile = new Items.Scroll("scroll of magic missile", rangedDamage)
+            Scroll magicMissile = new Scroll("scroll of magic missile", rangedDamage)
             {
                 X = Player.X - 1,
                 Y = Player.Y - 2,
                 Color = Swatch.DbSun
             };
-            Map.AddItem(magicMissile);
+            Map.AddItem(new ItemInfo(magicMissile));
 
-            Items.Scroll healing = new Items.Scroll("scroll of healing", heal)
+            Scroll healing = new Scroll("scroll of healing", heal)
             {
                 X = Player.X + 1,
                 Y = Player.Y + 1,
                 Color = Swatch.DbGrass
             };
-            Map.AddItem(healing);
+            Map.AddItem(new ItemInfo(healing));
 
             GameMode = Enums.Mode.Normal;
         }

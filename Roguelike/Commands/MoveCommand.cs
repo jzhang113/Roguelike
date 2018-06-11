@@ -64,8 +64,8 @@ namespace Roguelike.Commands
 
                 if (itemStack != null && !itemStack.IsEmpty())
                 {
-                    if (itemStack.Size() == 1)
-                        Game.MessageHandler.AddMessage($"You see a {itemStack.GetItem('a').Name} here.");
+                    if (itemStack.Count == 1)
+                        Game.MessageHandler.AddMessage($"You see a {itemStack.GetItem('a').Item.Name} here.");
                     else
                         Game.MessageHandler.AddMessage("You see several items here.");
                 }

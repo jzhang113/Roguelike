@@ -11,7 +11,7 @@ namespace Roguelike.Commands
         public int EnergyCost { get; } = 120;
 
         private char _key;
-        private Item _item;
+        private ItemInfo _item;
 
         public EquipCommand(Actor source, char key)
         {
@@ -36,7 +36,7 @@ namespace Roguelike.Commands
             }
             else
             {
-                Game.MessageHandler.AddMessage($"Cannot equip {_item.Name}.");
+                Game.MessageHandler.AddMessage($"Cannot equip {_item.Item.Name}.");
                 return new RedirectMessage(false);
             }
         }

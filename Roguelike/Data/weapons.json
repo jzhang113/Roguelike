@@ -1,0 +1,8 @@
+﻿{
+    "spear": {
+        "attackSpeed": 240,
+        "damage": 200,
+        "meleeRange": 1.5,
+        "throwRange": 7,
+    }
+}

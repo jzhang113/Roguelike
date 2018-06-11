@@ -31,13 +31,15 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            Item item = Source.Inventory.GetItem(_key);
-            Source.Inventory.Remove(item);
+            ItemInfo itemGroup = Source.Inventory.GetItem(_key);
+            Item item = itemGroup.Item;
+
+            Source.Inventory.Remove(itemGroup);
             item.Carrier = null;
 
             item.X = Source.X;
             item.Y = Source.Y;
-            Game.Map.AddItem(item);
+            Game.Map.AddItem(itemGroup);
             Game.MessageHandler.AddMessage($"You drop a {item.Name}.");
         }
     }

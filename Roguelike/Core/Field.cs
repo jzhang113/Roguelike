@@ -43,11 +43,7 @@ namespace Roguelike.Core
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach (Terrain[] row in _field)
-            {
-                foreach (Terrain tile in row)
-                    yield return tile;
-            }
+            return GetEnumerator();
         }
     }
 }

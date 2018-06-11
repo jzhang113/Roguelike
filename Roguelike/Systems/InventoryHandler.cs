@@ -2,88 +2,106 @@
 using Roguelike.Core;
 using Roguelike.Items;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
     // Handles all stacks of items in the game, such as the player inventory and piles of loot.
     [Serializable]
-    public class InventoryHandler
+    public class InventoryHandler : ICollection<ItemInfo>
     {
         private IList<ItemInfo> _inventory;
+
+        public int Count => _inventory.Count;
+        public bool IsReadOnly => false;
+
+        // Tells if the current inventory is empty or not.
+        public bool IsEmpty() => _inventory.Count == 0;
 
         public InventoryHandler()
         {
             _inventory = new List<ItemInfo>();
         }
 
-        // Increments the item stack if it already exists and adds the item to inventory otherwise.
-        public void Add(Item item)
+        // Increments the item stack if it already exists or adds the item to inventory.
+        public void Add(ItemInfo itemGroup)
         {
             bool found = false;
             foreach (ItemInfo info in _inventory)
             {
-                if (info.Contains(item))
+                if (info.Equals(itemGroup))
                 {
                     found = true;
-                    info.Add();
+                    info.Add(itemGroup.Count);
                     break;
                 }
             }
 
             if (!found)
-                _inventory.Add(new ItemInfo(item));
-        
+                _inventory.Add(itemGroup);
+
         }
 
-        // Decrements the item stack if there are multiple items or removes the item if there is
-        // only one.
-        public void Remove(Item item)
+        // Decrements the item stack if there are multiple items and removes the item if there are
+        // no more.
+        public bool Remove(ItemInfo itemGroup)
         {
-            bool found = false;
             foreach (ItemInfo info in _inventory)
             {
-                if (info.Contains(item))
+                if (info.Equals(itemGroup))
                 {
-                    found = true;
-                    info.Remove();
+                    info.Remove(itemGroup.Count);
 
                     // We shouldn't be negative here...
                     System.Diagnostics.Debug.Assert(info.Count >= 0);
                     if (info.Count == 0)
                         _inventory.Remove(info);
 
-                    break;
+                    return true;
                 }
             }
 
-            if (!found)
-            {
-                System.Diagnostics.Debug.Assert(false, "Cannot remove non-existant item from inventory");
-                Game.MessageHandler.AddMessage("You don't have that.", Enums.MessageLevel.Verbose);
-            }
+            System.Diagnostics.Debug.Assert(false, $"Cannot remove non-existant item, {itemGroup.Item.Name}, from inventory");
+            Game.MessageHandler.AddMessage($"{itemGroup.Item.Name} not found, can't remove it", Enums.MessageLevel.Verbose);
+            return false;
         }
-    
+
+        public void Clear()
+        {
+            _inventory.Clear();
+        }
+
+        public bool Contains(ItemInfo itemGroup)
+        {
+            foreach (ItemInfo info in _inventory)
+            {
+                if (info.Equals(itemGroup))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void CopyTo(ItemInfo[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool HasKey(char key)
         {
             if (key < 'a' || key > 'z')
                 return false;
-            
+
             return key - 'a' < _inventory.Count;
         }
 
         // Returns the item at position key. Does not remove the item from inventory.
-        public Item GetItem(char key)
+        public ItemInfo GetItem(char key)
         {
             System.Diagnostics.Debug.Assert(HasKey(key));
-            return _inventory[key - 'a'].Item;
+            return _inventory[key - 'a'];
         }
-
-        // Tells if the current inventory is empty or not.
-        public bool IsEmpty() => _inventory.Count == 0;
-
-        // Returns the number of distinct items in the current inventory.
-        public int Size() => _inventory.Count;
 
         public void Draw(RLConsole console)
         {
@@ -103,6 +121,16 @@ namespace Roguelike.Systems
                 line++;
                 letter++;
             }
+        }
+
+        public IEnumerator<ItemInfo> GetEnumerator()
+        {
+            return _inventory.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

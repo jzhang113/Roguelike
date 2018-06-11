@@ -32,40 +32,40 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            Item obj;
+            ItemInfo itemGroup;
 
-            switch(_itemStack.Size())
+            switch(_itemStack.Count)
             {
                 case 1:
-                    obj = _itemStack.GetItem('a');
-                    Source.Inventory.Add(obj);
-                    obj.Carrier = Source;
+                    itemGroup = _itemStack.GetItem('a');
+                    Source.Inventory.Add(itemGroup);
+                    itemGroup.Item.Carrier = Source;
 
-                    Game.Map.RemoveItem(obj);
-                    Game.MessageHandler.AddMessage($"You pick up a {obj.Name}.");
+                    Game.Map.RemoveItem(itemGroup);
+                    Game.MessageHandler.AddMessage($"You pick up a {itemGroup.Item.Name}.");
                     break;
                 default:
                     if (Source is Player)
                     {
                         // HACK: handle pickup menu - this placeholder at least lets you pick up the top item
-                        obj = _itemStack.GetItem('a');
-                        Source.Inventory.Add(obj);
-                        obj.Carrier = Source;
+                        itemGroup = _itemStack.GetItem('a');
+                        Source.Inventory.Add(itemGroup);
+                        itemGroup.Item.Carrier = Source;
 
-                        Game.Map.RemoveItem(obj);
-                        Game.MessageHandler.AddMessage($"You pick up a {obj.Name}.");
+                        Game.Map.RemoveItem(itemGroup);
+                        Game.MessageHandler.AddMessage($"You pick up a {itemGroup.Item.Name}.");
                     }
                     else
                     {
                         // HACK: Monsters will simply grab the top item off of a pile if they try to pick stuff up.
-                        obj = _itemStack.GetItem('a');
-                        Source.Inventory.Add(obj);
-                        obj.Carrier = Source;
+                        itemGroup = _itemStack.GetItem('a');
+                        Source.Inventory.Add(itemGroup);
+                        itemGroup.Item.Carrier = Source;
 
-                        Game.Map.RemoveItem(obj);
+                        Game.Map.RemoveItem(itemGroup);
 
                         // TODO: Tell the player only if they can see / notice this
-                        Game.MessageHandler.AddMessage($"{Source} picks up a {obj.Name}.");
+                        Game.MessageHandler.AddMessage($"{Source} picks up a {itemGroup.Item.Name}.");
                     }
                     break;
             }
