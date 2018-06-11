@@ -184,9 +184,11 @@ namespace Roguelike
                 BinaryFormatter serializer = new BinaryFormatter();
 
                 Stream stream2 = File.OpenWrite(Constants.SAVE_FILE + "_player");
-                serializer.Serialize(stream2, Player);
+                // serializer.Serialize(stream2, Player as Actor);
 
-                serializer.Serialize(stream, Map);
+                // serializer.Serialize(stream, Map);
+
+                stream2.Close();
             }
         }
 
@@ -195,58 +197,62 @@ namespace Roguelike
             if (File.Exists(Constants.SAVE_FILE))
             {
                 Console.WriteLine("Reading saved file");
+                Stream stream = null, stream2 = null, stream3 = null;
 
                 try
                 {
-                    using (Stream stream = File.OpenRead(Constants.SAVE_FILE))
+                    BinaryFormatter deserializer = new BinaryFormatter();
+
+                    stream = File.OpenRead(Constants.SAVE_FILE);
+                    stream2 = File.OpenRead(Constants.SAVE_FILE + "_player");
+                    stream3 = File.OpenRead(Constants.SAVE_FILE + "_events");
+
+                    Player = (Player)deserializer.Deserialize(stream2);
+                    Map = (MapHandler)deserializer.Deserialize(stream);
+
+                    foreach (Actor actor in Map.Units)
+                        EventScheduler.AddActor(actor);
+
+                    // Option.FixedSeed = false;
+                    Option.Seed = 10;
+
+                    int mainSeed;
+                    if (Option.FixedSeed)
+                        mainSeed = Option.Seed;
+                    else
+                        mainSeed = (int)DateTime.Now.Ticks;
+
+                    Random Random = new Random(mainSeed);
+                    int[] generatorSeed = new int[31];
+
+                    using (StreamWriter writer = new StreamWriter("log"))
                     {
-                        BinaryFormatter deserializer = new BinaryFormatter();
-                        Stream stream2 = File.OpenRead(Constants.SAVE_FILE + "_player");
-                        Stream stream3 = File.OpenRead(Constants.SAVE_FILE + "_events");
+                        writer.WriteLine(mainSeed);
 
-                        Player = (Player)deserializer.Deserialize(stream2);
-                        Map = (MapHandler)deserializer.Deserialize(stream);
-<<<<<<< Updated upstream
-=======
-
-                        foreach (Actor actor in Map.Units)
-                            EventScheduler.AddActor(actor);
-
-                        // Option.FixedSeed = false;
-                        Option.Seed = 10;
-
-                        int mainSeed;
-                        if (Option.FixedSeed)
-                            mainSeed = Option.Seed;
-                        else
-                            mainSeed = (int)DateTime.Now.Ticks;
-
-                        Random Random = new Random(mainSeed);
-                        int[] generatorSeed = new int[31];
-
-                        using (StreamWriter writer = new StreamWriter("log"))
+                        for (int i = 0; i < generatorSeed.Length; i++)
                         {
-                            writer.WriteLine(mainSeed);
-
-                            for (int i = 0; i < generatorSeed.Length; i++)
-                            {
-                                generatorSeed[i] = Random.Next();
-                                writer.WriteLine(generatorSeed[i]);
-                            }
+                            generatorSeed[i] = Random.Next();
+                            writer.WriteLine(generatorSeed[i]);
                         }
-
-                        CombatRandom = new Random(generatorSeed[30]);
-
-                        GameMode = Enums.Mode.Normal;
-
->>>>>>> Stashed changes
-                        NewGame();
                     }
+
+                    CombatRandom = new Random(generatorSeed[30]);
+
+                    GameMode = Enums.Mode.Normal;
+
+
+                    NewGame();
                 }
                 catch (Exception)
                 {
                     Console.Error.WriteLine("Load failed");
                     NewGame();
+                }
+                finally
+                {
+                    if (stream != null) stream.Dispose();
+                    if (stream2 != null) stream2.Dispose();
+                    if (stream3 != null) stream3.Dispose();
                 }
             }
             else

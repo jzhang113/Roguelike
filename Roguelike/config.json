@@ -1,8 +1,8 @@
 ﻿{
-	"fontName": "Ddw10x10.png",
-	"fontSize": 10,
+	"fontName": "ccc12x12.png",
+	"fontSize": 12,
 	"screen": {
-		"height": 100,
+		"height": 70,
 		"width": 80
 	},
 	"map": {
@@ -15,7 +15,7 @@
 	},
 	"messageMaxCount": 100,
 	"messageView": {
-		"height": 51,
+		"height": 21,
 		"width": 60
 	},
 	"statView": {
@@ -23,7 +23,7 @@
 		"width": 60
 	},
 	"inventoryView": {
-		"height": 60,
+		"height": 70,
 		"width": 30
 	},
 	"viewWindow": {

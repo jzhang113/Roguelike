@@ -6,7 +6,6 @@ using System;
 
 namespace Roguelike.Actors
 {
-    [Serializable]
     class Player : Actor
     {
         public Player()

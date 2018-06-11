@@ -27,6 +27,7 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
+            Game.Map.Refresh();
             return;
         }
     }

@@ -10,7 +10,6 @@ using System.Runtime.Serialization;
 
 namespace Roguelike.Systems
 {
-    // TODO: remove dependence on Map - implement FOV
     [Serializable]
     public class MapHandler : ISerializable
     {
@@ -24,7 +23,7 @@ namespace Roguelike.Systems
         internal ICollection<Actor> Units { get; }
         private ICollection<ItemInfo> Items { get; }
         private ICollection<Door> Doors { get; }
-        
+
         public MapHandler(int width, int height)
         {
             Width = width;
@@ -51,6 +50,11 @@ namespace Roguelike.Systems
             Highlight = new RLColor[Width, Height];
             PlayerMap = new float[Width, Height];
 
+            Refresh();
+        }
+
+        internal void Refresh()
+        {
             UpdatePlayerFov();
             UpdatePlayerMaps();
         }
@@ -96,10 +100,7 @@ namespace Roguelike.Systems
                 Field[x, y].Unit = actor;
 
                 if (actor is Player)
-                {
-                    UpdatePlayerFov();
-                    UpdatePlayerMaps();
-                }
+                    Refresh();
 
                 return true;
             }
@@ -239,7 +240,7 @@ namespace Roguelike.Systems
             yield return Field[sourceX, sourceY];
 
             // Take a step towards the target and return the new position.
-            while (sourceX != targetX)
+            while (sourceX != targetX || sourceY != targetY)
             {
                 int e2 = 2 * err;
                 if (e2 > -dy)
@@ -256,7 +257,7 @@ namespace Roguelike.Systems
                 yield return Field[sourceX, sourceY];
             }
         }
-        
+
         public IEnumerable<Terrain> GetTilesInRadius(int x, int y, int radius)
         {
             // NOTE: lazy implementation - replace if needed
@@ -275,15 +276,27 @@ namespace Roguelike.Systems
         public void ComputeFov(int x, int y, int radius)
         {
             // NOTE: slow implementation of fov - replace if needed
-            foreach(Terrain tile in GetTilesInRadius(x, y, radius))
+            foreach (Terrain tile in GetTilesInRadius(x, y, radius))
             {
                 bool visible = true;
+                bool prevWall = false;
                 foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y))
                 {
-                    if (tt.IsWall)
+                    if (!tt.IsWalkable)
                     {
-                        visible = false;
-                        break;
+                        if (prevWall)
+                        {
+                            visible = false;
+                            break;
+                        }
+                        else
+                        {
+                            prevWall = true;
+                        }
+                    }
+                    else if (prevWall)
+                    {
+                        prevWall = false;
                     }
                 }
 
@@ -312,7 +325,7 @@ namespace Roguelike.Systems
                 if (!unit.IsDead)
                     unit.Draw(mapConsole, this);
             }
-            
+
             foreach (Door door in Doors)
             {
                 door.Draw(mapConsole, this);
