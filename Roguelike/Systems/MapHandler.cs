@@ -15,10 +15,12 @@ namespace Roguelike.Systems
         public int Width { get; }
         public int Height { get; }
 
-        internal RLColor[,] Highlight { get; set; }
-        internal Field Field { get; set; }
+        internal RLColor[,] Highlight { get; }
+        internal RLColor[,] PermHighlight { get; }
+        internal Field Field { get; }
         internal float[,] PlayerMap { get; }
 
+        // Internal so that we can add Actors to the EventScheduler when deserializing.
         internal ICollection<Actor> Units { get; }
         private ICollection<ItemInfo> Items { get; }
         private ICollection<Door> Doors { get; }
@@ -30,6 +32,7 @@ namespace Roguelike.Systems
 
             Field = new Field(width, height);
             Highlight = new RLColor[width, height];
+            PermHighlight = new RLColor[width, height];
             PlayerMap = new float[width, height];
 
             Units = new List<Actor>();
@@ -269,40 +272,56 @@ namespace Roguelike.Systems
                 }
             }
         }
+
+        public IEnumerable<Terrain> GetTilesInRectangle(int x, int y, int width, int height)
+        {
+            for (int i = x; i <= x + width; i++)
+            {
+                for (int j = y; j <= y + height; j++)
+                {
+                    yield return Field[i, j];
+                }
+            }
+        }
+
+        public IEnumerable<Terrain> GetTilesInRectangleBorder(int x, int y, int width, int height)
+        {
+            for (int i = x + 1; i < x + width; i++)
+            {
+                yield return Field[i, y];
+                yield return Field[i, y + height];
+            }
+
+            for (int j = y; j <= y + height; j++)
+            {
+                yield return Field[x, j];
+                yield return Field[x + width, j];
+            }
+        }
         #endregion
 
         #region FOV Methods
         public void ComputeFov(int x, int y, int radius)
         {
             // NOTE: slow implementation of fov - replace if needed
-            foreach (Terrain tile in GetTilesInRadius(x, y, radius))
+            // Set the player square to true and then skip it on future ray traces.
+            Field[x, y].IsVisible = true;
+            foreach (Terrain tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
             {
                 bool visible = true;
-                bool prevWall = false;
-                foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y))
+                foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y).Skip(1))
                 {
-                    if (!tt.IsWalkable)
-                    {
-                        if (prevWall)
-                        {
-                            visible = false;
-                            break;
-                        }
-                        else
-                        {
-                            prevWall = true;
-                        }
-                    }
-                    else if (prevWall)
-                    {
-                        prevWall = false;
-                    }
+                    tt.IsVisible = visible;
+                    if (visible && tt.BlocksLight)
+                        visible = false;
                 }
+            }
 
-                tile.IsVisible = visible;
+            foreach (Terrain tile in GetTilesInRectangle(x - radius / 2, y - radius / 2, radius, radius))
+            {
+                // TODO: post processing to remove visual artifacts.
             }
         }
-
         #endregion
 
         #region Drawing Methods
