@@ -9,8 +9,6 @@ using Roguelike.Actions;
 using System.ComponentModel;
 using Roguelike.Utils;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Xml.Serialization;
-using System.Runtime.Serialization;
 using Roguelike.Items;
 
 namespace Roguelike
@@ -279,7 +277,7 @@ namespace Roguelike
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            while (EventScheduler.Update())
+             while (EventScheduler.Update())
             {
                 _render = true;
             }

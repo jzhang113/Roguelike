@@ -167,7 +167,7 @@ namespace Roguelike.Systems
         public void OpenDoor(Door door)
         {
             door.Symbol = '-';
-            Doors.Remove(door);
+            Field[door.X, door.Y].Unit = null;
         }
         #endregion
 
@@ -238,8 +238,8 @@ namespace Roguelike.Systems
             int sy = (targetY < sourceY) ? -1 : 1;
             int err = dx - dy;
 
-            // Return the initial position.
-            yield return Field[sourceX, sourceY];
+            // Skip initial position?
+            // yield return Field[sourceX, sourceY];
 
             // Take a step towards the target and return the new position.
             while (sourceX != targetX || sourceY != targetY)
@@ -267,7 +267,7 @@ namespace Roguelike.Systems
             {
                 for (int j = y - radius; j <= y + radius; j++)
                 {
-                    if (Field[i, j] != null && Utils.Distance.EuclideanDistanceSquared(i, j, x, y) <= radius * radius)
+                    if (Utils.Distance.EuclideanDistanceSquared(i, j, x, y) <= radius * radius)
                         yield return Field[i, j];
                 }
             }
@@ -308,12 +308,21 @@ namespace Roguelike.Systems
             Field[x, y].IsVisible = true;
             foreach (Terrain tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
             {
+                if (tile == null)
+                    continue;
+
                 bool visible = true;
-                foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y).Skip(1))
+                foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y))
                 {
                     tt.IsVisible = visible;
-                    if (visible && tt.BlocksLight)
-                        visible = false;
+                    if (visible)
+                    {
+                        // Update the explored status while we're at it
+                        tt.IsExplored = true;
+
+                        if (tt.BlocksLight)
+                            visible = false;
+                    }
                 }
             }
 
@@ -332,6 +341,11 @@ namespace Roguelike.Systems
                 DrawTile(mapConsole, tile);
             }
 
+            foreach (Door door in Doors)
+            {
+                door.Draw(mapConsole, this);
+            }
+
             foreach (ItemInfo stack in Items)
             {
                 if (stack.Count > 0)
@@ -344,18 +358,12 @@ namespace Roguelike.Systems
                     unit.Draw(mapConsole, this);
             }
 
-            foreach (Door door in Doors)
-            {
-                door.Draw(mapConsole, this);
-            }
-
             // debugging code for dijkstra maps
             foreach (Terrain tile in Field)
             {
                 if (Game.ShowOverlay)
                     DrawOverlay(mapConsole, tile);
             }
-
         }
 
         private void DrawTile(RLConsole mapConsole, Terrain tile)
@@ -422,16 +430,12 @@ namespace Roguelike.Systems
 
         private void UpdatePlayerFov()
         {
+            // Clear vision from last turn
+            foreach (Terrain tile in Field)
+                tile.IsVisible = false;
+
             Player player = Game.Player;
             ComputeFov(player.X, player.Y, player.Awareness);
-
-            foreach (Terrain tile in Field)
-            {
-                if (Field[tile.X, tile.Y].IsVisible)
-                {
-                    tile.IsExplored = true;
-                }
-            }
         }
 
         private void UpdatePlayerMaps()

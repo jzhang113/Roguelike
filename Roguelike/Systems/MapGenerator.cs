@@ -1,6 +1,5 @@
 ﻿using Roguelike.Core;
 using Roguelike.Utils;
-using RogueSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -343,7 +342,7 @@ namespace Roguelike.Systems
 
                 if (room.Top > 1 && IsDoorLocation(i, room.Top - 1))
                 {
-                    _map.AddActor(new Door()
+                    _map.AddDoor(new Door()
                     {
                         X = i,
                         Y = room.Top - 1
@@ -352,7 +351,7 @@ namespace Roguelike.Systems
 
                 if (room.Bottom < _height - 1 && IsDoorLocation(i, room.Bottom))
                 {
-                    _map.AddActor(new Door()
+                    _map.AddDoor(new Door()
                     {
                         X = i,
                         Y = room.Bottom
@@ -367,7 +366,7 @@ namespace Roguelike.Systems
 
                 if (room.Left > 1 && IsDoorLocation(room.Left - 1, j))
                 {
-                    _map.AddActor(new Door()
+                    _map.AddDoor(new Door()
                     {
                         X = room.Left - 1,
                         Y = j
@@ -376,7 +375,7 @@ namespace Roguelike.Systems
 
                 if (room.Right < _width - 1 && IsDoorLocation(room.Right, j))
                 {
-                    _map.AddActor(new Door()
+                    _map.AddDoor(new Door()
                     {
                         X = room.Right,
                         Y = j

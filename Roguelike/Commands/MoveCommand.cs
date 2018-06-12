@@ -44,7 +44,12 @@ namespace Roguelike.Commands
             {
                 Actor target = Game.Map.GetActor(_tile.X, _tile.Y);
 
-                if (target == Source)
+                if (target is Door)
+                {
+                    Game.Map.OpenDoor(target as Door);
+                    return new RedirectMessage(false, new WaitCommand(120));
+                }
+                else if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
                 else
                     return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(_tile.X, _tile.Y)));
