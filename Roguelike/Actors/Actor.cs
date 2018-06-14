@@ -4,11 +4,12 @@ using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Actors
 {
     [Serializable]
-    public class Actor : Drawable, ISchedulable
+    public class Actor : Drawable, ISchedulable, ISerializable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -29,8 +30,8 @@ namespace Roguelike.Actors
 
         public Enums.ActorState State { get; set; }
 
-        public override int X { get; set; }
-        public override int Y { get; set; }
+        //public override int X { get; set; }
+        //public override int Y { get; set; }
 
         public int Energy { get; set; }
         public int RefreshRate { get; set; }
@@ -50,6 +51,11 @@ namespace Roguelike.Actors
             Equipment = new EquipmentHandler(defaultWeapon);
 
             BlocksLight = true;
+        }
+
+        protected Actor(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+
         }
 
         public virtual void TriggerDeath()

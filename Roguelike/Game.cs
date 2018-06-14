@@ -24,7 +24,7 @@ namespace Roguelike
         public static Options Option { get; private set; }
 
         public static MapHandler Map { get; private set; }
-        public static Player Player { get; private set; }
+        public static Player Player { get; internal set; }
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
         public static Random CombatRandom { get; private set; }
@@ -178,16 +178,18 @@ namespace Roguelike
 
         private static void SaveGame(object sender, CancelEventArgs e)
         {
-            using (Stream stream = File.OpenWrite(Constants.SAVE_FILE))
+            using (Stream saveFile = File.OpenWrite(Constants.SAVE_FILE))
             {
                 BinaryFormatter serializer = new BinaryFormatter();
-
-                Stream stream2 = File.OpenWrite(Constants.SAVE_FILE + "_player");
-                // serializer.Serialize(stream2, Player as Actor);
-
-                // serializer.Serialize(stream, Map);
-
-                stream2.Close();
+                serializer.Serialize(saveFile, new SaveObject()
+                {
+                    GameMode = GameMode,
+                    ShowEquipment = ShowEquipment,
+                    ShowInventory = ShowInventory,
+                    ShowOverlay = ShowOverlay,
+                    Map = Map,
+                    CombatRandom = CombatRandom
+                });
             }
         }
 
@@ -195,63 +197,26 @@ namespace Roguelike
         {
             if (File.Exists(Constants.SAVE_FILE))
             {
-                Console.WriteLine("Reading saved file");
-                Stream stream = null, stream2 = null, stream3 = null;
-
+                System.Diagnostics.Debug.WriteLine("Reading saved file");
                 try
                 {
-                    BinaryFormatter deserializer = new BinaryFormatter();
-
-                    stream = File.OpenRead(Constants.SAVE_FILE);
-                    stream2 = File.OpenRead(Constants.SAVE_FILE + "_player");
-                    stream3 = File.OpenRead(Constants.SAVE_FILE + "_events");
-
-                    Player = (Player)deserializer.Deserialize(stream2);
-                    Map = (MapHandler)deserializer.Deserialize(stream);
-
-                    foreach (Actor actor in Map.Units)
-                        EventScheduler.AddActor(actor);
-
-                    // Option.FixedSeed = false;
-                    Option.Seed = 10;
-
-                    int mainSeed;
-                    if (Option.FixedSeed)
-                        mainSeed = Option.Seed;
-                    else
-                        mainSeed = (int)DateTime.Now.Ticks;
-
-                    Random Random = new Random(mainSeed);
-                    int[] generatorSeed = new int[31];
-
-                    using (StreamWriter writer = new StreamWriter("log"))
+                    using (Stream saveFile = File.OpenRead(Constants.SAVE_FILE))
                     {
-                        writer.WriteLine(mainSeed);
+                        BinaryFormatter deserializer = new BinaryFormatter();
+                        SaveObject saved = (SaveObject)deserializer.Deserialize(saveFile);
 
-                        for (int i = 0; i < generatorSeed.Length; i++)
-                        {
-                            generatorSeed[i] = Random.Next();
-                            writer.WriteLine(generatorSeed[i]);
-                        }
+                        GameMode = saved.GameMode;
+                        ShowEquipment = saved.ShowEquipment;
+                        ShowInventory = saved.ShowInventory;
+                        ShowOverlay = saved.ShowOverlay;
+                        Map = saved.Map;
+                        CombatRandom = saved.CombatRandom;
                     }
-
-                    CombatRandom = new Random(generatorSeed[30]);
-
-                    GameMode = Enums.Mode.Normal;
-
-
-                    NewGame();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Console.Error.WriteLine("Load failed");
+                    System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
                     NewGame();
-                }
-                finally
-                {
-                    if (stream != null) stream.Dispose();
-                    if (stream2 != null) stream2.Dispose();
-                    if (stream3 != null) stream3.Dispose();
                 }
             }
             else
@@ -277,7 +242,7 @@ namespace Roguelike
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-             while (EventScheduler.Update())
+            while (EventScheduler.Update())
             {
                 _render = true;
             }

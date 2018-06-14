@@ -5,19 +5,20 @@ using Roguelike.Actions;
 using System.Collections.Generic;
 using System;
 using Roguelike.Utils;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
     [Serializable]
-    public abstract class Item : Drawable
+    public class Item : Drawable, ISerializable
     {
         public string Name { get; }
         public IMaterial Material { get; }
         public bool BlocksLight { get; }
 
         public Actor Carrier { get; set; }
-        public override int X { get; set; }
-        public override int Y { get; set; }
+        //public override int X { get; set; }
+        //public override int Y { get; set; }
 
         internal int AttackSpeed { get; set; } = Constants.FULL_TURN;
         internal int Damage { get; set; } = Constants.DEFAULT_DAMAGE;
@@ -33,6 +34,11 @@ namespace Roguelike.Items
             BlocksLight = blocksLight;
 
             _abilities = new List<IAction>();
+        }
+
+        protected Item(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+
         }
 
         #region virtual methods

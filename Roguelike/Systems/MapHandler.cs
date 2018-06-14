@@ -20,8 +20,7 @@ namespace Roguelike.Systems
         internal Field Field { get; }
         internal float[,] PlayerMap { get; }
 
-        // Internal so that we can add Actors to the EventScheduler when deserializing.
-        internal ICollection<Actor> Units { get; }
+        private ICollection<Actor> Units { get; }
         private ICollection<ItemInfo> Items { get; }
         private ICollection<Door> Doors { get; }
 
@@ -50,7 +49,21 @@ namespace Roguelike.Systems
             Doors = (ICollection<Door>)info.GetValue(nameof(Doors), typeof(ICollection<Door>));
 
             Highlight = new RLColor[Width, Height];
+            PermHighlight = new RLColor[Width, Height];
             PlayerMap = new float[Width, Height];
+
+            foreach (Actor actor in Units)
+            {
+                if (actor is Player)
+                {
+                    Game.Player = (Player)actor;
+                }
+
+                actor.Color = RLColor.Red;
+            }
+            
+            foreach (Actor actor in Units)
+                Game.EventScheduler.AddActor(actor);
 
             Refresh();
         }
