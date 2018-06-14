@@ -69,8 +69,8 @@ namespace Roguelike.Core
                 case TargetShape.Directional:
                     int dx = current.X - X;
                     int dy = current.Y - Y;
-                    int sx = (dx == 0) ? 0 : dx / Math.Abs(dx);
-                    int sy = (dy == 0) ? 0 : dy / Math.Abs(dy);
+                    int sx = Math.Sign(dx);
+                    int sy = Math.Sign(dy);
                     int limit = Math.Max(Math.Abs(dx), Math.Abs(dy));
 
                     for (int i = 0; i < limit; i++)

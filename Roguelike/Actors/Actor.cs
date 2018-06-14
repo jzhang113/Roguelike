@@ -94,10 +94,17 @@ namespace Roguelike.Actors
         {
             int energyDiff = Energy - other.Energy;
 
-            if (energyDiff == 0 && other is Actor) //&& !(other is Player)) Q: do we need this??
+            if (energyDiff == 0 && other is Actor)
             {
                 Actor otherActor = other as Actor;
-                return (int)(Game.Map.PlayerMap[X, Y] - Game.Map.PlayerMap[otherActor.X, otherActor.Y]);
+                float distPlayer = Game.Map.PlayerMap[X, Y];
+                float otherDistPlayer = Game.Map.PlayerMap[otherActor.X, otherActor.Y];
+
+                // if we haven't discovered one of the actors, don't change the order
+                if (float.IsNaN(distPlayer) || float.IsNaN(otherDistPlayer))
+                    return 0;
+                else
+                    return (int)(otherDistPlayer - distPlayer);
             }
 
             return energyDiff;
