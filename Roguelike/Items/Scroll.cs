@@ -13,7 +13,7 @@ namespace Roguelike.Items
 
         public Scroll(string name, IAction action) : base(name, Materials.Paper)
         {
-            Symbol = '?';
+            DrawingComponent.Symbol = '?';
             ApplySkill = action;
         }
 

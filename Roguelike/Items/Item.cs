@@ -1,24 +1,40 @@
-﻿using RLNET;
-using Roguelike.Actors;
+﻿using Roguelike.Actors;
 using Roguelike.Interfaces;
 using Roguelike.Actions;
 using System.Collections.Generic;
 using System;
 using Roguelike.Utils;
-using System.Runtime.Serialization;
+using RLNET;
 
 namespace Roguelike.Items
 {
     [Serializable]
-    public class Item : Drawable, ISerializable
+    public class Item
     {
         public string Name { get; }
         public IMaterial Material { get; }
         public bool BlocksLight { get; }
 
         public Actor Carrier { get; set; }
-        //public override int X { get; set; }
-        //public override int Y { get; set; }
+        public Drawable DrawingComponent { get; }
+
+        public int X
+        {
+            get => DrawingComponent.X;
+            set => DrawingComponent.X = value;
+        }
+
+        public int Y
+        {
+            get => DrawingComponent.Y;
+            set => DrawingComponent.Y = value;
+        }
+
+        public RLColor Color
+        {
+            get => DrawingComponent.Color;
+            set => DrawingComponent.Color = value;
+        }
 
         internal int AttackSpeed { get; set; } = Constants.FULL_TURN;
         internal int Damage { get; set; } = Constants.DEFAULT_DAMAGE;
@@ -32,13 +48,9 @@ namespace Roguelike.Items
             Name = name;
             Material = material;
             BlocksLight = blocksLight;
+            DrawingComponent = new Drawable();
 
             _abilities = new List<IAction>();
-        }
-
-        protected Item(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-
         }
 
         #region virtual methods

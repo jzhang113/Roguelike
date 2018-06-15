@@ -1,5 +1,6 @@
 ﻿using Roguelike.Core;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Actors
 {
@@ -10,12 +11,16 @@ namespace Roguelike.Actors
         {
             Awareness = 10;
             Name = "Skeleton";
-            Color = Colors.TextHeading;
-            Symbol = 'S';
+            DrawingComponent.Color = Colors.TextHeading;
+            DrawingComponent.Symbol = 'S';
 
             HP = 50;
             SP = 20;
             MP = 20;
+        }
+
+        protected Skeleton(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
     }
 }

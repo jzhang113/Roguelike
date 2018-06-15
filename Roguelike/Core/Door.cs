@@ -2,6 +2,7 @@
 using Roguelike.Commands;
 using Roguelike.Interfaces;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Core
 {
@@ -11,8 +12,12 @@ namespace Roguelike.Core
         public Door()
         {
             Name = "door";
-            Color = Swatch.DbBrightWood;
-            Symbol = '+';
+            DrawingComponent.Color = Swatch.DbBrightWood;
+            DrawingComponent.Symbol = '+';
+        }
+
+        protected Door(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
 
         public override ICommand Act()

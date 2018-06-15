@@ -181,7 +181,7 @@ namespace Roguelike
             using (Stream saveFile = File.OpenWrite(Constants.SAVE_FILE))
             {
                 BinaryFormatter serializer = new BinaryFormatter();
-                serializer.Serialize(saveFile, new SaveObject()
+                serializer.Serialize(saveFile, new SaveObject
                 {
                     GameMode = GameMode,
                     ShowEquipment = ShowEquipment,
@@ -218,6 +218,8 @@ namespace Roguelike
                     System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
                     NewGame();
                 }
+
+                //NewGame();
             }
             else
             {

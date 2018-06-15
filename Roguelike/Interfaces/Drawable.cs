@@ -14,6 +14,10 @@ namespace Roguelike.Interfaces
         public int X { get; set; }
         public int Y { get; set; }
 
+        public Drawable()
+        {
+        }
+
         protected Drawable(SerializationInfo info, StreamingContext context)
         {
             float r = (float)info.GetValue("Color.r", typeof(float));

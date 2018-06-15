@@ -41,8 +41,8 @@ namespace Roguelike.Systems
 
         protected MapHandler(SerializationInfo info, StreamingContext context)
         {
-            Width = (int)info.GetValue(nameof(Width), typeof(int));
-            Height = (int)info.GetValue(nameof(Height), typeof(int));
+            Width = info.GetInt32(nameof(Width));
+            Height = info.GetInt32(nameof(Height));
             Field = (Field)info.GetValue(nameof(Field), typeof(Field));
             Units = (ICollection<Actor>)info.GetValue(nameof(Units), typeof(ICollection<Actor>));
             Items = (ICollection<ItemInfo>)info.GetValue(nameof(Items), typeof(ICollection<ItemInfo>));
@@ -51,17 +51,19 @@ namespace Roguelike.Systems
             Highlight = new RLColor[Width, Height];
             PermHighlight = new RLColor[Width, Height];
             PlayerMap = new float[Width, Height];
+        }
 
+        [OnDeserialized]
+        internal void AfterDeserialize(StreamingContext context)
+        {
             foreach (Actor actor in Units)
             {
-                if (actor is Player)
+                if (actor is Player player)
                 {
-                    Game.Player = (Player)actor;
+                    Game.Player = player;
                 }
-
-                actor.Color = RLColor.Red;
             }
-            
+
             foreach (Actor actor in Units)
                 Game.EventScheduler.AddActor(actor);
 
@@ -179,7 +181,7 @@ namespace Roguelike.Systems
 
         public void OpenDoor(Door door)
         {
-            door.Symbol = '-';
+            door.DrawingComponent.Symbol = '-';
             Field[door.X, door.Y].Unit = null;
         }
         #endregion
@@ -356,19 +358,19 @@ namespace Roguelike.Systems
 
             foreach (Door door in Doors)
             {
-                door.Draw(mapConsole, this);
+                door.DrawingComponent.Draw(mapConsole, this);
             }
 
             foreach (ItemInfo stack in Items)
             {
                 if (stack.Count > 0)
-                    stack.Item.Draw(mapConsole, this);
+                    stack.Item.DrawingComponent.Draw(mapConsole, this);
             }
 
             foreach (Actor unit in Units)
             {
                 if (!unit.IsDead)
-                    unit.Draw(mapConsole, this);
+                    unit.DrawingComponent.Draw(mapConsole, this);
             }
 
             // debugging code for dijkstra maps

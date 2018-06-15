@@ -1,7 +1,5 @@
 ﻿using Roguelike.Interfaces;
-using Roguelike.Systems;
 using System;
-using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
@@ -10,7 +8,7 @@ namespace Roguelike.Items
     {
         public Weapon(string name, IMaterial material) : base(name, material)
         {
-            Symbol = '(';
+            DrawingComponent.Symbol = '(';
         }
 
         public void Equip()

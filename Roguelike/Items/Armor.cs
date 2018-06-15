@@ -12,7 +12,7 @@ namespace Roguelike.Items
 
         public Armor(string name, IMaterial material, Enums.ArmorType type) : base(name, material)
         {
-            Symbol = '[';
+            DrawingComponent.Symbol = '[';
             Type = type;
         }
 

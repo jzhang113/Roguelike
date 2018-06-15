@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Roguelike.Actors
 {
     [Serializable]
-    public class Actor : Drawable, ISchedulable, ISerializable
+    public class Actor : ISchedulable, ISerializable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -30,16 +30,26 @@ namespace Roguelike.Actors
 
         public Enums.ActorState State { get; set; }
 
-        //public override int X { get; set; }
-        //public override int Y { get; set; }
-
         public int Energy { get; set; }
         public int RefreshRate { get; set; }
 
         public InventoryHandler Inventory { get; }
         public EquipmentHandler Equipment { get; }
+        public Drawable DrawingComponent { get; }
 
-        public bool IsDead { get => HP < 0; }
+        public int X
+        {
+            get => DrawingComponent.X;
+            set => DrawingComponent.X = value;
+        }
+
+        public int Y
+        {
+            get => DrawingComponent.Y;
+            set => DrawingComponent.Y = value;
+        }
+
+        public bool IsDead => HP < 0;
 
         public Actor()
         {
@@ -50,12 +60,38 @@ namespace Roguelike.Actors
             Weapon defaultWeapon = new Weapon("fists", Materials.Flesh);
             Equipment = new EquipmentHandler(defaultWeapon);
 
+            DrawingComponent = new Drawable();
+
             BlocksLight = true;
         }
 
-        protected Actor(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected Actor(SerializationInfo info, StreamingContext context)
         {
+            Name = info.GetString(nameof(Name));
+            Awareness = info.GetInt32(nameof(Awareness));
+            Speed = info.GetInt32(nameof(Speed));
+            BlocksLight = info.GetBoolean(nameof(BlocksLight));
 
+            HP = info.GetInt32(nameof(HP));
+            MaxHP = info.GetInt32(nameof(MaxHP));
+            SP = info.GetInt32(nameof(SP));
+            MaxSP = info.GetInt32(nameof(MaxSP));
+            MP = info.GetInt32(nameof(MP));
+            MaxMP = info.GetInt32(nameof(MaxMP));
+            
+            STR = info.GetInt32(nameof(STR));
+            DEX = info.GetInt32(nameof(DEX));
+            DEF = info.GetInt32(nameof(DEF));
+            INT = info.GetInt32(nameof(INT));
+            
+            State = (Enums.ActorState)info.GetValue(nameof(State), typeof(Enums.ActorState));
+            
+            Energy = info.GetInt32(nameof(Energy));
+            RefreshRate = info.GetInt32(nameof(RefreshRate));
+            
+            Inventory = (InventoryHandler)info.GetValue(nameof(Inventory), typeof(InventoryHandler));
+            Equipment = (EquipmentHandler)info.GetValue(nameof(Equipment), typeof(EquipmentHandler));
+            DrawingComponent = (Drawable)info.GetValue(nameof(DrawingComponent), typeof(Drawable));
         }
 
         public virtual void TriggerDeath()
@@ -114,6 +150,35 @@ namespace Roguelike.Actors
             }
 
             return energyDiff;
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(Name), Name);
+            info.AddValue(nameof(Awareness), Awareness);
+            info.AddValue(nameof(Speed), Speed);
+            info.AddValue(nameof(BlocksLight), BlocksLight);
+
+            info.AddValue(nameof(HP), HP);
+            info.AddValue(nameof(MaxHP), MaxHP);
+            info.AddValue(nameof(SP), SP);
+            info.AddValue(nameof(MaxSP), MaxSP);
+            info.AddValue(nameof(MP), MP);
+            info.AddValue(nameof(MaxMP), MaxMP);
+
+            info.AddValue(nameof(STR), STR);
+            info.AddValue(nameof(DEX), DEX);
+            info.AddValue(nameof(DEF), DEF);
+            info.AddValue(nameof(INT), INT);
+
+            info.AddValue(nameof(State), State);
+
+            info.AddValue(nameof(Energy), Energy);
+            info.AddValue(nameof(RefreshRate), RefreshRate);
+
+            info.AddValue(nameof(Inventory), Inventory);
+            info.AddValue(nameof(Equipment), Equipment);
+            info.AddValue(nameof(DrawingComponent), DrawingComponent);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
 
-        private char _key;
+        private readonly char _key;
 
         public DropCommand(Actor source, char key)
         {
