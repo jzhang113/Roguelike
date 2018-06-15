@@ -2,6 +2,7 @@
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using System.Linq;
 
 namespace Roguelike.Commands
 {
@@ -40,19 +41,22 @@ namespace Roguelike.Commands
             }
 
             // Check if the destination is already occupied.
-            if (_tile.IsOccupied)
+            if (Game.Map.TryGetActor(_tile.X, _tile.Y, out Actor target))
             {
-                Actor target = Game.Map.GetActor(_tile.X, _tile.Y);
-
                 if (target is Door)
                 {
+                    // HACK: need an open door command
                     Game.Map.OpenDoor(target as Door);
                     return new RedirectMessage(false, new WaitCommand(120));
                 }
                 else if (target == Source)
+                {
                     return new RedirectMessage(false, new WaitCommand(Source));
+                }
                 else
+                {
                     return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(_tile.X, _tile.Y)));
+                }
             }
 
             return new RedirectMessage(true);
@@ -65,14 +69,15 @@ namespace Roguelike.Commands
 
             if (Source is Player)
             {
-                InventoryHandler itemStack = Game.Map.Field[_newX, _newY].ItemStack;
-
-                if (itemStack != null && !itemStack.IsEmpty())
+                if (Game.Map.TryGetStack(_newX, _newY, out InventoryHandler stack))
                 {
-                    if (itemStack.Count == 1)
-                        Game.MessageHandler.AddMessage($"You see a {itemStack.GetItem('a').Item.Name} here.");
-                    else
-                        Game.MessageHandler.AddMessage("You see several items here.");
+                    if (!stack.IsEmpty())
+                    {
+                        if (stack.Count == 1)
+                            Game.MessageHandler.AddMessage($"You see a {stack.First().Item.Name} here.");
+                        else
+                            Game.MessageHandler.AddMessage("You see several items here.");
+                    }
                 }
             }
 

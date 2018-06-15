@@ -22,12 +22,12 @@ namespace Roguelike.Actions
         // Heals the target by amount up to its maximum health.
         public void Activate(Actor source, Terrain target)
         {
-            Actor targetUnit = target.Unit;
+            if (target == null)
+                return;
 
-            if (target != null)
+            if (Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
             {
                 int healing = targetUnit.TakeHealing(Power);
-
                 Game.MessageHandler.AddMessage($"{source.Name} healed {targetUnit.Name} by {healing} damage");
             }
         }

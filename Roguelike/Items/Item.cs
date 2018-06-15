@@ -14,7 +14,6 @@ namespace Roguelike.Items
     {
         public string Name { get; }
         public IMaterial Material { get; }
-        public bool BlocksLight { get; }
 
         public Actor Carrier { get; set; }
         public Drawable DrawingComponent { get; }
@@ -44,11 +43,10 @@ namespace Roguelike.Items
 
         private IList<IAction> _abilities { get; }
 
-        public Item(string name, IMaterial material, bool blocksLight = false)
+        public Item(string name, IMaterial material)
         {
             Name = name;
             Material = material;
-            BlocksLight = blocksLight;
             DrawingComponent = new Drawable();
 
             _abilities = new List<IAction>();
@@ -58,7 +56,6 @@ namespace Roguelike.Items
         {
             Name = info.GetString(nameof(Name));
             Material = (IMaterial)info.GetValue(nameof(Material), typeof(IMaterial));
-            BlocksLight = info.GetBoolean(nameof(BlocksLight));
 
             DrawingComponent = (Drawable)info.GetValue(nameof(DrawingComponent), typeof(Drawable));
 
@@ -110,7 +107,6 @@ namespace Roguelike.Items
         {
             info.AddValue(nameof(Name), Name);
             info.AddValue(nameof(Material), Material);
-            info.AddValue(nameof(BlocksLight), BlocksLight);
 
             info.AddValue(nameof(DrawingComponent), DrawingComponent);
 

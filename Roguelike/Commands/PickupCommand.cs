@@ -2,6 +2,7 @@
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
+using System.Linq;
 
 namespace Roguelike.Commands
 {
@@ -37,7 +38,7 @@ namespace Roguelike.Commands
             switch(_itemStack.Count)
             {
                 case 1:
-                    itemGroup = _itemStack.GetItem('a');
+                    itemGroup = _itemStack.First();
                     Source.Inventory.Add(itemGroup);
                     itemGroup.Item.Carrier = Source;
 
@@ -48,7 +49,7 @@ namespace Roguelike.Commands
                     if (Source is Player)
                     {
                         // HACK: handle pickup menu - this placeholder at least lets you pick up the top item
-                        itemGroup = _itemStack.GetItem('a');
+                        itemGroup = _itemStack.First();
                         Source.Inventory.Add(itemGroup);
                         itemGroup.Item.Carrier = Source;
 
@@ -58,7 +59,7 @@ namespace Roguelike.Commands
                     else
                     {
                         // HACK: Monsters will simply grab the top item off of a pile if they try to pick stuff up.
-                        itemGroup = _itemStack.GetItem('a');
+                        itemGroup = _itemStack.First();
                         Source.Inventory.Add(itemGroup);
                         itemGroup.Item.Carrier = Source;
 

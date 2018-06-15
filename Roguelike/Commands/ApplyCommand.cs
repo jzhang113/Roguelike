@@ -14,6 +14,7 @@ namespace Roguelike.Commands
         public IEnumerable<Terrain> Target { get; set; }
 
         private readonly char _key;
+        private ItemInfo _itemGroup;
 
         public ApplyCommand(Actor source, char key, IEnumerable<Terrain> targets = null)
         {
@@ -25,13 +26,13 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
-            if (!Source.Inventory.HasKey(_key))
+            if (!Source.Inventory.TryGetKey(_key, out _itemGroup))
             {
                 Game.MessageHandler.AddMessage("No such item to apply.");
                 return new RedirectMessage(false);
             }
 
-            Item item = Source.Inventory.GetItem(_key).Item;
+            Item item = _itemGroup.Item;
             if (item is IUsable)
             {
                 IAction action = (item as IUsable).ApplySkill;
@@ -68,10 +69,9 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            ItemInfo itemGroup = Source.Inventory.GetItem(_key);
-            Source.Inventory.Remove(itemGroup);
+            Source.Inventory.Remove(_itemGroup);
 
-            IUsable usableItem = itemGroup.Item as IUsable;
+            IUsable usableItem = (IUsable)_itemGroup.Item;
             usableItem.Apply(Target);
         }
     }

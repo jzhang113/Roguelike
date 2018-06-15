@@ -23,7 +23,10 @@ namespace Roguelike.Core
 
                 for (int j = 0; j < height; j++)
                 {
-                    _field[i][j] = new Terrain(true, 0, i, j);
+                    _field[i][j] = new Terrain(i, j)
+                    {
+                        IsWall = true
+                    };
                 }
             }
         }

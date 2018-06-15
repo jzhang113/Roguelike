@@ -22,9 +22,10 @@ namespace Roguelike.Actions
         // Deals tamage to the target.
         public void Activate(Actor source, Terrain target)
         {
-            Actor targetUnit = target.Unit;
+            if (target == null)
+                return;
 
-            if (targetUnit != null)
+            if (Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
             {
                 int damage = targetUnit.TakeDamage(Power);
 

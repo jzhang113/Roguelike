@@ -20,9 +20,9 @@ namespace Roguelike.Interfaces
 
         protected Drawable(SerializationInfo info, StreamingContext context)
         {
-            float r = (float)info.GetValue("Color.r", typeof(float));
-            float g = (float)info.GetValue("Color.g", typeof(float));
-            float b = (float)info.GetValue("Color.b", typeof(float));
+            float r = (float)info.GetValue($"{nameof(Color)}.r", typeof(float));
+            float g = (float)info.GetValue($"{nameof(Color)}.g", typeof(float));
+            float b = (float)info.GetValue($"{nameof(Color)}.b", typeof(float));
             Color = new RLColor(r, g, b);
 
             Symbol = (char)info.GetValue(nameof(Symbol), typeof(char));
@@ -32,8 +32,8 @@ namespace Roguelike.Interfaces
 
         public void Draw(RLConsole console, MapHandler map)
         {
-            //if (!map.Field[X, Y].IsExplored)
-            //    return;
+            if (!map.Field[X, Y].IsExplored)
+                return;
 
             if (map.Field[X, Y].IsVisible)
             {
@@ -48,9 +48,9 @@ namespace Roguelike.Interfaces
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("Color.r", Color.r);
-            info.AddValue("Color.g", Color.g);
-            info.AddValue("Color.b", Color.b);
+            info.AddValue($"{nameof(Color)}.r", Color.r);
+            info.AddValue($"{nameof(Color)}.g", Color.g);
+            info.AddValue($"{nameof(Color)}.b", Color.b);
             info.AddValue(nameof(Symbol), Symbol);
             info.AddValue(nameof(X), X);
             info.AddValue(nameof(Y), Y);

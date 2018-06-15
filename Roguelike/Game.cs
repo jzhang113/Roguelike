@@ -10,6 +10,7 @@ using System.ComponentModel;
 using Roguelike.Utils;
 using System.Runtime.Serialization.Formatters.Binary;
 using Roguelike.Items;
+using System.Runtime.Serialization;
 
 namespace Roguelike
 {
@@ -195,34 +196,28 @@ namespace Roguelike
 
         private static void StartGame(object sender, EventArgs e)
         {
-            if (File.Exists(Constants.SAVE_FILE))
+            if (!File.Exists(Constants.SAVE_FILE))
+                NewGame();
+
+            System.Diagnostics.Debug.WriteLine("Reading saved file");
+            try
             {
-                System.Diagnostics.Debug.WriteLine("Reading saved file");
-                try
+                using (Stream saveFile = File.OpenRead(Constants.SAVE_FILE))
                 {
-                    using (Stream saveFile = File.OpenRead(Constants.SAVE_FILE))
-                    {
-                        BinaryFormatter deserializer = new BinaryFormatter();
-                        SaveObject saved = (SaveObject)deserializer.Deserialize(saveFile);
+                    BinaryFormatter deserializer = new BinaryFormatter();
+                    SaveObject saved = (SaveObject)deserializer.Deserialize(saveFile);
 
-                        GameMode = saved.GameMode;
-                        ShowEquipment = saved.ShowEquipment;
-                        ShowInventory = saved.ShowInventory;
-                        ShowOverlay = saved.ShowOverlay;
-                        Map = saved.Map;
-                        CombatRandom = saved.CombatRandom;
-                    }
+                    GameMode = saved.GameMode;
+                    ShowEquipment = saved.ShowEquipment;
+                    ShowInventory = saved.ShowInventory;
+                    ShowOverlay = saved.ShowOverlay;
+                    Map = saved.Map;
+                    CombatRandom = saved.CombatRandom;
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
-                    NewGame();
-                }
-
-                //NewGame();
             }
-            else
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
                 NewGame();
             }
         }

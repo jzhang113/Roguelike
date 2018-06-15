@@ -1,12 +1,11 @@
 ﻿using RLNET;
-using RogueSharp;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using Roguelike.Actors;
 using Roguelike.Commands;
-using Roguelike.Actions;
+using Roguelike.Items;
 
 namespace Roguelike.Systems
 {
@@ -76,7 +75,7 @@ namespace Roguelike.Systems
                     if (current.IsWalkable && exploredPathExists)
                         map.Highlight[mouseX, mouseY] = RLColor.Red;
                 }
-                
+
                 //if (_console.Mouse.GetLeftClick())
                 //{
                 //    List<IAction> moves = new List<IAction>();
@@ -86,9 +85,12 @@ namespace Roguelike.Systems
 
                 //    return new AttackCommand(player, new ActionSequence(100, moves));
                 //}
-                
-                LookHandler.DisplayActor(map.GetActor(mouseX, mouseY));
-                LookHandler.DisplayItem(map.GetItem(mouseX, mouseY));
+                if (map.TryGetActor(mouseX, mouseY, out Actor displayActor))
+                    LookHandler.DisplayActor(displayActor);
+
+                if (map.TryGetItem(mouseX, mouseY, out ItemInfo displayItem))
+                    LookHandler.DisplayItem(displayItem);
+
                 LookHandler.DisplayTerrain(map.Field[mouseX, mouseY]);
             }
             
@@ -232,7 +234,9 @@ namespace Roguelike.Systems
                     return new WaitCommand(player);
                 #endregion
                 case RLKey.Comma:
-                    return new PickupCommand(player, Game.Map.Field[player.X, player.Y].ItemStack);
+                    // TODO: only grabs top item
+                    Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack);
+                    return new PickupCommand(player, stack);
                 case RLKey.A:
                     Game.GameMode = Enums.Mode.Apply;
                     Game.ShowInventory = true;

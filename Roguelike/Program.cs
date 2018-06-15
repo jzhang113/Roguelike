@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Roguelike.Core;
 using Roguelike.Systems;
-using System;
 using System.IO;
 
 namespace Roguelike

@@ -40,7 +40,6 @@ namespace Roguelike.Systems
 
             if (!found)
                 _inventory.Add(itemGroup);
-
         }
 
         // Decrements the item stack if there are multiple items and removes the item if there are
@@ -96,11 +95,18 @@ namespace Roguelike.Systems
             return key - 'a' < _inventory.Count;
         }
 
-        // Returns the item at position key. Does not remove the item from inventory.
-        public ItemInfo GetItem(char key)
+        // Attempts to returns the item at position key. Does not remove the item from inventory.
+        // Returns false if the item does not exist.
+        public bool TryGetKey(char key, out ItemInfo itemGroup)
         {
-            System.Diagnostics.Debug.Assert(HasKey(key));
-            return _inventory[key - 'a'];
+            if (!HasKey(key))
+            {
+                itemGroup = null;
+                return false;
+            }
+
+            itemGroup = _inventory[key - 'a'];
+            return true;
         }
 
         public void Draw(RLConsole console)

@@ -49,7 +49,7 @@ namespace Roguelike.Systems
 
             if (_showTile)
             {
-                console.Print(1, 8, "Move cost: " + _displayTile.MoveCost.ToString(), Colors.TextHeading);
+                // console.Print(1, 8, "Move cost: " + _displayTile.MoveCost.ToString(), Colors.TextHeading);
                 console.Print(1, 9, "Occupied: " + _displayTile.IsOccupied, Colors.TextHeading);
                 console.Print(1, 9, "Walkable: " + _displayTile.IsWalkable, Colors.TextHeading);
                 console.Print(1, 10, "Wall: " + _displayTile.IsWall, Colors.TextHeading);

@@ -11,7 +11,7 @@ namespace Roguelike.Commands
         public int EnergyCost { get; } = 120;
 
         private char _key;
-        private ItemInfo _item;
+        private ItemInfo _itemGroup;
 
         public EquipCommand(Actor source, char key)
         {
@@ -21,31 +21,28 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
-            if (!Source.Inventory.HasKey(_key))
+            if (!Source.Inventory.TryGetKey(_key, out _itemGroup))
             {
                 Game.MessageHandler.AddMessage("No such item to equip.");
                 return new RedirectMessage(false);
             }
 
-            if (_item == null)
-                _item = Source.Inventory.GetItem(_key);
-
-            if (_item is IEquipable)
+            if (_itemGroup is IEquipable)
             {
                 return new RedirectMessage(true);
             }
             else
             {
-                Game.MessageHandler.AddMessage($"Cannot equip {_item.Item.Name}.");
+                Game.MessageHandler.AddMessage($"Cannot equip {_itemGroup.Item.Name}.");
                 return new RedirectMessage(false);
             }
         }
 
         public void Execute()
         {
-            System.Diagnostics.Debug.Assert(_item != null);
-            Source.Inventory.Remove(_item);
-            (_item as IEquipable).Equip();
+            System.Diagnostics.Debug.Assert(_itemGroup != null);
+            Source.Inventory.Remove(_itemGroup);
+            (_itemGroup as IEquipable).Equip();
         }
     }
 }

@@ -20,9 +20,13 @@ namespace Roguelike.Systems
         internal Field Field { get; }
         internal float[,] PlayerMap { get; }
 
-        private ICollection<Actor> Units { get; }
-        private ICollection<ItemInfo> Items { get; }
-        private ICollection<Door> Doors { get; }
+        private IDictionary<int, Actor> Units { get; set; }
+        private IDictionary<int, InventoryHandler> Items { get; set; }
+        private IDictionary<int, Door> Doors { get; set; }
+
+        private readonly KeyValueHelper<int, Actor> _tempUnits;
+        private readonly KeyValueHelper<int, InventoryHandler> _tempItems;
+        private readonly KeyValueHelper<int, Door> _tempDoors;
 
         public MapHandler(int width, int height)
         {
@@ -34,19 +38,33 @@ namespace Roguelike.Systems
             PermHighlight = new RLColor[width, height];
             PlayerMap = new float[width, height];
 
-            Units = new List<Actor>();
-            Items = new List<ItemInfo>();
-            Doors = new List<Door>();
+            Units = new Dictionary<int, Actor>();
+            Items = new Dictionary<int, InventoryHandler>();
+            Doors = new Dictionary<int, Door>();
         }
 
+        #region Serialization Constructor
         protected MapHandler(SerializationInfo info, StreamingContext context)
         {
             Width = info.GetInt32(nameof(Width));
             Height = info.GetInt32(nameof(Height));
             Field = (Field)info.GetValue(nameof(Field), typeof(Field));
-            Units = (ICollection<Actor>)info.GetValue(nameof(Units), typeof(ICollection<Actor>));
-            Items = (ICollection<ItemInfo>)info.GetValue(nameof(Items), typeof(ICollection<ItemInfo>));
-            Doors = (ICollection<Door>)info.GetValue(nameof(Doors), typeof(ICollection<Door>));
+
+            _tempUnits = new KeyValueHelper<int, Actor>
+            {
+                Key = (ICollection<int>)info.GetValue($"{nameof(Units)}.keys", typeof(ICollection<int>)),
+                Value = (ICollection<Actor>)info.GetValue($"{nameof(Units)}.values", typeof(ICollection<Actor>))
+            };
+            _tempItems = new KeyValueHelper<int, InventoryHandler>
+            {
+                Key = (ICollection<int>)info.GetValue($"{nameof(Items)}.keys", typeof(ICollection<int>)),
+                Value = (ICollection<InventoryHandler>)info.GetValue($"{nameof(Items)}.values", typeof(ICollection<InventoryHandler>))
+            };
+            _tempDoors = new KeyValueHelper<int, Door>
+            {
+                Key = (ICollection<int>)info.GetValue($"{nameof(Doors)}.keys", typeof(ICollection<int>)),
+                Value = (ICollection<Door>)info.GetValue($"{nameof(Doors)}.values", typeof(ICollection<Door>))
+            };
 
             Highlight = new RLColor[Width, Height];
             PermHighlight = new RLColor[Width, Height];
@@ -56,7 +74,11 @@ namespace Roguelike.Systems
         [OnDeserialized]
         protected void AfterDeserialize(StreamingContext context)
         {
-            foreach (Actor actor in Units)
+            Units = _tempUnits.ToDictionary();
+            Items = _tempItems.ToDictionary();
+            Doors = _tempDoors.ToDictionary();
+
+            foreach (Actor actor in Units.Values)
             {
                 if (actor is Player player)
                 {
@@ -64,11 +86,12 @@ namespace Roguelike.Systems
                 }
             }
 
-            foreach (Actor actor in Units)
+            foreach (Actor actor in Units.Values)
                 Game.EventScheduler.AddActor(actor);
 
             Refresh();
         }
+        #endregion
 
         internal void Refresh()
         {
@@ -83,38 +106,42 @@ namespace Roguelike.Systems
                 return false;
 
             SetActorPosition(unit, unit.X, unit.Y);
-            Units.Add(unit);
-            Field[unit.X, unit.Y].Unit = unit;
             Game.EventScheduler.AddActor(unit);
 
             return true;
         }
 
-        public Actor GetActor(int x, int y)
+        public bool TryGetActor(int x, int y, out Actor actor)
         {
-            return Field[x, y].Unit;
+            return Units.TryGetValue(ToIndex(x, y), out actor);
         }
 
-        public void RemoveActor(Actor unit)
+        public bool RemoveActor(Actor unit)
         {
-            bool success = Units.Remove(unit);
+            bool success = Units.Remove(ToIndex(unit.X, unit.Y));
             if (success)
             {
                 unit.State = Enums.ActorState.Dead;
-                Field[unit.X, unit.Y].Unit = null;
-                Game.EventScheduler.RemoveActor(unit);
+                Field[unit.X, unit.Y].IsOccupied = false;
+                Field[unit.X, unit.Y].BlocksLight = false;
             }
+
+            return success;
         }
 
         public bool SetActorPosition(Actor actor, int x, int y)
         {
             if (Field[x, y].IsWalkable)
             {
-                Field[actor.X, actor.Y].Unit = null;
+                Field[actor.X, actor.Y].IsOccupied = false;
+                Field[actor.X, actor.Y].BlocksLight = false;
+                Units.Remove(ToIndex(actor.X, actor.Y));
 
                 actor.X = x;
                 actor.Y = y;
-                Field[x, y].Unit = actor;
+                Field[x, y].IsOccupied = true;
+                Field[x, y].BlocksLight = actor.BlocksLight;
+                Units.Add(ToIndex(x, y), actor);
 
                 if (actor is Player)
                     Refresh();
@@ -127,43 +154,48 @@ namespace Roguelike.Systems
         #endregion
 
         #region Item Methods
-        public bool AddItem(ItemInfo itemGroup)
+        public void AddItem(ItemInfo itemGroup)
         {
-            bool found = false;
-
-            foreach (ItemInfo stack in Items)
+            if (Items.TryGetValue(ToIndex(itemGroup.X, itemGroup.Y), out InventoryHandler stack))
             {
-                if (stack.Equals(itemGroup))
+                stack.Add(itemGroup);
+            }
+            else
+            {
+                Items.Add(ToIndex(itemGroup.X, itemGroup.Y), new InventoryHandler
                 {
-                    stack.Add(itemGroup.Count);
-                    found = true;
-                }
+                    itemGroup
+                });
+            }
+        }
+
+        public bool TryGetItem(int x, int y, out ItemInfo itemGroup)
+        {
+            bool success = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
+            if (!success || stack.Count == 0)
+            {
+                itemGroup = null;
+                return false;
             }
 
-            if (!found)
-                Items.Add(itemGroup);
-
-            if (Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack == null)
-                Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack = new InventoryHandler();
-
-            Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack.Add(itemGroup);
+            itemGroup = stack.First();
             return true;
         }
 
-        public void RemoveItem(ItemInfo itemGroup)
+        public bool TryGetStack(int x, int y, out InventoryHandler stack)
         {
-            foreach (ItemInfo stack in Items)
-            {
-                if (stack.Equals(itemGroup))
-                    stack.Remove(itemGroup.Count);
-            }
-
-            Field[itemGroup.Item.X, itemGroup.Item.Y].ItemStack.Remove(itemGroup);
+            return Items.TryGetValue(ToIndex(x, y), out stack);
         }
 
-        public ItemInfo GetItem(int x, int y)
+        public bool RemoveItem(ItemInfo itemGroup)
         {
-            return Items.FirstOrDefault(item => item.Item.X == x && item.Item.Y == y && item.Count > 0);
+            if (Items.TryGetValue(ToIndex(itemGroup.X, itemGroup.Y), out InventoryHandler stack))
+            {
+                if (stack.Contains(itemGroup))
+                    return stack.Remove(itemGroup);
+            }
+
+            return false;
         }
         #endregion
 
@@ -173,8 +205,10 @@ namespace Roguelike.Systems
             if (!Field[door.X, door.Y].IsWalkable)
                 return false;
 
-            Doors.Add(door);
-            Field[door.X, door.Y].Unit = door;
+            Doors.Add(ToIndex(door.X, door.Y), door);
+            Units.Add(ToIndex(door.X, door.Y), door);
+            Field[door.X, door.Y].IsOccupied = true;
+            Field[door.X, door.Y].BlocksLight = door.BlocksLight;
 
             return true;
         }
@@ -182,7 +216,9 @@ namespace Roguelike.Systems
         public void OpenDoor(Door door)
         {
             door.DrawingComponent.Symbol = '-';
-            Field[door.X, door.Y].Unit = null;
+            Units.Remove(ToIndex(door.X, door.Y));
+            Field[door.X, door.Y].IsOccupied = false;
+            Field[door.X, door.Y].BlocksLight = false;
         }
         #endregion
 
@@ -321,6 +357,8 @@ namespace Roguelike.Systems
             // NOTE: slow implementation of fov - replace if needed
             // Set the player square to true and then skip it on future ray traces.
             Field[x, y].IsVisible = true;
+            Field[x, y].IsExplored = true;
+
             foreach (Terrain tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
             {
                 if (tile == null)
@@ -335,7 +373,7 @@ namespace Roguelike.Systems
                         // Update the explored status while we're at it
                         tt.IsExplored = true;
 
-                        if (tt.BlocksLight)
+                        if (!tt.IsLightable)
                             visible = false;
                     }
                 }
@@ -356,21 +394,23 @@ namespace Roguelike.Systems
                 DrawTile(mapConsole, tile);
             }
 
-            foreach (Door door in Doors)
+            foreach (Door door in Doors.Values)
             {
                 door.DrawingComponent.Draw(mapConsole, this);
             }
 
-            foreach (ItemInfo stack in Items)
+            foreach (InventoryHandler stack in Items.Values)
             {
-                if (stack.Count > 0)
-                    stack.Item.DrawingComponent.Draw(mapConsole, this);
+                stack.First().Item.DrawingComponent.Draw(mapConsole, this);
             }
 
-            foreach (Actor unit in Units)
+            foreach (Actor unit in Units.Values)
             {
                 if (!unit.IsDead)
                     unit.DrawingComponent.Draw(mapConsole, this);
+                else
+                    // HACK: draw some corpses
+                    mapConsole.SetChar(unit.X, unit.Y, '%');
             }
 
             // debugging code for dijkstra maps
@@ -492,14 +532,37 @@ namespace Roguelike.Systems
             }
         }
 
+        private int ToIndex(int x, int y)
+        {
+            return x + Width * y;
+        }
+
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(nameof(Width), Width);
             info.AddValue(nameof(Height), Height);
             info.AddValue(nameof(Field), Field);
-            info.AddValue(nameof(Units), Units);
-            info.AddValue(nameof(Items), Items);
-            info.AddValue(nameof(Doors), Doors);
+
+            // Can't serialize Dictionary or KeyCollection, have to make it a list.
+            info.AddValue($"{nameof(Units)}.keys", Units.Keys.ToList());
+            info.AddValue($"{nameof(Units)}.values", Units.Values.ToList());
+            info.AddValue($"{nameof(Items)}.keys", Items.Keys.ToList());
+            info.AddValue($"{nameof(Items)}.values", Items.Values.ToList());
+            info.AddValue($"{nameof(Doors)}.keys", Doors.Keys.ToList());
+            info.AddValue($"{nameof(Doors)}.values", Doors.Values.ToList());
+        }
+
+        // Temporarily store lists when deserializing dictionaries
+        private class KeyValueHelper<TKey, TValue>
+        {
+            public ICollection<TKey> Key { get; set; }
+            public ICollection<TValue> Value { get; set; }
+
+            public IDictionary<TKey, TValue> ToDictionary()
+            {
+                return Key.Zip(Value, (k, v) => new { Key = k, Value = v })
+                    .ToDictionary(x => x.Key, x => x.Value);
+            }
         }
     }
 }

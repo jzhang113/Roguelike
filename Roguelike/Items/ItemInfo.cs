@@ -10,6 +10,9 @@ namespace Roguelike.Items
         public Item Item { get; }
         public int Count { get; private set; }
 
+        public int X => Item.X;
+        public int Y => Item.Y;
+
         public ItemInfo(Item item)
         {
             Item = item;
