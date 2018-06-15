@@ -3,6 +3,7 @@ using Roguelike.Interfaces;
 using Roguelike.Actions;
 using System.Collections.Generic;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
@@ -15,6 +16,10 @@ namespace Roguelike.Items
         {
             DrawingComponent.Symbol = '?';
             ApplySkill = action;
+        }
+
+        protected Scroll(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
 
         public void Apply(IEnumerable<Terrain> targets)

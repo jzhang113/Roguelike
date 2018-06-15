@@ -2,6 +2,7 @@
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
@@ -14,6 +15,10 @@ namespace Roguelike.Items
         {
             DrawingComponent.Symbol = '[';
             Type = type;
+        }
+
+        protected Armor(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
 
         public void Equip()

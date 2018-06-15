@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using System;
 using Roguelike.Utils;
 using RLNET;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
     [Serializable]
-    public class Item
+    public class Item: ISerializable
     {
         public string Name { get; }
         public IMaterial Material { get; }
@@ -53,6 +54,22 @@ namespace Roguelike.Items
             _abilities = new List<IAction>();
         }
 
+        protected Item(SerializationInfo info, StreamingContext context)
+        {
+            Name = info.GetString(nameof(Name));
+            Material = (IMaterial)info.GetValue(nameof(Material), typeof(IMaterial));
+            BlocksLight = info.GetBoolean(nameof(BlocksLight));
+
+            DrawingComponent = (Drawable)info.GetValue(nameof(DrawingComponent), typeof(Drawable));
+
+            AttackSpeed = info.GetInt32(nameof(AttackSpeed));
+            Damage = info.GetInt32(nameof(Damage));
+            MeleeRange = info.GetInt32(nameof(MeleeRange));
+            ThrowRange = info.GetInt32(nameof(ThrowRange));
+
+            _abilities = (IList<IAction>)info.GetValue(nameof(_abilities), typeof(IList<IAction>));
+        }
+
         #region virtual methods
         public virtual void Consume(Actor actor)
         {
@@ -87,6 +104,22 @@ namespace Roguelike.Items
         {
             // TODO: check that the skill doesn't already exist
             _abilities.Add(skill);
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(Name), Name);
+            info.AddValue(nameof(Material), Material);
+            info.AddValue(nameof(BlocksLight), BlocksLight);
+
+            info.AddValue(nameof(DrawingComponent), DrawingComponent);
+
+            info.AddValue(nameof(AttackSpeed), AttackSpeed);
+            info.AddValue(nameof(Damage), Damage);
+            info.AddValue(nameof(MeleeRange), MeleeRange);
+            info.AddValue(nameof(ThrowRange), ThrowRange);
+
+            info.AddValue(nameof(_abilities), _abilities);
         }
     }
 }

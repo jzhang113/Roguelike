@@ -54,7 +54,7 @@ namespace Roguelike.Systems
         }
 
         [OnDeserialized]
-        internal void AfterDeserialize(StreamingContext context)
+        protected void AfterDeserialize(StreamingContext context)
         {
             foreach (Actor actor in Units)
             {

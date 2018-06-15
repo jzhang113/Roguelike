@@ -1,5 +1,6 @@
 ﻿using Roguelike.Interfaces;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
@@ -9,6 +10,10 @@ namespace Roguelike.Items
         public Weapon(string name, IMaterial material) : base(name, material)
         {
             DrawingComponent.Symbol = '(';
+        }
+
+        protected Weapon(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
 
         public void Equip()

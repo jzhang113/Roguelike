@@ -1,10 +1,11 @@
 ﻿using Roguelike.Items;
 using System;
+using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
     [Serializable]
-    public class ItemInfo : IEquatable<ItemInfo>
+    public class ItemInfo : IEquatable<ItemInfo>, ISerializable
     {
         public Item Item { get; }
         public int Count { get; private set; }
@@ -19,6 +20,12 @@ namespace Roguelike.Items
         {
             Item = item;
             Count = count;
+        }
+
+        protected ItemInfo(SerializationInfo info, StreamingContext context)
+        {
+            Item = (Item)info.GetValue(nameof(Item), typeof(Item));
+            Count = info.GetInt32(nameof(Count));
         }
 
         public void Add(int count)
@@ -43,6 +50,12 @@ namespace Roguelike.Items
         public bool Equals(ItemInfo other)
         {
             return Item.Equals(other.Item);
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(Item), Item);
+            info.AddValue(nameof(Count), Count);
         }
     }
 }
