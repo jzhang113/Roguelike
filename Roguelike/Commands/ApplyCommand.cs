@@ -40,17 +40,17 @@ namespace Roguelike.Commands
 
                 if (action.Area.Aimed)
                 {
-                    if (Target == null)
+                    if (Target != null)
+                        return new RedirectMessage(true);
+
+                    if (action.Area.Target != null)
                     {
-                        if (action.Area.Target != null)
-                        {
-                            Target = action.Area.GetTilesInRange(Source);
-                        }
-                        else
-                        {
-                            InputHandler.BeginTargetting(this, Source, action);
-                            return new RedirectMessage(false);
-                        }
+                        Target = action.Area.GetTilesInRange(Source);
+                    }
+                    else
+                    {
+                        InputHandler.BeginTargetting(this, Source, action);
+                        return new RedirectMessage(false);
                     }
                 }
                 else

@@ -258,13 +258,13 @@ namespace Roguelike.Systems
                 int newX = currentX + dir.X;
                 int newY = currentY + dir.Y;
 
-                if (Field[newX, newY] == null || !(goalMap[newX, newY] < nearest) ||
-                    !Field[newX, newY].IsWalkable && !(Math.Abs(goalMap[newX, newY]) < 0.001f))
-                    continue;
-
-                nextX = newX;
-                nextY = newY;
-                nearest = goalMap[newX, newY];
+                if (Field.IsValid(newX, newY) && goalMap[newX, newY] < nearest &&
+                    (Field[newX, newY].IsWalkable || Math.Abs(goalMap[newX, newY]) < 0.001f))
+                {
+                    nextX = newX;
+                    nextY = newY;
+                    nearest = goalMap[newX, newY];
+                }
             }
 
             return new WeightedPoint(nextX, nextY, nearest);
@@ -358,9 +358,6 @@ namespace Roguelike.Systems
 
             foreach (Terrain tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
             {
-                if (tile == null)
-                    continue;
-
                 bool visible = true;
                 foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y))
                 {
@@ -421,9 +418,7 @@ namespace Roguelike.Systems
         private void DrawTile(RLConsole mapConsole, Terrain tile)
         {
             if (!tile.IsExplored)
-            {
-                return;
-            }
+               return;
 
             if (Field[tile.X, tile.Y].IsVisible)
             {
@@ -516,7 +511,7 @@ namespace Roguelike.Systems
                     float newWeight = p.Weight + dir.Weight;
                     Terrain tile = Field[newX, newY];
 
-                    if (tile != null && !tile.IsWall && tile.IsExplored &&
+                    if (Field.IsValid(newX, newY) && !tile.IsWall && tile.IsExplored &&
                         (float.IsNaN(PlayerMap[newX, newY]) || newWeight < PlayerMap[newX, newY]))
                     {
                         PlayerMap[newX, newY] = newWeight;

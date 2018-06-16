@@ -21,6 +21,11 @@ namespace Roguelike.Systems
         public void AddActor(ISchedulable schedulable) => _entities.Add(schedulable);
         public void RemoveActor(ISchedulable schedulable) => _eventSet.Remove(schedulable);
 
+        public void Clear()
+        {
+            _entities.Clear();
+        }
+
         public bool Update()
         {
             if (_entities.Count == 0)

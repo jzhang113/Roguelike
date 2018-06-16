@@ -143,7 +143,9 @@ namespace Roguelike.Actors
             float otherDistPlayer = Game.Map.PlayerMap[otherActor.X, otherActor.Y];
 
             // if we haven't discovered one of the actors, don't change the order
-            return float.IsNaN(distPlayer) || float.IsNaN(otherDistPlayer) ? 0 : (int) (otherDistPlayer - distPlayer);
+            return float.IsNaN(distPlayer) || float.IsNaN(otherDistPlayer)
+                ? 0
+                : (int) (otherDistPlayer - distPlayer);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)

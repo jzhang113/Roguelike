@@ -32,7 +32,24 @@ namespace Roguelike.Core
             }
         }
 
-        public Terrain this[int i, int j] => IsValid(i, j) ? _field[i][j] : null;
+        public Terrain this[int i, int j]
+        {
+            get
+            {
+                int tempX = i, tempY = j;
+                if (i < 0)
+                    tempX = 0;
+                else if (i >= _width)
+                    tempX = _width - 1;
+
+                if (j < 0)
+                    tempY = 0;
+                else if (j >= _height)
+                    tempY = _height - 1;
+
+                return _field[tempX][tempY];
+            }
+        }
 
         public bool IsValid(int i, int j) => i >= 0 && i < _width && j >= 0 && j < _height;
 

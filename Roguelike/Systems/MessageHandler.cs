@@ -25,15 +25,15 @@ namespace Roguelike.Systems
         // set level.
         public void AddMessage(string text, MessageLevel level = MessageLevel.Normal)
         {
-            if (level <= Game.Option.Verbosity)
-            {
-                _messages.Add(text);
+            if (level > Game.Option.Verbosity)
+                return;
 
-                if (_messages.Count > _maxSize)
-                    _messages.RemoveAt(0);
+            _messages.Add(text);
 
-                Redraw = true;
-            }
+            if (_messages.Count > _maxSize)
+                _messages.RemoveAt(0);
+
+            Redraw = true;
         }
 
         // Modify the last message by adding additional text.
@@ -42,6 +42,12 @@ namespace Roguelike.Systems
             int prev = _messages.Count - 1;
             _messages[prev] += " " + text;
 
+            Redraw = true;
+        }
+
+        public void Clear()
+        {
+            _messages.Clear();
             Redraw = true;
         }
 

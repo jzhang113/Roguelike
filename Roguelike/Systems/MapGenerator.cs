@@ -283,10 +283,11 @@ namespace Roguelike.Systems
             {
                 for (int j = room.Top; j < room.Bottom; j++)
                 {
-                    if (_map.Field.IsValid(i, j))
-                    {
-                        _map.Field[i, j].IsWall = false;
-                    }
+                    // Don't excavate the edges of the map
+                    if (i == 0 || j == 0 || i == _width - 1 || j == _height - 1)
+                        continue;
+
+                    _map.Field[i, j].IsWall = false;
                 }
             }
         }

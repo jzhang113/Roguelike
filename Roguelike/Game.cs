@@ -65,6 +65,9 @@ namespace Roguelike
 
         public static void NewGame()
         {
+            MessageHandler.Clear();
+            EventScheduler.Clear();
+
             // Option.FixedSeed = false;
             Option.Seed = 10;
 
