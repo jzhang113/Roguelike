@@ -14,9 +14,9 @@ namespace Roguelike.Actors
             DrawingComponent.Color = Colors.TextHeading;
             DrawingComponent.Symbol = 'S';
 
-            HP = 50;
-            SP = 20;
-            MP = 20;
+            Hp = 50;
+            Sp = 20;
+            Mp = 20;
         }
 
         protected Skeleton(SerializationInfo info, StreamingContext context) : base(info, context)

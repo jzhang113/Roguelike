@@ -2,7 +2,7 @@
 
 namespace Roguelike.Core
 {
-    class Swatch
+    static class Swatch
     {
         public static RLColor PrimaryLightest = new RLColor(110, 121, 119);
         public static RLColor PrimaryLighter = new RLColor(88, 100, 98);

@@ -1,5 +1,4 @@
 ﻿using Roguelike.Actors;
-using Roguelike.Interfaces;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands
@@ -28,7 +27,6 @@ namespace Roguelike.Commands
         public void Execute()
         {
             Game.Map.Refresh();
-            return;
         }
     }
 }

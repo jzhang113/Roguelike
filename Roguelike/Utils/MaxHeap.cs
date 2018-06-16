@@ -32,15 +32,14 @@ namespace Roguelike.Utils
 
         public T PopMax()
         {
-            if (Count > 0)
-            {
-                T item = _heap[0];
-                --Count;
-                _heap[0] = _heap[Count];
-                ReheapDown(0);
-                return item;
-            }
-            throw new InvalidOperationException("The heap is empty");
+            if (Count <= 0)
+                throw new InvalidOperationException("The heap is empty");
+
+            T item = _heap[0];
+            --Count;
+            _heap[0] = _heap[Count];
+            ReheapDown(0);
+            return item;
         }
 
         public void Clear()
@@ -71,9 +70,9 @@ namespace Roguelike.Utils
         public void CopyTo(T[] array, int arrayIndex)
         {
             if (array == null)
-                throw new ArgumentNullException("array");
+                throw new ArgumentNullException(nameof(array));
             if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException("arrayIndex", "arrayIndex is less than 0.");
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex), "arrayIndex is less than 0.");
             if (array.Rank > 1)
                 throw new ArgumentException("array is multidimensional.");
             if (Count == 0)
@@ -124,7 +123,7 @@ namespace Roguelike.Utils
             return GetEnumerator();
         }
 
-        internal void ReheapUp(int initial)
+        private void ReheapUp(int initial)
         {
             int pos = initial;
             T oldItem = _heap[pos];
@@ -141,7 +140,7 @@ namespace Roguelike.Utils
             _heap[pos] = oldItem;
         }
 
-        internal void ReheapDown(int initial)
+        private void ReheapDown(int initial)
         {
             int pos = initial;
             T oldItem = _heap[pos];
@@ -175,7 +174,6 @@ namespace Roguelike.Utils
         private void Resize()
         {
             T[] newHeap = new T[_heap.Length * 3/2];
-            int[] newOrder = new int[_heap.Length * 3/2];
 
             for (int i = 0; i < Count; i++)
             {
@@ -185,7 +183,7 @@ namespace Roguelike.Utils
             _heap = newHeap;
         }
 
-        private int CompareItem(T a, T b)
+        private static int CompareItem(T a, T b)
         {
             return a.CompareTo(b);
         }

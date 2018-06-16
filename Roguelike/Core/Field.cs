@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.Core
 {
@@ -31,17 +32,13 @@ namespace Roguelike.Core
             }
         }
 
-        public Terrain this[int i, int j] { get => IsValid(i, j) ? _field[i][j] : null; }
+        public Terrain this[int i, int j] => IsValid(i, j) ? _field[i][j] : null;
 
         public bool IsValid(int i, int j) => i >= 0 && i < _width && j >= 0 && j < _height;
 
         public IEnumerator<Terrain> GetEnumerator()
         {
-            foreach (Terrain[] row in _field)
-            {
-                foreach (Terrain tile in row)
-                    yield return tile;
-            }
+            return _field.SelectMany(row => row).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

@@ -1,6 +1,5 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using System;
 
 namespace Roguelike.Actions
@@ -25,11 +24,11 @@ namespace Roguelike.Actions
             if (target == null)
                 return;
 
-            if (Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
-            {
-                int healing = targetUnit.TakeHealing(Power);
-                Game.MessageHandler.AddMessage($"{source.Name} healed {targetUnit.Name} by {healing} damage");
-            }
+            if (!Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
+                return;
+
+            int healing = targetUnit.TakeHealing(Power);
+            Game.MessageHandler.AddMessage($"{source.Name} healed {targetUnit.Name} by {healing} damage");
         }
     }
 }

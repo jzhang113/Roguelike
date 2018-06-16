@@ -1,5 +1,4 @@
-﻿using Roguelike.Items;
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace Roguelike.Items
@@ -52,7 +51,7 @@ namespace Roguelike.Items
 
         public bool Equals(ItemInfo other)
         {
-            return Item.Equals(other.Item);
+            return Item.Equals(other?.Item);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)

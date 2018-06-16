@@ -2,45 +2,42 @@
 {
     struct Room
     {
-        private int _width;
-        private int _height;
-
         public int X { get; internal set; }
         public int Y { get; internal set; }
-        public int Width { get => _width; private set => _width = (value >= 2) ? value : 2; }
-        public int Height { get => _height; private set => _height = (value >= 2) ? value : 2; }
+        public int Width { get; }
+        public int Height { get; }
 
-        public int Area { get => Width * Height; }
-        public (int, int) Center { get => (X + Width / 2, Y + Height / 2); }
-        public (int, int) TopLeft { get => (X, Y); }
-        public (int, int) BottomRight { get => (X + Width, Y + Height); }
+        public int Area => Width * Height;
+        public (int, int) Center => (X + Width / 2, Y + Height / 2);
+        public (int, int) TopLeft => (X, Y);
+        public (int, int) BottomRight => (X + Width, Y + Height);
 
-        public int Left { get => X; }
-        public int Right { get => X + Width; }
-        public int Top { get => Y; }
-        public int Bottom { get => Y + Height; }
+        public int Left => X;
+        public int Right => X + Width;
+        public int Top => Y;
+        public int Bottom => Y + Height;
 
         public Room(int x, int y, int width, int height)
         {
             X = x;
             Y = y;
-            _width = width;
-            _height = height;
+            Width = width;
+            Height = height;
         }
 
         public Room(int width, int height)
         {
             X = 0;
             Y = 0;
-            _width = width;
-            _height = height;
+            Width = width;
+            Height = height;
         }
 
         public bool Intersects(Room other)
         {
-            return other.X < X + _width &&
+            return other.X < X + Width &&
                    X < other.X + other.Width &&
-                   other.Y < Y + _height &&
+                   other.Y < Y + Height &&
                    Y < other.Y + other.Height;
         }
 

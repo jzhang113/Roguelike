@@ -1,6 +1,5 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System.Linq;
 
@@ -13,7 +12,7 @@ namespace Roguelike.Commands
 
         private readonly int _newX;
         private readonly int _newY;
-        private Terrain _tile;
+        private readonly Terrain _tile;
 
         public MoveCommand(Actor source, int x, int y)
         {
@@ -43,10 +42,10 @@ namespace Roguelike.Commands
             // Check if the destination is already occupied.
             if (Game.Map.TryGetActor(_tile.X, _tile.Y, out Actor target))
             {
-                if (target is Door)
+                if (target is Door door)
                 {
                     // HACK: need an open door command
-                    Game.Map.OpenDoor(target as Door);
+                    Game.Map.OpenDoor(door);
                     return new RedirectMessage(false, new WaitCommand(120));
                 }
                 else if (target == Source)
@@ -73,10 +72,9 @@ namespace Roguelike.Commands
                 {
                     if (!stack.IsEmpty())
                     {
-                        if (stack.Count == 1)
-                            Game.MessageHandler.AddMessage($"You see a {stack.First().Item.Name} here.");
-                        else
-                            Game.MessageHandler.AddMessage("You see several items here.");
+                        Game.MessageHandler.AddMessage(stack.Count == 1
+                            ? $"You see a {stack.First().Item.Name} here."
+                            : "You see several items here.");
                     }
                 }
             }

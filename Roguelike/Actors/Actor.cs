@@ -1,10 +1,10 @@
-﻿using RLNET;
-using Roguelike.Core;
+﻿using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 using System;
 using System.Runtime.Serialization;
+using Roguelike.Commands;
 
 namespace Roguelike.Actors
 {
@@ -16,17 +16,17 @@ namespace Roguelike.Actors
         public int Speed { get; set; }
         public bool BlocksLight { get; set; }
 
-        public int HP { get; set; }
-        public int MaxHP { get; set; }
-        public int SP { get; set; }
-        public int MaxSP { get; set; }
-        public int MP { get; set; }
-        public int MaxMP { get; set; }
+        public int Hp { get; set; }
+        public int MaxHp { get; set; }
+        public int Sp { get; set; }
+        public int MaxSp { get; set; }
+        public int Mp { get; set; }
+        public int MaxMp { get; set; }
 
-        public int STR { get; }
-        public int DEX { get; }
-        public int DEF { get; set; }
-        public int INT { get; set; }
+        public int Str { get; }
+        public int Dex { get; }
+        public int Def { get; set; }
+        public int Int { get; set; }
 
         public Enums.ActorState State { get; set; }
 
@@ -49,7 +49,7 @@ namespace Roguelike.Actors
             set => DrawingComponent.Y = value;
         }
 
-        public bool IsDead => HP < 0;
+        public bool IsDead => Hp < 0;
 
         public Actor()
         {
@@ -72,17 +72,17 @@ namespace Roguelike.Actors
             Speed = info.GetInt32(nameof(Speed));
             BlocksLight = info.GetBoolean(nameof(BlocksLight));
 
-            HP = info.GetInt32(nameof(HP));
-            MaxHP = info.GetInt32(nameof(MaxHP));
-            SP = info.GetInt32(nameof(SP));
-            MaxSP = info.GetInt32(nameof(MaxSP));
-            MP = info.GetInt32(nameof(MP));
-            MaxMP = info.GetInt32(nameof(MaxMP));
+            Hp = info.GetInt32(nameof(Hp));
+            MaxHp = info.GetInt32(nameof(MaxHp));
+            Sp = info.GetInt32(nameof(Sp));
+            MaxSp = info.GetInt32(nameof(MaxSp));
+            Mp = info.GetInt32(nameof(Mp));
+            MaxMp = info.GetInt32(nameof(MaxMp));
             
-            STR = info.GetInt32(nameof(STR));
-            DEX = info.GetInt32(nameof(DEX));
-            DEF = info.GetInt32(nameof(DEF));
-            INT = info.GetInt32(nameof(INT));
+            Str = info.GetInt32(nameof(Str));
+            Dex = info.GetInt32(nameof(Dex));
+            Def = info.GetInt32(nameof(Def));
+            Int = info.GetInt32(nameof(Int));
             
             State = (Enums.ActorState)info.GetValue(nameof(State), typeof(Enums.ActorState));
             
@@ -108,23 +108,23 @@ namespace Roguelike.Actors
 
         public int TakeDamage(int power)
         {
-            HP -= power;
+            Hp -= power;
             return power;
         }
 
         public int TakeHealing(int power)
         {
-            int restore = MaxHP - HP;
+            int restore = MaxHp - Hp;
             restore = (restore > 0) ? restore : 0;
 
             if (restore > power)
             {
-                HP += power;
+                Hp += power;
                 return power;
             }
             else
             {
-                HP += restore;
+                Hp += restore;
                 return restore;
             }
         }
@@ -136,20 +136,14 @@ namespace Roguelike.Actors
         {
             int energyDiff = Energy - other.Energy;
 
-            if (energyDiff == 0 && other is Actor)
-            {
-                Actor otherActor = other as Actor;
-                float distPlayer = Game.Map.PlayerMap[X, Y];
-                float otherDistPlayer = Game.Map.PlayerMap[otherActor.X, otherActor.Y];
+            if (energyDiff != 0 || !(other is Actor otherActor))
+                return energyDiff;
 
-                // if we haven't discovered one of the actors, don't change the order
-                if (float.IsNaN(distPlayer) || float.IsNaN(otherDistPlayer))
-                    return 0;
-                else
-                    return (int)(otherDistPlayer - distPlayer);
-            }
+            float distPlayer = Game.Map.PlayerMap[X, Y];
+            float otherDistPlayer = Game.Map.PlayerMap[otherActor.X, otherActor.Y];
 
-            return energyDiff;
+            // if we haven't discovered one of the actors, don't change the order
+            return float.IsNaN(distPlayer) || float.IsNaN(otherDistPlayer) ? 0 : (int) (otherDistPlayer - distPlayer);
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -159,17 +153,17 @@ namespace Roguelike.Actors
             info.AddValue(nameof(Speed), Speed);
             info.AddValue(nameof(BlocksLight), BlocksLight);
 
-            info.AddValue(nameof(HP), HP);
-            info.AddValue(nameof(MaxHP), MaxHP);
-            info.AddValue(nameof(SP), SP);
-            info.AddValue(nameof(MaxSP), MaxSP);
-            info.AddValue(nameof(MP), MP);
-            info.AddValue(nameof(MaxMP), MaxMP);
+            info.AddValue(nameof(Hp), Hp);
+            info.AddValue(nameof(MaxHp), MaxHp);
+            info.AddValue(nameof(Sp), Sp);
+            info.AddValue(nameof(MaxSp), MaxSp);
+            info.AddValue(nameof(Mp), Mp);
+            info.AddValue(nameof(MaxMp), MaxMp);
 
-            info.AddValue(nameof(STR), STR);
-            info.AddValue(nameof(DEX), DEX);
-            info.AddValue(nameof(DEF), DEF);
-            info.AddValue(nameof(INT), INT);
+            info.AddValue(nameof(Str), Str);
+            info.AddValue(nameof(Dex), Dex);
+            info.AddValue(nameof(Def), Def);
+            info.AddValue(nameof(Int), Int);
 
             info.AddValue(nameof(State), State);
 

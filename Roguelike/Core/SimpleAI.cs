@@ -1,12 +1,12 @@
 ﻿using Roguelike.Commands;
 using Roguelike.Actors;
-using Roguelike.Interfaces;
 using Roguelike.Enums;
 
 namespace Roguelike.Core
 {
     // Provides the default behavior for Actors.
-    class SimpleAI
+    // ReSharper disable once InconsistentNaming
+    static class SimpleAI
     {
         // Monsters will wander randomly if awake and chase the Player if s/he is in their perception
         // range. If their health falls below a certain threshold, they will attempt to flee.
@@ -27,7 +27,7 @@ namespace Roguelike.Core
                     }
                 case ActorState.Chase:
                     // TODO: set dynamic threshold
-                    if (monster.HP < 10)
+                    if (monster.Hp < 10)
                     {
                         monster.State = ActorState.Flee;
                         return GetAction(monster);
@@ -39,7 +39,7 @@ namespace Roguelike.Core
                     }
                 case ActorState.Flee:
                     // TODO: set dynamic threshold
-                    if (monster.HP > 100)
+                    if (monster.Hp > 100)
                     {
                         monster.State = ActorState.Wander;
                         return GetAction(monster);

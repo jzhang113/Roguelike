@@ -1,6 +1,5 @@
 ﻿using Roguelike.Commands;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System;
 using System.Runtime.Serialization;
@@ -17,9 +16,9 @@ namespace Roguelike.Actors
             DrawingComponent.Color = Colors.Player;
             DrawingComponent.Symbol = '@';
 
-            HP = 100;
-            SP = 50;
-            MP = 50;
+            Hp = 100;
+            Sp = 50;
+            Mp = 50;
         }
 
         protected Player(SerializationInfo info, StreamingContext context) : base(info, context)

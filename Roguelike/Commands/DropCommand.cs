@@ -1,5 +1,4 @@
 ﻿using Roguelike.Actors;
-using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 
@@ -21,13 +20,11 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
-            if (!Source.Inventory.TryGetKey(_key, out _itemGroup))
-            {
-                Game.MessageHandler.AddMessage("No such item to drop.");
-                return new RedirectMessage(false);
-            }
+            if (Source.Inventory.TryGetKey(_key, out _itemGroup))
+                return new RedirectMessage(true);
 
-            return new RedirectMessage(true);
+            Game.MessageHandler.AddMessage("No such item to drop.");
+            return new RedirectMessage(false);
         }
 
         public void Execute()

@@ -5,6 +5,7 @@ using Roguelike.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Roguelike.Systems
@@ -119,37 +120,35 @@ namespace Roguelike.Systems
         public bool RemoveActor(Actor unit)
         {
             bool success = Units.Remove(ToIndex(unit.X, unit.Y));
-            if (success)
-            {
-                unit.State = Enums.ActorState.Dead;
-                Field[unit.X, unit.Y].IsOccupied = false;
-                Field[unit.X, unit.Y].BlocksLight = false;
-            }
+            if (!success)
+                return false;
 
-            return success;
+            unit.State = Enums.ActorState.Dead;
+            Field[unit.X, unit.Y].IsOccupied = false;
+            Field[unit.X, unit.Y].BlocksLight = false;
+
+            return true;
         }
 
         public bool SetActorPosition(Actor actor, int x, int y)
         {
-            if (Field[x, y].IsWalkable)
-            {
-                Field[actor.X, actor.Y].IsOccupied = false;
-                Field[actor.X, actor.Y].BlocksLight = false;
-                Units.Remove(ToIndex(actor.X, actor.Y));
+            if (!Field[x, y].IsWalkable)
+                return false;
 
-                actor.X = x;
-                actor.Y = y;
-                Field[x, y].IsOccupied = true;
-                Field[x, y].BlocksLight = actor.BlocksLight;
-                Units.Add(ToIndex(x, y), actor);
+            Field[actor.X, actor.Y].IsOccupied = false;
+            Field[actor.X, actor.Y].BlocksLight = false;
+            Units.Remove(ToIndex(actor.X, actor.Y));
 
-                if (actor is Player)
-                    Refresh();
+            actor.X = x;
+            actor.Y = y;
+            Field[x, y].IsOccupied = true;
+            Field[x, y].BlocksLight = actor.BlocksLight;
+            Units.Add(ToIndex(x, y), actor);
 
-                return true;
-            }
+            if (actor is Player)
+                Refresh();
 
-            return false;
+            return true;
         }
         #endregion
 
@@ -236,7 +235,7 @@ namespace Roguelike.Systems
                 y = nextMove.Y;
                 nearest = nextMove.Weight;
 
-                if (nearest == prev || nearest == 0)
+                if (Math.Abs(nearest - prev) < 0.001f || Math.Abs(nearest) < 0.01f)
                 {
                     yield break;
                 }
@@ -259,7 +258,7 @@ namespace Roguelike.Systems
                 int newX = currentX + dir.X;
                 int newY = currentY + dir.Y;
 
-                if (goalMap[newX, newY] < nearest && (Field[newX, newY].IsWalkable || goalMap[newX, newY] == 0))
+                if (goalMap[newX, newY] < nearest && (Field[newX, newY].IsWalkable || Math.Abs(goalMap[newX, newY]) < 0.001f))
                 {
                     nextX = newX;
                     nextY = newY;
@@ -273,10 +272,7 @@ namespace Roguelike.Systems
         public IEnumerable<Terrain> GetStraightPathToPlayer(int x, int y)
         {
             System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
-            if (Field[x, y].IsVisible)
-                return GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y);
-            else
-                return new List<Terrain>();
+            return Field[x, y].IsVisible ? GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y) : new List<Terrain>();
         }
 
         // Returns a straight line from the source to target. Does not check if the path is actually
@@ -461,14 +457,11 @@ namespace Roguelike.Systems
             float distance = PlayerMap[tile.X, tile.Y];
 
             if (distance < 10 || float.IsNaN(distance))
-                display = distance.ToString();
+                display = distance.ToString(CultureInfo.InvariantCulture);
             else
                 display = ((char)(distance - 10 + 'a')).ToString();
 
-            if (display == "NaN")
-                mapConsole.Print(tile.X, tile.Y, display, Swatch.DbBlood);
-            else
-                mapConsole.Print(tile.X, tile.Y, display, Swatch.DbWater);
+            mapConsole.Print(tile.X, tile.Y, display, display == "NaN" ? Swatch.DbBlood : Swatch.DbWater);
         }
 
         internal void ClearHighlight()
@@ -555,8 +548,8 @@ namespace Roguelike.Systems
         // Temporarily store lists when deserializing dictionaries
         private class KeyValueHelper<TKey, TValue>
         {
-            public ICollection<TKey> Key { get; set; }
-            public ICollection<TValue> Value { get; set; }
+            public ICollection<TKey> Key { private get; set; }
+            public ICollection<TValue> Value { private get; set; }
 
             public IDictionary<TKey, TValue> ToDictionary()
             {

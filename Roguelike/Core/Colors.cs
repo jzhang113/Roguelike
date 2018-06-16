@@ -2,7 +2,7 @@
 
 namespace Roguelike.Core
 {
-    class Colors
+    static class Colors
     {
         public static RLColor FloorBackground = RLColor.Black;
         public static RLColor Floor = Swatch.AlternateDarkest;

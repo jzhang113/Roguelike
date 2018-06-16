@@ -1,5 +1,4 @@
 ﻿using Roguelike.Actors;
-using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 60;
 
-        private InventoryHandler _itemStack;
+        private readonly InventoryHandler _itemStack;
 
         public PickupCommand(Actor source, InventoryHandler itemStack)
         {

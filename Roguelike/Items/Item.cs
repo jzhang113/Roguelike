@@ -41,7 +41,7 @@ namespace Roguelike.Items
         internal float MeleeRange { get; set; } = Constants.DEFAULT_MELEE_RANGE;
         internal float ThrowRange { get; set; } = Constants.DEFAULT_THROW_RANGE;
 
-        private IList<IAction> _abilities { get; }
+        private readonly IList<IAction> _abilities;
 
         public Item(string name, IMaterial material)
         {
@@ -75,12 +75,12 @@ namespace Roguelike.Items
 
         public virtual void Attack()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public virtual void Throw()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
         #endregion
 

@@ -10,7 +10,6 @@ using System.ComponentModel;
 using Roguelike.Utils;
 using System.Runtime.Serialization.Formatters.Binary;
 using Roguelike.Items;
-using System.Runtime.Serialization;
 
 namespace Roguelike
 {
@@ -75,7 +74,7 @@ namespace Roguelike
             else
                 mainSeed = (int)DateTime.Now.Ticks;
 
-            Random Random = new Random(mainSeed);
+            Random random = new Random(mainSeed);
             int[] generatorSeed = new int[31];
 
             using (StreamWriter writer = new StreamWriter("log"))
@@ -84,7 +83,7 @@ namespace Roguelike
 
                 for (int i = 0; i < generatorSeed.Length; i++)
                 {
-                    generatorSeed[i] = Random.Next();
+                    generatorSeed[i] = random.Next();
                     writer.WriteLine(generatorSeed[i]);
                 }
             }
@@ -94,8 +93,8 @@ namespace Roguelike
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
-            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, Random);
-            Map = mapGenerator.CreateMapBSP();
+            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, random);
+            Map = mapGenerator.CreateMapBsp();
             sw.Stop();
 
             Console.WriteLine("Map generated in: " + sw.Elapsed);
@@ -103,8 +102,8 @@ namespace Roguelike
             Player = new Player();
             do
             {
-                Player.X = Random.Next(1, Config.Map.Width - 1);
-                Player.Y = Random.Next(1, Config.Map.Height - 1);
+                Player.X = random.Next(1, Config.Map.Width - 1);
+                Player.Y = random.Next(1, Config.Map.Height - 1);
             }
             while (!Map.Field[Player.X, Player.Y].IsWalkable);
 
@@ -116,8 +115,8 @@ namespace Roguelike
                 Skeleton s = new Skeleton();
                 while (!Map.Field[s.X, s.Y].IsWalkable)
                 {
-                    s.X = Random.Next(1, Config.Map.Width - 1);
-                    s.Y = Random.Next(1, Config.Map.Height - 1);
+                    s.X = random.Next(1, Config.Map.Width - 1);
+                    s.Y = random.Next(1, Config.Map.Height - 1);
                     s.Name = "Mook #" + (i + 1);
                 }
                 Map.AddActor(s);

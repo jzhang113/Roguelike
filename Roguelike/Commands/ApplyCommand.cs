@@ -4,6 +4,7 @@ using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 using System.Collections.Generic;
+using Roguelike.Actions;
 
 namespace Roguelike.Commands
 {
@@ -33,9 +34,9 @@ namespace Roguelike.Commands
             }
 
             Item item = _itemGroup.Item;
-            if (item is IUsable)
+            if (item is IUsable usable)
             {
-                IAction action = (item as IUsable).ApplySkill;
+                IAction action = usable.ApplySkill;
 
                 if (action.Area.Aimed)
                 {

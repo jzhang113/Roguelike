@@ -1,7 +1,4 @@
-﻿using Roguelike.Actors;
-using Roguelike.Items;
-using Roguelike.Systems;
-using System;
+﻿using System;
 
 namespace Roguelike.Core
 {
@@ -17,8 +14,8 @@ namespace Roguelike.Core
         public bool IsOccupied { get; internal set; }
         public bool BlocksLight { get; internal set; }
 
-        public bool IsWalkable { get => !IsWall && !IsOccupied; }
-        public bool IsLightable { get => !IsWall && !BlocksLight; }
+        public bool IsWalkable => !IsWall && !IsOccupied;
+        public bool IsLightable => !IsWall && !BlocksLight;
 
         public Terrain(int x, int y)
         {

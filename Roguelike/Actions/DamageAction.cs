@@ -1,6 +1,5 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using System;
 
 namespace Roguelike.Actions
@@ -25,15 +24,15 @@ namespace Roguelike.Actions
             if (target == null)
                 return;
 
-            if (Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
-            {
-                int damage = targetUnit.TakeDamage(Power);
+            if (!Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
+                return;
 
-                if (targetUnit.IsDead)
-                    targetUnit.State = Enums.ActorState.Dead;
+            int damage = targetUnit.TakeDamage(Power);
 
-                Game.MessageHandler.AddMessage($"{source.Name} hits {targetUnit.Name} for {damage} damage");
-            }
+            if (targetUnit.IsDead)
+                targetUnit.State = Enums.ActorState.Dead;
+
+            Game.MessageHandler.AddMessage($"{source.Name} hits {targetUnit.Name} for {damage} damage");
         }
     }
 }

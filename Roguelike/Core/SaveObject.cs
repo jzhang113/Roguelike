@@ -1,5 +1,4 @@
-﻿using Roguelike.Actors;
-using Roguelike.Systems;
+﻿using Roguelike.Systems;
 using System;
 
 namespace Roguelike.Core

@@ -25,7 +25,7 @@ namespace Roguelike.Items
         
         public void Unequip()
         {
-            Carrier.Equipment.Unequip(this);
+            Carrier.Equipment.Unequip();
             Game.MessageHandler.AddMessage($"You unwield a {Name}.");
         }
     }

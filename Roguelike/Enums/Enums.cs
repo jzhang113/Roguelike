@@ -5,9 +5,9 @@ namespace Roguelike.Enums
 
     public enum ArmorType { Helmet, Armor, Gloves, Boots, RingLeft, RingRight }
 
-    enum MessageLevel { Minimal, Normal, Verbose }
+    internal enum MessageLevel { Minimal, Normal, Verbose }
 
-    enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply, Targetting };
+    internal enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply, Targetting };
 
     public enum TargetShape { Area, Directional, Range, Ray, Self }
 }

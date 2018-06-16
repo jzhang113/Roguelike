@@ -8,8 +8,8 @@ namespace Roguelike.Interfaces
     [Serializable]
     public class Drawable : ISerializable
     {
-        public RLColor Color { get; internal protected set; }
-        public char Symbol { get; internal protected set; }
+        public RLColor Color { get; protected internal set; }
+        public char Symbol { get; protected internal set; }
 
         public int X { get; set; }
         public int Y { get; set; }
@@ -51,6 +51,7 @@ namespace Roguelike.Interfaces
             info.AddValue($"{nameof(Color)}.r", Color.r);
             info.AddValue($"{nameof(Color)}.g", Color.g);
             info.AddValue($"{nameof(Color)}.b", Color.b);
+
             info.AddValue(nameof(Symbol), Symbol);
             info.AddValue(nameof(X), X);
             info.AddValue(nameof(Y), Y);

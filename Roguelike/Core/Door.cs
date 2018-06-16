@@ -1,6 +1,5 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Commands;
-using Roguelike.Interfaces;
 using System;
 using System.Runtime.Serialization;
 

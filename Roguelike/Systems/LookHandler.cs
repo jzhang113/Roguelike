@@ -5,7 +5,7 @@ using Roguelike.Items;
 
 namespace Roguelike.Systems
 {
-    class LookHandler
+    static class LookHandler
     {
         private static Actor _displayActor;
         private static ItemInfo _displayItem;
@@ -40,9 +40,9 @@ namespace Roguelike.Systems
             if (_showActorInfo)
             {
                 console.Print(1, 1, _displayActor.Name, Colors.TextHeading);
-                console.Print(1, 2, "HP: " + _displayActor.HP + " / " + _displayActor.MaxHP, Colors.TextHeading);
-                console.Print(1, 3, "MP: " + _displayActor.MP + " / " + _displayActor.MaxMP, Colors.TextHeading);
-                console.Print(1, 4, "SP: " + _displayActor.SP + " / " + _displayActor.MaxSP, Colors.TextHeading);
+                console.Print(1, 2, "HP: " + _displayActor.Hp + " / " + _displayActor.MaxHp, Colors.TextHeading);
+                console.Print(1, 3, "MP: " + _displayActor.Mp + " / " + _displayActor.MaxMp, Colors.TextHeading);
+                console.Print(1, 4, "SP: " + _displayActor.Sp + " / " + _displayActor.MaxSp, Colors.TextHeading);
                 console.Print(1, 5, "Energy: " + _displayActor.Energy.ToString(), Colors.TextHeading);
                 console.Print(1, 6, "State: " + _displayActor.State, Colors.TextHeading);
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Roguelike.Commands;
 
 namespace Roguelike.Interfaces
 {

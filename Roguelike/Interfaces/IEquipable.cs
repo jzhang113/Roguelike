@@ -1,6 +1,4 @@
-﻿using Roguelike.Actors;
-
-namespace Roguelike.Interfaces
+﻿namespace Roguelike.Interfaces
 {
     // Represents items that can be equipped.
     interface IEquipable

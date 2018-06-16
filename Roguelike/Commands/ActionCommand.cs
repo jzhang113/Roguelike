@@ -3,6 +3,7 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System.Collections.Generic;
+using Roguelike.Actions;
 
 namespace Roguelike.Commands
 {
@@ -12,7 +13,7 @@ namespace Roguelike.Commands
         public int EnergyCost { get; }
         public IEnumerable<Terrain> Target { get; set; }
 
-        private IAction _action;
+        private readonly IAction _action;
 
         public ActionCommand(Actor source, IAction action, IEnumerable<Terrain> targets = null)
         {

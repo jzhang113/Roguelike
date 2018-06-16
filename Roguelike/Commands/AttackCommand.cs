@@ -1,9 +1,8 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
-using Roguelike.Interfaces;
-using Roguelike.Actions;
 using Roguelike.Systems;
 using System.Collections.Generic;
+using Roguelike.Actions;
 
 namespace Roguelike.Commands
 {
@@ -12,7 +11,7 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; }
 
-        private IAction _skill;
+        private readonly IAction _skill;
         private readonly IEnumerable<Terrain> _targets;
 
         public AttackCommand(Actor source, IAction attack)
@@ -25,7 +24,7 @@ namespace Roguelike.Commands
         public AttackCommand(Actor source, IAction attack, Terrain target)
         {
             _skill = attack;
-            _targets = new List<Terrain>()
+            _targets = new List<Terrain>
             {
                 target
             };

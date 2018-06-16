@@ -1,7 +1,7 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Systems;
 
-namespace Roguelike.Interfaces
+namespace Roguelike.Commands
 {
     // Describes most possible in game actions that take time. Actions that do not take time, such
     // as opening the inventory, are not Actions.

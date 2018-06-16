@@ -1,7 +1,7 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
 
-namespace Roguelike.Interfaces
+namespace Roguelike.Actions
 {
     // Actions are similar to commands, but takes a target and will always trigger when called.
     // Actions may be chained into action sequences, which is considered as a single move and 

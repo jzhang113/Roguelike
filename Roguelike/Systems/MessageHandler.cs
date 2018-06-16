@@ -1,8 +1,8 @@
 ﻿using RLNET;
 using Roguelike.Core;
-using Roguelike.Enums;
 using System;
 using System.Collections.Generic;
+using Roguelike.Enums;
 
 namespace Roguelike.Systems
 {
@@ -13,12 +13,12 @@ namespace Roguelike.Systems
         public bool Redraw { get; private set; }
 
         private readonly int _maxSize;
-        private readonly IList<string> messages;
+        private readonly IList<string> _messages;
 
         public MessageHandler(int maxSize)
         {
             _maxSize = maxSize;
-            messages = new List<string>();
+            _messages = new List<string>();
         }
 
         // Place a new message onto the message log if its MessageLevel is lower than the currently
@@ -27,10 +27,10 @@ namespace Roguelike.Systems
         {
             if (level <= Game.Option.Verbosity)
             {
-                messages.Add(text);
+                _messages.Add(text);
 
-                if (messages.Count > _maxSize)
-                    messages.RemoveAt(0);
+                if (_messages.Count > _maxSize)
+                    _messages.RemoveAt(0);
 
                 Redraw = true;
             }
@@ -39,8 +39,8 @@ namespace Roguelike.Systems
         // Modify the last message by adding additional text.
         public void AppendMessage(string text)
         {
-            int prev = messages.Count - 1;
-            messages[prev] += " " + text;
+            int prev = _messages.Count - 1;
+            _messages[prev] += " " + text;
 
             Redraw = true;
         }
@@ -48,12 +48,12 @@ namespace Roguelike.Systems
         public void Draw(RLConsole console)
         {
             int viewSize = (console.Height - 1) / 2;
-            int maxCount = Math.Min(messages.Count, viewSize);
+            int maxCount = Math.Min(_messages.Count, viewSize);
             int yPos = console.Height - 2;
 
             for (int i = 0; i < maxCount; i++)
             {
-                console.Print(1, yPos, messages[messages.Count - i - 1], Colors.TextHeading);
+                console.Print(1, yPos, _messages[_messages.Count - i - 1], Colors.TextHeading);
                 yPos -= 2;
             }
 

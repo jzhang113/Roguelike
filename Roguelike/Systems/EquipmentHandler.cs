@@ -1,9 +1,9 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.Items;
-using Roguelike.Enums;
 using System.Collections.Generic;
 using System;
+using Roguelike.Enums;
 
 namespace Roguelike.Systems
 {
@@ -43,7 +43,7 @@ namespace Roguelike.Systems
             Armor[armor.Type] = armor;
         }
 
-        public void Unequip(Weapon weapon)
+        public void Unequip()
         {
             PrimaryWeapon = DefaultWeapon;
         }

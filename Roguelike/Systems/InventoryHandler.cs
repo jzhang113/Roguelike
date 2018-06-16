@@ -4,6 +4,7 @@ using Roguelike.Items;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.Systems
 {
@@ -11,7 +12,7 @@ namespace Roguelike.Systems
     [Serializable]
     public class InventoryHandler : ICollection<ItemInfo>
     {
-        private IList<ItemInfo> _inventory;
+        private readonly IList<ItemInfo> _inventory;
 
         public int Count => _inventory.Count;
         public bool IsReadOnly => false;
@@ -27,6 +28,9 @@ namespace Roguelike.Systems
         // Increments the item stack if it already exists or adds the item to inventory.
         public void Add(ItemInfo itemGroup)
         {
+            if (itemGroup == null)
+                return;
+
             bool found = false;
             foreach (ItemInfo info in _inventory)
             {
@@ -46,6 +50,9 @@ namespace Roguelike.Systems
         // no more.
         public bool Remove(ItemInfo itemGroup)
         {
+            if (itemGroup == null)
+                return false;
+
             foreach (ItemInfo info in _inventory)
             {
                 if (info.Equals(itemGroup))
@@ -73,13 +80,7 @@ namespace Roguelike.Systems
 
         public bool Contains(ItemInfo itemGroup)
         {
-            foreach (ItemInfo info in _inventory)
-            {
-                if (info.Equals(itemGroup))
-                    return true;
-            }
-
-            return false;
+            return _inventory.Any(info => info.Equals(itemGroup));
         }
 
         public void CopyTo(ItemInfo[] array, int arrayIndex)
@@ -116,12 +117,9 @@ namespace Roguelike.Systems
 
             foreach (ItemInfo info in _inventory)
             {
-                string itemString;
-
-                if (info.Count > 1)
-                    itemString = string.Format("{0}) {1} {2}s", letter, info.Count, info.Item.Name);
-                else
-                    itemString = string.Format("{0}) {1}", letter, info.Item.Name);
+                var itemString = info.Count > 1
+                    ? $"{letter}) {info.Count} {info.Item.Name}s"
+                    : $"{letter}) {info.Item.Name}";
 
                 console.Print(1, line, itemString, Colors.TextHeading);
                 line++;

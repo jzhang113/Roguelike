@@ -1,6 +1,6 @@
-﻿using Roguelike.Actions;
-using Roguelike.Core;
+﻿using Roguelike.Core;
 using System.Collections.Generic;
+using Roguelike.Actions;
 
 namespace Roguelike.Interfaces
 {

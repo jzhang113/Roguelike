@@ -1,6 +1,4 @@
-﻿using Roguelike.Core;
-using Roguelike.Interfaces;
-using Roguelike.Systems;
+﻿using Roguelike.Interfaces;
 using System;
 using System.Runtime.Serialization;
 

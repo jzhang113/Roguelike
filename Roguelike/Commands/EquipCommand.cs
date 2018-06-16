@@ -10,7 +10,7 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;
 
-        private char _key;
+        private readonly char _key;
         private ItemInfo _itemGroup;
 
         public EquipCommand(Actor source, char key)
@@ -27,7 +27,7 @@ namespace Roguelike.Commands
                 return new RedirectMessage(false);
             }
 
-            if (_itemGroup is IEquipable)
+            if (_itemGroup.Item is IEquipable)
             {
                 return new RedirectMessage(true);
             }
@@ -42,7 +42,7 @@ namespace Roguelike.Commands
         {
             System.Diagnostics.Debug.Assert(_itemGroup != null);
             Source.Inventory.Remove(_itemGroup);
-            (_itemGroup as IEquipable).Equip();
+            (_itemGroup.Item as IEquipable)?.Equip();
         }
     }
 }

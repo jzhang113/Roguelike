@@ -1,6 +1,7 @@
 ﻿using Roguelike.Interfaces;
 using Roguelike.Utils;
 using System.Collections.Generic;
+using Roguelike.Commands;
 
 namespace Roguelike.Systems
 {
@@ -8,10 +9,8 @@ namespace Roguelike.Systems
     // only occur with the Player.
     class EventScheduler
     {
-        private ICollection<ISchedulable> _entities;
-        private MaxHeap<ISchedulable> _eventSet;
-
-        public ISchedulable Current => _eventSet.Peek();
+        private readonly ICollection<ISchedulable> _entities;
+        private readonly MaxHeap<ISchedulable> _eventSet;
 
         public EventScheduler(int size)
         {

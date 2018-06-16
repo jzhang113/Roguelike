@@ -1,7 +1,7 @@
 ﻿using Roguelike.Actors;
-using Roguelike.Enums;
 using System;
 using System.Collections.Generic;
+using Roguelike.Enums;
 
 namespace Roguelike.Core
 {
@@ -37,13 +37,13 @@ namespace Roguelike.Core
 
         public IEnumerable<Terrain> GetTilesInRange(Actor current, (int X, int Y)? target = null)
         {
-            int X = 0, Y = 0;
+            int x = 0, y = 0;
             if (Aimed)
             {
                 if (Target != null)
-                    (X, Y) = Target.Value;
+                    (x, y) = Target.Value;
                 else if (target != null)
-                    (X, Y) = target.Value;
+                    (x, y) = target.Value;
                 else
                     throw new ArgumentException("aimed target destination not supplied");
             }
@@ -62,19 +62,19 @@ namespace Roguelike.Core
                     }
                     return inRange;
                 case TargetShape.Range:
-                    AddTilesInRange(current, X, Y, inRange);
+                    AddTilesInRange(current, x, y, inRange);
                     return inRange;
                 case TargetShape.Ray:
-                    return Game.Map.GetStraightLinePath(current.X, current.Y, X, Y);
+                    return Game.Map.GetStraightLinePath(current.X, current.Y, x, y);
                 case TargetShape.Directional:
-                    int dx = current.X - X;
-                    int dy = current.Y - Y;
+                    int dx = current.X - x;
+                    int dy = current.Y - y;
                     int sx = Math.Sign(dx);
                     int sy = Math.Sign(dy);
                     int limit = Math.Max(Math.Abs(dx), Math.Abs(dy));
 
                     for (int i = 0; i < limit; i++)
-                        AddTilesInRange(current, X + i * sx, Y + i * sy, inRange);
+                        AddTilesInRange(current, x + i * sx, y + i * sy, inRange);
 
                     return inRange;
                 default:

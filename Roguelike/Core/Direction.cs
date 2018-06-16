@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+// ReSharper disable InconsistentNaming
 
 namespace Roguelike.Core
 {
@@ -13,6 +14,6 @@ namespace Roguelike.Core
         public static WeightedPoint SW { get; } = new WeightedPoint(-1, 1, 1.5f);
         public static WeightedPoint NW { get; } = new WeightedPoint(-1, -1, 1.5f);
 
-        public static IList<WeightedPoint> Directions = new WeightedPoint[]{ N, E, S, W, NE, SE, SW, NW };
+        public static readonly IList<WeightedPoint> Directions = new[]{ N, E, S, W, NE, SE, SW, NW };
     }
 }

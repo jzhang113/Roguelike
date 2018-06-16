@@ -8,8 +8,8 @@ namespace Roguelike.Systems
 {
     class MapGenerator
     {
-        private readonly int _minRoomSize = 4;
-        private readonly int _maxRoomSize = 15;
+        private const int _MIN_ROOM_SIZE = 4;
+        private const int _MAX_ROOM_SIZE = 15;
 
         private readonly int _width;
         private readonly int _height;
@@ -40,7 +40,7 @@ namespace Roguelike.Systems
 
                 bool first = true;
                 bool horiz = false;
-                bool intersects = false;
+                bool intersects;
                 int dx = 0, dy = 0;
                 int iterations = 0;
 
@@ -143,18 +143,18 @@ namespace Roguelike.Systems
                 //Console.WriteLine(i + " " + room.X + " " + room.Y + " " + room.Width + " " + room.Height); 
             }
 
-            AsciiPrint(roomsList);
+            AsciiPrint();
 
             return _map;
         }
 
-        public MapHandler CreateMapBSP()
+        public MapHandler CreateMapBsp()
         {
             TreeNode<Room> root = new TreeNode<Room>(new Room(0, 0, _width, _height));
-            TreeNode<Room> roomsPartition = PartitionMapBSP(root, _maxRoomSize, _maxRoomSize);
+            TreeNode<Room> roomsPartition = PartitionMapBsp(root, _MAX_ROOM_SIZE, _MAX_ROOM_SIZE);
             ICollection<Room> roomsList = new List<Room>();
 
-            MakeRoomsBSP(roomsPartition, ref roomsList);
+            MakeRoomsBsp(roomsPartition, ref roomsList);
             foreach (Room r in roomsList)
             {
                 PlaceDoors(r);
@@ -163,7 +163,7 @@ namespace Roguelike.Systems
             return _map;
         }
 
-        private TreeNode<Room> PartitionMapBSP(TreeNode<Room> current, int minWidth, int minHeight, int dir = -1)
+        private TreeNode<Room> PartitionMapBsp(TreeNode<Room> current, int minWidth, int minHeight, int dir = -1)
         {
             Room room = current.Value;
             if (dir == -1) dir = _rand.Next(2);
@@ -172,60 +172,58 @@ namespace Roguelike.Systems
             {
                 if (room.Width < minWidth)
                 {
-                    if (_rand.Next(room.Height) > minHeight)
-                        return PartitionMapBSP(current, minWidth, minHeight, 1);
-                    else
-                        return current;
+                    return _rand.Next(room.Height) > minHeight
+                        ? PartitionMapBsp(current, minWidth, minHeight, 1)
+                        : current;
                 }
 
-                int split = _rand.Next(_minRoomSize, room.Width - _minRoomSize + 1);
+                int split = _rand.Next(_MIN_ROOM_SIZE, room.Width - _MIN_ROOM_SIZE + 1);
                 Room left = new Room(room.X, room.Y, split, room.Height);
-                var leftChild = PartitionMapBSP(new TreeNode<Room>(current, left), minWidth, minHeight);
+                var leftChild = PartitionMapBsp(new TreeNode<Room>(current, left), minWidth, minHeight);
                 current.AddChild(leftChild);
 
                 Room right = new Room(room.X + split, room.Y, room.Width - split, room.Height);
-                var rightChild = PartitionMapBSP(new TreeNode<Room>(current, right), minWidth, minHeight);
+                var rightChild = PartitionMapBsp(new TreeNode<Room>(current, right), minWidth, minHeight);
                 current.AddChild(rightChild);
             }
             else
             {
                 if (room.Height < minHeight)
                 {
-                    if (_rand.Next(room.Width) > minWidth)
-                        return PartitionMapBSP(current, minWidth, minHeight, 0);
-                    else
-                        return current;
+                    return _rand.Next(room.Width) > minWidth
+                        ? PartitionMapBsp(current, minWidth, minHeight, 0)
+                        : current;
                 }
 
-                int split = _rand.Next(_minRoomSize, room.Height - _minRoomSize + 1);
+                int split = _rand.Next(_MIN_ROOM_SIZE, room.Height - _MIN_ROOM_SIZE + 1);
                 Room top = new Room(room.X, room.Y, room.Width, split);
-                var topChild = PartitionMapBSP(new TreeNode<Room>(current, top), minWidth, minHeight);
+                var topChild = PartitionMapBsp(new TreeNode<Room>(current, top), minWidth, minHeight);
                 current.AddChild(topChild);
 
                 Room bottom = new Room(room.X, room.Y + split, room.Width, room.Height - split);
-                var bottomChild = PartitionMapBSP(new TreeNode<Room>(current, bottom), minWidth, minHeight);
+                var bottomChild = PartitionMapBsp(new TreeNode<Room>(current, bottom), minWidth, minHeight);
                 current.AddChild(bottomChild);
             }
 
             return current;
         }
 
-        private IList<(int X, int Y)> MakeRoomsBSP(TreeNode<Room> root, ref ICollection<Room> roomsList)
+        private IList<(int X, int Y)> MakeRoomsBsp(TreeNode<Room> root, ref ICollection<Room> roomsList)
         {
             IList<(int X, int Y)> allocated = new List<(int X, int Y)>();
             IList<(int X, int Y)> connections = new List<(int X, int Y)>();
 
             foreach (var child in root.Children)
             {
-                var suballocated = MakeRoomsBSP(child, ref roomsList);
+                var suballocated = MakeRoomsBsp(child, ref roomsList);
 
-                if (suballocated.Count > 0)
-                {
-                    var point = suballocated[_rand.Next(suballocated.Count)];
+                if (suballocated.Count <= 0)
+                    continue;
 
-                    connections.Add(point);
-                    allocated = allocated.Concat(suballocated).ToList();
-                }
+                var point = suballocated[_rand.Next(suballocated.Count)];
+
+                connections.Add(point);
+                allocated = allocated.Concat(suballocated).ToList();
             }
 
             if (root.Children.Count == 0)
@@ -263,7 +261,7 @@ namespace Roguelike.Systems
             return allocated;
         }
 
-        internal void AsciiPrint(IList<Room> rooms)
+        private void AsciiPrint()
         {
             using (var writer = new System.IO.StreamWriter("map"))
             {
@@ -271,14 +269,7 @@ namespace Roguelike.Systems
                 {
                     for (int b = 0; b < _width; b++)
                     {
-                        if (_map.Field[b, a].IsWalkable)
-                        {
-                            writer.Write(".");
-                        }
-                        else
-                        {
-                            writer.Write("#");
-                        }
+                        writer.Write(_map.Field[b, a].IsWalkable ? "." : "#");
                     }
 
                     writer.WriteLine();
@@ -342,7 +333,7 @@ namespace Roguelike.Systems
 
                 if (room.Top > 1 && IsDoorLocation(i, room.Top - 1))
                 {
-                    _map.AddDoor(new Door()
+                    _map.AddDoor(new Door
                     {
                         X = i,
                         Y = room.Top - 1
@@ -351,7 +342,7 @@ namespace Roguelike.Systems
 
                 if (room.Bottom < _height - 1 && IsDoorLocation(i, room.Bottom))
                 {
-                    _map.AddDoor(new Door()
+                    _map.AddDoor(new Door
                     {
                         X = i,
                         Y = room.Bottom
@@ -366,7 +357,7 @@ namespace Roguelike.Systems
 
                 if (room.Left > 1 && IsDoorLocation(room.Left - 1, j))
                 {
-                    _map.AddDoor(new Door()
+                    _map.AddDoor(new Door
                     {
                         X = room.Left - 1,
                         Y = j
@@ -375,7 +366,7 @@ namespace Roguelike.Systems
 
                 if (room.Right < _width - 1 && IsDoorLocation(room.Right, j))
                 {
-                    _map.AddDoor(new Door()
+                    _map.AddDoor(new Door
                     {
                         X = room.Right,
                         Y = j

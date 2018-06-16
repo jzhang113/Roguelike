@@ -3,23 +3,28 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Items;
 
 namespace Roguelike.Systems
 {
-    class InputHandler
+    static class InputHandler
     {
         private static RLRootConsole _console;
-        private static int _holdTimeout = 0;
-        private static bool _holdingKey = false;
-        private static readonly int HOLD_LIMIT = 15;
+        private static int _holdTimeout;
+        private static bool _holdingKey;
+        private const int _HOLD_LIMIT = 15;
 
         private static ITargettable _targettingCommand;
         private static Actor _targettingSource;
         private static IAction _targettingAction;
-        internal static (int X, int Y)? PrevTarget { get; set; }
+
+        static InputHandler()
+        {
+            _holdTimeout = 0;
+        }
 
         public static void Initialize(RLRootConsole console)
         {
@@ -110,7 +115,7 @@ namespace Roguelike.Systems
                 // We resolve this by making holds somewhat sticky.
                 if (_holdingKey)
                 {
-                    if (_holdTimeout < HOLD_LIMIT)
+                    if (_holdTimeout < _HOLD_LIMIT)
                     {
                         _holdTimeout++;
                     }
@@ -192,7 +197,6 @@ namespace Roguelike.Systems
                     case RLKey.Keypad3:
                     case RLKey.N:
                         return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y]);
-                    case RLKey.Keypad5:
                     default: return null;
                 }
             }
@@ -292,7 +296,7 @@ namespace Roguelike.Systems
         }
 
         #region Mouse Input
-        public static (int X, int Y)? GetHoverPosition()
+        private static (int X, int Y)? GetHoverPosition()
         {
             RLMouse mouse = _console.Mouse;
             int mapTop = Game.Config.MessageView.Height;
@@ -312,12 +316,9 @@ namespace Roguelike.Systems
             }
         }
 
-        public static (int X, int Y)? GetClickPosition()
+        private static (int X, int Y)? GetClickPosition()
         {
-            if (_console.Mouse.GetLeftClick())
-                return GetHoverPosition();
-            else
-                return null;
+            return _console.Mouse.GetLeftClick() ? GetHoverPosition() : null;
         }
         #endregion
 
