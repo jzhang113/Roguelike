@@ -35,79 +35,12 @@ namespace Roguelike.Systems
         {
             MapHandler map = Game.Map;
             Player player = Game.Player;
+
             var mousePos = GetHoverPosition();
-
             if (mousePos != null)
-            {
-                var (mouseX, mouseY) = mousePos.Value;
+                ResolveMouseInput(mousePos.Value, map, player);
 
-                map.ClearHighlight();
-                Terrain current = map.Field[mouseX, mouseY];
-
-                if (Game.GameMode == Enums.Mode.Targetting)
-                {
-                    IEnumerable<Terrain> path =Game.Map.GetStraightLinePath(player.X, player.Y, mouseX, mouseY);
-                    foreach (Terrain tile in path)
-                    {
-                        if (!map.Field[tile.X, tile.Y].IsExplored)
-                        {
-                            break;
-                        }
-
-                        map.Highlight[tile.X, tile.Y] = RLColor.Red;
-                    }
-                }
-                else
-                {
-                    // TODO: Path may end up broken because an enemy is in the way.
-                    IEnumerable<WeightedPoint> path = map.GetPathToPlayer(mouseX, mouseY).Reverse();
-                    bool exploredPathExists = false;
-
-                    foreach (WeightedPoint p in path)
-                    {
-                        if (!exploredPathExists)
-                            exploredPathExists = true;
-
-                        if (!map.Field[p.X, p.Y].IsExplored)
-                        {
-                            exploredPathExists = false;
-                            break;
-                        }
-
-                        map.Highlight[p.X, p.Y] = RLColor.Red;
-                    }
-
-                    if (current.IsWalkable && exploredPathExists)
-                        map.Highlight[mouseX, mouseY] = RLColor.Red;
-                }
-
-                //if (_console.Mouse.GetLeftClick())
-                //{
-                //    List<IAction> moves = new List<IAction>();
-
-                //    foreach (WeightedPoint p in path)
-                //        moves.Add(new MoveAction(new TargetZone(TargetShape.Range, (p.X, p.Y))));
-
-                //    return new AttackCommand(player, new ActionSequence(100, moves));
-                //}
-                if (map.TryGetActor(mouseX, mouseY, out Actor displayActor))
-                    LookHandler.DisplayActor(displayActor);
-
-                if (map.TryGetItem(mouseX, mouseY, out ItemInfo displayItem))
-                    LookHandler.DisplayItem(displayItem);
-
-                LookHandler.DisplayTerrain(map.Field[mouseX, mouseY]);
-            }
-            
             RLKeyPress keyPress = _console.Keyboard.GetKeyPress();
-
-            if (Game.GameMode == Enums.Mode.Targetting)
-            {
-                if (keyPress != null)
-                    HandleTargettingInput(keyPress);
-
-                return ResolveTargetting();
-            }
 
             if (keyPress == null)
             {
@@ -129,34 +62,15 @@ namespace Roguelike.Systems
 
                 return null;
             }
+            if (Game.GameMode == Enums.Mode.Targetting)
+                return ResolveTargettingInput(keyPress);
 
-            if (Game.ShowInventory)
-            {
-                if (!HandleMenuInput(keyPress))
-                    return null;
-
-                char keyChar = ToChar(keyPress.Key);
-
-                switch (Game.GameMode)
-                {
-                    case Enums.Mode.Inventory:
-                        // TODO: implement inventory actions
-                        return null;
-                    case Enums.Mode.Apply:
-                        return new ApplyCommand(player, keyChar);
-                    case Enums.Mode.Drop:
-                        return new DropCommand(player, keyChar);
-                    case Enums.Mode.Equip:
-                        return new EquipCommand(player, keyChar);
-                    case Enums.Mode.Unequip:
-                        return new UnequipCommand(player, keyChar);
-                }
-            }
+            if (Game.ShowModal)
+                return ResolveModalInput(keyPress, player);
 
             Game.ShowOverlay = (keyPress.Key == RLKey.Tab);
             _holdingKey = true;
 
-            #region Attack Move
             IAction ability = null;
             if (keyPress.Shift)
                 ability = player.Equipment.PrimaryWeapon.GetAbility(0);
@@ -165,134 +79,9 @@ namespace Roguelike.Systems
             else if (keyPress.Control)
                 ability = player.Equipment.PrimaryWeapon.GetAbility(2);
 
-            if (ability != null)
-            {
-                switch (keyPress.Key)
-                {
-                    case RLKey.Left:
-                    case RLKey.Keypad4:
-                    case RLKey.H:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.W.X, player.Y]);
-                    case RLKey.Down:
-                    case RLKey.Keypad2:
-                    case RLKey.J:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.Y]);
-                    case RLKey.Up:
-                    case RLKey.Keypad8:
-                    case RLKey.K:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.Y]);
-                    case RLKey.Right:
-                    case RLKey.Keypad6:
-                    case RLKey.L:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.E.X, player.Y]);
-                    case RLKey.Keypad7:
-                    case RLKey.Y:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y]);
-                    case RLKey.Keypad9:
-                    case RLKey.U:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y]);
-                    case RLKey.Keypad1:
-                    case RLKey.B:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y]);
-                    case RLKey.Keypad3:
-                    case RLKey.N:
-                        return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y]);
-                    default: return null;
-                }
-            }
-            #endregion
-
-            switch (keyPress.Key)
-            {
-                #region Movement Keys
-                case RLKey.Left:
-                case RLKey.Keypad4:
-                case RLKey.H:
-                    return new MoveCommand(player, player.X + Direction.W.X, player.Y);
-                case RLKey.Down:
-                case RLKey.Keypad2:
-                case RLKey.J:
-                    return new MoveCommand(player, player.X, player.Y + Direction.S.Y);
-                case RLKey.Up:
-                case RLKey.Keypad8:
-                case RLKey.K:
-                    return new MoveCommand(player, player.X, player.Y + Direction.N.Y);
-                case RLKey.Right:
-                case RLKey.Keypad6:
-                case RLKey.L:
-                    return new MoveCommand(player, player.X + Direction.E.X, player.Y);
-                case RLKey.Keypad7:
-                case RLKey.Y:
-                    return new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
-                case RLKey.Keypad9:
-                case RLKey.U:
-                    return new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
-                case RLKey.Keypad1:
-                case RLKey.B:
-                    return new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
-                case RLKey.Keypad3:
-                case RLKey.N:
-                    return new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
-                case RLKey.Keypad5:
-                case RLKey.Period:
-                    return new WaitCommand(player);
-                #endregion
-                case RLKey.Comma:
-                    // TODO: only grabs top item
-                    Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack);
-                    return new PickupCommand(player, stack);
-                case RLKey.A:
-                    Game.GameMode = Enums.Mode.Apply;
-                    Game.ShowInventory = true;
-                    return null;
-                case RLKey.D:
-                    Game.GameMode = Enums.Mode.Drop;
-                    Game.ShowInventory = true;
-                    return null;
-                case RLKey.E:
-                    Game.GameMode = Enums.Mode.Equip;
-                    Game.ShowInventory = true;
-                    return null;
-                case RLKey.I:
-                    Game.GameMode = Enums.Mode.Inventory;
-                    Game.ShowInventory = true;
-                    return null;
-                case RLKey.T:
-                    Game.GameMode = Enums.Mode.Unequip;
-                    Game.ShowEquipment = true;
-                    return null;
-                case RLKey.Escape:
-                    Game.Exit();
-                    return null;
-                default: return null;
-            }
-        }
-
-        private static bool HandleMenuInput(RLKeyPress keyPress)
-        {
-            // TODO: Implement this - Also, please rename it to sth more logical
-            switch(keyPress.Key)
-            {
-                case RLKey.Escape:
-                    Game.GameMode = Enums.Mode.Normal;
-                    Game.ShowInventory = false;
-                    Game.ShowEquipment = false;
-                    Game.ForceRender();
-                    return false;
-                default:
-                    return true;
-            }
-        }
-
-        private static void HandleTargettingInput(RLKeyPress keyPress)
-        {
-            switch (keyPress.Key)
-            {
-                case RLKey.Escape:
-                    Game.GameMode = Enums.Mode.Normal;
-                    Game.ForceRender();
-                    break;
-            }
+            return ability != null
+                ? ResolveAttackInput(keyPress, player, ability)
+                : ResolveInput(keyPress, player);
         }
 
         #region Mouse Input
@@ -303,7 +92,7 @@ namespace Roguelike.Systems
             int mapBottom = Game.Config.MessageView.Height + Game.Config.MapView.Height;
             int mapLeft = 0;
             int mapRight = Game.Config.MapView.Width;
-            
+
             if (mouse.X > mapLeft && mouse.X < mapRight - 1 && mouse.Y > mapTop && mouse.Y < mapBottom - 1)
             {
                 int xPos = (mouse.X - mapLeft);
@@ -320,13 +109,73 @@ namespace Roguelike.Systems
         {
             return _console.Mouse.GetLeftClick() ? GetHoverPosition() : null;
         }
+
+        private static void ResolveMouseInput((int X, int Y) mousePos, MapHandler map, Player player)
+        {
+            map.ClearHighlight();
+            Terrain current = map.Field[mousePos.X, mousePos.Y];
+
+            if (Game.GameMode == Enums.Mode.Targetting)
+            {
+                IEnumerable<Terrain> path = Game.Map.GetStraightLinePath(player.X, player.Y, mousePos.X, mousePos.Y);
+                foreach (Terrain tile in path)
+                {
+                    if (!map.Field[tile.X, tile.Y].IsExplored)
+                    {
+                        break;
+                    }
+
+                    map.Highlight[tile.X, tile.Y] = RLColor.Red;
+                }
+            }
+            else
+            {
+                // TODO: Path may end up broken because an enemy is in the way.
+                IEnumerable<WeightedPoint> path = map.GetPathToPlayer(mousePos.X, mousePos.Y).Reverse();
+                bool exploredPathExists = false;
+
+                foreach (WeightedPoint p in path)
+                {
+                    if (!exploredPathExists)
+                        exploredPathExists = true;
+
+                    if (!map.Field[p.X, p.Y].IsExplored)
+                    {
+                        exploredPathExists = false;
+                        break;
+                    }
+
+                    map.Highlight[p.X, p.Y] = RLColor.Red;
+                }
+
+                if (current.IsWalkable && exploredPathExists)
+                    map.Highlight[mousePos.X, mousePos.Y] = RLColor.Red;
+            }
+
+            //if (_console.Mouse.GetLeftClick())
+            //{
+            //    List<IAction> moves = new List<IAction>();
+
+            //    foreach (WeightedPoint p in path)
+            //        moves.Add(new MoveAction(new TargetZone(TargetShape.Range, (p.X, p.Y))));
+
+            //    return new AttackCommand(player, new ActionSequence(100, moves));
+            //}
+            if (map.TryGetActor(mousePos.X, mousePos.Y, out Actor displayActor))
+                LookHandler.DisplayActor(displayActor);
+
+            if (map.TryGetItem(mousePos.X, mousePos.Y, out ItemInfo displayItem))
+                LookHandler.DisplayItem(displayItem);
+
+            LookHandler.DisplayTerrain(map.Field[mousePos.X, mousePos.Y]);
+        }
         #endregion
 
         #region Target Handling
         public static void BeginTargetting(ITargettable command, Actor source, IAction action)
         {
             Game.GameMode = Enums.Mode.Targetting;
-            Game.ShowInventory = false;
+            Game.ShowModal = false;
             Game.ForceRender();
 
             _targettingCommand = command;
@@ -366,6 +215,167 @@ namespace Roguelike.Systems
         }
         #endregion
 
+        #region Input Handling
+        private static ICommand ResolveTargettingInput(RLKeyPress keyPress)
+        {
+            switch (keyPress.Key)
+            {
+                case RLKey.Escape:
+                    Game.GameMode = Enums.Mode.Normal;
+                    Game.ForceRender();
+                    break;
+            }
+
+            return ResolveTargetting();
+        }
+
+        private static ICommand ResolveModalInput(RLKeyPress keyPress, Actor player)
+        {
+            switch (keyPress.Key)
+            {
+                case RLKey.Escape:
+                    Game.GameMode = Enums.Mode.Normal;
+                    Game.ShowModal = false;
+                    Game.ShowEquipment = false;
+                    Game.ForceRender();
+                    return null;
+            }
+
+            char keyChar = ToChar(keyPress.Key);
+            switch (Game.GameMode)
+            {
+                case Enums.Mode.Inventory:
+                    // TODO: implement inventory actions
+                    return null;
+                case Enums.Mode.Apply:
+                    return new ApplyCommand(player, keyChar);
+                case Enums.Mode.Drop:
+                    return new DropCommand(player, keyChar);
+                case Enums.Mode.Equip:
+                    return new EquipCommand(player, keyChar);
+                case Enums.Mode.Unequip:
+                    return new UnequipCommand(player, keyChar);
+                default:
+                    return null;
+            }
+        }
+
+        // ReSharper disable once CyclomaticComplexity
+        private static ICommand ResolveAttackInput(RLKeyPress keyPress, Player player, IAction ability)
+        {
+            switch (keyPress.Key)
+            {
+                case RLKey.Left:
+                case RLKey.Keypad4:
+                case RLKey.H:
+                    return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.W.X, player.Y]);
+                case RLKey.Down:
+                case RLKey.Keypad2:
+                case RLKey.J:
+                    return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.Y]);
+                case RLKey.Up:
+                case RLKey.Keypad8:
+                case RLKey.K:
+                    return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.Y]);
+                case RLKey.Right:
+                case RLKey.Keypad6:
+                case RLKey.L:
+                    return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.E.X, player.Y]);
+                case RLKey.Keypad7:
+                case RLKey.Y:
+                    return new AttackCommand(player, ability,
+                        Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y]);
+                case RLKey.Keypad9:
+                case RLKey.U:
+                    return new AttackCommand(player, ability,
+                        Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y]);
+                case RLKey.Keypad1:
+                case RLKey.B:
+                    return new AttackCommand(player, ability,
+                        Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y]);
+                case RLKey.Keypad3:
+                case RLKey.N:
+                    return new AttackCommand(player, ability,
+                        Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y]);
+                default: return null;
+            }
+        }
+
+        // ReSharper disable once CyclomaticComplexity
+        private static ICommand ResolveInput(RLKeyPress keyPress, Actor player)
+        {
+            switch (keyPress.Key)
+            {
+                #region Movement Keys
+                case RLKey.Left:
+                case RLKey.Keypad4:
+                case RLKey.H:
+                    return new MoveCommand(player, player.X + Direction.W.X, player.Y);
+                case RLKey.Down:
+                case RLKey.Keypad2:
+                case RLKey.J:
+                    return new MoveCommand(player, player.X, player.Y + Direction.S.Y);
+                case RLKey.Up:
+                case RLKey.Keypad8:
+                case RLKey.K:
+                    return new MoveCommand(player, player.X, player.Y + Direction.N.Y);
+                case RLKey.Right:
+                case RLKey.Keypad6:
+                case RLKey.L:
+                    return new MoveCommand(player, player.X + Direction.E.X, player.Y);
+                case RLKey.Keypad7:
+                case RLKey.Y:
+                    return new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
+                case RLKey.Keypad9:
+                case RLKey.U:
+                    return new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
+                case RLKey.Keypad1:
+                case RLKey.B:
+                    return new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
+                case RLKey.Keypad3:
+                case RLKey.N:
+                    return new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
+                case RLKey.Keypad5:
+                case RLKey.Period:
+                    return new WaitCommand(player);
+                #endregion
+
+                case RLKey.Comma:
+                    // TODO: only grabs top item
+                    Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack);
+                    return new PickupCommand(player, stack);
+                case RLKey.A:
+                    Game.GameMode = Enums.Mode.Apply;
+                    Game.ShowModal = true;
+                    return null;
+                case RLKey.D:
+                    Game.GameMode = Enums.Mode.Drop;
+                    Game.ShowModal = true;
+                    return null;
+                case RLKey.E:
+                    Game.GameMode = Enums.Mode.Equip;
+                    Game.ShowModal = true;
+                    return null;
+                case RLKey.I:
+                    Game.GameMode = Enums.Mode.Inventory;
+                    Game.ShowModal = true;
+                    return null;
+                case RLKey.T:
+                    Game.GameMode = Enums.Mode.Unequip;
+                    Game.ShowEquipment = true;
+                    return null;
+                case RLKey.R:
+                    Game.NewGame();
+                    return null;
+                case RLKey.Escape:
+                    Game.Exit();
+                    return null;
+                default: return null;
+            }
+        }
+        #endregion
+
+        // ReSharper disable once CyclomaticComplexity
         private static char ToChar(RLKey key)
         {
             int keyValue = (int)key;

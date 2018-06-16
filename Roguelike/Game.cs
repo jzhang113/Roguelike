@@ -16,7 +16,7 @@ namespace Roguelike
     static class Game
     {
         public static Enums.Mode GameMode { get; set; }
-        public static bool ShowInventory { get; internal set; }
+        public static bool ShowModal { get; internal set; }
         public static bool ShowEquipment { get; internal set; }
         public static bool ShowOverlay { get; internal set; }
 
@@ -63,7 +63,7 @@ namespace Roguelike
             _rootConsole.Run();
         }
 
-        private static void NewGame()
+        public static void NewGame()
         {
             // Option.FixedSeed = false;
             Option.Seed = 10;
@@ -185,7 +185,7 @@ namespace Roguelike
                 {
                     GameMode = GameMode,
                     ShowEquipment = ShowEquipment,
-                    ShowInventory = ShowInventory,
+                    ShowInventory = ShowModal,
                     ShowOverlay = ShowOverlay,
                     Map = Map,
                     CombatRandom = CombatRandom
@@ -208,7 +208,7 @@ namespace Roguelike
 
                     GameMode = saved.GameMode;
                     ShowEquipment = saved.ShowEquipment;
-                    ShowInventory = saved.ShowInventory;
+                    ShowModal = saved.ShowInventory;
                     ShowOverlay = saved.ShowOverlay;
                     Map = saved.Map;
                     CombatRandom = saved.CombatRandom;
@@ -275,7 +275,7 @@ namespace Roguelike
             RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, _rootConsole, Config.Map.Width, 0);
 
-            if (ShowInventory)
+            if (ShowModal)
             {
                 _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
                 Player.Inventory.Draw(_inventoryConsole);

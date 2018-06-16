@@ -258,12 +258,13 @@ namespace Roguelike.Systems
                 int newX = currentX + dir.X;
                 int newY = currentY + dir.Y;
 
-                if (goalMap[newX, newY] < nearest && (Field[newX, newY].IsWalkable || Math.Abs(goalMap[newX, newY]) < 0.001f))
-                {
-                    nextX = newX;
-                    nextY = newY;
-                    nearest = goalMap[newX, newY];
-                }
+                if (Field[newX, newY] == null || !(goalMap[newX, newY] < nearest) ||
+                    !Field[newX, newY].IsWalkable && !(Math.Abs(goalMap[newX, newY]) < 0.001f))
+                    continue;
+
+                nextX = newX;
+                nextY = newY;
+                nearest = goalMap[newX, newY];
             }
 
             return new WeightedPoint(nextX, nextY, nearest);
