@@ -4,17 +4,15 @@ using Roguelike.Systems;
 using System.IO;
 using System;
 using Roguelike.Actors;
-using Roguelike.Interfaces;
-using Roguelike.Actions;
-using System.ComponentModel;
 using Roguelike.Utils;
 using System.Runtime.Serialization.Formatters.Binary;
-using Roguelike.Items;
+using System.ComponentModel;
 
 namespace Roguelike
 {
     static class Game
     {
+        // internal so input handler can change modes
         public static Enums.Mode GameMode { get; set; }
         public static bool ShowModal { get; internal set; }
         public static bool ShowEquipment { get; internal set; }
@@ -23,11 +21,12 @@ namespace Roguelike
         public static Configuration Config { get; private set; }
         public static Options Option { get; private set; }
 
-        public static MapHandler Map { get; private set; }
-        public static Player Player { get; internal set; }
+        public static WorldHandler World { get; private set; }
+        public static Player Player { get; internal set; } // internal for deserialization
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
-        public static Random CombatRandom { get; private set; }
+
+        public static MapHandler Map => World.Map;
 
         private static RLRootConsole _rootConsole;
         private static RLConsole _mapConsole;
@@ -52,9 +51,14 @@ namespace Roguelike
             _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
 
+            Player = new Player();
+
             InputHandler.Initialize(_rootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(20);
+            World = Option.FixedSeed
+                ? new WorldHandler(Option.Seed)
+                : new WorldHandler();
 
             _rootConsole.Update += RootConsoleUpdate;
             _rootConsole.Render += RootConsoleRender;
@@ -67,114 +71,9 @@ namespace Roguelike
         {
             MessageHandler.Clear();
             EventScheduler.Clear();
-
-            // Option.FixedSeed = false;
-            Option.Seed = 10;
-
-            int mainSeed;
-            if (Option.FixedSeed)
-                mainSeed = Option.Seed;
-            else
-                mainSeed = (int)DateTime.Now.Ticks;
-
-            Random random = new Random(mainSeed);
-            int[] generatorSeed = new int[31];
-
-            using (StreamWriter writer = new StreamWriter("log"))
-            {
-                writer.WriteLine(mainSeed);
-
-                for (int i = 0; i < generatorSeed.Length; i++)
-                {
-                    generatorSeed[i] = random.Next();
-                    writer.WriteLine(generatorSeed[i]);
-                }
-            }
-
-            CombatRandom = new Random(generatorSeed[30]);
-
-            var sw = new System.Diagnostics.Stopwatch();
-
-            sw.Start();
-            MapGenerator mapGenerator = new MapGenerator(Config.Map.Width, Config.Map.Height, random);
-            Map = mapGenerator.CreateMapBsp();
-            sw.Stop();
-
-            Console.WriteLine("Map generated in: " + sw.Elapsed);
-
-            Player = new Player();
-            do
-            {
-                Player.X = random.Next(1, Config.Map.Width - 1);
-                Player.Y = random.Next(1, Config.Map.Height - 1);
-            }
-            while (!Map.Field[Player.X, Player.Y].IsWalkable);
-
-            Map.AddActor(Player);
-            // Map.SetActorPosition(Player, playerX, playerY);
-
-            for (int i = 0; i < 3; i++)
-            {
-                Skeleton s = new Skeleton();
-                while (!Map.Field[s.X, s.Y].IsWalkable)
-                {
-                    s.X = random.Next(1, Config.Map.Width - 1);
-                    s.Y = random.Next(1, Config.Map.Height - 1);
-                    s.Name = "Mook #" + (i + 1);
-                }
-                Map.AddActor(s);
-            }
-
-            Weapon spear = new Weapon("spear", Materials.Wood)
-            {
-                AttackSpeed = 240,
-                Damage = 200,
-                MeleeRange = 1.5f,
-                ThrowRange = 7,
-                X = Player.X - 1,
-                Y = Player.Y - 1,
-                Color = Swatch.DbBlood
-            };
-            Map.AddItem(new ItemInfo(spear));
-
-            IAction rangedDamage = new DamageAction(200, new TargetZone(Enums.TargetShape.Ray, range: 10));
-            IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
-
-            //var lungeSkill = new System.Collections.Generic.List<IAction>()
-            //{
-            //    new MoveAction(new TargetZone(Enums.TargetShape.Directional)),
-            //    new DamageAction(100, new TargetZone(Enums.TargetShape.Directional))
-            //};
-            //var lungeAction = new Actions.ActionSequence(150, lungeSkill);
-            //spear.AddAbility(lungeAction);
-
-            Armor ha = new Armor("heavy armor", Materials.Iron, Enums.ArmorType.Armor)
-            {
-                AttackSpeed = 1000,
-                Damage = 100,
-                MeleeRange = 1,
-                ThrowRange = 3,
-                X = Player.X - 2,
-                Y = Player.Y - 3,
-                Color = Swatch.DbMetal
-            };
-            Map.AddItem(new ItemInfo(ha));
-
-            Scroll magicMissile = new Scroll("scroll of magic missile", rangedDamage)
-            {
-                X = Player.X - 1,
-                Y = Player.Y - 2,
-                Color = Swatch.DbSun
-            };
-            Map.AddItem(new ItemInfo(magicMissile));
-
-            Scroll healing = new Scroll("scroll of healing", heal)
-            {
-                X = Player.X + 1,
-                Y = Player.Y + 1,
-                Color = Swatch.DbGrass
-            };
-            Map.AddItem(new ItemInfo(healing));
+            World = Option.FixedSeed
+                ? new WorldHandler(Option.Seed)
+                : new WorldHandler();
 
             GameMode = Enums.Mode.Normal;
         }
@@ -190,8 +89,7 @@ namespace Roguelike
                     ShowEquipment = ShowEquipment,
                     ShowInventory = ShowModal,
                     ShowOverlay = ShowOverlay,
-                    Map = Map,
-                    CombatRandom = CombatRandom
+                    World = World
                 });
             }
         }
@@ -213,8 +111,7 @@ namespace Roguelike
                     ShowEquipment = saved.ShowEquipment;
                     ShowModal = saved.ShowInventory;
                     ShowOverlay = saved.ShowOverlay;
-                    Map = saved.Map;
-                    CombatRandom = saved.CombatRandom;
+                    World = saved.World;
                 }
             }
             catch (Exception ex)

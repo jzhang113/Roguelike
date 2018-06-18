@@ -344,6 +344,9 @@ namespace Roguelike.Systems
                     // TODO: only grabs top item
                     Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack);
                     return new PickupCommand(player, stack);
+                case RLKey.BackSlash:
+                    // HACK: Ad-hoc input handling
+                    return new ChangeLevelCommand(player, "main_2");
                 case RLKey.A:
                     Game.GameMode = Enums.Mode.Apply;
                     Game.ShowModal = true;

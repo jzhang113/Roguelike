@@ -8,7 +8,10 @@ namespace Roguelike.Systems
         // Parse command line arguments
         public static Options ParseOptions(string[] args)
         {
-            Options options = new Options();
+            Options options = new Options
+            {
+                Verbosity = Enums.MessageLevel.Normal
+            };
 
             for (int i = 0; i < args.Length; i++)
             {

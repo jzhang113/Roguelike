@@ -1,4 +1,8 @@
-﻿using Roguelike.Core;
+﻿using Roguelike.Actions;
+using Roguelike.Actors;
+using Roguelike.Core;
+using Roguelike.Interfaces;
+using Roguelike.Items;
 using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
@@ -159,6 +163,10 @@ namespace Roguelike.Systems
             {
                 PlaceDoors(r);
             }
+
+            PlaceStairs();
+            PlaceActors();
+            PlaceItems();
 
             return _map;
         }
@@ -394,6 +402,99 @@ namespace Roguelike.Systems
                 return true;
 
             return false;
+        }
+
+        // HACK: ad-hoc placement code
+        private void PlaceItems()
+        {
+            Weapon spear = new Weapon("spear", Materials.Wood)
+            {
+                AttackSpeed = 240,
+                Damage = 200,
+                MeleeRange = 1.5f,
+                ThrowRange = 7,
+                X = Game.Player.X - 1,
+                Y = Game.Player.Y - 1,
+                Color = Swatch.DbBlood
+            };
+            _map.AddItem(new ItemInfo(spear));
+
+            IAction rangedDamage = new DamageAction(200, new TargetZone(Enums.TargetShape.Ray, range: 10));
+            IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
+
+            //var lungeSkill = new System.Collections.Generic.List<IAction>()
+            //{
+            //    new MoveAction(new TargetZone(Enums.TargetShape.Directional)),
+            //    new DamageAction(100, new TargetZone(Enums.TargetShape.Directional))
+            //};
+            //var lungeAction = new Actions.ActionSequence(150, lungeSkill);
+            //spear.AddAbility(lungeAction);
+
+            Armor ha = new Armor("heavy armor", Materials.Iron, Enums.ArmorType.Armor)
+            {
+                AttackSpeed = 1000,
+                Damage = 100,
+                MeleeRange = 1,
+                ThrowRange = 3,
+                X = Game.Player.X - 2,
+                Y = Game.Player.Y - 3,
+                Color = Swatch.DbMetal
+            };
+            _map.AddItem(new ItemInfo(ha));
+
+            Scroll magicMissile = new Scroll("scroll of magic missile", rangedDamage)
+            {
+                X = Game.Player.X - 1,
+                Y = Game.Player.Y - 2,
+                Color = Swatch.DbSun
+            };
+            _map.AddItem(new ItemInfo(magicMissile));
+
+            Scroll healing = new Scroll("scroll of healing", heal)
+            {
+                X = Game.Player.X + 1,
+                Y = Game.Player.Y + 1,
+                Color = Swatch.DbGrass
+            };
+            _map.AddItem(new ItemInfo(healing));
+        }
+
+        // HACK: ad-hoc placement code
+        private void PlaceActors()
+        {
+            do
+            {
+                Game.Player.X = _rand.Next(1, Game.Config.Map.Width - 1);
+                Game.Player.Y = _rand.Next(1, Game.Config.Map.Height - 1);
+            }
+            while (!_map.Field[Game.Player.X, Game.Player.Y].IsWalkable);
+
+            _map.AddActor(Game.Player);
+            // Map.SetActorPosition(Player, playerX, playerY);
+
+            for (int i = 0; i < 3; i++)
+            {
+                Skeleton s = new Skeleton();
+                while (!_map.Field[s.X, s.Y].IsWalkable)
+                {
+                    s.X = _rand.Next(1, Game.Config.Map.Width - 1);
+                    s.Y = _rand.Next(1, Game.Config.Map.Height - 1);
+                    s.Name = "Mook #" + (i + 1);
+                }
+                _map.AddActor(s);
+            }
+        }
+
+        private void PlaceStairs()
+        {
+            Stair down = new Stair();
+            while (!_map.Field[down.X, down.Y].IsWalkable)
+            {
+                down.X = _rand.Next(1, Game.Config.Map.Width - 1);
+                down.Y = _rand.Next(1, Game.Config.Map.Height - 1);
+            }
+
+            _map._downStairs = down;
         }
 
         private double RandNormal(double mean, double stdDev)

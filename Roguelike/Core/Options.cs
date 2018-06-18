@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Core
 {
-    internal class Options
+    class Options
     {
         // How much text to show.
         internal Enums.MessageLevel Verbosity { get; set; }

@@ -11,7 +11,6 @@ namespace Roguelike.Core
         public bool ShowInventory { get; set; }
         public bool ShowOverlay { get; set; }
 
-        public MapHandler Map { get; set; }
-        public Random CombatRandom { get; set; }
+        public WorldHandler World { get; set; }
     }
 }

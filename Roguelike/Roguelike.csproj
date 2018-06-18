@@ -103,6 +103,7 @@
     <Compile Include="Actions\MoveAction.cs" />
     <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\ApplyCommand.cs" />
+    <Compile Include="Commands\ChangeLevelCommand.cs" />
     <Compile Include="Commands\DropCommand.cs" />
     <Compile Include="Commands\EquipCommand.cs" />
     <Compile Include="Commands\WaitCommand.cs" />
@@ -111,6 +112,8 @@
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Commands\AttackCommand.cs" />
+    <Compile Include="Core\Stair.cs" />
+    <Compile Include="Systems\WorldHandler.cs" />
     <Compile Include="Core\Door.cs" />
     <Compile Include="Core\Room.cs" />
     <Compile Include="Core\SaveObject.cs" />

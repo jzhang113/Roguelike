@@ -21,6 +21,8 @@ namespace Roguelike.Systems
         internal Field Field { get; }
         internal float[,] PlayerMap { get; }
 
+        internal Stair _downStairs;
+
         private IDictionary<int, Actor> Units { get; set; }
         private IDictionary<int, InventoryHandler> Items { get; set; }
         private IDictionary<int, Door> Doors { get; set; }
@@ -50,6 +52,7 @@ namespace Roguelike.Systems
             Width = info.GetInt32(nameof(Width));
             Height = info.GetInt32(nameof(Height));
             Field = (Field)info.GetValue(nameof(Field), typeof(Field));
+            _downStairs = (Stair)info.GetValue(nameof(_downStairs), typeof(Stair));
 
             _tempUnits = new KeyValueHelper<int, Actor>
             {
@@ -407,6 +410,8 @@ namespace Roguelike.Systems
                     mapConsole.SetChar(unit.X, unit.Y, '%');
             }
 
+            mapConsole.SetChar(_downStairs.X, _downStairs.Y, '>');
+
             // debugging code for dijkstra maps
             foreach (Terrain tile in Field)
             {
@@ -531,6 +536,7 @@ namespace Roguelike.Systems
             info.AddValue(nameof(Width), Width);
             info.AddValue(nameof(Height), Height);
             info.AddValue(nameof(Field), Field);
+            info.AddValue(nameof(_downStairs), _downStairs);
 
             // Can't serialize Dictionary or KeyCollection, have to make it a list.
             info.AddValue($"{nameof(Units)}.keys", Units.Keys.ToList());
