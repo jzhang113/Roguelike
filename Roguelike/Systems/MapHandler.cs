@@ -7,6 +7,7 @@ using System.Linq;
 using System;
 using System.Globalization;
 using System.Runtime.Serialization;
+using Roguelike.Commands;
 
 namespace Roguelike.Systems
 {
@@ -16,20 +17,22 @@ namespace Roguelike.Systems
         public int Width { get; }
         public int Height { get; }
 
+        internal Field Field { get; }
+
         internal RLColor[,] Highlight { get; }
         internal RLColor[,] PermHighlight { get; }
-        internal Field Field { get; }
         internal float[,] PlayerMap { get; }
 
-        internal Stair _downStairs;
-
+        // can't auto serialize these dictionaries
         private IDictionary<int, Actor> Units { get; set; }
         private IDictionary<int, InventoryHandler> Items { get; set; }
         private IDictionary<int, Door> Doors { get; set; }
+        private IDictionary<int, Stair> Exits { get; set; }
 
         private readonly KeyValueHelper<int, Actor> _tempUnits;
         private readonly KeyValueHelper<int, InventoryHandler> _tempItems;
         private readonly KeyValueHelper<int, Door> _tempDoors;
+        private readonly KeyValueHelper<int, Stair> _tempExits;
 
         public MapHandler(int width, int height)
         {
@@ -44,6 +47,7 @@ namespace Roguelike.Systems
             Units = new Dictionary<int, Actor>();
             Items = new Dictionary<int, InventoryHandler>();
             Doors = new Dictionary<int, Door>();
+            Exits = new Dictionary<int, Stair>();
         }
 
         #region Serialization Constructor
@@ -52,7 +56,6 @@ namespace Roguelike.Systems
             Width = info.GetInt32(nameof(Width));
             Height = info.GetInt32(nameof(Height));
             Field = (Field)info.GetValue(nameof(Field), typeof(Field));
-            _downStairs = (Stair)info.GetValue(nameof(_downStairs), typeof(Stair));
 
             _tempUnits = new KeyValueHelper<int, Actor>
             {
@@ -69,6 +72,11 @@ namespace Roguelike.Systems
                 Key = (ICollection<int>)info.GetValue($"{nameof(Doors)}.keys", typeof(ICollection<int>)),
                 Value = (ICollection<Door>)info.GetValue($"{nameof(Doors)}.values", typeof(ICollection<Door>))
             };
+            _tempExits = new KeyValueHelper<int, Stair>
+            {
+                Key = (ICollection<int>)info.GetValue($"{nameof(Exits)}.keys", typeof(ICollection<int>)),
+                Value = (ICollection<Stair>)info.GetValue($"{nameof(Exits)}.values", typeof(ICollection<Stair>))
+            };
 
             Highlight = new RLColor[Width, Height];
             PermHighlight = new RLColor[Width, Height];
@@ -81,6 +89,7 @@ namespace Roguelike.Systems
             Units = _tempUnits.ToDictionary();
             Items = _tempItems.ToDictionary();
             Doors = _tempDoors.ToDictionary();
+            Exits = _tempExits.ToDictionary();
 
             foreach (Actor actor in Units.Values)
             {
@@ -153,6 +162,19 @@ namespace Roguelike.Systems
 
             return true;
         }
+
+        public bool TryChangeLocation(Actor actor, out string destination)
+        {
+            if (Exits.TryGetValue(ToIndex(actor.X, actor.Y), out Stair exit))
+            {
+                destination = exit.Destination;
+                return true;
+            }
+
+            destination = null;
+            return false;
+        }
+
         #endregion
 
         #region Item Methods
@@ -223,6 +245,16 @@ namespace Roguelike.Systems
             Field[door.X, door.Y].BlocksLight = false;
         }
         #endregion
+
+        public bool AddExit(Stair exit)
+        {
+            // TODO: also check exit reachability
+            if (!Field[exit.X, exit.Y].IsWalkable)
+                return false;
+
+            Exits.Add(ToIndex(exit.X, exit.Y), exit);
+            return true;
+        }
 
         #region Tile Selection Methods
         public IEnumerable<WeightedPoint> GetPathToPlayer(int x, int y)
@@ -410,7 +442,10 @@ namespace Roguelike.Systems
                     mapConsole.SetChar(unit.X, unit.Y, '%');
             }
 
-            mapConsole.SetChar(_downStairs.X, _downStairs.Y, '>');
+            foreach (Stair exit in Exits.Values)
+            {
+                exit.DrawingComponent.Draw(mapConsole, this);
+            }
 
             // debugging code for dijkstra maps
             foreach (Terrain tile in Field)
@@ -536,7 +571,6 @@ namespace Roguelike.Systems
             info.AddValue(nameof(Width), Width);
             info.AddValue(nameof(Height), Height);
             info.AddValue(nameof(Field), Field);
-            info.AddValue(nameof(_downStairs), _downStairs);
 
             // Can't serialize Dictionary or KeyCollection, have to make it a list.
             info.AddValue($"{nameof(Units)}.keys", Units.Keys.ToList());
@@ -545,6 +579,8 @@ namespace Roguelike.Systems
             info.AddValue($"{nameof(Items)}.values", Items.Values.ToList());
             info.AddValue($"{nameof(Doors)}.keys", Doors.Keys.ToList());
             info.AddValue($"{nameof(Doors)}.values", Doors.Values.ToList());
+            info.AddValue($"{nameof(Exits)}.keys", Exits.Keys.ToList());
+            info.AddValue($"{nameof(Exits)}.values", Exits.Values.ToList());
         }
 
         // Temporarily store lists when deserializing dictionaries

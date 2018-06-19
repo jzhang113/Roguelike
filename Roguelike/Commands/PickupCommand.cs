@@ -14,6 +14,7 @@ namespace Roguelike.Commands
 
         public PickupCommand(Actor source, InventoryHandler itemStack)
         {
+            System.Diagnostics.Debug.Assert(itemStack != null);
             Source = source;
             _itemStack = itemStack;
         }
@@ -21,7 +22,7 @@ namespace Roguelike.Commands
         public RedirectMessage Validate()
         {
             // Trying to pick up an empty tile.
-            if (_itemStack == null || _itemStack.IsEmpty())
+            if (_itemStack.IsEmpty())
             {
                 Game.MessageHandler.AddMessage("There's nothing to pick up here.");
                 return new RedirectMessage(false);

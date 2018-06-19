@@ -75,6 +75,7 @@ namespace Roguelike
                 ? new WorldHandler(Option.Seed)
                 : new WorldHandler();
 
+            World.ChangeLevel("main_1");
             GameMode = Enums.Mode.Normal;
         }
 

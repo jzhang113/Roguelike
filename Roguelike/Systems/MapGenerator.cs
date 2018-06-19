@@ -487,14 +487,14 @@ namespace Roguelike.Systems
 
         private void PlaceStairs()
         {
-            Stair down = new Stair();
+            Stair down = new Stair("main_2");
             while (!_map.Field[down.X, down.Y].IsWalkable)
             {
                 down.X = _rand.Next(1, Game.Config.Map.Width - 1);
                 down.Y = _rand.Next(1, Game.Config.Map.Height - 1);
             }
 
-            _map._downStairs = down;
+            _map.AddExit(down);
         }
 
         private double RandNormal(double mean, double stdDev)

@@ -14,9 +14,9 @@ namespace Roguelike.Systems
 
         public MapHandler Map { get; private set; }
 
-        private IDictionary<string, bool> _levels;
+        private Dictionary<string, bool> _levels;
         private string _currentLevel;
-        
+
         public WorldHandler() : this((int)DateTime.Now.Ticks)
         {
         }
@@ -33,9 +33,6 @@ namespace Roguelike.Systems
                 { "main_2", false },
                 { "main_3", false }
             };
-
-            Map = CreateLevel("main_1");
-            _currentLevel = "main_1";
         }
 
         public MapHandler CreateLevel(string levelName)
@@ -52,6 +49,8 @@ namespace Roguelike.Systems
             sw.Stop();
 
             Console.WriteLine($"Map generated in: {sw.Elapsed}");
+
+            _levels[levelName] = true;
 
             return map;
         }
@@ -75,9 +74,10 @@ namespace Roguelike.Systems
                 return;
             }
 
-            SaveLevel(_currentLevel);
+            if (_currentLevel != null)
+                SaveLevel(_currentLevel);
 
-            _levels.TryGetValue(levelName, out bool seen);
+            bool seen = _levels[levelName];
             Map = seen ? LoadLevel(levelName) : CreateLevel(levelName);
             _currentLevel = levelName;
         }

@@ -342,11 +342,16 @@ namespace Roguelike.Systems
 
                 case RLKey.Comma:
                     // TODO: only grabs top item
-                    Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack);
-                    return new PickupCommand(player, stack);
+                    if (Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack))
+                        return new PickupCommand(player, stack);
+                    else
+                        return null;
                 case RLKey.BackSlash:
                     // HACK: Ad-hoc input handling
-                    return new ChangeLevelCommand(player, "main_2");
+                    if (Game.Map.TryChangeLocation(player, out string destination))
+                        return new ChangeLevelCommand(player, destination);
+                    else
+                        return null;
                 case RLKey.A:
                     Game.GameMode = Enums.Mode.Apply;
                     Game.ShowModal = true;
