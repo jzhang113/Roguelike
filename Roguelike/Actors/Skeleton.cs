@@ -18,9 +18,5 @@ namespace Roguelike.Actors
             Sp = 20;
             Mp = 20;
         }
-
-        protected Skeleton(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }

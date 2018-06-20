@@ -9,7 +9,7 @@ using Roguelike.Commands;
 namespace Roguelike.Actors
 {
     [Serializable]
-    public class Actor : ISchedulable, ISerializable
+    public class Actor : ISchedulable
     {
         public string Name { get; set; }
         public int Awareness { get; set; }
@@ -65,34 +65,6 @@ namespace Roguelike.Actors
             BlocksLight = true;
         }
 
-        protected Actor(SerializationInfo info, StreamingContext context)
-        {
-            Name = info.GetString(nameof(Name));
-            Awareness = info.GetInt32(nameof(Awareness));
-            Speed = info.GetInt32(nameof(Speed));
-            BlocksLight = info.GetBoolean(nameof(BlocksLight));
-
-            Hp = info.GetInt32(nameof(Hp));
-            MaxHp = info.GetInt32(nameof(MaxHp));
-            Sp = info.GetInt32(nameof(Sp));
-            MaxSp = info.GetInt32(nameof(MaxSp));
-            Mp = info.GetInt32(nameof(Mp));
-            MaxMp = info.GetInt32(nameof(MaxMp));
-            
-            Str = info.GetInt32(nameof(Str));
-            Dex = info.GetInt32(nameof(Dex));
-            Def = info.GetInt32(nameof(Def));
-            Int = info.GetInt32(nameof(Int));
-            
-            State = (Enums.ActorState)info.GetValue(nameof(State), typeof(Enums.ActorState));
-            
-            Energy = info.GetInt32(nameof(Energy));
-            RefreshRate = info.GetInt32(nameof(RefreshRate));
-            
-            Inventory = (InventoryHandler)info.GetValue(nameof(Inventory), typeof(InventoryHandler));
-            Equipment = (EquipmentHandler)info.GetValue(nameof(Equipment), typeof(EquipmentHandler));
-            DrawingComponent = (Drawable)info.GetValue(nameof(DrawingComponent), typeof(Drawable));
-        }
 
         public virtual void TriggerDeath()
         {
@@ -146,35 +118,6 @@ namespace Roguelike.Actors
             return float.IsNaN(distPlayer) || float.IsNaN(otherDistPlayer)
                 ? 0
                 : (int) (otherDistPlayer - distPlayer);
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(Name), Name);
-            info.AddValue(nameof(Awareness), Awareness);
-            info.AddValue(nameof(Speed), Speed);
-            info.AddValue(nameof(BlocksLight), BlocksLight);
-
-            info.AddValue(nameof(Hp), Hp);
-            info.AddValue(nameof(MaxHp), MaxHp);
-            info.AddValue(nameof(Sp), Sp);
-            info.AddValue(nameof(MaxSp), MaxSp);
-            info.AddValue(nameof(Mp), Mp);
-            info.AddValue(nameof(MaxMp), MaxMp);
-
-            info.AddValue(nameof(Str), Str);
-            info.AddValue(nameof(Dex), Dex);
-            info.AddValue(nameof(Def), Def);
-            info.AddValue(nameof(Int), Int);
-
-            info.AddValue(nameof(State), State);
-
-            info.AddValue(nameof(Energy), Energy);
-            info.AddValue(nameof(RefreshRate), RefreshRate);
-
-            info.AddValue(nameof(Inventory), Inventory);
-            info.AddValue(nameof(Equipment), Equipment);
-            info.AddValue(nameof(DrawingComponent), DrawingComponent);
         }
     }
 }

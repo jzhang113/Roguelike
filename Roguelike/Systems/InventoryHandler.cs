@@ -10,9 +10,9 @@ namespace Roguelike.Systems
 {
     // Handles all stacks of items in the game, such as the player inventory and piles of loot.
     [Serializable]
-    public class InventoryHandler : ICollection<ItemInfo>
+    public class InventoryHandler : ICollection<Item>
     {
-        private readonly IList<ItemInfo> _inventory;
+        private readonly IList<Item> _inventory;
 
         public int Count => _inventory.Count;
         public bool IsReadOnly => false;
@@ -22,55 +22,73 @@ namespace Roguelike.Systems
 
         public InventoryHandler()
         {
-            _inventory = new List<ItemInfo>();
+            _inventory = new List<Item>();
         }
 
         // Increments the item stack if it already exists or adds the item to inventory.
-        public void Add(ItemInfo itemGroup)
+        public void Add(Item item)
         {
-            if (itemGroup == null)
+            if (item == null)
                 return;
 
             bool found = false;
-            foreach (ItemInfo info in _inventory)
+            foreach (Item inventoryItem in _inventory)
             {
-                if (info.Equals(itemGroup))
+                if (inventoryItem.Equals(item))
                 {
                     found = true;
-                    info.Add(itemGroup.Count);
+                    inventoryItem.Add(item.Count);
                     break;
                 }
             }
 
             if (!found)
-                _inventory.Add(itemGroup);
+                _inventory.Add(item);
         }
 
-        // Decrements the item stack if there are multiple items and removes the item if there are
-        // no more.
-        public bool Remove(ItemInfo itemGroup)
+        // Deregister an Item from the Inventory.
+        public bool Remove(Item item)
         {
-            if (itemGroup == null)
-                return false;
+            return _inventory.Remove(item);
+        }
 
-            foreach (ItemInfo info in _inventory)
+        // Permanently remove Items from the world. If the Item is still needed later, use Split.
+        public bool Destroy(Item item, int amount)
+        {
+            System.Diagnostics.Debug.Assert(item != null);
+
+            foreach (Item inventoryItem in _inventory)
             {
-                if (info.Equals(itemGroup))
+                if (inventoryItem.Equals(item))
                 {
-                    info.Remove(itemGroup.Count);
+                    item.Remove(amount);
 
-                    // We shouldn't be negative here...
-                    System.Diagnostics.Debug.Assert(info.Count >= 0);
-                    if (info.Count == 0)
-                        _inventory.Remove(info);
+                    if (item.Count == 0)
+                        _inventory.Remove(item);
 
                     return true;
                 }
             }
 
-            System.Diagnostics.Debug.Assert(false, $"Cannot remove non-existant item, {itemGroup.Item.Name}, from inventory");
-            Game.MessageHandler.AddMessage($"{itemGroup.Item.Name} not found, can't remove it", Enums.MessageLevel.Verbose);
+            Game.MessageHandler.AddMessage($"{item.Name} not found, can't remove it", Enums.MessageLevel.Verbose);
+            System.Diagnostics.Debug.Assert(false, $"Cannot remove non-existant item, {item.Name}, from inventory");
             return false;
+        }
+
+        // Similar to Remove, but returns a new Item containing the split amount.
+        public Item Split(Item item, int amount)
+        {
+            System.Diagnostics.Debug.Assert(item != null);
+
+            foreach (Item inventoryItem in _inventory)
+            {
+                if (inventoryItem.Equals(item))
+                    return inventoryItem.Split(amount);
+            }
+
+            Game.MessageHandler.AddMessage($"{item.Name} not found, can't split it", Enums.MessageLevel.Verbose);
+            System.Diagnostics.Debug.Assert(false, $"Cannot split non-existant item, {item.Name}, from inventory");
+            return null;
         }
 
         public void Clear()
@@ -78,14 +96,14 @@ namespace Roguelike.Systems
             _inventory.Clear();
         }
 
-        public bool Contains(ItemInfo itemGroup)
+        public bool Contains(Item item)
         {
-            return _inventory.Any(info => info.Equals(itemGroup));
+            return _inventory.Any(it => it.Equals(item));
         }
 
-        public void CopyTo(ItemInfo[] array, int arrayIndex)
+        public void CopyTo(Item[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            _inventory.CopyTo(array, arrayIndex);
         }
 
         public bool HasKey(char key)
@@ -98,15 +116,15 @@ namespace Roguelike.Systems
 
         // Attempts to returns the item at position key. Does not remove the item from inventory.
         // Returns false if the item does not exist.
-        public bool TryGetKey(char key, out ItemInfo itemGroup)
+        public bool TryGetKey(char key, out Item item)
         {
             if (!HasKey(key))
             {
-                itemGroup = null;
+                item = null;
                 return false;
             }
 
-            itemGroup = _inventory[key - 'a'];
+            item = _inventory[key - 'a'];
             return true;
         }
 
@@ -115,11 +133,11 @@ namespace Roguelike.Systems
             int line = 1;
             char letter = 'a';
 
-            foreach (ItemInfo info in _inventory)
+            foreach (Item item in _inventory)
             {
-                var itemString = info.Count > 1
-                    ? $"{letter}) {info.Count} {info.Item.Name}s"
-                    : $"{letter}) {info.Item.Name}";
+                var itemString = item.Count > 1
+                    ? $"{letter}) {item.Count} {item.Name}s"
+                    : $"{letter}) {item.Name}";
 
                 console.Print(1, line, itemString, Colors.TextHeading);
                 line++;
@@ -127,7 +145,7 @@ namespace Roguelike.Systems
             }
         }
 
-        public IEnumerator<ItemInfo> GetEnumerator()
+        public IEnumerator<Item> GetEnumerator()
         {
             return _inventory.GetEnumerator();
         }

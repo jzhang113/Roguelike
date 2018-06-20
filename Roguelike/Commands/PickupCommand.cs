@@ -14,7 +14,9 @@ namespace Roguelike.Commands
 
         public PickupCommand(Actor source, InventoryHandler itemStack)
         {
+            System.Diagnostics.Debug.Assert(source != null);
             System.Diagnostics.Debug.Assert(itemStack != null);
+
             Source = source;
             _itemStack = itemStack;
         }
@@ -33,40 +35,37 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            ItemInfo itemGroup;
+            Item item;
 
             switch(_itemStack.Count)
             {
                 case 1:
-                    itemGroup = _itemStack.First();
-                    Source.Inventory.Add(itemGroup);
-                    itemGroup.Item.Carrier = Source;
+                    item = _itemStack.First();
+                    Source.Inventory.Add(item);
 
-                    Game.Map.RemoveItem(itemGroup);
-                    Game.MessageHandler.AddMessage($"You pick up a {itemGroup.Item.Name}.");
+                    Game.Map.RemoveItem(item);
+                    Game.MessageHandler.AddMessage($"You pick up a {item.Name}.");
                     break;
                 default:
                     if (Source is Player)
                     {
                         // HACK: handle pickup menu - this placeholder at least lets you pick up the top item
-                        itemGroup = _itemStack.First();
-                        Source.Inventory.Add(itemGroup);
-                        itemGroup.Item.Carrier = Source;
+                        item = _itemStack.First();
+                        Source.Inventory.Add(item);
 
-                        Game.Map.RemoveItem(itemGroup);
-                        Game.MessageHandler.AddMessage($"You pick up a {itemGroup.Item.Name}.");
+                        Game.Map.RemoveItem(item);
+                        Game.MessageHandler.AddMessage($"You pick up a {item.Name}.");
                     }
                     else
                     {
                         // HACK: Monsters will simply grab the top item off of a pile if they try to pick stuff up.
-                        itemGroup = _itemStack.First();
-                        Source.Inventory.Add(itemGroup);
-                        itemGroup.Item.Carrier = Source;
+                        item = _itemStack.First();
+                        Source.Inventory.Add(item);
 
-                        Game.Map.RemoveItem(itemGroup);
+                        Game.Map.RemoveItem(item);
 
                         // TODO: Tell the player only if they can see / notice this
-                        Game.MessageHandler.AddMessage($"{Source} picks up a {itemGroup.Item.Name}.");
+                        Game.MessageHandler.AddMessage($"{Source} picks up a {item.Name}.");
                     }
                     break;
             }

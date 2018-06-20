@@ -8,7 +8,7 @@ namespace Roguelike.Systems
     static class LookHandler
     {
         private static Actor _displayActor;
-        private static ItemInfo _displayItem;
+        private static Item _displayItem;
         private static Terrain _displayTile;
         private static bool _showActorInfo;
         private static bool _showItemInfo;
@@ -20,10 +20,10 @@ namespace Roguelike.Systems
             _showActorInfo = (actor != null);
         }
 
-        public static void DisplayItem(ItemInfo itemGroup)
+        public static void DisplayItem(Item item)
         {
-            _displayItem = itemGroup;
-            _showItemInfo = (itemGroup != null) && (itemGroup.Count > 0);
+            _displayItem = item;
+            _showItemInfo = (item != null) && (item.Count > 0);
         }
 
         internal static void DisplayTerrain(Terrain tile)
@@ -35,7 +35,7 @@ namespace Roguelike.Systems
         public static void Draw(RLConsole console)
         {
             if (_showItemInfo)
-                console.Print(1, 1, _displayItem?.Item.Name, Colors.TextHeading);
+                console.Print(1, 1, _displayItem.Name, Colors.TextHeading);
 
             if (_showActorInfo)
             {

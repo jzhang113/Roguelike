@@ -140,7 +140,6 @@
     <Compile Include="Actors\Skeleton.cs" />
     <Compile Include="Interfaces\IMaterial.cs" />
     <Compile Include="Systems\InventoryHandler.cs" />
-    <Compile Include="Items\ItemInfo.cs" />
     <Compile Include="Systems\LookHandler.cs" />
     <Compile Include="Systems\OptionHandler.cs" />
     <Compile Include="Core\Options.cs" />

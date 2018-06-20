@@ -10,12 +10,13 @@ using System.Runtime.Serialization;
 namespace Roguelike.Items
 {
     [Serializable]
-    public class Item: ISerializable
+    public class Item
     {
         public string Name { get; }
         public IMaterial Material { get; }
+        public int Count { get; private set; }
 
-        public Actor Carrier { get; set; }
+        // public Actor Carrier { get; set; }
         public Drawable DrawingComponent { get; }
 
         public int X
@@ -43,28 +44,50 @@ namespace Roguelike.Items
 
         private readonly IList<IAction> _abilities;
 
-        public Item(string name, IMaterial material)
+        public Item(string name, IMaterial material, int count = 1)
         {
             Name = name;
             Material = material;
-            DrawingComponent = new Drawable();
+            Count = count;
 
+            DrawingComponent = new Drawable();
             _abilities = new List<IAction>();
         }
 
-        protected Item(SerializationInfo info, StreamingContext context)
+        // copy constructor
+        public Item(Item other) : this(other.Name, other.Material)
         {
-            Name = info.GetString(nameof(Name));
-            Material = (IMaterial)info.GetValue(nameof(Material), typeof(IMaterial));
+            Count = other.Count;
+            DrawingComponent = other.DrawingComponent;
 
-            DrawingComponent = (Drawable)info.GetValue(nameof(DrawingComponent), typeof(Drawable));
+            AttackSpeed = other.AttackSpeed;
+            Damage = other.Damage;
+            MeleeRange = other.MeleeRange;
+            ThrowRange = other.ThrowRange;
 
-            AttackSpeed = info.GetInt32(nameof(AttackSpeed));
-            Damage = info.GetInt32(nameof(Damage));
-            MeleeRange = info.GetInt32(nameof(MeleeRange));
-            ThrowRange = info.GetInt32(nameof(ThrowRange));
+            _abilities = new List<IAction>(other._abilities);
+        }
 
-            _abilities = (IList<IAction>)info.GetValue(nameof(_abilities), typeof(IList<IAction>));
+        public void Add(int addCount) => Count += addCount;
+
+        public void Remove(int removeCount) => Count = Math.Max(Count - removeCount, 0);
+
+        public Item Split(int splitCount)
+        {
+            System.Diagnostics.Debug.Assert(Count >= splitCount);
+
+            if (Count == splitCount)
+            {
+                Item copy = new Item(this);
+                Count = 0;
+                return copy;
+            }
+
+            Count -= splitCount;
+            return new Item(this)
+            {
+                Count = splitCount
+            };
         }
 
         #region virtual methods
@@ -101,21 +124,6 @@ namespace Roguelike.Items
         {
             // TODO: check that the skill doesn't already exist
             _abilities.Add(skill);
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(Name), Name);
-            info.AddValue(nameof(Material), Material);
-
-            info.AddValue(nameof(DrawingComponent), DrawingComponent);
-
-            info.AddValue(nameof(AttackSpeed), AttackSpeed);
-            info.AddValue(nameof(Damage), Damage);
-            info.AddValue(nameof(MeleeRange), MeleeRange);
-            info.AddValue(nameof(ThrowRange), ThrowRange);
-
-            info.AddValue(nameof(_abilities), _abilities);
         }
     }
 }

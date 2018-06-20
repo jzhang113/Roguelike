@@ -1,6 +1,6 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using System;
-using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
@@ -15,20 +15,25 @@ namespace Roguelike.Items
             Type = type;
         }
 
-        protected Armor(SerializationInfo info, StreamingContext context) : base(info, context)
+        public void Equip(Actor actor)
         {
-        }
+            System.Diagnostics.Debug.Assert(actor != null);
 
-        public void Equip()
-        {
-            System.Diagnostics.Debug.Assert(Carrier.Equipment.Armor[Type] == null);
-            Carrier.Equipment.Equip(this);
+            if (actor.Equipment.Armor[Type] != null)
+            {
+                Game.MessageHandler.AddMessage($"You are already wearing a {actor.Equipment.Armor[Type]}!");
+                return;
+            }
+
+            actor.Equipment.Equip(this);
             Game.MessageHandler.AddMessage($"You put on the {Name}.");
         }
 
-        public void Unequip()
+        public void Unequip(Actor actor)
         {
-            Carrier.Equipment.Unequip(this);
+            System.Diagnostics.Debug.Assert(actor != null);
+
+            actor.Equipment.Unequip(this);
             Game.MessageHandler.AddMessage($"You take off the {Name}.");
         }
     }

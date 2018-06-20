@@ -15,10 +15,6 @@ namespace Roguelike.Core
             DrawingComponent.Symbol = '+';
         }
 
-        protected Door(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public override ICommand Act()
         {
             if (IsDead)

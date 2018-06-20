@@ -21,10 +21,6 @@ namespace Roguelike.Actors
             Mp = 50;
         }
 
-        protected Player(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public override ICommand Act() => InputHandler.HandleInput();
 
         public override void TriggerDeath() => Game.GameOver();

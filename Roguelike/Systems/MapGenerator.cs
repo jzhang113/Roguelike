@@ -417,18 +417,17 @@ namespace Roguelike.Systems
                 Y = Game.Player.Y - 1,
                 Color = Swatch.DbBlood
             };
-            _map.AddItem(new ItemInfo(spear));
+            _map.AddItem(spear);
 
             IAction rangedDamage = new DamageAction(200, new TargetZone(Enums.TargetShape.Ray, range: 10));
             IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
 
-            //var lungeSkill = new System.Collections.Generic.List<IAction>()
+            //var lungeSkill = new List<IAction>()
             //{
             //    new MoveAction(new TargetZone(Enums.TargetShape.Directional)),
             //    new DamageAction(100, new TargetZone(Enums.TargetShape.Directional))
             //};
-            //var lungeAction = new Actions.ActionSequence(150, lungeSkill);
-            //spear.AddAbility(lungeAction);
+            spear.AddAbility(new DamageAction(100, new TargetZone(Enums.TargetShape.Directional)));
 
             Armor ha = new Armor("heavy armor", Materials.Iron, Enums.ArmorType.Armor)
             {
@@ -440,7 +439,7 @@ namespace Roguelike.Systems
                 Y = Game.Player.Y - 3,
                 Color = Swatch.DbMetal
             };
-            _map.AddItem(new ItemInfo(ha));
+            _map.AddItem(ha);
 
             Scroll magicMissile = new Scroll("scroll of magic missile", rangedDamage)
             {
@@ -448,7 +447,7 @@ namespace Roguelike.Systems
                 Y = Game.Player.Y - 2,
                 Color = Swatch.DbSun
             };
-            _map.AddItem(new ItemInfo(magicMissile));
+            _map.AddItem(magicMissile);
 
             Scroll healing = new Scroll("scroll of healing", heal)
             {
@@ -456,7 +455,7 @@ namespace Roguelike.Systems
                 Y = Game.Player.Y + 1,
                 Color = Swatch.DbGrass
             };
-            _map.AddItem(new ItemInfo(healing));
+            _map.AddItem(healing);
         }
 
         // HACK: ad-hoc placement code

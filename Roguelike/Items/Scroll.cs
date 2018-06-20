@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Runtime.Serialization;
 using Roguelike.Actions;
+using Roguelike.Actors;
 
 namespace Roguelike.Items
 {
@@ -18,15 +19,11 @@ namespace Roguelike.Items
             ApplySkill = action;
         }
 
-        protected Scroll(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
-        public void Apply(IEnumerable<Terrain> targets)
+        public void Apply(Actor source, IEnumerable<Terrain> targets)
         {
             foreach (Terrain tile in targets)
             {
-                ApplySkill.Activate(Carrier, tile);
+                ApplySkill.Activate(source, tile);
             }
         }
     }

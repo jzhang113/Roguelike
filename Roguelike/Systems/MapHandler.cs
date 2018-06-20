@@ -178,31 +178,32 @@ namespace Roguelike.Systems
         #endregion
 
         #region Item Methods
-        public void AddItem(ItemInfo itemGroup)
+        public void AddItem(Item item)
         {
-            if (Items.TryGetValue(ToIndex(itemGroup.X, itemGroup.Y), out InventoryHandler stack))
+            int index = ToIndex(item.X, item.Y);
+            if (Items.TryGetValue(index, out InventoryHandler stack))
             {
-                stack.Add(itemGroup);
+                stack.Add(item);
             }
             else
             {
-                Items.Add(ToIndex(itemGroup.X, itemGroup.Y), new InventoryHandler
+                Items.Add(index, new InventoryHandler
                 {
-                    itemGroup
+                    item
                 });
             }
         }
 
-        public bool TryGetItem(int x, int y, out ItemInfo itemGroup)
+        public bool TryGetItem(int x, int y, out Item item)
         {
             bool success = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
             if (!success || stack.Count == 0)
             {
-                itemGroup = null;
+                item = null;
                 return false;
             }
 
-            itemGroup = stack.First();
+            item = stack.First();
             return true;
         }
 
@@ -211,15 +212,55 @@ namespace Roguelike.Systems
             return Items.TryGetValue(ToIndex(x, y), out stack);
         }
 
-        public bool RemoveItem(ItemInfo itemGroup)
+        // Take an entire stack of item off of the map.
+        public bool RemoveItem(Item item)
         {
-            if (Items.TryGetValue(ToIndex(itemGroup.X, itemGroup.Y), out InventoryHandler stack))
+            int index = ToIndex(item.X, item.Y);
+            if (!Items.TryGetValue(index, out InventoryHandler stack))
+                return false;
+
+            if (!stack.Contains(item))
+                return false;
+
+            return Items.Remove(index);
+        }
+
+        // Permanently remove items from the map.
+        public bool DestroyItem(Item item, int amount)
+        {
+            int index = ToIndex(item.X, item.Y);
+            if (!Items.TryGetValue(index, out InventoryHandler stack))
+                return false;
+
+            if (!stack.Contains(item))
+                return false;
+
+            stack.Destroy(item, amount);
+            if (item.Count == 0)
+                Items.Remove(index);
+
+            return true;
+        }
+
+        // Take only part of a stack from the map.
+        public Item SplitItem(Item item, int amount)
+        {
+            int index = ToIndex(item.X, item.Y);
+            if (!Items.TryGetValue(index, out InventoryHandler stack))
             {
-                if (stack.Contains(itemGroup))
-                    return stack.Remove(itemGroup);
+                System.Diagnostics.Debug.Assert(false, $"Could not split {item.Name} on the map.");
+                return null;
             }
 
-            return false;
+            System.Diagnostics.Debug.Assert(stack.Contains(item), $"Map does not contain {item.Name}.");
+
+            if (amount < item.Count)
+                return stack.Split(item, amount);
+
+            bool removeStatus = Items.Remove(index);
+            System.Diagnostics.Debug.Assert(removeStatus, $"Could not remove {item.Name} at {index}.");
+
+            return item;
         }
         #endregion
 
@@ -430,7 +471,7 @@ namespace Roguelike.Systems
 
             foreach (InventoryHandler stack in Items.Values)
             {
-                stack.First().Item.DrawingComponent.Draw(mapConsole, this);
+                stack.First().DrawingComponent.Draw(mapConsole, this);
             }
 
             foreach (Actor unit in Units.Values)
@@ -458,7 +499,7 @@ namespace Roguelike.Systems
         private void DrawTile(RLConsole mapConsole, Terrain tile)
         {
             if (!tile.IsExplored)
-               return;
+                return;
 
             if (Field[tile.X, tile.Y].IsVisible)
             {

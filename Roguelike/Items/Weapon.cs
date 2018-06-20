@@ -1,6 +1,6 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using System;
-using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
@@ -12,20 +12,25 @@ namespace Roguelike.Items
             DrawingComponent.Symbol = '(';
         }
 
-        protected Weapon(SerializationInfo info, StreamingContext context) : base(info, context)
+        public void Equip(Actor actor)
         {
-        }
+            System.Diagnostics.Debug.Assert(actor != null);
 
-        public void Equip()
-        {
-            System.Diagnostics.Debug.Assert(Carrier.Equipment.IsDefaultWeapon());
-            Carrier.Equipment.Equip(this);
+            if (!actor.Equipment.IsDefaultWeapon())
+            {
+                Game.MessageHandler.AddMessage($"You are already wielding a {actor.Equipment.PrimaryWeapon.Name}!");
+                return;
+            }
+
+            actor.Equipment.Equip(this);
             Game.MessageHandler.AddMessage($"You wield a {Name}.");
         }
         
-        public void Unequip()
+        public void Unequip(Actor actor)
         {
-            Carrier.Equipment.Unequip();
+            System.Diagnostics.Debug.Assert(actor != null);
+
+            actor.Equipment.Unequip();
             Game.MessageHandler.AddMessage($"You unwield a {Name}.");
         }
     }

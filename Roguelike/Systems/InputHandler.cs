@@ -164,7 +164,7 @@ namespace Roguelike.Systems
             if (map.TryGetActor(mousePos.X, mousePos.Y, out Actor displayActor))
                 LookHandler.DisplayActor(displayActor);
 
-            if (map.TryGetItem(mousePos.X, mousePos.Y, out ItemInfo displayItem))
+            if (map.TryGetItem(mousePos.X, mousePos.Y, out Item displayItem))
                 LookHandler.DisplayItem(displayItem);
 
             LookHandler.DisplayTerrain(map.Field[mousePos.X, mousePos.Y]);

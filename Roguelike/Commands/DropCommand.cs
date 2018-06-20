@@ -10,7 +10,7 @@ namespace Roguelike.Commands
         public int EnergyCost { get; } = 0;
 
         private readonly char _key;
-        private ItemInfo _itemGroup;
+        private Item _item;
 
         public DropCommand(Actor source, char key)
         {
@@ -20,7 +20,7 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
-            if (Source.Inventory.TryGetKey(_key, out _itemGroup))
+            if (Source.Inventory.TryGetKey(_key, out _item))
                 return new RedirectMessage(true);
 
             Game.MessageHandler.AddMessage("No such item to drop.");
@@ -29,14 +29,12 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            Item item = _itemGroup.Item;
-
-            Source.Inventory.Remove(_itemGroup);
-            item.Carrier = null;
+            Item item = _item;
+            Item dropped = Source.Inventory.Split(_item, _item.Count);
 
             item.X = Source.X;
             item.Y = Source.Y;
-            Game.Map.AddItem(_itemGroup);
+            Game.Map.AddItem(dropped);
             Game.MessageHandler.AddMessage($"You drop a {item.Name}.");
         }
     }
