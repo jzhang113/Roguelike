@@ -2,7 +2,6 @@
 using Roguelike.Interfaces;
 using System.Collections.Generic;
 using System;
-using System.Runtime.Serialization;
 using Roguelike.Actions;
 using Roguelike.Actors;
 
@@ -13,9 +12,8 @@ namespace Roguelike.Items
     {
         public IAction ApplySkill { get; }
 
-        public Scroll(string name, IAction action) : base(name, Materials.Paper)
+        public Scroll(string name, IAction action, RLNET.RLColor color) : base(name, Materials.Paper, color, '?')
         {
-            DrawingComponent.Symbol = '?';
             ApplySkill = action;
         }
 

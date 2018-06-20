@@ -7,9 +7,8 @@ namespace Roguelike.Items
     [Serializable]
     public class Weapon : Item, IEquipable
     {
-        public Weapon(string name, IMaterial material) : base(name, material)
+        public Weapon(string name, IMaterial material, RLNET.RLColor color) : base(name, material, color, '(')
         {
-            DrawingComponent.Symbol = '(';
         }
 
         public void Equip(Actor actor)

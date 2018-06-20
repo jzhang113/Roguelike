@@ -51,7 +51,7 @@ namespace Roguelike
             _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
 
-            Player = new Player();
+            //Player = new Player();
 
             InputHandler.Initialize(_rootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
@@ -69,6 +69,7 @@ namespace Roguelike
 
         public static void NewGame()
         {
+            Player = new Player();
             MessageHandler.Clear();
             EventScheduler.Clear();
             World = Option.FixedSeed

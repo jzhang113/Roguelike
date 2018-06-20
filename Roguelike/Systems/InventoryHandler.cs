@@ -34,7 +34,7 @@ namespace Roguelike.Systems
             bool found = false;
             foreach (Item inventoryItem in _inventory)
             {
-                if (inventoryItem.Equals(item))
+                if (inventoryItem.SameAs(item))
                 {
                     found = true;
                     inventoryItem.Add(item.Count);
@@ -83,7 +83,14 @@ namespace Roguelike.Systems
             foreach (Item inventoryItem in _inventory)
             {
                 if (inventoryItem.Equals(item))
-                    return inventoryItem.Split(amount);
+                {
+                    Item split = item.Split(amount);
+
+                    if (item.Count == 0)
+                        _inventory.Remove(item);
+
+                    return split;
+                }
             }
 
             Game.MessageHandler.AddMessage($"{item.Name} not found, can't split it", Enums.MessageLevel.Verbose);

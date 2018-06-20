@@ -4,8 +4,6 @@ using Roguelike.Actions;
 using System.Collections.Generic;
 using System;
 using Roguelike.Utils;
-using RLNET;
-using System.Runtime.Serialization;
 
 namespace Roguelike.Items
 {
@@ -16,7 +14,6 @@ namespace Roguelike.Items
         public IMaterial Material { get; }
         public int Count { get; private set; }
 
-        // public Actor Carrier { get; set; }
         public Drawable DrawingComponent { get; }
 
         public int X
@@ -31,12 +28,6 @@ namespace Roguelike.Items
             set => DrawingComponent.Y = value;
         }
 
-        public RLColor Color
-        {
-            get => DrawingComponent.Color;
-            set => DrawingComponent.Color = value;
-        }
-
         internal int AttackSpeed { get; set; } = Constants.FULL_TURN;
         internal int Damage { get; set; } = Constants.DEFAULT_DAMAGE;
         internal float MeleeRange { get; set; } = Constants.DEFAULT_MELEE_RANGE;
@@ -44,21 +35,34 @@ namespace Roguelike.Items
 
         private readonly IList<IAction> _abilities;
 
-        public Item(string name, IMaterial material, int count = 1)
+        public Item(string name, IMaterial material, RLNET.RLColor color, char symbol, int count = 1)
         {
             Name = name;
             Material = material;
             Count = count;
 
-            DrawingComponent = new Drawable();
+            DrawingComponent = new Drawable
+            {
+                Color = color,
+                Symbol = symbol
+            };
             _abilities = new List<IAction>();
         }
 
         // copy constructor
-        public Item(Item other) : this(other.Name, other.Material)
+        public Item(Item other)
         {
+            Name = other.Name;
+            Material = other.Material;
             Count = other.Count;
-            DrawingComponent = other.DrawingComponent;
+
+            DrawingComponent = new Drawable()
+            {
+                X = other.X,
+                Y = other.Y,
+                Color = other.DrawingComponent.Color,
+                Symbol = other.DrawingComponent.Symbol
+            };
 
             AttackSpeed = other.AttackSpeed;
             Damage = other.Damage;
@@ -124,6 +128,13 @@ namespace Roguelike.Items
         {
             // TODO: check that the skill doesn't already exist
             _abilities.Add(skill);
+        }
+
+        // Helper method for merge items. Doesn't check if the items are at the same position.
+        internal bool SameAs(Item other)
+        {
+            return Name == other.Name &&
+                Material.Equals(other.Material);
         }
     }
 }

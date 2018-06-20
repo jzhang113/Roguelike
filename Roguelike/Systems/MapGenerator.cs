@@ -407,15 +407,14 @@ namespace Roguelike.Systems
         // HACK: ad-hoc placement code
         private void PlaceItems()
         {
-            Weapon spear = new Weapon("spear", Materials.Wood)
+            Weapon spear = new Weapon("spear", Materials.Wood, Swatch.DbBlood)
             {
                 AttackSpeed = 240,
                 Damage = 200,
                 MeleeRange = 1.5f,
                 ThrowRange = 7,
                 X = Game.Player.X - 1,
-                Y = Game.Player.Y - 1,
-                Color = Swatch.DbBlood
+                Y = Game.Player.Y - 1
             };
             _map.AddItem(spear);
 
@@ -429,33 +428,43 @@ namespace Roguelike.Systems
             //};
             spear.AddAbility(new DamageAction(100, new TargetZone(Enums.TargetShape.Directional)));
 
-            Armor ha = new Armor("heavy armor", Materials.Iron, Enums.ArmorType.Armor)
+            Armor ha = new Armor("heavy armor", Materials.Iron, Swatch.DbMetal, Enums.ArmorType.Armor)
             {
                 AttackSpeed = 1000,
                 Damage = 100,
                 MeleeRange = 1,
                 ThrowRange = 3,
                 X = Game.Player.X - 2,
-                Y = Game.Player.Y - 3,
-                Color = Swatch.DbMetal
+                Y = Game.Player.Y - 3
             };
             _map.AddItem(ha);
 
-            Scroll magicMissile = new Scroll("scroll of magic missile", rangedDamage)
+            Scroll magicMissile = new Scroll("scroll of magic missile", rangedDamage, Swatch.DbSun)
             {
                 X = Game.Player.X - 1,
-                Y = Game.Player.Y - 2,
-                Color = Swatch.DbSun
+                Y = Game.Player.Y - 2
             };
             _map.AddItem(magicMissile);
 
-            Scroll healing = new Scroll("scroll of healing", heal)
+            Scroll healing = new Scroll("scroll of healing", heal, Swatch.DbGrass)
             {
                 X = Game.Player.X + 1,
-                Y = Game.Player.Y + 1,
-                Color = Swatch.DbGrass
+                Y = Game.Player.Y + 1
             };
             _map.AddItem(healing);
+
+            Item planks = new Item("planks", Materials.Wood, Swatch.DbWood, '\\', 10)
+            {
+                X = Game.Player.X + 2,
+                Y = Game.Player.Y + 2,
+            };
+            Item planks2 = new Item(planks) { X = Game.Player.X + 3 };
+            Item planks3 = new Item(planks) { Y = Game.Player.Y + 3 };
+            Item planks4 = new Item(planks) { X = Game.Player.X + 3, Y = Game.Player.Y + 3 };
+            _map.AddItem(planks);
+            _map.AddItem(planks2);
+            _map.AddItem(planks3);
+            _map.AddItem(planks4);
         }
 
         // HACK: ad-hoc placement code

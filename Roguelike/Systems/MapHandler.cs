@@ -7,7 +7,6 @@ using System.Linq;
 using System;
 using System.Globalization;
 using System.Runtime.Serialization;
-using Roguelike.Commands;
 
 namespace Roguelike.Systems
 {
@@ -222,7 +221,8 @@ namespace Roguelike.Systems
             if (!stack.Contains(item))
                 return false;
 
-            return Items.Remove(index);
+            return stack.Remove(item);
+            // Q: remove stack from Items if it is empty?
         }
 
         // Permanently remove items from the map.
@@ -236,9 +236,6 @@ namespace Roguelike.Systems
                 return false;
 
             stack.Destroy(item, amount);
-            if (item.Count == 0)
-                Items.Remove(index);
-
             return true;
         }
 
@@ -257,7 +254,7 @@ namespace Roguelike.Systems
             if (amount < item.Count)
                 return stack.Split(item, amount);
 
-            bool removeStatus = Items.Remove(index);
+            bool removeStatus = stack.Remove(item);
             System.Diagnostics.Debug.Assert(removeStatus, $"Could not remove {item.Name} at {index}.");
 
             return item;
@@ -471,7 +468,8 @@ namespace Roguelike.Systems
 
             foreach (InventoryHandler stack in Items.Values)
             {
-                stack.First().DrawingComponent.Draw(mapConsole, this);
+                if (stack.Any())
+                    stack.First().DrawingComponent.Draw(mapConsole, this);
             }
 
             foreach (Actor unit in Units.Values)

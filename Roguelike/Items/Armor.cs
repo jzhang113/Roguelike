@@ -9,9 +9,8 @@ namespace Roguelike.Items
     {
         public Enums.ArmorType Type { get; }
 
-        public Armor(string name, IMaterial material, Enums.ArmorType type) : base(name, material)
+        public Armor(string name, IMaterial material, RLNET.RLColor color, Enums.ArmorType type) : base(name, material, color, '[')
         {
-            DrawingComponent.Symbol = '[';
             Type = type;
         }
 
