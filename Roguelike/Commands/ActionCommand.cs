@@ -1,13 +1,12 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System.Collections.Generic;
 using Roguelike.Actions;
 
 namespace Roguelike.Commands
 {
-    class ActionCommand : ICommand, ITargettable
+    class ActionCommand : ITargetCommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; }

@@ -1,9 +1,9 @@
 ﻿using Roguelike.Core;
 using System.Collections.Generic;
 
-namespace Roguelike.Interfaces
+namespace Roguelike.Commands
 {
-    interface ITargettable
+    interface ITargetCommand : ICommand
     {
         IEnumerable<Terrain> Target { get; set; }
     }

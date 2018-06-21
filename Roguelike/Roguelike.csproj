@@ -106,6 +106,7 @@
     <Compile Include="Commands\ChangeLevelCommand.cs" />
     <Compile Include="Commands\DropCommand.cs" />
     <Compile Include="Commands\EquipCommand.cs" />
+    <Compile Include="Commands\IInputCommand.cs" />
     <Compile Include="Commands\WaitCommand.cs" />
     <Compile Include="Commands\PickupCommand.cs" />
     <Compile Include="Commands\ThrowCommand.cs" />
@@ -113,13 +114,14 @@
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Commands\AttackCommand.cs" />
     <Compile Include="Core\Stair.cs" />
+    <Compile Include="Systems\OverlayHandler.cs" />
     <Compile Include="Systems\WorldHandler.cs" />
     <Compile Include="Core\Door.cs" />
     <Compile Include="Core\Room.cs" />
     <Compile Include="Core\SaveObject.cs" />
     <Compile Include="Core\TargetZone.cs" />
     <Compile Include="Actions\IAction.cs" />
-    <Compile Include="Interfaces\ITargettable.cs" />
+    <Compile Include="Commands\ITargetCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="State\IState.cs" />
     <Compile Include="Systems\EquipmentHandler.cs" />

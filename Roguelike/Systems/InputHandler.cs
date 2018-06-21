@@ -1,30 +1,30 @@
 ﻿using RLNET;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Items;
+using System.Text;
+using Roguelike.Enums;
 
 namespace Roguelike.Systems
 {
     static class InputHandler
     {
         private static RLRootConsole _console;
-        private static int _holdTimeout;
+        private static int _holdTimeout = 0;
         private static bool _holdingKey;
         private const int _HOLD_LIMIT = 15;
 
-        private static ITargettable _targettingCommand;
-        private static Actor _targettingSource;
-        private static IAction _targettingAction;
+        private static ITargetCommand _targetCommand;
+        private static Actor _targetSource;
+        private static IAction _targetAction;
 
-        static InputHandler()
-        {
-            _holdTimeout = 0;
-        }
+        private static IInputCommand _inputCommand;
+        private static StringBuilder _inputBuffer = new StringBuilder();
+        private static Mode _prevMode = Mode.Normal;
 
         public static void Initialize(RLRootConsole console)
         {
@@ -46,24 +46,27 @@ namespace Roguelike.Systems
             {
                 // For some reason, holding a key issues a command, but follows up with nulls.
                 // We resolve this by making holds somewhat sticky.
-                if (_holdingKey)
-                {
-                    if (_holdTimeout < _HOLD_LIMIT)
-                    {
-                        _holdTimeout++;
-                    }
-                    else
-                    {
-                        Game.ShowOverlay = false;
-                        _holdingKey = false;
-                        _holdTimeout = 0;
-                    }
-                }
+                //if (_holdingKey)
+                //{
+                //    if (_holdTimeout < _HOLD_LIMIT)
+                //    {
+                //        _holdTimeout++;
+                //    }
+                //    else
+                //    {
+                //        Game.ShowOverlay = false;
+                //        _holdingKey = false;
+                //        _holdTimeout = 0;
+                //    }
+                //}
 
                 return null;
             }
-            if (Game.GameMode == Enums.Mode.Targetting)
+            if (Game.GameMode == Mode.Targetting)
                 return ResolveTargettingInput(keyPress);
+
+            if (Game.GameMode == Mode.TextInput)
+                return ResolveTextInput(keyPress);
 
             if (Game.ShowModal)
                 return ResolveModalInput(keyPress, player);
@@ -115,7 +118,7 @@ namespace Roguelike.Systems
             map.ClearHighlight();
             Terrain current = map.Field[mousePos.X, mousePos.Y];
 
-            if (Game.GameMode == Enums.Mode.Targetting)
+            if (Game.GameMode == Mode.Targetting)
             {
                 IEnumerable<Terrain> path = Game.Map.GetStraightLinePath(player.X, player.Y, mousePos.X, mousePos.Y);
                 foreach (Terrain tile in path)
@@ -172,46 +175,64 @@ namespace Roguelike.Systems
         #endregion
 
         #region Target Handling
-        public static void BeginTargetting(ITargettable command, Actor source, IAction action)
+        public static void BeginTargetting(ITargetCommand command, Actor source, IAction action)
         {
-            Game.GameMode = Enums.Mode.Targetting;
+            _prevMode = Game.GameMode;
+            Game.GameMode = Mode.Targetting;
             Game.ShowModal = false;
             Game.ForceRender();
 
-            _targettingCommand = command;
-            _targettingSource = source;
-            _targettingAction = action;
-
-            ResolveTargetting();
+            _targetCommand = command;
+            _targetSource = source;
+            _targetAction = action;
         }
 
-        private static ICommand ResolveTargetting()
+        private static ICommand CompleteTargetting()
         {
-            foreach (Terrain tile in Game.Map.GetTilesInRadius(_targettingSource.X, _targettingSource.Y, (int)_targettingAction.Area.Range))
+            foreach (Terrain tile in Game.Map.GetTilesInRadius(_targetSource.X, _targetSource.Y, (int)_targetAction.Area.Range))
             {
                 Game.Map.Highlight[tile.X, tile.Y] = Swatch.DbGrass;
             }
 
             var clickPos = GetClickPosition();
-            if (clickPos != null)
-            {
-                var (clickX, clickY) = clickPos.Value;
-                int distance = Utils.Distance.EuclideanDistanceSquared(_targettingSource.X, _targettingSource.Y, clickX, clickY);
-                float maxRange = _targettingAction.Area.Range * _targettingAction.Area.Range;
+            if (clickPos == null)
+                return null;
 
-                if (distance <= maxRange)
-                {
-                    Game.GameMode = Enums.Mode.Normal;
-                    _targettingCommand.Target = _targettingAction.Area.GetTilesInRange(_targettingSource, clickPos.Value);
-                    return _targettingCommand as ICommand;
-                }
-                else
-                {
-                    Game.MessageHandler.AddMessage("Target out of range.");
-                }
+            var (clickX, clickY) = clickPos.Value;
+            int distance = Utils.Distance.EuclideanDistanceSquared(_targetSource.X, _targetSource.Y, clickX, clickY);
+            float maxRange = _targetAction.Area.Range * _targetAction.Area.Range;
+
+            if (distance > maxRange)
+            {
+                Game.MessageHandler.AddMessage("Target out of range.");
+                return null;
             }
 
-            return null;
+            Game.GameMode = _prevMode;
+            _targetCommand.Target = _targetAction.Area.GetTilesInRange(_targetSource, clickPos.Value);
+            return _targetCommand;
+        }
+        #endregion
+
+        #region Text Input Handling
+        public static void BeginTextInput(IInputCommand command)
+        {
+            _prevMode = Game.GameMode;
+            Game.GameMode = Mode.TextInput;
+            Game.ShowOverlay = true;
+            OverlayHandler.DisplayText = $"Drop how many?";
+            _inputBuffer.Clear();
+
+            _inputCommand = command;
+        }
+
+        private static ICommand CompleteTextInput(string input)
+        {
+            Game.GameMode = _prevMode;
+            Game.ShowOverlay = false;
+
+            _inputCommand.Input = input;
+            return _inputCommand;
         }
         #endregion
 
@@ -221,12 +242,36 @@ namespace Roguelike.Systems
             switch (keyPress.Key)
             {
                 case RLKey.Escape:
-                    Game.GameMode = Enums.Mode.Normal;
+                    Game.GameMode = _prevMode;
                     Game.ForceRender();
                     break;
             }
 
-            return ResolveTargetting();
+            return CompleteTargetting();
+        }
+
+        private static ICommand ResolveTextInput(RLKeyPress keyPress)
+        {
+            switch (keyPress.Key)
+            {
+                case RLKey.Escape:
+                    Game.GameMode = _prevMode;
+                    Game.ShowOverlay = false;
+                    Game.ForceRender();
+                    break;
+                case RLKey.BackSpace:
+                    if (_inputBuffer.Length > 0) _inputBuffer.Length--;
+                    break;
+                case RLKey.Enter:
+                case RLKey.KeypadEnter:
+                    return CompleteTextInput(_inputBuffer.ToString());
+                default:
+                    _inputBuffer.Append(ToChar(keyPress.Key));
+                    break;
+            }
+
+            OverlayHandler.DisplayText = $"Drop how many? {_inputBuffer.ToString()}";
+            return null;
         }
 
         private static ICommand ResolveModalInput(RLKeyPress keyPress, Actor player)
@@ -234,7 +279,7 @@ namespace Roguelike.Systems
             switch (keyPress.Key)
             {
                 case RLKey.Escape:
-                    Game.GameMode = Enums.Mode.Normal;
+                    Game.GameMode = Mode.Normal;
                     Game.ShowModal = false;
                     Game.ShowEquipment = false;
                     Game.ForceRender();
@@ -244,16 +289,16 @@ namespace Roguelike.Systems
             char keyChar = ToChar(keyPress.Key);
             switch (Game.GameMode)
             {
-                case Enums.Mode.Inventory:
+                case Mode.Inventory:
                     // TODO: implement inventory actions
                     return null;
-                case Enums.Mode.Apply:
+                case Mode.Apply:
                     return new ApplyCommand(player, keyChar);
-                case Enums.Mode.Drop:
+                case Mode.Drop:
                     return new DropCommand(player, keyChar);
-                case Enums.Mode.Equip:
+                case Mode.Equip:
                     return new EquipCommand(player, keyChar);
-                case Enums.Mode.Unequip:
+                case Mode.Unequip:
                     return new UnequipCommand(player, keyChar);
                 default:
                     return null;
@@ -353,23 +398,23 @@ namespace Roguelike.Systems
                     else
                         return null;
                 case RLKey.A:
-                    Game.GameMode = Enums.Mode.Apply;
+                    Game.GameMode = Mode.Apply;
                     Game.ShowModal = true;
                     return null;
                 case RLKey.D:
-                    Game.GameMode = Enums.Mode.Drop;
+                    Game.GameMode = Mode.Drop;
                     Game.ShowModal = true;
                     return null;
                 case RLKey.E:
-                    Game.GameMode = Enums.Mode.Equip;
+                    Game.GameMode = Mode.Equip;
                     Game.ShowModal = true;
                     return null;
                 case RLKey.I:
-                    Game.GameMode = Enums.Mode.Inventory;
+                    Game.GameMode = Mode.Inventory;
                     Game.ShowModal = true;
                     return null;
                 case RLKey.T:
-                    Game.GameMode = Enums.Mode.Unequip;
+                    Game.GameMode = Mode.Unequip;
                     Game.ShowEquipment = true;
                     return null;
                 case RLKey.R:

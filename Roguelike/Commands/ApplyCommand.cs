@@ -8,7 +8,7 @@ using Roguelike.Actions;
 
 namespace Roguelike.Commands
 {
-    class ApplyCommand : ICommand, ITargettable
+    class ApplyCommand : ICommand, ITargetCommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;
@@ -70,7 +70,7 @@ namespace Roguelike.Commands
         public void Execute()
         {
             System.Diagnostics.Debug.Assert(_item != null);
-
+            
             IUsable usableItem = (IUsable)Source.Inventory.Split(_item, 1);
             usableItem.Apply(Source, Target);
         }

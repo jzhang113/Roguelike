@@ -487,11 +487,11 @@ namespace Roguelike.Systems
             }
 
             // debugging code for dijkstra maps
-            foreach (Terrain tile in Field)
-            {
-                if (Game.ShowOverlay)
-                    DrawOverlay(mapConsole, tile);
-            }
+            //foreach (Terrain tile in Field)
+            //{
+            //    if (Game.ShowOverlay)
+            //        DrawOverlay(mapConsole, tile);
+            //}
         }
 
         private void DrawTile(RLConsole mapConsole, Terrain tile)
