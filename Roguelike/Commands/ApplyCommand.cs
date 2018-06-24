@@ -8,7 +8,7 @@ using Roguelike.Actions;
 
 namespace Roguelike.Commands
 {
-    class ApplyCommand : ICommand, ITargetCommand
+    class ApplyCommand : ITargetCommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 120;

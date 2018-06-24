@@ -18,7 +18,16 @@ namespace Roguelike.Commands
         {
             Source = source;
             _key = key;
-            Input = null;
+
+            if (int.TryParse(amount, out int dropAmount))
+            {
+                Input = amount;
+                _dropAmount = dropAmount;
+            }
+            else
+            {
+                Input = null;
+            }
         }
 
         public RedirectMessage Validate()
@@ -36,19 +45,20 @@ namespace Roguelike.Commands
                 return new RedirectMessage(true);
             }
 
+            if (_dropAmount > 0)
+                return new RedirectMessage(true);
+
             if (Input == null)
             {
                 InputHandler.BeginTextInput(this);
                 return new RedirectMessage(false);
             }
 
-            if (!int.TryParse(Input, out _dropAmount) || _dropAmount <= 0)
-            {
-                Game.MessageHandler.AddMessage($"Unknown amount: {Input}");
-                return new RedirectMessage(false);
-            }
+            if (int.TryParse(Input, out _dropAmount) && _dropAmount > 0)
+                return new RedirectMessage(true);
 
-            return new RedirectMessage(true);
+            Game.MessageHandler.AddMessage($"Unknown amount: {Input}");
+            return new RedirectMessage(false);
         }
 
         public void Execute()

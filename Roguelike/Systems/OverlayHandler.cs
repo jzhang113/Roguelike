@@ -1,7 +1,7 @@
 ﻿using RLNET;
 using Roguelike.Core;
 
-namespace Roguelike
+namespace Roguelike.Systems
 {
     static class OverlayHandler
     {

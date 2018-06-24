@@ -1,7 +1,6 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Commands;
 using System;
-using System.Runtime.Serialization;
 
 namespace Roguelike.Core
 {

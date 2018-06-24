@@ -34,7 +34,6 @@ namespace Roguelike
         private static RLConsole _statConsole;
         private static RLConsole _inventoryConsole;
         private static RLConsole _viewConsole;
-        private static RLConsole _mapOverlay;
 
         private static bool _render = true;
 
@@ -51,7 +50,6 @@ namespace Roguelike
             _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
             _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
-            _mapOverlay = new RLConsole(Config.MapView.Width, Config.MapView.Height);
 
             InputHandler.Initialize(_rootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);

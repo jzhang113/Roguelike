@@ -8,13 +8,13 @@ namespace Roguelike.Systems
     [Serializable]
     class WorldHandler
     {
-        public Random Random { get; }
+        private Random Random { get; }
         public Random MapRandom { get; }
         public Random CombatRandom { get; }
 
         public MapHandler Map { get; private set; }
 
-        private Dictionary<string, bool> _levels;
+        private readonly Dictionary<string, bool> _levels;
         private string _currentLevel;
 
         public WorldHandler() : this((int)DateTime.Now.Ticks)
@@ -92,9 +92,9 @@ namespace Roguelike.Systems
             }
         }
 
-        private MapHandler LoadLevel(string levelName)
+        private static MapHandler LoadLevel(string levelName)
         {
-            using (Stream saveFile = File.OpenRead($"{_currentLevel}.dat"))
+            using (Stream saveFile = File.OpenRead($"{levelName}.dat"))
             {
                 BinaryFormatter deserializer = new BinaryFormatter();
                 return (MapHandler)deserializer.Deserialize(saveFile);

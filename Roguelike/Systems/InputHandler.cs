@@ -270,7 +270,7 @@ namespace Roguelike.Systems
                     break;
             }
 
-            OverlayHandler.DisplayText = $"Drop how many? {_inputBuffer.ToString()}";
+            OverlayHandler.DisplayText = $"Drop how many? {_inputBuffer}";
             return null;
         }
 

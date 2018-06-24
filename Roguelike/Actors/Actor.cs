@@ -3,7 +3,6 @@ using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Systems;
 using System;
-using System.Runtime.Serialization;
 using Roguelike.Commands;
 
 namespace Roguelike.Actors
@@ -23,8 +22,8 @@ namespace Roguelike.Actors
         public int Mp { get; set; }
         public int MaxMp { get; set; }
 
-        public int Str { get; }
-        public int Dex { get; }
+        public int Str { get; set; }
+        public int Dex { get; set; }
         public int Def { get; set; }
         public int Int { get; set; }
 
