@@ -9,8 +9,6 @@ namespace Roguelike.Items
     [Serializable]
     public class Item
     {
-        public int Count { get; private set; }
-
         public ItemParameters Parameters { get; }
         public Drawable DrawingComponent { get; }
         
@@ -30,9 +28,8 @@ namespace Roguelike.Items
 
         private readonly IList<IAction> _abilities;
 
-        public Item(ItemParameters parameters, RLNET.RLColor color, char symbol, int count = 1)
+        public Item(ItemParameters parameters, RLNET.RLColor color, char symbol)
         {
-            Count = count;
             Parameters = parameters;
             DrawingComponent = new Drawable
             {
@@ -46,9 +43,8 @@ namespace Roguelike.Items
         // copy constructor
         public Item(Item other)
         {
-            Count = other.Count;
             Parameters = other.Parameters;
-            DrawingComponent = new Drawable()
+            DrawingComponent = new Drawable
             {
                 X = other.X,
                 Y = other.Y,
@@ -58,20 +54,7 @@ namespace Roguelike.Items
             
             _abilities = new List<IAction>(other._abilities);
         }
-
-        public void Add(int addCount) => Count += addCount;
-
-        public void Remove(int removeCount) => Count = Math.Max(Count - removeCount, 0);
-
-        public Item Split(int splitCount)
-        {
-            System.Diagnostics.Debug.Assert(Count >= splitCount);
-            Count -= splitCount;
-            Item copy = DeepClone();
-            copy.Count = splitCount;
-            return copy;
-        }
-
+        
         #region virtual methods
         public virtual void Consume(Actor actor)
         {

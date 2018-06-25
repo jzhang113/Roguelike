@@ -21,10 +21,10 @@ namespace Roguelike.Systems
             _showItemInfo = false;
         }
 
-        public static void DisplayItem(Item item)
+        public static void DisplayItem(ItemCount itemCount)
         {
-            _displayItem = item;
-            _showItemInfo = (item != null) && (item.Count > 0);
+            _displayItem = itemCount?.Item;
+            _showItemInfo = (itemCount?.Item != null) && (itemCount.Count > 0);
             _showActorInfo = false;
         }
 

@@ -115,7 +115,10 @@
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Commands\AttackCommand.cs" />
     <Compile Include="Core\Stair.cs" />
+    <Compile Include="Items\ItemCount.cs" />
     <Compile Include="Items\ItemParameters.cs" />
+    <Compile Include="Items\ItemStack.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="Systems\OverlayHandler.cs" />
     <Compile Include="Systems\WorldHandler.cs" />
     <Compile Include="Core\Door.cs" />

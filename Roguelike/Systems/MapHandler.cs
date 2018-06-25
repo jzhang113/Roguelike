@@ -177,32 +177,32 @@ namespace Roguelike.Systems
         #endregion
 
         #region Item Methods
-        public void AddItem(Item item)
+        public void AddItem(ItemCount itemCount)
         {
-            int index = ToIndex(item.X, item.Y);
+            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
             if (Items.TryGetValue(index, out InventoryHandler stack))
             {
-                stack.Add(item);
+                stack.Add(itemCount);
             }
             else
             {
                 Items.Add(index, new InventoryHandler
                 {
-                    item
+                    itemCount
                 });
             }
         }
 
-        public bool TryGetItem(int x, int y, out Item item)
+        public bool TryGetItem(int x, int y, out ItemCount itemCount)
         {
             bool success = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
             if (!success || stack.Count == 0)
             {
-                item = null;
+                itemCount = null;
                 return false;
             }
 
-            item = stack.First();
+            itemCount = stack.First();
             return true;
         }
 
@@ -212,52 +212,46 @@ namespace Roguelike.Systems
         }
 
         // Take an entire stack of item off of the map.
-        public bool RemoveItem(Item item)
+        public bool RemoveItem(ItemCount itemCount)
         {
-            int index = ToIndex(item.X, item.Y);
+            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
                 return false;
 
-            if (!stack.Contains(item))
+            if (!stack.Contains(itemCount))
                 return false;
 
-            return stack.Remove(item);
+            return stack.Remove(itemCount);
             // Q: remove stack from Items if it is empty?
         }
 
         // Permanently remove items from the map.
-        public bool DestroyItem(Item item, int amount)
+        public bool DestroyItem(ItemCount itemCount)
         {
-            int index = ToIndex(item.X, item.Y);
+            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
                 return false;
 
-            if (!stack.Contains(item))
+            if (!stack.Contains(itemCount))
                 return false;
 
-            stack.Destroy(item, amount);
+            stack.Destroy(itemCount);
             return true;
         }
 
         // Take only part of a stack from the map.
-        public Item SplitItem(Item item, int amount)
+        public ItemCount SplitItem(ItemCount itemCount)
         {
-            int index = ToIndex(item.X, item.Y);
+            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
             {
-                System.Diagnostics.Debug.Assert(false, $"Could not split {item.Name} on the map.");
+                System.Diagnostics.Debug.Assert(false, $"Could not split {itemCount.Item.Name} on the map.");
                 return null;
             }
 
-            System.Diagnostics.Debug.Assert(stack.Contains(item), $"Map does not contain {item.Name}.");
+            System.Diagnostics.Debug.Assert(stack.Contains(itemCount), $"Map does not contain {itemCount.Item.Name}.");
 
-            if (amount < item.Count)
-                return stack.Split(item, amount);
-
-            bool removeStatus = stack.Remove(item);
-            System.Diagnostics.Debug.Assert(removeStatus, $"Could not remove {item.Name} at {index}.");
-
-            return item;
+            return stack.Split(itemCount);
         }
         #endregion
 
@@ -469,7 +463,7 @@ namespace Roguelike.Systems
             foreach (InventoryHandler stack in Items.Values)
             {
                 if (stack.Any())
-                    stack.First().DrawingComponent.Draw(mapConsole, this);
+                    stack.First().Item.DrawingComponent.Draw(mapConsole, this);
             }
 
             foreach (Actor unit in Units.Values)

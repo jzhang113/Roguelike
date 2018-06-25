@@ -11,7 +11,7 @@ namespace Roguelike.Commands
         public string Input { get; set; }
 
         private readonly char _key;
-        private Item _item;
+        private ItemCount _itemCount;
         private int _dropAmount;
 
         public DropCommand(Actor source, char key, string amount = null)
@@ -32,14 +32,14 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
-            if (!Source.Inventory.TryGetKey(_key, out _item))
+            if (!Source.Inventory.TryGetKey(_key, out _itemCount))
             {
                 Game.MessageHandler.AddMessage("No such item to drop.");
                 return new RedirectMessage(false);
             }
 
-            System.Diagnostics.Debug.Assert(_item.Count > 0);
-            if (_item.Count == 1)
+            System.Diagnostics.Debug.Assert(_itemCount.Count > 0);
+            if (_itemCount.Count == 1)
             {
                 _dropAmount = 1;
                 return new RedirectMessage(true);
@@ -64,14 +64,14 @@ namespace Roguelike.Commands
         public void Execute()
         {
             System.Diagnostics.Debug.Assert(_dropAmount > 0);
-            if (_dropAmount > _item.Count)
-                _dropAmount = _item.Count;
-            Item dropped = Source.Inventory.Split(_item, _dropAmount);
+            if (_dropAmount > _itemCount.Count)
+                _dropAmount = _itemCount.Count;
+            ItemCount dropped = Source.Inventory.Split(new ItemCount { Item = _itemCount.Item, Count = _dropAmount });
 
-            dropped.X = Source.X;
-            dropped.Y = Source.Y;
+            dropped.Item.X = Source.X;
+            dropped.Item.Y = Source.Y;
             Game.Map.AddItem(dropped);
-            Game.MessageHandler.AddMessage($"You drop {_dropAmount} {_item.Name}.");
+            Game.MessageHandler.AddMessage($"You drop {dropped}.");
         }
     }
 }

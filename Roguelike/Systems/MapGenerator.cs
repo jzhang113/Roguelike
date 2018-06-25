@@ -419,7 +419,7 @@ namespace Roguelike.Systems
                 X = Game.Player.X - 1,
                 Y = Game.Player.Y - 1
             };
-            _map.AddItem(spear);
+            _map.AddItem(new ItemCount { Item = spear, Count = 1 });
 
             IAction rangedDamage = new DamageAction(200, new TargetZone(Enums.TargetShape.Ray, range: 10));
             IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
@@ -443,7 +443,7 @@ namespace Roguelike.Systems
                 X = Game.Player.X - 2,
                 Y = Game.Player.Y - 3
             };
-            _map.AddItem(ha);
+            _map.AddItem(new ItemCount { Item = ha, Count = 1 });
 
             Scroll magicMissile = new Scroll(
                 new ItemParameters("scroll of magic missile", Materials.Paper), rangedDamage, Swatch.DbSun)
@@ -451,7 +451,7 @@ namespace Roguelike.Systems
                 X = Game.Player.X - 1,
                 Y = Game.Player.Y - 2
             };
-            _map.AddItem(magicMissile);
+            _map.AddItem(new ItemCount { Item = magicMissile, Count = 1 });
 
             Scroll healing = new Scroll(
                 new ItemParameters("scroll of healing", Materials.Paper), heal, Swatch.DbGrass)
@@ -459,10 +459,10 @@ namespace Roguelike.Systems
                 X = Game.Player.X + 1,
                 Y = Game.Player.Y + 1
             };
-            _map.AddItem(healing);
+            _map.AddItem(new ItemCount { Item = healing, Count = 1 });
 
             Item planks = new Item(
-                new ItemParameters("planks", Materials.Wood), Swatch.DbWood, '\\', 10)
+                new ItemParameters("plank", Materials.Wood), Swatch.DbWood, '\\')
             {
                 X = Game.Player.X + 2,
                 Y = Game.Player.Y + 2,
@@ -470,10 +470,10 @@ namespace Roguelike.Systems
             Item planks2 = new Item(planks) { X = Game.Player.X + 3 };
             Item planks3 = new Item(planks) { Y = Game.Player.Y + 3 };
             Item planks4 = new Item(planks) { X = Game.Player.X + 3, Y = Game.Player.Y + 3 };
-            _map.AddItem(planks);
-            _map.AddItem(planks2);
-            _map.AddItem(planks3);
-            _map.AddItem(planks4);
+            _map.AddItem(new ItemCount { Item = planks, Count = 10 });
+            _map.AddItem(new ItemCount { Item = planks2, Count = 10 });
+            _map.AddItem(new ItemCount { Item = planks3, Count = 10 });
+            _map.AddItem(new ItemCount { Item = planks4, Count = 10 });
         }
 
         // HACK: ad-hoc placement code

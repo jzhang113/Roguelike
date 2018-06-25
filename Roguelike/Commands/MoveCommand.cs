@@ -73,7 +73,7 @@ namespace Roguelike.Commands
                     if (!stack.IsEmpty())
                     {
                         Game.MessageHandler.AddMessage(stack.Count == 1
-                            ? $"You see a {stack.First().Name} here."
+                            ? $"You see {stack.First()} here."
                             : "You see several items here.");
                     }
                 }

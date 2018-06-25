@@ -167,7 +167,7 @@ namespace Roguelike.Systems
             if (map.TryGetActor(mousePos.X, mousePos.Y, out Actor displayActor))
                 LookHandler.DisplayActor(displayActor);
 
-            if (map.TryGetItem(mousePos.X, mousePos.Y, out Item displayItem))
+            if (map.TryGetItem(mousePos.X, mousePos.Y, out ItemCount displayItem))
                 LookHandler.DisplayItem(displayItem);
 
             LookHandler.DisplayTerrain(map.Field[mousePos.X, mousePos.Y]);
@@ -220,7 +220,7 @@ namespace Roguelike.Systems
             _prevMode = Game.GameMode;
             Game.GameMode = Mode.TextInput;
             Game.ShowOverlay = true;
-            OverlayHandler.DisplayText = $"Drop how many?";
+            OverlayHandler.DisplayText = "Drop how many?";
             _inputBuffer.Clear();
 
             _inputCommand = command;
