@@ -7,7 +7,11 @@ namespace Roguelike.Items
     [Serializable]
     public class Weapon : Item, IEquipable
     {
-        public Weapon(string name, IMaterial material, RLNET.RLColor color) : base(name, material, color, '(')
+        public Weapon(ItemParameters parameters, RLNET.RLColor color) : base(parameters, color, '(')
+        {
+        }
+
+        public Weapon(Weapon other) : base(other)
         {
         }
 
@@ -31,6 +35,11 @@ namespace Roguelike.Items
 
             actor.Equipment.Unequip();
             Game.MessageHandler.AddMessage($"You unwield a {Name}.");
+        }
+
+        public override Item DeepClone()
+        {
+            return new Weapon(this);
         }
     }
 }

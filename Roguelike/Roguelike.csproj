@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\MoveAction.cs" />
+    <Compile Include="Actors\ActorParameters.cs" />
     <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\ApplyCommand.cs" />
     <Compile Include="Commands\ChangeLevelCommand.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Commands\AttackCommand.cs" />
     <Compile Include="Core\Stair.cs" />
+    <Compile Include="Items\ItemParameters.cs" />
     <Compile Include="Systems\OverlayHandler.cs" />
     <Compile Include="Systems\WorldHandler.cs" />
     <Compile Include="Core\Door.cs" />

@@ -3,19 +3,17 @@ using Roguelike.Interfaces;
 using Roguelike.Actions;
 using System.Collections.Generic;
 using System;
-using Roguelike.Utils;
 
 namespace Roguelike.Items
 {
     [Serializable]
     public class Item
     {
-        public string Name { get; }
-        public IMaterial Material { get; }
         public int Count { get; private set; }
 
+        public ItemParameters Parameters { get; }
         public Drawable DrawingComponent { get; }
-
+        
         public int X
         {
             get => DrawingComponent.X;
@@ -28,34 +26,28 @@ namespace Roguelike.Items
             set => DrawingComponent.Y = value;
         }
 
-        internal int AttackSpeed { get; set; } = Constants.FULL_TURN;
-        internal int Damage { get; set; } = Constants.DEFAULT_DAMAGE;
-        internal float MeleeRange { get; set; } = Constants.DEFAULT_MELEE_RANGE;
-        internal float ThrowRange { get; set; } = Constants.DEFAULT_THROW_RANGE;
+        public string Name => Parameters.Name;
 
         private readonly IList<IAction> _abilities;
 
-        public Item(string name, IMaterial material, RLNET.RLColor color, char symbol, int count = 1)
+        public Item(ItemParameters parameters, RLNET.RLColor color, char symbol, int count = 1)
         {
-            Name = name;
-            Material = material;
             Count = count;
-
+            Parameters = parameters;
             DrawingComponent = new Drawable
             {
                 Color = color,
                 Symbol = symbol
             };
+
             _abilities = new List<IAction>();
         }
 
         // copy constructor
         public Item(Item other)
         {
-            Name = other.Name;
-            Material = other.Material;
             Count = other.Count;
-
+            Parameters = other.Parameters;
             DrawingComponent = new Drawable()
             {
                 X = other.X,
@@ -63,12 +55,7 @@ namespace Roguelike.Items
                 Color = other.DrawingComponent.Color,
                 Symbol = other.DrawingComponent.Symbol
             };
-
-            AttackSpeed = other.AttackSpeed;
-            Damage = other.Damage;
-            MeleeRange = other.MeleeRange;
-            ThrowRange = other.ThrowRange;
-
+            
             _abilities = new List<IAction>(other._abilities);
         }
 
@@ -79,19 +66,10 @@ namespace Roguelike.Items
         public Item Split(int splitCount)
         {
             System.Diagnostics.Debug.Assert(Count >= splitCount);
-
-            if (Count == splitCount)
-            {
-                Item copy = new Item(this);
-                Count = 0;
-                return copy;
-            }
-
             Count -= splitCount;
-            return new Item(this)
-            {
-                Count = splitCount
-            };
+            Item copy = DeepClone();
+            copy.Count = splitCount;
+            return copy;
         }
 
         #region virtual methods
@@ -109,11 +87,16 @@ namespace Roguelike.Items
         {
             throw new NotImplementedException();
         }
+
+        public virtual Item DeepClone()
+        {
+            return new Item(this);
+        }
         #endregion
 
         public IAction GetBasicAttack(int targetX, int targetY)
         {
-            return new DamageAction(Damage, new Core.TargetZone(Enums.TargetShape.Directional, (targetX, targetY)));
+            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Directional, (targetX, targetY)));
         }
 
         public IAction GetAbility(int index)
@@ -130,11 +113,17 @@ namespace Roguelike.Items
             _abilities.Add(skill);
         }
 
-        // Helper method for merge items. Doesn't check if the items are at the same position.
+        // Helper method for merging hard stacks.
         internal bool SameAs(Item other)
         {
             return Name == other.Name &&
-                Material.Equals(other.Material);
+                Parameters.Equals(other.Parameters);
+        }
+
+        // Helper method for merging soft stacks.
+        internal bool SimilarTo(Item other)
+        {
+            return Name == other.Name;
         }
     }
 }

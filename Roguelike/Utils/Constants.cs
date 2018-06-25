@@ -11,8 +11,8 @@
 
         public const string SAVE_FILE = "save.dat";
 
-        public const float DEFAULT_MELEE_RANGE = 1.5f;
-        public const float DEFAULT_THROW_RANGE = 1.5f;
+        public const double DEFAULT_MELEE_RANGE = 1.5;
+        public const double DEFAULT_THROW_RANGE = 1.5;
         public const int DEFAULT_DAMAGE = 100;
     }
 }

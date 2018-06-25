@@ -7,11 +7,8 @@ namespace Roguelike.Core
     [Serializable]
     public class Door : Actor
     {
-        public Door()
+        public Door() : base(new ActorParameters("Door"), Swatch.DbWood, '+')
         {
-            Name = "door";
-            DrawingComponent.Color = Swatch.DbBrightWood;
-            DrawingComponent.Symbol = '+';
         }
 
         public override ICommand Act()

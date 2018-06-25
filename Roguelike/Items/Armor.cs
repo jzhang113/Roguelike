@@ -9,9 +9,14 @@ namespace Roguelike.Items
     {
         public Enums.ArmorType Type { get; }
 
-        public Armor(string name, IMaterial material, RLNET.RLColor color, Enums.ArmorType type) : base(name, material, color, '[')
+        public Armor(ItemParameters parameters, RLNET.RLColor color, Enums.ArmorType type) : base(parameters, color, '[')
         {
             Type = type;
+        }
+
+        public Armor(Armor other) : base(other)
+        {
+            Type = other.Type;
         }
 
         public void Equip(Actor actor)
@@ -34,6 +39,11 @@ namespace Roguelike.Items
 
             actor.Equipment.Unequip(this);
             Game.MessageHandler.AddMessage($"You take off the {Name}.");
+        }
+
+        public override Item DeepClone()
+        {
+            return new Armor(this);
         }
     }
 }

@@ -407,12 +407,15 @@ namespace Roguelike.Systems
         // HACK: ad-hoc placement code
         private void PlaceItems()
         {
-            Weapon spear = new Weapon("spear", Materials.Wood, Swatch.DbBlood)
+            Weapon spear = new Weapon(
+                new ItemParameters("spear", Materials.Wood)
+                {
+                    AttackSpeed = 240,
+                    Damage = 200,
+                    MeleeRange = 1.5f,
+                    ThrowRange = 7
+                }, Swatch.DbBlood)
             {
-                AttackSpeed = 240,
-                Damage = 200,
-                MeleeRange = 1.5f,
-                ThrowRange = 7,
                 X = Game.Player.X - 1,
                 Y = Game.Player.Y - 1
             };
@@ -428,32 +431,38 @@ namespace Roguelike.Systems
             //};
             spear.AddAbility(new DamageAction(100, new TargetZone(Enums.TargetShape.Directional)));
 
-            Armor ha = new Armor("heavy armor", Materials.Iron, Swatch.DbMetal, Enums.ArmorType.Armor)
+            Armor ha = new Armor(
+                new ItemParameters("heavy armor", Materials.Iron)
+                {
+                    AttackSpeed = 1000,
+                    Damage = 100,
+                    MeleeRange = 1,
+                    ThrowRange = 3
+                }, Swatch.DbMetal, Enums.ArmorType.Armor)
             {
-                AttackSpeed = 1000,
-                Damage = 100,
-                MeleeRange = 1,
-                ThrowRange = 3,
                 X = Game.Player.X - 2,
                 Y = Game.Player.Y - 3
             };
             _map.AddItem(ha);
 
-            Scroll magicMissile = new Scroll("scroll of magic missile", rangedDamage, Swatch.DbSun)
+            Scroll magicMissile = new Scroll(
+                new ItemParameters("scroll of magic missile", Materials.Paper), rangedDamage, Swatch.DbSun)
             {
                 X = Game.Player.X - 1,
                 Y = Game.Player.Y - 2
             };
             _map.AddItem(magicMissile);
 
-            Scroll healing = new Scroll("scroll of healing", heal, Swatch.DbGrass)
+            Scroll healing = new Scroll(
+                new ItemParameters("scroll of healing", Materials.Paper), heal, Swatch.DbGrass)
             {
                 X = Game.Player.X + 1,
                 Y = Game.Player.Y + 1
             };
             _map.AddItem(healing);
 
-            Item planks = new Item("planks", Materials.Wood, Swatch.DbWood, '\\', 10)
+            Item planks = new Item(
+                new ItemParameters("planks", Materials.Wood), Swatch.DbWood, '\\', 10)
             {
                 X = Game.Player.X + 2,
                 Y = Game.Player.Y + 2,
@@ -482,12 +491,17 @@ namespace Roguelike.Systems
 
             for (int i = 0; i < 3; i++)
             {
-                Skeleton s = new Skeleton();
+                Skeleton s = new Skeleton(new ActorParameters($"Skeleton #{i}")
+                {
+                    Awareness = 10,
+                    MaxHp = 50,
+                    MaxMp = 20,
+                    MaxSp = 20
+                });
                 while (!_map.Field[s.X, s.Y].IsWalkable)
                 {
                     s.X = _rand.Next(1, Game.Config.Map.Width - 1);
                     s.Y = _rand.Next(1, Game.Config.Map.Height - 1);
-                    s.Name = "Mook #" + (i + 1);
                 }
                 _map.AddActor(s);
             }

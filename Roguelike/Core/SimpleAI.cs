@@ -15,7 +15,7 @@ namespace Roguelike.Core
             switch (monster.State)
             {
                 case ActorState.Wander:
-                    if (Game.Map.PlayerMap[monster.X, monster.Y] < monster.Awareness)
+                    if (Game.Map.PlayerMap[monster.X, monster.Y] < monster.Parameters.Awareness)
                     {
                         monster.State = ActorState.Chase;
                         return GetAction(monster);

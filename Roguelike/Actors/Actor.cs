@@ -10,22 +10,12 @@ namespace Roguelike.Actors
     [Serializable]
     public class Actor : ISchedulable
     {
-        public string Name { get; set; }
-        public int Awareness { get; set; }
-        public int Speed { get; set; }
+        public string Name => Parameters.Name;
         public bool BlocksLight { get; set; }
 
         public int Hp { get; set; }
-        public int MaxHp { get; set; }
-        public int Sp { get; set; }
-        public int MaxSp { get; set; }
         public int Mp { get; set; }
-        public int MaxMp { get; set; }
-
-        public int Str { get; set; }
-        public int Dex { get; set; }
-        public int Def { get; set; }
-        public int Int { get; set; }
+        public int Sp { get; set; }
 
         public Enums.ActorState State { get; set; }
 
@@ -35,6 +25,7 @@ namespace Roguelike.Actors
         public InventoryHandler Inventory { get; }
         public EquipmentHandler Equipment { get; }
         public Drawable DrawingComponent { get; }
+        public ActorParameters Parameters { get; }
 
         public int X
         {
@@ -50,16 +41,25 @@ namespace Roguelike.Actors
 
         public bool IsDead => Hp < 0;
 
-        public Actor()
+        public Actor(ActorParameters parameters, RLNET.RLColor color, char symbol)
         {
+            Parameters = parameters;
+            Hp = Parameters.MaxHp;
+            Sp = Parameters.MaxSp;
+            Mp = Parameters.MaxMp;
+
             Energy = 0;
             RefreshRate = Utils.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
 
-            Weapon defaultWeapon = new Weapon("fists", Materials.Flesh, Colors.TextHeading);
+            Weapon defaultWeapon = new Weapon(new ItemParameters("fists", Materials.Flesh), Colors.TextHeading);
             Equipment = new EquipmentHandler(defaultWeapon);
 
-            DrawingComponent = new Drawable();
+            DrawingComponent = new Drawable
+            {
+                Color = color,
+                Symbol = symbol
+            };
 
             BlocksLight = true;
         }
@@ -85,7 +85,7 @@ namespace Roguelike.Actors
 
         public int TakeHealing(int power)
         {
-            int restore = MaxHp - Hp;
+            int restore = Parameters.MaxHp - Hp;
             restore = (restore > 0) ? restore : 0;
 
             if (restore > power)

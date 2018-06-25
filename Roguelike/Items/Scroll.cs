@@ -12,9 +12,14 @@ namespace Roguelike.Items
     {
         public IAction ApplySkill { get; }
 
-        public Scroll(string name, IAction action, RLNET.RLColor color) : base(name, Materials.Paper, color, '?')
+        public Scroll(ItemParameters parameters, IAction action, RLNET.RLColor color) : base(parameters, color, '?')
         {
             ApplySkill = action;
+        }
+
+        public Scroll(Scroll other) : base(other)
+        {
+            ApplySkill = other.ApplySkill;
         }
 
         public void Apply(Actor source, IEnumerable<Terrain> targets)
@@ -23,6 +28,11 @@ namespace Roguelike.Items
             {
                 ApplySkill.Activate(source, tile);
             }
+        }
+
+        public override Item DeepClone()
+        {
+            return new Scroll(this);
         }
     }
 }

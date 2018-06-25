@@ -18,12 +18,14 @@ namespace Roguelike.Systems
         {
             _displayActor = actor;
             _showActorInfo = (actor != null);
+            _showItemInfo = false;
         }
 
         public static void DisplayItem(Item item)
         {
             _displayItem = item;
             _showItemInfo = (item != null) && (item.Count > 0);
+            _showActorInfo = false;
         }
 
         internal static void DisplayTerrain(Terrain tile)
@@ -40,9 +42,9 @@ namespace Roguelike.Systems
             if (_showActorInfo)
             {
                 console.Print(1, 1, _displayActor.Name, Colors.TextHeading);
-                console.Print(1, 2, "HP: " + _displayActor.Hp + " / " + _displayActor.MaxHp, Colors.TextHeading);
-                console.Print(1, 3, "MP: " + _displayActor.Mp + " / " + _displayActor.MaxMp, Colors.TextHeading);
-                console.Print(1, 4, "SP: " + _displayActor.Sp + " / " + _displayActor.MaxSp, Colors.TextHeading);
+                console.Print(1, 2, "HP: " + _displayActor.Hp + " / " + _displayActor.Parameters.MaxHp, Colors.TextHeading);
+                console.Print(1, 3, "MP: " + _displayActor.Mp + " / " + _displayActor.Parameters.MaxMp, Colors.TextHeading);
+                console.Print(1, 4, "SP: " + _displayActor.Sp + " / " + _displayActor.Parameters.MaxSp, Colors.TextHeading);
                 console.Print(1, 5, "Energy: " + _displayActor.Energy.ToString(), Colors.TextHeading);
                 console.Print(1, 6, "State: " + _displayActor.State, Colors.TextHeading);
             }

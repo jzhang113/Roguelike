@@ -8,16 +8,8 @@ namespace Roguelike.Actors
     [Serializable]
     class Player : Actor
     {
-        public Player()
+        public Player(ActorParameters parameters) : base(parameters, Colors.Player, '@')
         {
-            Awareness = 10;
-            Name = "Player";
-            DrawingComponent.Color = Colors.Player;
-            DrawingComponent.Symbol = '@';
-
-            Hp = 100;
-            Sp = 50;
-            Mp = 50;
         }
 
         public override ICommand Act() => InputHandler.HandleInput();

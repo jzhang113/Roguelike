@@ -67,7 +67,13 @@ namespace Roguelike
 
         public static void NewGame()
         {
-            Player = new Player();
+            Player = new Player(new ActorParameters("Player")
+            {
+                Awareness = 10,
+                MaxHp = 100,
+                MaxMp = 50,
+                MaxSp = 50
+            });
             MessageHandler.Clear();
             EventScheduler.Clear();
             World = Option.FixedSeed
