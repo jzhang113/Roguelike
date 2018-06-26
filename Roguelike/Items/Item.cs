@@ -9,6 +9,8 @@ namespace Roguelike.Items
     [Serializable]
     public class Item
     {
+        public int Enchantment { get; set; } = 0;
+
         public ItemParameters Parameters { get; }
         public Drawable DrawingComponent { get; }
         
@@ -43,6 +45,8 @@ namespace Roguelike.Items
         // copy constructor
         public Item(Item other)
         {
+            Enchantment = other.Enchantment;
+
             Parameters = other.Parameters;
             DrawingComponent = new Drawable
             {
@@ -96,11 +100,16 @@ namespace Roguelike.Items
             _abilities.Add(skill);
         }
 
+        public override string ToString()
+        {
+            return $"{Enchantment:+0;-#} {Parameters.Name}";
+        }
+
         // Helper method for merging hard stacks.
         internal bool SameAs(Item other)
         {
-            return Name == other.Name &&
-                Parameters.Equals(other.Parameters);
+            return Enchantment == other.Enchantment &&
+                   Parameters.Equals(other.Parameters);
         }
 
         // Helper method for merging soft stacks.

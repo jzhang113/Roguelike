@@ -33,10 +33,10 @@ namespace Roguelike.Systems
             bool found = false;
             foreach (ItemStack itemStack in _inventory)
             {
-                if (itemStack.Contains(itemCount.Item, out Item key))
+                if (itemStack.Contains(itemCount.Item, out _))
                 {
                     found = true;
-                    itemStack.Add(key, itemCount.Count);
+                    itemStack.Add(itemCount.Item, itemCount.Count);
                     break;
                 }
             }

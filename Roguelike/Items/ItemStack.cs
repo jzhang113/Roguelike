@@ -28,6 +28,21 @@ namespace Roguelike.Items
         {
             foreach (Item itemKey in _itemStack.Keys)
             {
+                if (itemKey.SimilarTo(item))
+                {
+                    key = itemKey;
+                    return true;
+                }
+            }
+
+            key = null;
+            return false;
+        }
+
+        private bool Similar(Item item, out Item key)
+        {
+            foreach (Item itemKey in _itemStack.Keys)
+            {
                 if (itemKey.SameAs(item))
                 {
                     key = itemKey;
@@ -43,7 +58,7 @@ namespace Roguelike.Items
         {
             System.Diagnostics.Debug.Assert(item.Name == Name);
 
-            if (Contains(item, out Item key))
+            if (Similar(item, out Item key))
                 _itemStack[key] += count;
             else
                 _itemStack.Add(item, count);

@@ -7,6 +7,7 @@ using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RLNET;
 
 namespace Roguelike.Systems
 {
@@ -460,6 +461,20 @@ namespace Roguelike.Systems
                 Y = Game.Player.Y + 1
             };
             _map.AddItem(new ItemCount { Item = healing, Count = 1 });
+
+            _map.AddItem(new ItemCount
+            {
+                Item = new Scroll(
+                    new ItemParameters("scroll of enchantment", Materials.Paper),
+                    new EnchantAction(
+                        new TargetZone(Enums.TargetShape.Range, range: 10)),
+                    RLColor.LightGreen)
+                {
+                    X = Game.Player.X - 1,
+                    Y = Game.Player.Y
+                },
+                Count = 1
+            });
 
             Item planks = new Item(
                 new ItemParameters("plank", Materials.Wood), Swatch.DbWood, '\\')

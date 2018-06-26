@@ -7,7 +7,7 @@
 
         public override string ToString()
         {
-            return Count == 1 ? $"a {Item.Name}" : $"{Count} {Item.Name.Pluralize()}";
+            return Count == 1 ? $"a {Item}" : $"{Count} {Item.ToString().Pluralize()}";
         }
     }
 }

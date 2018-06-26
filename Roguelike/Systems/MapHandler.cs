@@ -221,8 +221,10 @@ namespace Roguelike.Systems
             if (!stack.Contains(itemCount))
                 return false;
 
-            return stack.Remove(itemCount);
-            // Q: remove stack from Items if it is empty?
+            stack.Remove(itemCount);
+            if (!stack.Any())
+                Items.Remove(index);
+            return true;
         }
 
         // Permanently remove items from the map.
@@ -236,6 +238,8 @@ namespace Roguelike.Systems
                 return false;
 
             stack.Destroy(itemCount);
+            if (!stack.Any())
+                Items.Remove(index);
             return true;
         }
 
@@ -251,7 +255,10 @@ namespace Roguelike.Systems
 
             System.Diagnostics.Debug.Assert(stack.Contains(itemCount), $"Map does not contain {itemCount.Item.Name}.");
 
-            return stack.Split(itemCount);
+            ItemCount split = stack.Split(itemCount);
+            if (!stack.Any())
+                Items.Remove(index);
+            return split;
         }
         #endregion
 
