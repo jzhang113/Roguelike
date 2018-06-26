@@ -10,6 +10,9 @@ namespace Roguelike.Items
     {
         public string Name { get; }
         public int Count { get; private set; }
+        internal bool Collapsed { get; set; }
+
+        public int TypeCount => _itemStack.Count;
 
         private readonly IDictionary<Item, int> _itemStack;
 
@@ -17,6 +20,7 @@ namespace Roguelike.Items
         {
             Name = item.Name;
             Count = count;
+            Collapsed = true;
 
             _itemStack = new Dictionary<Item, int>
             {
@@ -113,7 +117,7 @@ namespace Roguelike.Items
         {
             if (Count == 1)
                 return $"a {Name}";
-            else if (_itemStack.Count == 1)
+            else if (TypeCount == 1)
                 return $"{Count} {Name.Pluralize()}";
             else
                 return $"{Count} {Name.Pluralize()}*";

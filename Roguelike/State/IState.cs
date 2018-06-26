@@ -1,14 +1,26 @@
-﻿namespace Roguelike.State
+﻿using RLNET;
+using Roguelike.Commands;
+
+namespace Roguelike.State
 {
     interface IState
     {
-        // Perform any setup needed
-        void Initialize();
+        // Perform any setup needed.
+        // void Initialize();
 
-        // Update the state. Returns true if the state is updated successfully
-        bool Update();
+        // Perform any cleanup needed.
+        // void Cleanup();
 
-        // Draw to the screen
+        // Handle keyboard inputs.
+        ICommand HandleKeyInput(RLKeyPress keyPress);
+
+        // Handle mouse inputs.
+        ICommand HandleMouseInput(RLMouse mouse);
+
+        // Update state information.
+        void Update();
+
+        // Draw to the screen.
         void Draw();
     }
 }

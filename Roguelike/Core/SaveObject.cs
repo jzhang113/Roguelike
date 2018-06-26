@@ -1,4 +1,5 @@
-﻿using Roguelike.Systems;
+﻿using Roguelike.State;
+using Roguelike.Systems;
 using System;
 
 namespace Roguelike.Core
@@ -6,7 +7,7 @@ namespace Roguelike.Core
     [Serializable]
     class SaveObject
     {
-        public Enums.Mode GameMode { get; set; }
+        public IState GameState { get; set; }
         public bool ShowEquipment { get; set; }
         public bool ShowInventory { get; set; }
         public bool ShowOverlay { get; set; }

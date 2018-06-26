@@ -39,7 +39,8 @@ namespace Roguelike.Commands
                     }
                     else
                     {
-                        InputHandler.BeginTargetting(this, Source, _action);
+                        // TODO
+                        //StateHandler.BeginTargetting(this, Source, _action);
                         return new RedirectMessage(false);
                     }
                 }

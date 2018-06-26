@@ -7,13 +7,14 @@ using Roguelike.Actors;
 using Roguelike.Utils;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.ComponentModel;
+using Roguelike.State;
 
 namespace Roguelike
 {
     static class Game
     {
         // internal so input handler can change modes
-        public static Enums.Mode GameMode { get; set; }
+        public static IState GameState { get; set; }
         public static bool ShowModal { get; internal set; }
         public static bool ShowEquipment { get; internal set; }
         public static bool ShowOverlay { get; internal set; }
@@ -25,15 +26,16 @@ namespace Roguelike
         public static Player Player { get; internal set; } // internal for deserialization
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
+        public static StateHandler StateHandler { get; private set; }
 
         public static MapHandler Map => World.Map;
 
-        private static RLRootConsole _rootConsole;
-        private static RLConsole _mapConsole;
-        private static RLConsole _messageConsole;
-        private static RLConsole _statConsole;
-        private static RLConsole _inventoryConsole;
-        private static RLConsole _viewConsole;
+        public static RLRootConsole _rootConsole;
+        public static RLConsole _mapConsole;
+        public static RLConsole _messageConsole;
+        public static RLConsole _statConsole;
+        public static RLConsole _inventoryConsole;
+        public static RLConsole _viewConsole;
 
         private static bool _render = true;
 
@@ -51,7 +53,7 @@ namespace Roguelike
             _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
 
-            InputHandler.Initialize(_rootConsole);
+            StateHandler = new StateHandler(_rootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(20);
             World = Option.FixedSeed
@@ -81,7 +83,6 @@ namespace Roguelike
                 : new WorldHandler();
 
             World.ChangeLevel("main_1");
-            GameMode = Enums.Mode.Normal;
         }
 
         private static void SaveGame(object sender, CancelEventArgs e)
@@ -91,7 +92,7 @@ namespace Roguelike
                 BinaryFormatter serializer = new BinaryFormatter();
                 serializer.Serialize(saveFile, new SaveObject
                 {
-                    GameMode = GameMode,
+                    GameState = GameState,
                     ShowEquipment = ShowEquipment,
                     ShowInventory = ShowModal,
                     ShowOverlay = ShowOverlay,
@@ -113,7 +114,7 @@ namespace Roguelike
                     BinaryFormatter deserializer = new BinaryFormatter();
                     SaveObject saved = (SaveObject)deserializer.Deserialize(saveFile);
 
-                    GameMode = saved.GameMode;
+                    GameState = saved.GameState;
                     ShowEquipment = saved.ShowEquipment;
                     ShowModal = saved.ShowInventory;
                     ShowOverlay = saved.ShowOverlay;
@@ -144,62 +145,32 @@ namespace Roguelike
 
         private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            while (EventScheduler.Update())
-            {
-                _render = true;
-            }
+            StateHandler.Update();
         }
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            if (MessageHandler.Redraw || _render)
-            {
-                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
-                MessageHandler.Draw(_messageConsole);
-                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, _rootConsole, 0, 0);
-            }
+            StateHandler.Draw();
 
-            if (_render)
-            {
-                Map.ClearHighlight();
+            //if (ShowOverlay)
+            //{
+            //    OverlayHandler.Draw(_mapConsole);
+            //    RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
+            //}
 
-                _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
-                RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, _rootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
+            //if (ShowModal)
+            //{
+            //    _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
+            //    Player.Inventory.Draw(_inventoryConsole);
+            //    RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
+            //}
 
-                _render = false;
-            }
-
-            _mapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
-            Map.Draw(_mapConsole);
-
-            if (GameMode == Enums.Mode.Targetting)
-                _mapConsole.Print(1, 1, "targetting mode", Colors.TextHeading);
-
-            _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
-            LookHandler.Draw(_viewConsole);
-
-            RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-            RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, _rootConsole, Config.Map.Width, 0);
-
-            if (ShowOverlay)
-            {
-                OverlayHandler.Draw(_mapConsole);
-                RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-            }
-
-            if (ShowModal)
-            {
-                _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
-                Player.Inventory.Draw(_inventoryConsole);
-                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
-            }
-
-            if (ShowEquipment)
-            {
-                _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
-                Player.Equipment.Draw(_inventoryConsole);
-                RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
-            }
+            //if (ShowEquipment)
+            //{
+            //    _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
+            //    Player.Equipment.Draw(_inventoryConsole);
+            //    RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
+            //}
 
             _rootConsole.Draw();
         }

@@ -12,7 +12,7 @@ namespace Roguelike.Actors
         {
         }
 
-        public override ICommand Act() => InputHandler.HandleInput();
+        public override ICommand Act() => Game.StateHandler.HandleInput();
 
         public override void TriggerDeath() => Game.GameOver();
     }

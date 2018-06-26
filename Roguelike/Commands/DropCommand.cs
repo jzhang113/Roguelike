@@ -50,7 +50,8 @@ namespace Roguelike.Commands
 
             if (Input == null)
             {
-                InputHandler.BeginTextInput(this);
+                // TODO
+                //StateHandler.BeginTextInput(this);
                 return new RedirectMessage(false);
             }
 

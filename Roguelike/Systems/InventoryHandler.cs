@@ -154,6 +154,32 @@ namespace Roguelike.Systems
            return true;
         }
 
+        public bool OpenStack(char key)
+        {
+            if (!HasKey(key))
+                return false;
+
+            ItemStack itemStack = _inventory[key - 'a'];
+            if (itemStack.TypeCount == 1)
+                return false;
+
+            itemStack.Collapsed = false;
+            return true;
+        }
+
+        public bool CollapseStack(char key)
+        {
+            if (!HasKey(key))
+                return false;
+
+            ItemStack itemStack = _inventory[key - 'a'];
+            if (itemStack.TypeCount == 1)
+                return false;
+
+            itemStack.Collapsed = true;
+            return true;
+        }
+
         public void Draw(RLConsole console)
         {
             int line = 1;
@@ -164,6 +190,17 @@ namespace Roguelike.Systems
                 console.Print(1, line, $"{letter}) {itemStack}", Colors.TextHeading);
                 line++;
                 letter++;
+
+                if (!itemStack.Collapsed)
+                {
+                    char subletter = 'a';
+                    foreach (ItemCount itemCount in itemStack)
+                    {
+                        console.Print(3, line, $"{letter} {subletter} - {itemCount}", Colors.TextHeading);
+                        line++;
+                        subletter++;
+                    }
+                }
             }
         }
 

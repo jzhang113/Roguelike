@@ -76,7 +76,6 @@ namespace Roguelike.Actors
 
         public virtual ICommand Act()
         {
-            System.Diagnostics.Debug.Assert(Game.GameMode != Enums.Mode.Targetting);
             return SimpleAI.GetAction(this);
         }
 
