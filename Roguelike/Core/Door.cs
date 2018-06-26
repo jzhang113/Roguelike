@@ -7,8 +7,11 @@ namespace Roguelike.Core
     [Serializable]
     public class Door : Actor
     {
-        public Door() : base(new ActorParameters("Door"), Swatch.DbWood, '+')
+        public bool IsOpen { get; set; }
+
+        public Door(bool open = false) : base(new ActorParameters("Door"), Swatch.DbWood, '+')
         {
+            IsOpen = open;
         }
 
         public override ICommand Act()

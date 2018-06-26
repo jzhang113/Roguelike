@@ -39,23 +39,23 @@ namespace Roguelike.Commands
                     return new RedirectMessage(false, new WaitCommand(Source));
             }
 
-            // Check if the destination is already occupied.
-            if (Game.Map.TryGetActor(_tile.X, _tile.Y, out Actor target))
+            if (Game.Map.TryGetDoor(_tile.X, _tile.Y, out Door door))
             {
-                if (target is Door door)
+                // HACK: need an open door command
+                if (!door.IsOpen)
                 {
-                    // HACK: need an open door command
                     Game.Map.OpenDoor(door);
                     return new RedirectMessage(false, new WaitCommand(120));
                 }
-                else if (target == Source)
-                {
+            }
+
+            // Check if the destination is already occupied.
+            if (Game.Map.TryGetActor(_tile.X, _tile.Y, out Actor target))
+            {
+                if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
-                }
                 else
-                {
                     return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(_tile.X, _tile.Y)));
-                }
             }
 
             return new RedirectMessage(true);

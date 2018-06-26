@@ -269,17 +269,21 @@ namespace Roguelike.Systems
                 return false;
 
             Doors.Add(ToIndex(door.X, door.Y), door);
-            Units.Add(ToIndex(door.X, door.Y), door);
             Field[door.X, door.Y].IsOccupied = true;
             Field[door.X, door.Y].BlocksLight = door.BlocksLight;
 
             return true;
         }
 
+        public bool TryGetDoor(int x, int y, out Door door)
+        {
+            return Doors.TryGetValue(ToIndex(x, y), out door);
+        }
+
         public void OpenDoor(Door door)
         {
             door.DrawingComponent.Symbol = '-';
-            Units.Remove(ToIndex(door.X, door.Y));
+            door.IsOpen = true;
             Field[door.X, door.Y].IsOccupied = false;
             Field[door.X, door.Y].BlocksLight = false;
         }

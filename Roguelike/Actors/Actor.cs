@@ -69,6 +69,9 @@ namespace Roguelike.Actors
         {
             Game.Map.RemoveActor(this);
             Game.EventScheduler.RemoveActor(this);
+
+            if (Game.Map.Field[X, Y].IsVisible)
+                Game.MessageHandler.AddMessage($"{Name} dies");
         }
 
         public virtual ICommand Act()

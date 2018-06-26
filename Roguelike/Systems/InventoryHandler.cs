@@ -161,11 +161,7 @@ namespace Roguelike.Systems
 
             foreach (ItemStack itemStack in _inventory)
             {
-                var itemString = itemStack.Count > 1
-                    ? $"{letter}) {itemStack.Count} {itemStack.Name.Pluralize()}"
-                    : $"{letter}) {itemStack.Name}";
-
-                console.Print(1, line, itemString, Colors.TextHeading);
+                console.Print(1, line, $"{letter}) {itemStack}", Colors.TextHeading);
                 line++;
                 letter++;
             }
