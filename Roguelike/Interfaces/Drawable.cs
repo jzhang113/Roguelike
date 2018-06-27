@@ -1,5 +1,5 @@
 ﻿using RLNET;
-using Roguelike.Systems;
+using Roguelike.Core;
 using System;
 using System.Runtime.Serialization;
 
@@ -30,19 +30,19 @@ namespace Roguelike.Interfaces
             Y = (int)info.GetValue(nameof(Y), typeof(int));
         }
 
-        public void Draw(RLConsole console, MapHandler map)
+        public void Draw(RLConsole console, Terrain tile, int destX, int destY)
         {
-            if (!map.Field[X, Y].IsExplored)
+            if (!tile.IsExplored)
                 return;
 
-            if (map.Field[X, Y].IsVisible)
+            if (tile.IsVisible)
             {
-                console.Set(X, Y, Color, null, Symbol);
+                console.Set(destX, destY, Color, null, Symbol);
             }
             else
             {
                 //console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
-                console.Set(X, Y, Color, null, Symbol);
+                console.Set(destX, destY, Color, null, Symbol);
             }
         }
 

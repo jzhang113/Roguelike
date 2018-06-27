@@ -461,34 +461,60 @@ namespace Roguelike.Systems
         #region Drawing Methods
         public void Draw(RLConsole mapConsole)
         {
-            foreach (Terrain tile in Field)
+            int screenWidth = Game.Config.MapView.Width;
+            int screenHeight = Game.Config.MapView.Height;
+            int halfWidth = screenWidth / 2;
+            int halfHeight = screenHeight / 2;
+
+            // set left and top limits for the camera
+            int startX = Math.Max(Game.Player.X - halfWidth, 0);
+            int startY = Math.Max(Game.Player.Y - halfHeight, 0);
+
+            // set right and bottom limits for the camera
+            startX = Math.Min(Width - screenWidth, startX);
+            startY = Math.Min(Height - screenHeight, startY);
+
+            for (int dx = 0; dx < screenWidth; dx++)
             {
-                DrawTile(mapConsole, tile);
+                for (int dy = 0; dy < screenHeight; dy++)
+                {
+                    DrawTile(mapConsole, startX + dx, startY + dy, dx, dy);
+                }
             }
 
             foreach (Door door in Doors.Values)
             {
-                door.DrawingComponent.Draw(mapConsole, this);
+                int destX = door.X - startX;
+                int destY = door.Y - startY;
+                door.DrawingComponent.Draw(mapConsole, Field[door.X, door.Y], destX, destY);
             }
 
             foreach (InventoryHandler stack in Items.Values)
             {
-                if (stack.Any())
-                    stack.First().Item.DrawingComponent.Draw(mapConsole, this);
+                Item topItem = stack.First().Item;
+                int destX = topItem.X - startX;
+                int destY = topItem.Y - startY;
+                topItem.DrawingComponent.Draw(mapConsole, Field[topItem.X, topItem.Y], destX, destY);
             }
 
             foreach (Actor unit in Units.Values)
             {
                 if (!unit.IsDead)
-                    unit.DrawingComponent.Draw(mapConsole, this);
+                {
+                    int destX = unit.X - startX;
+                    int destY = unit.Y - startY;
+                    unit.DrawingComponent.Draw(mapConsole, Field[unit.X, unit.Y], destX, destY);
+                }
                 else
                     // HACK: draw some corpses
-                    mapConsole.SetChar(unit.X, unit.Y, '%');
+                    mapConsole.SetChar(unit.X - startX, unit.Y - startY, '%');
             }
 
             foreach (Stair exit in Exits.Values)
             {
-                exit.DrawingComponent.Draw(mapConsole, this);
+                int destX = exit.X - startX;
+                int destY = exit.Y - startY;
+                exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y], destX, destY);
             }
 
             // debugging code for dijkstra maps
@@ -499,36 +525,37 @@ namespace Roguelike.Systems
             //}
         }
 
-        private void DrawTile(RLConsole mapConsole, Terrain tile)
+        private void DrawTile(RLConsole mapConsole, int srcX, int srcY, int destX, int destY)
         {
+            Terrain tile = Field[srcX, srcY];
             if (!tile.IsExplored)
                 return;
 
-            if (Field[tile.X, tile.Y].IsVisible)
+            if (tile.IsVisible)
             {
-                if (!Field[tile.X, tile.Y].IsWall)
+                if (!tile.IsWall)
                 {
-                    mapConsole.Set(tile.X, tile.Y, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
+                    mapConsole.Set(destX, destY, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
                     // mapConsole.SetColor(tile.X, tile.Y, new RLColor(1, 1 - PlayerMap[tile.X, tile.Y] / 20, 0));
                 }
                 else
                 {
-                    mapConsole.Set(tile.X, tile.Y, Colors.WallFov, Colors.WallBackgroundFov, '#');
+                    mapConsole.Set(destX, destY, Colors.WallFov, Colors.WallBackgroundFov, '#');
                 }
             }
             else
             {
-                if (!Field[tile.X, tile.Y].IsWall)
+                if (!tile.IsWall)
                 {
-                    mapConsole.Set(tile.X, tile.Y, Colors.Floor, Colors.FloorBackground, '.');
+                    mapConsole.Set(destX, destY, Colors.Floor, Colors.FloorBackground, '.');
                 }
                 else
                 {
-                    mapConsole.Set(tile.X, tile.Y, Colors.Wall, Colors.WallBackground, '#');
+                    mapConsole.Set(destX, destY, Colors.Wall, Colors.WallBackground, '#');
                 }
             }
 
-            mapConsole.SetBackColor(tile.X, tile.Y, Highlight[tile.X, tile.Y]);
+            mapConsole.SetBackColor(destX, destY, Highlight[srcX, srcY]);
         }
 
         private void DrawOverlay(RLConsole mapConsole, Terrain tile)
