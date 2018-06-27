@@ -1,46 +1,23 @@
 ﻿using RLNET;
 using Roguelike.Commands;
+using Roguelike.Utils;
 using System;
 
 namespace Roguelike.State
 {
-    class UnequipState : IState
+    class UnequipState : ModalState
     {
-        private static Lazy<UnequipState> _instance = new Lazy<UnequipState>(() => new UnequipState());
+        private static readonly Lazy<UnequipState> _instance = new Lazy<UnequipState>(() => new UnequipState());
         public static UnequipState Instance => _instance.Value;
 
         private UnequipState()
         {
         }
 
-        public void Cleanup()
+        public override ICommand HandleKeyInput(RLKeyPress keyPress)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Draw()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ICommand HandleMouseInput(RLMouse mouse)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Initialize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update()
-        {
-            throw new NotImplementedException();
+            char keyChar = keyPress.Key.ToChar();
+            return new UnequipCommand(Game.Player, keyChar);
         }
     }
 }

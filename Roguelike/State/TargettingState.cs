@@ -1,46 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RLNET;
+﻿using RLNET;
 using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
+using Roguelike.Core;
+using Roguelike.Systems;
 
 namespace Roguelike.State
 {
     class TargettingState : IState
     {
-        private ITargetCommand _targetCommand;
-        private Actor _targetSource;
-        private IAction _targetAction;
+        private readonly ITargetCommand _targetCommand;
+        private readonly Actor _targetSource;
+        private readonly IAction _targetAction;
 
-        public TargettingState(ITargetCommand targetCommand, Actor source, IAction targetAction)
+        public TargettingState(ITargetCommand command, Actor source, IAction action)
         {
-            _targetCommand = targetCommand;
+            _targetCommand = command;
             _targetSource = source;
-            _targetAction = targetAction;
-        }
-
-        public void Draw()
-        {
-            throw new NotImplementedException();
+            _targetAction = action;
         }
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)
         {
-            throw new NotImplementedException();
+            // TODO
+            return null;
         }
 
         public ICommand HandleMouseInput(RLMouse mouse)
         {
-            throw new NotImplementedException();
+            foreach (Terrain tile in Game.Map.GetTilesInRadius(_targetSource.X, _targetSource.Y, (int)_targetAction.Area.Range))
+            {
+                Game.Map.Highlight[tile.X, tile.Y] = Swatch.DbGrass;
+            }
+
+            if (!MouseHandler.GetClickPosition(mouse, out (int X, int Y) click))
+                return null;
+
+            int distance = Utils.Distance.EuclideanDistanceSquared(_targetSource.X, _targetSource.Y, click.X, click.Y);
+            float maxRange = _targetAction.Area.Range * _targetAction.Area.Range;
+
+            if (distance > maxRange)
+            {
+                Game.MessageHandler.AddMessage("Target out of range.");
+                return null;
+            }
+
+            _targetCommand.Target = _targetAction.Area.GetTilesInRange(_targetSource, click);
+            return _targetCommand;
         }
 
         public void Update()
         {
-            throw new NotImplementedException();
+            Game.ForceRender();
+            ICommand command = Game.StateHandler.HandleInput();
+            if (command == null)
+                return;
+
+            if (EventScheduler.Execute(Game.Player, command))
+                Game.StateHandler.PopState();
+        }
+
+        public void Draw()
+        {
+            Game.MapConsole.Print(1, 1, "targetting mode", Colors.TextHeading);
+
+            //IEnumerable<Terrain> path = Game.Map.GetStraightLinePath(Game.Player.X, Game.Player.Y, mousePos.X, mousePos.Y);
+            //foreach (Terrain tile in path)
+            //{
+            //    if (!Game.Map.Field[tile.X, tile.Y].IsExplored)
+            //    {
+            //        break;
+            //    }
+
+            //    Game.Map.Highlight[tile.X, tile.Y] = RLColor.Red;
+            //}
         }
     }
 }

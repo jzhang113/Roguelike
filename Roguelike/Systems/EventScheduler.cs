@@ -1,7 +1,7 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Commands;
+using Roguelike.Interfaces;
 using Roguelike.Utils;
 using System.Collections.Generic;
-using Roguelike.Commands;
 
 namespace Roguelike.Systems
 {
@@ -63,46 +63,54 @@ namespace Roguelike.Systems
             // Dequeue and execute the handler for each entities in the turn queue until empty
             foreach (ISchedulable current in _eventSet)
             {
-                // Break the event loop when there is no Action.
-                // This should only happen with input handling for the Player's Actions.
                 ICommand action = current.Act();
-                if (action == null)
-                {
-                    System.Diagnostics.Debug.Assert(current is Actors.Player);
+                if (!Execute(current, action))
                     return false;
-                }
+            }
 
-                // Check that the action can succeed before executing it. If there are potential
-                // alternative actions, try them as well.
-                RedirectMessage status = action.Validate();
-                while (!status.Success && status.Alternative != null)
-                {
-                    action = status.Alternative;
-                    status = action.Validate();
-                }
+            return true;
+        }
 
-                // If we still don't succeed, the action is bad and should be cancelled. Otherwise,
-                // we can execute the action which should succeed at this point.
-                if (!status.Success)
+        public static bool Execute(ISchedulable current, ICommand action)
+        {
+            // Break the event loop when there is no Action.
+            // This should only happen with input handling for the Player's Actions.
+            if (action == null)
+            {
+                System.Diagnostics.Debug.Assert(current is Actors.Player);
+                return false;
+            }
+
+            // Check that the action can succeed before executing it. If there are potential
+            // alternative actions, try them as well.
+            RedirectMessage status = action.Validate();
+            while (!status.Success && status.Alternative != null)
+            {
+                action = status.Alternative;
+                status = action.Validate();
+            }
+
+            // If we still don't succeed, the action is bad and should be cancelled. Otherwise,
+            // we can execute the action which should succeed at this point.
+            if (!status.Success)
+            {
+                // Let the Player pick another move. Otherwise, if the AI made an invalid move,
+                // perform a wait action to prevent an infinite loop.
+                if (current is Actors.Player)
                 {
-                    // Let the Player pick another move. Otherwise, if the AI made an invalid move,
-                    // perform a wait action to prevent an infinite loop.
-                    if (current is Actors.Player)
-                    {
-                        Game.MessageHandler.AddMessage("Can't do that.");
-                        return false;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.Assert(false, "monster made invalid move");
-                        current.Energy = 0;
-                    }
+                    Game.MessageHandler.AddMessage("Can't do that.");
+                    return false;
                 }
                 else
                 {
-                    action.Execute();
-                    current.Energy -= action.EnergyCost;
+                    System.Diagnostics.Debug.Assert(false, "monster made invalid move");
+                    current.Energy = 0;
                 }
+            }
+            else
+            {
+                action.Execute();
+                current.Energy -= action.EnergyCost;
             }
 
             return true;

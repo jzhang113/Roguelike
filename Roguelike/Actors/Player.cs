@@ -1,6 +1,5 @@
 ﻿using Roguelike.Commands;
 using Roguelike.Core;
-using Roguelike.Systems;
 using System;
 
 namespace Roguelike.Actors

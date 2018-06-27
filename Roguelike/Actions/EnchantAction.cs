@@ -1,7 +1,7 @@
-﻿using System;
-using Roguelike.Actors;
+﻿using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Items;
+using System;
 
 namespace Roguelike.Actions
 {

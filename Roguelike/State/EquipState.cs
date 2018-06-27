@@ -1,46 +1,23 @@
-﻿using RLNET;
+﻿using System;
+using RLNET;
 using Roguelike.Commands;
-using System;
+using Roguelike.Utils;
 
 namespace Roguelike.State
 {
-    class EquipState : IState
+    class EquipState : ModalState
     {
-        private static Lazy<EquipState> _instance = new Lazy<EquipState>(() => new EquipState());
+        private static readonly Lazy<EquipState> _instance = new Lazy<EquipState>(() => new EquipState());
         public static EquipState Instance => _instance.Value;
 
         private EquipState()
         {
         }
 
-        public void Cleanup()
+        public override ICommand HandleKeyInput(RLKeyPress keyPress)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public void Draw()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public ICommand HandleMouseInput(RLMouse mouse)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Initialize()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Update()
-        {
-            throw new System.NotImplementedException();
+            char keyChar = keyPress.Key.ToChar();
+            return new EquipCommand(Game.Player, keyChar);
         }
     }
 }

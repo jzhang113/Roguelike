@@ -1,10 +1,11 @@
-﻿using Roguelike.Actors;
+﻿using Roguelike.Actions;
+using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
+using Roguelike.State;
 using Roguelike.Systems;
 using System.Collections.Generic;
-using Roguelike.Actions;
 
 namespace Roguelike.Commands
 {
@@ -48,8 +49,7 @@ namespace Roguelike.Commands
                     }
                     else
                     {
-                        // TODO
-                        //StateHandler.BeginTargetting(this, Source, action);
+                        Game.StateHandler.PushState(new TargettingState(this, Source, action));
                         return new RedirectMessage(false);
                     }
                 }

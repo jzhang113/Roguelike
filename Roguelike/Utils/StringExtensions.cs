@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Roguelike
+namespace Roguelike.Utils
 {
     static class StringExtensions
     {

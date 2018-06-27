@@ -1,5 +1,6 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Items;
+using Roguelike.State;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands
@@ -50,8 +51,7 @@ namespace Roguelike.Commands
 
             if (Input == null)
             {
-                // TODO
-                //StateHandler.BeginTextInput(this);
+                Game.StateHandler.PushState(new TextInputState(this));
                 return new RedirectMessage(false);
             }
 

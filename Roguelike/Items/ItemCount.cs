@@ -1,4 +1,6 @@
-﻿namespace Roguelike.Items
+﻿using Roguelike.Utils;
+
+namespace Roguelike.Items
 {
     public class ItemCount
     {

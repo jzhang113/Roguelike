@@ -1,13 +1,13 @@
 ﻿using RLNET;
-using Roguelike.Core;
-using Roguelike.Systems;
-using System.IO;
-using System;
 using Roguelike.Actors;
-using Roguelike.Utils;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.ComponentModel;
+using Roguelike.Core;
 using Roguelike.State;
+using Roguelike.Systems;
+using Roguelike.Utils;
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Roguelike
 {
@@ -30,12 +30,13 @@ namespace Roguelike
 
         public static MapHandler Map => World.Map;
 
-        public static RLRootConsole _rootConsole;
-        public static RLConsole _mapConsole;
-        public static RLConsole _messageConsole;
-        public static RLConsole _statConsole;
-        public static RLConsole _inventoryConsole;
-        public static RLConsole _viewConsole;
+        public static RLRootConsole RootConsole { get; private set; }
+        public static RLConsole MapConsole { get; private set; }
+        public static RLConsole InventoryConsole { get; private set; }
+
+        private static RLConsole _messageConsole;
+        private static RLConsole _statConsole;
+        private static RLConsole _viewConsole;
 
         private static bool _render = true;
 
@@ -46,25 +47,25 @@ namespace Roguelike
 
             string consoleTitle = "Roguelike";
 
-            _rootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
-            _mapConsole = new RLConsole(Config.MapView.Width, Config.MapView.Height);
+            RootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
+            MapConsole = new RLConsole(Config.MapView.Width, Config.MapView.Height);
+            InventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
             _messageConsole = new RLConsole(Config.MessageView.Width, Config.MessageView.Height);
             _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
-            _inventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
 
-            StateHandler = new StateHandler(_rootConsole);
+            StateHandler = new StateHandler(RootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(20);
             World = Option.FixedSeed
                 ? new WorldHandler(Option.Seed)
                 : new WorldHandler();
 
-            _rootConsole.Update += RootConsoleUpdate;
-            _rootConsole.Render += RootConsoleRender;
-            _rootConsole.OnLoad += StartGame;
-            _rootConsole.OnClosing += SaveGame;
-            _rootConsole.Run();
+            RootConsole.Update += RootConsoleUpdate;
+            RootConsole.Render += RootConsoleRender;
+            RootConsole.OnLoad += StartGame;
+            RootConsole.OnClosing += SaveGame;
+            RootConsole.Run();
         }
 
         public static void NewGame()
@@ -83,6 +84,7 @@ namespace Roguelike
                 : new WorldHandler();
 
             World.ChangeLevel("main_1");
+            ForceRender();
         }
 
         private static void SaveGame(object sender, CancelEventArgs e)
@@ -135,7 +137,7 @@ namespace Roguelike
 
         internal static void Exit()
         {
-            _rootConsole.Close();
+            RootConsole.Close();
         }
 
         internal static void ForceRender()
@@ -150,29 +152,32 @@ namespace Roguelike
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
+            if (_render)
+            {
+                Map.ClearHighlight();
+                MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
+                Map.Draw(MapConsole);
+                RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.MessageView.Height);
+            }
+
+            if (MessageHandler.Redraw || _render)
+            {
+                _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
+                MessageHandler.Draw(_messageConsole);
+                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, RootConsole, 0, 0);
+
+                _render = false;
+            }
+
+            _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
+            RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, RootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
+
+            _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
+            LookHandler.Draw(_viewConsole);
+            RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.Map.Width, 0);
+
             StateHandler.Draw();
-
-            //if (ShowOverlay)
-            //{
-            //    OverlayHandler.Draw(_mapConsole);
-            //    RLConsole.Blit(_mapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, _rootConsole, 0, Config.MessageView.Height);
-            //}
-
-            //if (ShowModal)
-            //{
-            //    _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
-            //    Player.Inventory.Draw(_inventoryConsole);
-            //    RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
-            //}
-
-            //if (ShowEquipment)
-            //{
-            //    _inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
-            //    Player.Equipment.Draw(_inventoryConsole);
-            //    RLConsole.Blit(_inventoryConsole, 0, 0, Config.InventoryView.Width, Config.InventoryView.Height, _rootConsole, Config.Map.Width - 10, 0);
-            //}
-
-            _rootConsole.Draw();
+            RootConsole.Draw();
         }
     }
 }

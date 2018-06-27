@@ -3,6 +3,7 @@ using Roguelike.Core;
 using Roguelike.Systems;
 using System.Collections.Generic;
 using Roguelike.Actions;
+using Roguelike.State;
 
 namespace Roguelike.Commands
 {
@@ -39,8 +40,7 @@ namespace Roguelike.Commands
                     }
                     else
                     {
-                        // TODO
-                        //StateHandler.BeginTargetting(this, Source, _action);
+                        Game.StateHandler.PushState(new TargettingState(this, Source, _action));
                         return new RedirectMessage(false);
                     }
                 }

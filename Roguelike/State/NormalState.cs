@@ -1,16 +1,16 @@
-﻿using System;
-using RLNET;
+﻿using RLNET;
 using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Systems;
+using System;
 
 namespace Roguelike.State
 {
     class NormalState : IState
     {
-        private static Lazy<NormalState> _instance = new Lazy<NormalState>(() => new NormalState());
+        private static readonly Lazy<NormalState> _instance = new Lazy<NormalState>(() => new NormalState());
         public static NormalState Instance => _instance.Value;
 
         private bool _render;
@@ -40,7 +40,8 @@ namespace Roguelike.State
                 : ResolveInput(keyPress, player);
         }
 
-        private ICommand ResolveInput(RLKeyPress keyPress, Player player)
+        // ReSharper disable once CyclomaticComplexity
+        private static ICommand ResolveInput(RLKeyPress keyPress, Actor player)
         {
             switch (keyPress.Key)
             {
@@ -115,7 +116,8 @@ namespace Roguelike.State
             }
         }
 
-        private ICommand ResolveAttackInput(RLKeyPress keyPress, Player player, IAction ability)
+        // ReSharper disable once CyclomaticComplexity
+        private static ICommand ResolveAttackInput(RLKeyPress keyPress, Actor player, IAction ability)
         {
             switch (keyPress.Key)
             {
@@ -157,13 +159,48 @@ namespace Roguelike.State
 
         public ICommand HandleMouseInput(RLMouse mouse)
         {
-            // TODO
-            return null;
-        }
+            //    map.ClearHighlight();
+            //    Terrain current = map.Field[mousePos.X, mousePos.Y];
 
-        public void Cleanup()
-        {
-            throw new NotImplementedException();
+            //        // TODO: Path may end up broken because an enemy is in the way.
+            //        IEnumerable<WeightedPoint> path = map.GetPathToPlayer(mousePos.X, mousePos.Y).Reverse();
+            //        bool exploredPathExists = false;
+
+            //        foreach (WeightedPoint p in path)
+            //        {
+            //            if (!exploredPathExists)
+            //                exploredPathExists = true;
+
+            //            if (!map.Field[p.X, p.Y].IsExplored)
+            //            {
+            //                exploredPathExists = false;
+            //                break;
+            //            }
+
+            //            map.Highlight[p.X, p.Y] = RLColor.Red;
+            //        }
+
+            //        if (current.IsWalkable && exploredPathExists)
+            //            map.Highlight[mousePos.X, mousePos.Y] = RLColor.Red;
+            //    
+
+            //    //if (_console.Mouse.GetLeftClick())
+            //    //{
+            //    //    List<IAction> moves = new List<IAction>();
+
+            //    //    foreach (WeightedPoint p in path)
+            //    //        moves.Add(new MoveAction(new TargetZone(TargetShape.Range, (p.X, p.Y))));
+
+            //    //    return new AttackCommand(player, new ActionSequence(100, moves));
+            //    //}
+            //    if (map.TryGetActor(mousePos.X, mousePos.Y, out Actor displayActor))
+            //        LookHandler.DisplayActor(displayActor);
+
+            //    if (map.TryGetItem(mousePos.X, mousePos.Y, out ItemCount displayItem))
+            //        LookHandler.DisplayItem(displayItem);
+
+            //    LookHandler.DisplayTerrain(map.Field[mousePos.X, mousePos.Y]);
+            return null;
         }
 
         public void Update()
@@ -176,34 +213,15 @@ namespace Roguelike.State
 
         public void Draw()
         {
-            if (Game.MessageHandler.Redraw || _render)
-            {
-                Game._messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
-                Game.MessageHandler.Draw(Game._messageConsole);
-                RLConsole.Blit(Game._messageConsole, 0, 0, Game.Config.MessageView.Width, Game.Config.MessageView.Height, Game._rootConsole, 0, 0);
-            }
+            if (!_render)
+                return;
 
-            if (_render)
-            {
-                Game.Map.ClearHighlight();
+            Game.Map.ClearHighlight();
+            Game.MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
+            Game.Map.Draw(Game.MapConsole);
+            RLConsole.Blit(Game.MapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game.RootConsole, 0, Game.Config.MessageView.Height);
 
-                Game._statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
-                RLConsole.Blit(Game._statConsole, 0, 0, Game.Config.StatView.Width, Game.Config.StatView.Height, Game._rootConsole, 0, Game.Config.MessageView.Height + Game.Config.MapView.Height);
-
-                _render = false;
-            }
-
-            Game._mapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
-            Game.Map.Draw(Game._mapConsole);
-
-            //if (GameState == Enums.Mode.Targetting)
-            //    _mapConsole.Print(1, 1, "targetting mode", Colors.TextHeading);
-
-            Game._viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
-            LookHandler.Draw(Game._viewConsole);
-
-            RLConsole.Blit(Game._mapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game._rootConsole, 0, Game.Config.MessageView.Height);
-            RLConsole.Blit(Game._viewConsole, 0, 0, Game.Config.ViewWindow.Width, Game.Config.ViewWindow.Height, Game._rootConsole, Game.Config.Map.Width, 0);
+            _render = false;
         }
     }
 }
