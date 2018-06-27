@@ -1,11 +1,12 @@
 ﻿using RLNET;
 using Roguelike.Commands;
+using Roguelike.Items;
 using Roguelike.Utils;
 using System;
 
 namespace Roguelike.State
 {
-    class InventoryState : ModalState
+    class InventoryState : ItemActionState
     {
         private static readonly Lazy<InventoryState> _instance = new Lazy<InventoryState>(() => new InventoryState());
         public static InventoryState Instance => _instance.Value;
@@ -30,6 +31,11 @@ namespace Roguelike.State
 
             // TODO
             return null;
+        }
+
+        protected override ICommand ResolveInput(ItemCount itemCount)
+        {
+            throw new NotImplementedException();
         }
     }
 }

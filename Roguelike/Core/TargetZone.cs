@@ -6,14 +6,14 @@ using Roguelike.Enums;
 namespace Roguelike.Core
 {
     [Serializable]
-    public struct TargetZone
+    public class TargetZone
     {
         public TargetShape Shape { get; }
-        public float Range { get; }
+        public double Range { get; }
         public bool Aimed { get; }
         public (int X, int Y)? Target { get; }
 
-        public TargetZone(TargetShape shape, (int X, int Y)? target = null, float range = 1.5f)
+        public TargetZone(TargetShape shape, (int X, int Y)? target = null, double range = 1.5)
         {
             Shape = shape;
             Range = range;

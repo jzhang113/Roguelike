@@ -8,7 +8,7 @@ namespace Roguelike.Commands
     class PickupCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 60;
+        public int EnergyCost { get; } = Utils.Constants.HALF_TURN;
 
         private readonly InventoryHandler _itemStack;
 

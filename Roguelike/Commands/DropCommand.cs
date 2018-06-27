@@ -11,14 +11,13 @@ namespace Roguelike.Commands
         public int EnergyCost { get; } = 0;
         public string Input { get; set; }
 
-        private readonly char _key;
-        private ItemCount _itemCount;
+        private readonly ItemCount _itemCount;
         private int _dropAmount;
 
-        public DropCommand(Actor source, char key, string amount = null)
+        public DropCommand(Actor source, ItemCount itemCount, string amount = null)
         {
             Source = source;
-            _key = key;
+            _itemCount = itemCount;
 
             if (int.TryParse(amount, out int dropAmount))
             {
@@ -33,13 +32,6 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
-            if (!Source.Inventory.TryGetKey(_key, out _itemCount))
-            {
-                Game.MessageHandler.AddMessage("No such item to drop.");
-                return new RedirectMessage(false);
-            }
-
-            System.Diagnostics.Debug.Assert(_itemCount.Count > 0);
             if (_itemCount.Count == 1)
             {
                 _dropAmount = 1;

@@ -1,50 +1,31 @@
-﻿using Roguelike.Interfaces;
-using Roguelike.Actors;
+﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using Roguelike.Systems;
-using Roguelike.Items;
 
 namespace Roguelike.Commands
 {
     class EquipCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 120;
+        public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
 
-        private readonly char _key;
-        private ItemCount _itemCount;
+        private readonly IEquipable _equipableItem;
 
-        public EquipCommand(Actor source, char key)
+        public EquipCommand(Actor source, IEquipable item)
         {
             Source = source;
-            _key = key;
+
+            _equipableItem = item;
         }
 
         public RedirectMessage Validate()
         {
-            if (!Source.Inventory.TryGetKey(_key, out _itemCount))
-            {
-                Game.MessageHandler.AddMessage("No such item to equip.");
-                return new RedirectMessage(false);
-            }
-
-            if (_itemCount.Item is IEquipable)
-            {
-                return new RedirectMessage(true);
-            }
-            else
-            {
-                Game.MessageHandler.AddMessage($"Cannot equip {_itemCount.Item.Name}.");
-                return new RedirectMessage(false);
-            }
+            return new RedirectMessage(true);
         }
 
         public void Execute()
         {
-            System.Diagnostics.Debug.Assert(_itemCount?.Item != null);
-
-            ItemCount itemCount = Source.Inventory.Split(new ItemCount {Item = _itemCount.Item, Count = 1});
-            IEquipable equipable = (IEquipable)itemCount.Item;
-            equipable.Equip(Source);
+            _equipableItem.Equip(Source);
         }
     }
 }

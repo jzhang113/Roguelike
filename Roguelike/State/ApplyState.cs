@@ -1,11 +1,11 @@
-﻿using RLNET;
-using Roguelike.Commands;
-using Roguelike.Utils;
+﻿using Roguelike.Commands;
+using Roguelike.Interfaces;
+using Roguelike.Items;
 using System;
 
 namespace Roguelike.State
 {
-    class ApplyState : ModalState
+    class ApplyState : ItemActionState
     {
         private static readonly Lazy<ApplyState> _instance = new Lazy<ApplyState>(() => new ApplyState());
         public static ApplyState Instance => _instance.Value;
@@ -14,10 +14,17 @@ namespace Roguelike.State
         {
         }
 
-        public override ICommand HandleKeyInput(RLKeyPress keyPress)
+        protected override ICommand ResolveInput(ItemCount itemCount)
         {
-            char keyChar = keyPress.Key.ToChar();
-            return new ApplyCommand(Game.Player, keyChar);
+            ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
+            IUsable usableItem = splitCount.Item as IUsable;
+            if (usableItem == null)
+            {
+                Game.MessageHandler.AddMessage($"Don't know how to apply {itemCount.Item.Name}.");
+                return null;
+            }
+
+            return new ApplyCommand(Game.Player, usableItem);
         }
     }
 }

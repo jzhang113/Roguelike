@@ -8,7 +8,7 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
 
-        private string _newLevel;
+        private readonly string _newLevel;
 
         public ChangeLevelCommand(Actor actor, string newLevel)
         {

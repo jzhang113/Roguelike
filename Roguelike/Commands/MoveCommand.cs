@@ -8,7 +8,7 @@ namespace Roguelike.Commands
     class MoveCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 120;
+        public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
 
         private readonly int _newX;
         private readonly int _newY;

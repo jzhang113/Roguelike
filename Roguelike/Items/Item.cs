@@ -65,14 +65,14 @@ namespace Roguelike.Items
             Game.MessageHandler.AddMessage("That would be unhealthy.");
         }
 
-        public virtual void Attack()
+        public virtual IAction Attack(Actor target)
         {
-            throw new NotImplementedException();
+            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, (target.X, target.Y), Parameters.MeleeRange));
         }
 
-        public virtual void Throw()
+        public virtual IAction Throw(Actor target)
         {
-            throw new NotImplementedException();
+            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, (target.X, target.Y), Parameters.ThrowRange));
         }
 
         public virtual Item DeepClone()

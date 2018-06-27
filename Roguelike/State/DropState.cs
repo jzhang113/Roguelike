@@ -1,11 +1,10 @@
-﻿using RLNET;
-using Roguelike.Commands;
-using Roguelike.Utils;
+﻿using Roguelike.Commands;
+using Roguelike.Items;
 using System;
 
 namespace Roguelike.State
 {
-    class DropState : ModalState
+    class DropState : ItemActionState
     {
         private static readonly Lazy<DropState> _instance = new Lazy<DropState>(() => new DropState());
         public static DropState Instance => _instance.Value;
@@ -14,10 +13,9 @@ namespace Roguelike.State
         {
         }
 
-        public override ICommand HandleKeyInput(RLKeyPress keyPress)
+        protected override ICommand ResolveInput(ItemCount itemCount)
         {
-            char keyChar = keyPress.Key.ToChar();
-            return new DropCommand(Game.Player, keyChar);
+            return new DropCommand(Game.Player, itemCount);
         }
     }
 }

@@ -1,27 +1,33 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Interfaces;
 using Roguelike.Systems;
-using System;
 
 namespace Roguelike.Commands
 {
     class UnequipCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 120;
+        public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
 
-        public UnequipCommand(Actor source, char key)
+        private readonly IEquipable _equipableItem;
+
+        public UnequipCommand(Actor source, IEquipable item)
         {
             Source = source;
+            _equipableItem = item;
         }
 
         public RedirectMessage Validate()
         {
-            throw new NotImplementedException();
+            // TODO: check item is equipped
+            // if (Source.Equipment)
+
+            return new RedirectMessage(true);
         }
 
         public void Execute()
         {
-            throw new NotImplementedException();
+            _equipableItem.Unequip(Source);
         }
     }
 }

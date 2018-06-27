@@ -37,7 +37,7 @@ namespace Roguelike.State
                 return null;
 
             int distance = Utils.Distance.EuclideanDistanceSquared(_targetSource.X, _targetSource.Y, click.X, click.Y);
-            float maxRange = _targetAction.Area.Range * _targetAction.Area.Range;
+            double maxRange = _targetAction.Area.Range * _targetAction.Area.Range;
 
             if (distance > maxRange)
             {

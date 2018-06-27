@@ -2,21 +2,34 @@
 using Roguelike.Commands;
 using Roguelike.Systems;
 using Roguelike.Core;
+using Roguelike.Utils;
+using Roguelike.Items;
 
 namespace Roguelike.State
 {
-    class ModalState : IState
+    abstract class ItemActionState : IState
     {
         public virtual ICommand HandleKeyInput(RLKeyPress keyPress)
         {
-            return null;
+            char keyChar = keyPress.Key.ToChar();
+            if (!Game.Player.Inventory.TryGetKey(keyChar, out ItemCount itemCount))
+            {
+                Game.MessageHandler.AddMessage("No such item.");
+                return null;
+            }
+
+            System.Diagnostics.Debug.Assert(itemCount.Item != null);
+            System.Diagnostics.Debug.Assert(itemCount.Count > 0);
+            return ResolveInput(itemCount);
         }
 
         public virtual ICommand HandleMouseInput(RLMouse mouse)
         {
-            // TODO
+            // TODO do stuff and get the item selected
             return null;
         }
+
+        protected abstract ICommand ResolveInput(ItemCount itemCount);
 
         public virtual void Update()
         {
