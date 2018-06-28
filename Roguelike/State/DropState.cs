@@ -18,16 +18,14 @@ namespace Roguelike.State
             if (itemCount.Count == 1)
                 return new DropCommand(Game.Player, itemCount, 1);
 
-            TextInputState inputState = new TextInputState();
-            inputState.Submit += (sender, args) =>
+            Game.StateHandler.PushState(new TextInputState(input =>
             {
-                if (int.TryParse(args.Input, out int dropAmount) && dropAmount > 0)
+                if (int.TryParse(input, out int dropAmount) && dropAmount > 0)
                     return new DropCommand(Game.Player, itemCount, dropAmount);
 
-                Game.MessageHandler.AddMessage($"Unknown amount: {args.Input}");
+                Game.MessageHandler.AddMessage($"Unknown amount: {input}");
                 return null;
-            };
-            Game.StateHandler.PushState(inputState);
+            }));
             return null;
         }
     }

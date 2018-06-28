@@ -13,11 +13,13 @@ namespace Roguelike.State
     {
         private readonly Actor _targetSource;
         private readonly IAction _targetAction;
+        private readonly Func<IEnumerable<Terrain>, ICommand> _createCommand;
 
-        public TargettingState(Actor source, IAction action)
+        public TargettingState(Actor source, IAction action, Func<IEnumerable<Terrain>, ICommand> func)
         {
             _targetSource = source;
             _targetAction = action;
+            _createCommand = func;
 
             OverlayHandler.DisplayText = "targetting mode";
         }
@@ -48,7 +50,7 @@ namespace Roguelike.State
             }
 
             IEnumerable<Terrain> targets = _targetAction.Area.GetTilesInRange(_targetSource, click);
-            return OnSubmit(new TargettingEventArgs(targets));
+            return _createCommand(targets);
         }
 
         public void Update()
@@ -77,23 +79,6 @@ namespace Roguelike.State
 
             //    Game.Map.Highlight[tile.X, tile.Y] = RLColor.Red;
             //}
-        }
-
-        public event CommandEventHandler<TargettingEventArgs> Submit;
-
-        protected virtual ICommand OnSubmit(TargettingEventArgs e)
-        {
-            return Submit?.Invoke(this, e);
-        }
-
-        public class TargettingEventArgs : EventArgs
-        {
-            public IEnumerable<Terrain> Target { get; }
-
-            public TargettingEventArgs(IEnumerable<Terrain> target)
-            {
-                Target = target;
-            }
         }
     }
 }

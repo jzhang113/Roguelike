@@ -12,15 +12,32 @@ namespace Roguelike.Commands
         public int EnergyCost { get; }
 
         private readonly IAction _action;
-        private readonly IEnumerable<Terrain> _target;
+        private readonly bool _singleTarget;
+        private readonly Terrain _target;
+        private readonly IEnumerable<Terrain> _targets;
 
         public ActionCommand(Actor source, IAction action, IEnumerable<Terrain> targets)
         {
+            System.Diagnostics.Debug.Assert(action != null);
+
             Source = source;
             EnergyCost = action.Speed;
 
             _action = action;
-            _target = targets;
+            _singleTarget = false;
+            _targets = targets;
+        }
+
+        public ActionCommand(Actor source, IAction action, Terrain target)
+        {
+            System.Diagnostics.Debug.Assert(action != null);
+
+            Source = source;
+            EnergyCost = action.Speed;
+
+            _action = action;
+            _singleTarget = true;
+            _target = target;
         }
 
         public RedirectMessage Validate()
@@ -30,9 +47,16 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            foreach (Terrain tile in _target)
+            if (_singleTarget)
             {
-                _action.Activate(Source, tile);
+                _action.Activate(Source, _target);
+            }
+            else
+            {
+                foreach (Terrain tile in _targets)
+                {
+                    _action.Activate(Source, tile);
+                }
             }
         }
     }

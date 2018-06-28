@@ -10,10 +10,12 @@ namespace Roguelike.State
     class TextInputState : IState
     {
         private readonly StringBuilder _inputBuffer;
+        private readonly Func<string, ICommand> _createCommand;
 
-        public TextInputState()
+        public TextInputState(Func<string, ICommand> func)
         {
             _inputBuffer = new StringBuilder();
+            _createCommand = func;
 
             OverlayHandler.DisplayText = "Drop how many?";
         }
@@ -27,7 +29,7 @@ namespace Roguelike.State
                     break;
                 case RLKey.Enter:
                 case RLKey.KeypadEnter:
-                    return OnSubmit(new InputEventArgs(_inputBuffer.ToString()));
+                    return _createCommand(_inputBuffer.ToString());
                 default:
                     _inputBuffer.Append(keyPress.Key.ToChar());
                     break;
@@ -57,23 +59,6 @@ namespace Roguelike.State
         {
             OverlayHandler.Draw(Game.MapConsole);
             RLConsole.Blit(Game.MapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game.RootConsole, 0, Game.Config.MessageView.Height);
-        }
-
-        public event CommandEventHandler<InputEventArgs> Submit;
-
-        protected virtual ICommand OnSubmit(InputEventArgs e)
-        {
-            return Submit?.Invoke(this, e);
-        }
-
-        public class InputEventArgs : EventArgs
-        {
-            public string Input { get; }
-
-            public InputEventArgs(string text)
-            {
-                Input = text;
-            }
         }
     }
 }

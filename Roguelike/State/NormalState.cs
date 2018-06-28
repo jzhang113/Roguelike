@@ -124,34 +124,34 @@ namespace Roguelike.State
                 case RLKey.Left:
                 case RLKey.Keypad4:
                 case RLKey.H:
-                    return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.W.X, player.Y]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.W.X, player.Y]);
                 case RLKey.Down:
                 case RLKey.Keypad2:
                 case RLKey.J:
-                    return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.Y]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.Y]);
                 case RLKey.Up:
                 case RLKey.Keypad8:
                 case RLKey.K:
-                    return new AttackCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.Y]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.Y]);
                 case RLKey.Right:
                 case RLKey.Keypad6:
                 case RLKey.L:
-                    return new AttackCommand(player, ability, Game.Map.Field[player.X + Direction.E.X, player.Y]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.E.X, player.Y]);
                 case RLKey.Keypad7:
                 case RLKey.Y:
-                    return new AttackCommand(player, ability,
+                    return new ActionCommand(player, ability,
                         Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y]);
                 case RLKey.Keypad9:
                 case RLKey.U:
-                    return new AttackCommand(player, ability,
+                    return new ActionCommand(player, ability,
                         Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y]);
                 case RLKey.Keypad1:
                 case RLKey.B:
-                    return new AttackCommand(player, ability,
+                    return new ActionCommand(player, ability,
                         Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y]);
                 case RLKey.Keypad3:
                 case RLKey.N:
-                    return new AttackCommand(player, ability,
+                    return new ActionCommand(player, ability,
                         Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y]);
                 default: return null;
             }

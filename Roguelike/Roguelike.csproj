@@ -113,7 +113,6 @@
     <Compile Include="Commands\ThrowCommand.cs" />
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
-    <Compile Include="Commands\AttackCommand.cs" />
     <Compile Include="Core\Stair.cs" />
     <Compile Include="Items\ItemCount.cs" />
     <Compile Include="Items\ItemParameters.cs" />
@@ -176,7 +175,6 @@
     <Compile Include="Core\Configuration.cs" />
     <Compile Include="Utils\MaxHeap.cs" />
     <Compile Include="Core\WeightedPoint.cs" />
-    <Compile Include="Systems\TargetHandler.cs" />
     <Compile Include="Utils\Constants.cs" />
     <Compile Include="Utils\Distance.cs" />
     <Compile Include="Enums\Enums.cs" />

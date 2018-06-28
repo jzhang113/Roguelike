@@ -13,6 +13,8 @@ namespace Roguelike.Core
         public bool Aimed { get; }
         public (int X, int Y)? Target { get; }
 
+        public bool InputRequired => Aimed && Target == null;
+
         public TargetZone(TargetShape shape, (int X, int Y)? target = null, double range = 1.5)
         {
             Shape = shape;

@@ -1,6 +1,8 @@
-﻿using Roguelike.Actors;
+﻿using Roguelike.Actions;
+using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Systems;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Roguelike.Commands
@@ -54,8 +56,11 @@ namespace Roguelike.Commands
             {
                 if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
-                else
-                    return new RedirectMessage(false, new AttackCommand(Source, Source.Equipment.PrimaryWeapon.GetBasicAttack(_tile.X, _tile.Y)));
+
+                IAction attack = Source.Equipment.PrimaryWeapon.GetBasicAttack(_tile.X, _tile.Y);
+                // should be safe to ask for tiles since we just supplied a target
+                IEnumerable<Terrain> targets = attack.Area.GetTilesInRange(Source);
+                return new RedirectMessage(false, new ActionCommand(Source, attack, targets));
             }
 
             return new RedirectMessage(true);

@@ -3,8 +3,6 @@ using Roguelike.Commands;
 
 namespace Roguelike.State
 {
-    public delegate ICommand CommandEventHandler<TEventArgs>(object sender, TEventArgs e);
-
     interface IState
     {
         // Handle keyboard inputs.
