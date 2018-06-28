@@ -1,11 +1,10 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Items;
-using Roguelike.State;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands
 {
-    class DropCommand : IInputCommand
+    class DropCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
@@ -14,44 +13,17 @@ namespace Roguelike.Commands
         private readonly ItemCount _itemCount;
         private int _dropAmount;
 
-        public DropCommand(Actor source, ItemCount itemCount, string amount = null)
+        public DropCommand(Actor source, ItemCount itemCount, int dropAmount)
         {
             Source = source;
-            _itemCount = itemCount;
 
-            if (int.TryParse(amount, out int dropAmount))
-            {
-                Input = amount;
-                _dropAmount = dropAmount;
-            }
-            else
-            {
-                Input = null;
-            }
+            _itemCount = itemCount;
+            _dropAmount = dropAmount;
         }
 
         public RedirectMessage Validate()
         {
-            if (_itemCount.Count == 1)
-            {
-                _dropAmount = 1;
-                return new RedirectMessage(true);
-            }
-
-            if (_dropAmount > 0)
-                return new RedirectMessage(true);
-
-            if (Input == null)
-            {
-                Game.StateHandler.PushState(new TextInputState(this));
-                return new RedirectMessage(false);
-            }
-
-            if (int.TryParse(Input, out _dropAmount) && _dropAmount > 0)
-                return new RedirectMessage(true);
-
-            Game.MessageHandler.AddMessage($"Unknown amount: {Input}");
-            return new RedirectMessage(false);
+            return new RedirectMessage(true);
         }
 
         public void Execute()

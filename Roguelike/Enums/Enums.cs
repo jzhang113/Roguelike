@@ -7,7 +7,5 @@ namespace Roguelike.Enums
 
     internal enum MessageLevel { Minimal, Normal, Verbose }
 
-    internal enum Mode { Normal, Inventory, Drop, Equip, Unequip, Apply, Targetting, TextInput, InvMenu, SubInv };
-
     public enum TargetShape { Area, Directional, Range, Ray, Self }
 }

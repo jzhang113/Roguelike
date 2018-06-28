@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.State
 {
-    class TargettingState : IState
+    class TargettingState: IState
     {
         private readonly Actor _targetSource;
         private readonly IAction _targetAction;
@@ -48,7 +48,7 @@ namespace Roguelike.State
             }
 
             IEnumerable<Terrain> targets = _targetAction.Area.GetTilesInRange(_targetSource, click);
-            return new ActionCommand(_targetSource, _targetAction, targets);
+            return OnSubmit(new TargettingEventArgs(targets));
         }
 
         public void Update()
@@ -59,10 +59,7 @@ namespace Roguelike.State
                 return;
 
             if (EventScheduler.Execute(Game.Player, command))
-            {
-                OnComplete(EventArgs.Empty);
                 Game.StateHandler.PopState();
-            }
         }
 
         public void Draw()
@@ -82,11 +79,21 @@ namespace Roguelike.State
             //}
         }
 
-        public event EventHandler Complete;
+        public event CommandEventHandler<TargettingEventArgs> Submit;
 
-        protected virtual void OnComplete(EventArgs e)
+        protected virtual ICommand OnSubmit(TargettingEventArgs e)
         {
-            Complete?.Invoke(this, e);
+            return Submit?.Invoke(this, e);
+        }
+
+        public class TargettingEventArgs : EventArgs
+        {
+            public IEnumerable<Terrain> Target { get; }
+
+            public TargettingEventArgs(IEnumerable<Terrain> target)
+            {
+                Target = target;
+            }
         }
     }
 }

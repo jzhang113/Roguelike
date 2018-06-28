@@ -3,14 +3,10 @@ using Roguelike.Commands;
 
 namespace Roguelike.State
 {
+    public delegate ICommand CommandEventHandler<TEventArgs>(object sender, TEventArgs e);
+
     interface IState
     {
-        // Perform any setup needed.
-        // void Initialize();
-
-        // Perform any cleanup needed.
-        // void Cleanup();
-
         // Handle keyboard inputs.
         ICommand HandleKeyInput(RLKeyPress keyPress);
 

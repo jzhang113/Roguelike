@@ -27,8 +27,11 @@ namespace Roguelike.State
                     if (action.Area.Target == null)
                     {
                         TargettingState state = new TargettingState(Game.Player, action);
-                        state.Complete += (sender, args) =>
-                            Game.Player.Inventory.Split(new ItemCount {Item = itemCount.Item, Count = 1});
+                        state.Submit += (sender, args) =>
+                        {
+                            Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
+                            return new ApplyCommand(Game.Player, usableItem, args.Target);
+                        };
                         Game.StateHandler.PushState(state);
                         return null;
                     }

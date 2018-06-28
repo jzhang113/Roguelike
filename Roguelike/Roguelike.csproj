@@ -108,7 +108,6 @@
     <Compile Include="Commands\ChangeLevelCommand.cs" />
     <Compile Include="Commands\DropCommand.cs" />
     <Compile Include="Commands\EquipCommand.cs" />
-    <Compile Include="Commands\IInputCommand.cs" />
     <Compile Include="Commands\WaitCommand.cs" />
     <Compile Include="Commands\PickupCommand.cs" />
     <Compile Include="Commands\ThrowCommand.cs" />
