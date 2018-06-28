@@ -174,7 +174,7 @@ namespace Roguelike
 
             _viewConsole.Clear(0, Swatch.DbWood, Colors.TextHeading);
             LookHandler.Draw(_viewConsole);
-            RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.Map.Width, 0);
+            RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.MapView.Width, 0);
 
             StateHandler.Draw();
             RootConsole.Draw();

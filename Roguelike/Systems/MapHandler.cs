@@ -227,22 +227,6 @@ namespace Roguelike.Systems
             return true;
         }
 
-        // Permanently remove items from the map.
-        public bool DestroyItem(ItemCount itemCount)
-        {
-            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
-            if (!Items.TryGetValue(index, out InventoryHandler stack))
-                return false;
-
-            if (!stack.Contains(itemCount))
-                return false;
-
-            stack.Destroy(itemCount);
-            if (!stack.Any())
-                Items.Remove(index);
-            return true;
-        }
-
         // Take only part of a stack from the map.
         public ItemCount SplitItem(ItemCount itemCount)
         {

@@ -67,31 +67,7 @@ namespace Roguelike.Systems
             return false;
         }
 
-        // Permanently remove Items from the world. If the Item is still needed later, use Split.
-        public bool Destroy(ItemCount itemCount)
-        {
-            if (itemCount?.Item == null)
-                return false;
-
-            foreach (ItemStack itemStack in _inventory)
-            {
-                if (itemStack.Contains(itemCount.Item, out Item key))
-                {
-                    itemStack.Split(key, itemCount.Count);
-
-                    if (itemStack.IsEmpty())
-                        _inventory.Remove(itemStack);
-
-                    return true;
-                }
-            }
-
-            Game.MessageHandler.AddMessage($"{itemCount.Item.Name} not found, can't remove it", Enums.MessageLevel.Verbose);
-            System.Diagnostics.Debug.Assert(false, $"Cannot remove non-existant item, {itemCount.Item.Name}, from inventory");
-            return false;
-        }
-
-        // Similar to Remove, but returns a new ItemCount containing the split amount.
+        // Returns a new ItemCount containing the split amount.
         public ItemCount Split(ItemCount itemCount)
         {
             System.Diagnostics.Debug.Assert(itemCount?.Item != null);

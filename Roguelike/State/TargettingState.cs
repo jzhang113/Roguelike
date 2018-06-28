@@ -4,20 +4,22 @@ using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Systems;
+using System;
+using System.Collections.Generic;
 
 namespace Roguelike.State
 {
     class TargettingState : IState
     {
-        private readonly ITargetCommand _targetCommand;
         private readonly Actor _targetSource;
         private readonly IAction _targetAction;
 
-        public TargettingState(ITargetCommand command, Actor source, IAction action)
+        public TargettingState(Actor source, IAction action)
         {
-            _targetCommand = command;
             _targetSource = source;
             _targetAction = action;
+
+            OverlayHandler.DisplayText = "targetting mode";
         }
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)
@@ -45,8 +47,8 @@ namespace Roguelike.State
                 return null;
             }
 
-            _targetCommand.Target = _targetAction.Area.GetTilesInRange(_targetSource, click);
-            return _targetCommand;
+            IEnumerable<Terrain> targets = _targetAction.Area.GetTilesInRange(_targetSource, click);
+            return new ActionCommand(_targetSource, _targetAction, targets);
         }
 
         public void Update()
@@ -57,12 +59,16 @@ namespace Roguelike.State
                 return;
 
             if (EventScheduler.Execute(Game.Player, command))
+            {
+                OnComplete(EventArgs.Empty);
                 Game.StateHandler.PopState();
+            }
         }
 
         public void Draw()
         {
-            Game.MapConsole.Print(1, 1, "targetting mode", Colors.TextHeading);
+            OverlayHandler.Draw(Game.MapConsole);
+            RLConsole.Blit(Game.MapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game.RootConsole, 0, Game.Config.MessageView.Height);
 
             //IEnumerable<Terrain> path = Game.Map.GetStraightLinePath(Game.Player.X, Game.Player.Y, mousePos.X, mousePos.Y);
             //foreach (Terrain tile in path)
@@ -74,6 +80,13 @@ namespace Roguelike.State
 
             //    Game.Map.Highlight[tile.X, tile.Y] = RLColor.Red;
             //}
+        }
+
+        public event EventHandler Complete;
+
+        protected virtual void OnComplete(EventArgs e)
+        {
+            Complete?.Invoke(this, e);
         }
     }
 }

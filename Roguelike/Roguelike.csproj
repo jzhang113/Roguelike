@@ -138,7 +138,6 @@
     <Compile Include="Core\SaveObject.cs" />
     <Compile Include="Core\TargetZone.cs" />
     <Compile Include="Actions\IAction.cs" />
-    <Compile Include="Commands\ITargetCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="State\IState.cs" />
     <Compile Include="Systems\EquipmentHandler.cs" />

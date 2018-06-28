@@ -1,7 +1,10 @@
-﻿using Roguelike.Commands;
+﻿using Roguelike.Actions;
+using Roguelike.Commands;
+using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using System;
+using System.Collections.Generic;
 
 namespace Roguelike.State
 {
@@ -16,15 +19,28 @@ namespace Roguelike.State
 
         protected override ICommand ResolveInput(ItemCount itemCount)
         {
-            ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
-            IUsable usableItem = splitCount.Item as IUsable;
-            if (usableItem == null)
+            if (itemCount.Item is IUsable usableItem)
             {
-                Game.MessageHandler.AddMessage($"Don't know how to apply {itemCount.Item.Name}.");
-                return null;
+                IAction action = usableItem.ApplySkill;
+                if (action.Area.Aimed)
+                {
+                    if (action.Area.Target == null)
+                    {
+                        TargettingState state = new TargettingState(Game.Player, action);
+                        state.Complete += (sender, args) =>
+                            Game.Player.Inventory.Split(new ItemCount {Item = itemCount.Item, Count = 1});
+                        Game.StateHandler.PushState(state);
+                        return null;
+                    }
+                }
+
+                IEnumerable<Terrain> target = action.Area.GetTilesInRange(Game.Player);
+                Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
+                return new ApplyCommand(Game.Player, usableItem, target);
             }
 
-            return new ApplyCommand(Game.Player, usableItem);
+            Game.MessageHandler.AddMessage($"Cannot apply {itemCount.Item}.");
+            return null;
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using RLNET;
 using Roguelike.Commands;
-using Roguelike.Systems;
 using Roguelike.Core;
-using Roguelike.Utils;
 using Roguelike.Items;
+using Roguelike.Systems;
+using Roguelike.Utils;
 
 namespace Roguelike.State
 {
@@ -45,7 +45,7 @@ namespace Roguelike.State
         {
             Game.InventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
             Game.Player.Inventory.Draw(Game.InventoryConsole);
-            RLConsole.Blit(Game.InventoryConsole, 0, 0, Game.Config.InventoryView.Width, Game.Config.InventoryView.Height, Game.RootConsole, Game.Config.Map.Width - 10, 0);
+            RLConsole.Blit(Game.InventoryConsole, 0, 0, Game.Config.InventoryView.Width, Game.Config.InventoryView.Height, Game.RootConsole, Game.Config.MapView.Width - 10, 0);
         }
     }
 }
