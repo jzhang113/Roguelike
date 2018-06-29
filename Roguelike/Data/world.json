@@ -1,0 +1,36 @@
+﻿{
+    "regions": [
+        {
+            "name": "main",
+            "minLength": 6,
+            "maxLength": 12,
+            "require": true,
+            "unique": true
+        },
+        {
+            "name": "side",
+            "minLength": 3,
+            "maxLength": 5,
+            "require": false,
+            "unique": false
+        }
+    ],
+    "constraints": {
+        "require": [
+            {
+                "from": {
+                    "regionName": "main",
+                    "depth": 4
+                },
+                "to": {
+                    "regionName": "side",
+                    "depth": 1
+                }
+            }
+        ]
+    },
+    "startLevel": {
+        "regionName": "main",
+        "depth": 1
+    }
+}

@@ -2,13 +2,14 @@
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Items;
+using Roguelike.Systems;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Roguelike.Systems
+namespace Roguelike.World
 {
     [Serializable]
     public class MapHandler : ISerializable
@@ -162,7 +163,7 @@ namespace Roguelike.Systems
             return true;
         }
 
-        public bool TryChangeLocation(Actor actor, out string destination)
+        public bool TryChangeLocation(Actor actor, out LevelId destination)
         {
             if (Exits.TryGetValue(ToIndex(actor.X, actor.Y), out Stair exit))
             {
@@ -170,7 +171,7 @@ namespace Roguelike.Systems
                 return true;
             }
 
-            destination = null;
+            destination = Game.World.CurrentLevel;
             return false;
         }
 

@@ -1,5 +1,6 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Systems;
+using Roguelike.World;
 
 namespace Roguelike.Commands
 {
@@ -8,9 +9,9 @@ namespace Roguelike.Commands
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
 
-        private readonly string _newLevel;
+        private readonly LevelId _newLevel;
 
-        public ChangeLevelCommand(Actor actor, string newLevel)
+        public ChangeLevelCommand(Actor actor, LevelId newLevel)
         {
             Source = actor;
             _newLevel = newLevel;

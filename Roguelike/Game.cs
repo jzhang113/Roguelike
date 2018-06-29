@@ -4,6 +4,7 @@ using Roguelike.Core;
 using Roguelike.State;
 using Roguelike.Systems;
 using Roguelike.Utils;
+using Roguelike.World;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -57,19 +58,23 @@ namespace Roguelike
             StateHandler = new StateHandler(RootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(20);
-            World = Option.FixedSeed
-                ? new WorldHandler(Option.Seed)
-                : new WorldHandler();
+            // NewGame();
 
             RootConsole.Update += RootConsoleUpdate;
             RootConsole.Render += RootConsoleRender;
             RootConsole.OnLoad += StartGame;
             RootConsole.OnClosing += SaveGame;
+        }
+
+        public static void Run()
+        {
             RootConsole.Run();
         }
 
         public static void NewGame()
         {
+            WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
+
             Player = new Player(new ActorParameters("Player")
             {
                 Awareness = 10,
@@ -80,10 +85,9 @@ namespace Roguelike
             MessageHandler.Clear();
             EventScheduler.Clear();
             World = Option.FixedSeed
-                ? new WorldHandler(Option.Seed)
-                : new WorldHandler();
+                ? new WorldHandler(worldParameter, Option.Seed)
+                : new WorldHandler(worldParameter);
 
-            World.ChangeLevel("main_1");
             ForceRender();
         }
 

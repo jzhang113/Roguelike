@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RLNET;
+using Roguelike.World;
 
 namespace Roguelike.Systems
 {
@@ -18,14 +19,16 @@ namespace Roguelike.Systems
 
         private readonly int _width;
         private readonly int _height;
+        private readonly IEnumerable<LevelId> _exits;
         private readonly Random _rand;
         private readonly MapHandler _map;
 
-        public MapGenerator(int width, int height, Random rand)
+        public MapGenerator(int width, int height, IEnumerable<LevelId> exits, Random random)
         {
             _width = width;
             _height = height;
-            _rand = rand;
+            _exits = exits;
+            _rand = random;
             _map = new MapHandler(_width, _height);
         }
 
@@ -165,9 +168,9 @@ namespace Roguelike.Systems
                 PlaceDoors(r);
             }
 
-            PlaceStairs();
             PlaceActors();
             PlaceItems();
+            PlaceStairs();
 
             return _map;
         }
@@ -409,7 +412,7 @@ namespace Roguelike.Systems
         private void PlaceItems()
         {
             Weapon spear = new Weapon(
-                new ItemParameters("spear", Materials.Wood)
+                new ItemParameter("spear", Materials.Wood)
                 {
                     AttackSpeed = 240,
                     Damage = 200,
@@ -433,7 +436,7 @@ namespace Roguelike.Systems
             spear.AddAbility(new DamageAction(100, new TargetZone(Enums.TargetShape.Directional)));
 
             Armor ha = new Armor(
-                new ItemParameters("heavy armor", Materials.Iron)
+                new ItemParameter("heavy armor", Materials.Iron)
                 {
                     AttackSpeed = 1000,
                     Damage = 100,
@@ -447,7 +450,7 @@ namespace Roguelike.Systems
             _map.AddItem(new ItemCount { Item = ha, Count = 1 });
 
             Scroll magicMissile = new Scroll(
-                new ItemParameters("scroll of magic missile", Materials.Paper), rangedDamage, Swatch.DbSun)
+                new ItemParameter("scroll of magic missile", Materials.Paper), rangedDamage, Swatch.DbSun)
             {
                 X = Game.Player.X - 1,
                 Y = Game.Player.Y - 2
@@ -455,7 +458,7 @@ namespace Roguelike.Systems
             _map.AddItem(new ItemCount { Item = magicMissile, Count = 1 });
 
             Scroll healing = new Scroll(
-                new ItemParameters("scroll of healing", Materials.Paper), heal, Swatch.DbGrass)
+                new ItemParameter("scroll of healing", Materials.Paper), heal, Swatch.DbGrass)
             {
                 X = Game.Player.X + 1,
                 Y = Game.Player.Y + 1
@@ -465,7 +468,7 @@ namespace Roguelike.Systems
             _map.AddItem(new ItemCount
             {
                 Item = new Scroll(
-                    new ItemParameters("scroll of enchantment", Materials.Paper),
+                    new ItemParameter("scroll of enchantment", Materials.Paper),
                     new EnchantAction(
                         new TargetZone(Enums.TargetShape.Range, range: 10)),
                     RLColor.LightGreen)
@@ -477,7 +480,7 @@ namespace Roguelike.Systems
             });
 
             Item planks = new Item(
-                new ItemParameters("plank", Materials.Wood), Swatch.DbWood, '\\')
+                new ItemParameter("plank", Materials.Wood), Swatch.DbWood, '\\')
             {
                 X = Game.Player.X + 2,
                 Y = Game.Player.Y + 2,
@@ -524,14 +527,17 @@ namespace Roguelike.Systems
 
         private void PlaceStairs()
         {
-            Stair down = new Stair("main_2");
-            while (!_map.Field[down.X, down.Y].IsWalkable)
+            foreach (LevelId id in _exits)
             {
-                down.X = _rand.Next(1, Game.Config.Map.Width - 1);
-                down.Y = _rand.Next(1, Game.Config.Map.Height - 1);
-            }
+                Stair exit = new Stair(id);
+                while (!_map.Field[exit.X, exit.Y].IsWalkable)
+                {
+                    exit.X = _rand.Next(1, Game.Config.Map.Width - 1);
+                    exit.Y = _rand.Next(1, Game.Config.Map.Height - 1);
+                }
 
-            _map.AddExit(down);
+                _map.AddExit(exit);
+            }
         }
 
         private double RandNormal(double mean, double stdDev)

@@ -87,7 +87,7 @@ namespace Roguelike.State
                         return null;
                 case RLKey.BackSlash:
                     // HACK: Ad-hoc input handling
-                    if (Game.Map.TryChangeLocation(player, out string destination))
+                    if (Game.Map.TryChangeLocation(player, out World.LevelId destination))
                         return new ChangeLevelCommand(player, destination);
                     else
                         return null;
