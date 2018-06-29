@@ -12,11 +12,11 @@
         public WindowConfig StatView { get; set; }
         public WindowConfig InventoryView { get; set; }
         public WindowConfig ViewWindow { get; set; }
-    }
 
-    class WindowConfig
-    {
-        public int Width { get; set; }
-        public int Height { get; set; }
+        internal class WindowConfig
+        {
+            public int Width { get; set; }
+            public int Height { get; set; }
+        }
     }
 }
