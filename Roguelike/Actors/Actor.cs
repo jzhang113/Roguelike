@@ -52,7 +52,7 @@ namespace Roguelike.Actors
             RefreshRate = Utils.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
 
-            Weapon defaultWeapon = new Weapon(new ItemParameters("fists", Materials.Flesh), Colors.TextHeading);
+            Weapon defaultWeapon = new Weapon(new ItemParameter("fists", Materials.Flesh), Colors.TextHeading);
             Equipment = new EquipmentHandler(defaultWeapon);
 
             DrawingComponent = new Drawable
