@@ -12,7 +12,7 @@ namespace Roguelike.Items
     {
         public IAction ApplySkill { get; }
 
-        public Scroll(ItemParameters parameters, IAction action, RLNET.RLColor color) : base(parameters, color, '?')
+        public Scroll(ItemParameter parameters, IAction action, RLNET.RLColor color) : base(parameters, color, '?')
         {
             ApplySkill = action;
         }

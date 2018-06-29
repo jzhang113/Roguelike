@@ -7,7 +7,7 @@ namespace Roguelike.Items
     [Serializable]
     public class Weapon : Item, IEquipable
     {
-        public Weapon(ItemParameters parameters, RLNET.RLColor color) : base(parameters, color, '(')
+        public Weapon(ItemParameter parameters, RLNET.RLColor color) : base(parameters, color, '(')
         {
         }
 

@@ -5,7 +5,7 @@ using System;
 namespace Roguelike.Items
 {
     [Serializable]
-    public class ItemParameters
+    public class ItemParameter
     {
         public string Name { get; }
         public IMaterial Material { get; set; }
@@ -15,7 +15,7 @@ namespace Roguelike.Items
         public double MeleeRange { get; set; } = Constants.DEFAULT_MELEE_RANGE;
         public double ThrowRange { get; set; } = Constants.DEFAULT_THROW_RANGE;
 
-        public ItemParameters(string name, IMaterial material)
+        public ItemParameter(string name, IMaterial material)
         {
             Name = name;
             Material = material;

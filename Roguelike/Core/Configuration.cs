@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Core
 {
-    class Configuration
+    struct Configuration
     {
         public string FontName { get; set; }
         public int FontSize { get; set; }
@@ -13,7 +13,7 @@
         public WindowConfig InventoryView { get; set; }
         public WindowConfig ViewWindow { get; set; }
 
-        internal class WindowConfig
+        internal struct WindowConfig
         {
             public int Width { get; set; }
             public int Height { get; set; }

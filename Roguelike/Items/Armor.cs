@@ -9,7 +9,7 @@ namespace Roguelike.Items
     {
         public Enums.ArmorType Type { get; }
 
-        public Armor(ItemParameters parameters, RLNET.RLColor color, Enums.ArmorType type) : base(parameters, color, '[')
+        public Armor(ItemParameter parameters, RLNET.RLColor color, Enums.ArmorType type) : base(parameters, color, '[')
         {
             Type = type;
         }
