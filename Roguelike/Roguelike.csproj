@@ -103,6 +103,7 @@
     <Compile Include="Items\ItemParameter.cs" />
     <Compile Include="Items\ItemStack.cs" />
     <Compile Include="State\ApplyState.cs" />
+    <Compile Include="State\AutoexploreState.cs" />
     <Compile Include="State\DropState.cs" />
     <Compile Include="State\EquipState.cs" />
     <Compile Include="State\InventoryState.cs" />

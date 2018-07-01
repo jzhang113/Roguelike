@@ -106,6 +106,9 @@ namespace Roguelike.State
                 case RLKey.T:
                     Game.StateHandler.PushState(UnequipState.Instance);
                     return null;
+                case RLKey.O:
+                    Game.StateHandler.PushState(AutoexploreState.Instance);
+                    return null;
                 case RLKey.R:
                     Game.NewGame();
                     return null;

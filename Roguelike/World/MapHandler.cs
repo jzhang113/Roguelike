@@ -5,7 +5,6 @@ using Roguelike.Items;
 using Roguelike.Systems;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -22,6 +21,7 @@ namespace Roguelike.World
         internal RLColor[,] Highlight { get; }
         internal RLColor[,] PermHighlight { get; }
         internal float[,] PlayerMap { get; }
+        internal float[,] AutoexploreMap { get; }
 
         // can't auto serialize these dictionaries
         private IDictionary<int, Actor> Units { get; set; }
@@ -43,6 +43,7 @@ namespace Roguelike.World
             Highlight = new RLColor[width, height];
             PermHighlight = new RLColor[width, height];
             PlayerMap = new float[width, height];
+            AutoexploreMap = new float[width, height];
 
             Units = new Dictionary<int, Actor>();
             Items = new Dictionary<int, InventoryHandler>();
@@ -81,6 +82,7 @@ namespace Roguelike.World
             Highlight = new RLColor[Width, Height];
             PermHighlight = new RLColor[Width, Height];
             PlayerMap = new float[Width, Height];
+            AutoexploreMap = new float[Width, Height];
         }
 
         [OnDeserialized]
@@ -110,6 +112,7 @@ namespace Roguelike.World
         {
             UpdatePlayerFov();
             UpdatePlayerMaps();
+            UpdateAutoExploreMaps();
         }
 
         #region Actor Methods
@@ -310,7 +313,7 @@ namespace Roguelike.World
             }
         }
 
-        internal WeightedPoint MoveTowardsTarget(int currentX, int currentY, float[,] goalMap)
+        internal WeightedPoint MoveTowardsTarget(int currentX, int currentY, float[,] goalMap, bool openDoors = false)
         {
             int nextX = currentX;
             int nextY = currentY;
@@ -321,12 +324,20 @@ namespace Roguelike.World
                 int newX = currentX + dir.X;
                 int newY = currentY + dir.Y;
 
-                if (Field.IsValid(newX, newY) && goalMap[newX, newY] < nearest &&
-                    (Field[newX, newY].IsWalkable || Math.Abs(goalMap[newX, newY]) < 0.001f))
+                if (Field.IsValid(newX, newY) && goalMap[newX, newY] < nearest)
                 {
-                    nextX = newX;
-                    nextY = newY;
-                    nearest = goalMap[newX, newY];
+                    //if (Field[newX, newY].IsWalkable || Math.Abs(goalMap[newX, newY]) < 0.001f)
+                    {
+                        nextX = newX;
+                        nextY = newY;
+                        nearest = goalMap[newX, newY];
+                    }
+                    //else if (openDoors && TryGetDoor(newX, newY, out _))
+                    //{
+                    //    nextX = newX;
+                    //    nextY = newY;
+                    //    nearest = goalMap[newX, newY];
+                    //}
                 }
             }
 
@@ -501,13 +512,6 @@ namespace Roguelike.World
                 int destY = exit.Y - startY;
                 exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y], destX, destY);
             }
-
-            // debugging code for dijkstra maps
-            //foreach (Terrain tile in Field)
-            //{
-            //    if (Game.ShowOverlay)
-            //        DrawOverlay(mapConsole, tile);
-            //}
         }
 
         private void DrawTile(RLConsole mapConsole, int srcX, int srcY, int destX, int destY)
@@ -541,19 +545,6 @@ namespace Roguelike.World
             }
 
             mapConsole.SetBackColor(destX, destY, Highlight[srcX, srcY]);
-        }
-
-        private void DrawOverlay(RLConsole mapConsole, Terrain tile)
-        {
-            string display;
-            float distance = PlayerMap[tile.X, tile.Y];
-
-            if (distance < 10 || float.IsNaN(distance))
-                display = distance.ToString(CultureInfo.InvariantCulture);
-            else
-                display = ((char)(distance - 10 + 'a')).ToString();
-
-            mapConsole.Print(tile.X, tile.Y, display, display == "NaN" ? Swatch.DbBlood : Swatch.DbWater);
         }
 
         internal void ClearHighlight()
@@ -596,6 +587,34 @@ namespace Roguelike.World
                 PlayerMap[p.X, p.Y] = 0;
             }
 
+            ProcessDijkstraMaps(goals, PlayerMap);
+        }
+
+        private void UpdateAutoExploreMaps()
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    AutoexploreMap[x, y] = float.NaN;
+                }
+            }
+
+            Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
+            foreach (Terrain tile in Field)
+            {
+                if (!tile.IsExplored)
+                {
+                    goals.Enqueue(new WeightedPoint(tile.X, tile.Y));
+                    AutoexploreMap[tile.X, tile.Y] = 0;
+                }
+            }
+
+            ProcessDijkstraMaps(goals, AutoexploreMap);
+        }
+
+        private void ProcessDijkstraMaps(Queue<WeightedPoint> goals, float[,] mapWeights)
+        {
             while (goals.Count > 0)
             {
                 WeightedPoint p = goals.Dequeue();
@@ -607,10 +626,10 @@ namespace Roguelike.World
                     float newWeight = p.Weight + dir.Weight;
                     Terrain tile = Field[newX, newY];
 
-                    if (Field.IsValid(newX, newY) && !tile.IsWall && tile.IsExplored &&
-                        (float.IsNaN(PlayerMap[newX, newY]) || newWeight < PlayerMap[newX, newY]))
+                    if (Field.IsValid(newX, newY) && !tile.IsWall &&
+                        (double.IsNaN(mapWeights[newX, newY]) || newWeight < mapWeights[newX, newY]))
                     {
-                        PlayerMap[newX, newY] = newWeight;
+                        mapWeights[newX, newY] = newWeight;
                         goals.Enqueue(new WeightedPoint(newX, newY, newWeight));
                     }
                 }
