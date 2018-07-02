@@ -19,7 +19,7 @@ namespace Roguelike.Core
             DrawingComponent = new Drawable
             {
                 Color = Swatch.DbSky,
-                Symbol = '>'
+                Symbol = '*'
             };
         }
     }

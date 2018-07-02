@@ -4,12 +4,13 @@ namespace Roguelike.World
 {
     struct WorldParameter
     {
-        public ICollection<Region> Regions { get; set; }
-        public LevelId StartLevel { get; set; }
+        public ICollection<RegionData> Regions { get; set; }
+        public int MinWorldSize { get; set; }
+        public int MaxWorldSize { get; set; }
 
-        internal struct Region
+        internal struct RegionData
         {
-            public string Name { get; set; }
+            public RegionType Type { get; set; }
             public int MinLength { get; set; }
             public int MaxLength { get; set; }
             public bool Require { get; set; }
@@ -19,14 +20,14 @@ namespace Roguelike.World
 
         internal struct ConnectionConstraint
         {
-            public ICollection<LevelConnection> Require { get; set; }
-            public ICollection<RegionConnection> Avoid { get; set; }
+            public ICollection<LevelId> Require { get; set; }
+            public ICollection<RegionType> Avoid { get; set; }
         }
 
         internal struct RegionConnection
         {
-            public Region From { get; set; }
-            public Region To { get; set; }
+            public RegionData From { get; set; }
+            public RegionData To { get; set; }
         }
 
         internal struct LevelConnection
@@ -34,5 +35,13 @@ namespace Roguelike.World
             public LevelId From { get; set; }
             public LevelId To { get; set; }
         }
+    }
+
+    public enum RegionType
+    {
+        Root,
+        Main,
+        Side,
+        Otherside
     }
 }

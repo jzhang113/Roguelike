@@ -6,7 +6,7 @@ namespace Roguelike.World
     public struct LevelId
     {
         public string Name { get; set; }
-        public string RegionName { get; set; }
+        public RegionType RegionName { get; set; }
         public int Depth { get; set; }
 
         public override string ToString()
