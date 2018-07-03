@@ -529,7 +529,7 @@ namespace Roguelike.Systems
         {
             foreach (LevelId id in _exits)
             {
-                Stair exit = new Stair(id);
+                Exit exit = new Exit(id);
                 while (!_map.Field[exit.X, exit.Y].IsWalkable)
                 {
                     exit.X = _rand.Next(1, Game.Config.Map.Width - 1);

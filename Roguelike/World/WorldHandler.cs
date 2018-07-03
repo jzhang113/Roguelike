@@ -63,6 +63,8 @@ namespace Roguelike.World
             }
 
             SaveLevel(CurrentLevel);
+            Game.EventScheduler.Clear();
+            // TODO: save and restore monsters on level
 
             bool seen = _levels[id].Seen;
             Map = seen ? LoadLevel(id) : CreateLevel(id);

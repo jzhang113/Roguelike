@@ -29,12 +29,12 @@ namespace Roguelike.World
         private IDictionary<int, Actor> Units { get; set; }
         private IDictionary<int, InventoryHandler> Items { get; set; }
         private IDictionary<int, Door> Doors { get; set; }
-        private IDictionary<int, Stair> Exits { get; set; }
+        private IDictionary<int, Exit> Exits { get; set; }
 
         private readonly KeyValueHelper<int, Actor> _tempUnits;
         private readonly KeyValueHelper<int, InventoryHandler> _tempItems;
         private readonly KeyValueHelper<int, Door> _tempDoors;
-        private readonly KeyValueHelper<int, Stair> _tempExits;
+        private readonly KeyValueHelper<int, Exit> _tempExits;
 
         public MapHandler(int width, int height)
         {
@@ -51,7 +51,7 @@ namespace Roguelike.World
             Units = new Dictionary<int, Actor>();
             Items = new Dictionary<int, InventoryHandler>();
             Doors = new Dictionary<int, Door>();
-            Exits = new Dictionary<int, Stair>();
+            Exits = new Dictionary<int, Exit>();
         }
 
         #region Serialization Constructor
@@ -76,10 +76,10 @@ namespace Roguelike.World
                 Key = (ICollection<int>)info.GetValue($"{nameof(Doors)}.keys", typeof(ICollection<int>)),
                 Value = (ICollection<Door>)info.GetValue($"{nameof(Doors)}.values", typeof(ICollection<Door>))
             };
-            _tempExits = new KeyValueHelper<int, Stair>
+            _tempExits = new KeyValueHelper<int, Exit>
             {
                 Key = (ICollection<int>)info.GetValue($"{nameof(Exits)}.keys", typeof(ICollection<int>)),
-                Value = (ICollection<Stair>)info.GetValue($"{nameof(Exits)}.values", typeof(ICollection<Stair>))
+                Value = (ICollection<Exit>)info.GetValue($"{nameof(Exits)}.values", typeof(ICollection<Exit>))
             };
 
             Highlight = new RLColor[Width, Height];
@@ -172,7 +172,7 @@ namespace Roguelike.World
 
         public bool TryChangeLocation(Actor actor, out LevelId destination)
         {
-            if (Exits.TryGetValue(ToIndex(actor.X, actor.Y), out Stair exit))
+            if (Exits.TryGetValue(ToIndex(actor.X, actor.Y), out Exit exit))
             {
                 destination = exit.Destination;
                 return true;
@@ -281,7 +281,7 @@ namespace Roguelike.World
         }
         #endregion
 
-        public bool AddExit(Stair exit)
+        public bool AddExit(Exit exit)
         {
             // TODO: also check exit reachability
             if (!Field[exit.X, exit.Y].IsWalkable)
@@ -291,10 +291,9 @@ namespace Roguelike.World
             return true;
         }
 
-        public bool IsInteresting(int x, int y)
+        public bool TryGetExit(int x, int y, out Exit exit)
         {
-            int index = ToIndex(x, y);
-            return Exits.TryGetValue(index, out _);
+            return Exits.TryGetValue(ToIndex(x, y), out exit);
         }
 
         #region Tile Selection Methods
@@ -527,7 +526,7 @@ namespace Roguelike.World
                     mapConsole.SetChar(unit.X - startX, unit.Y - startY, '%');
             }
 
-            foreach (Stair exit in Exits.Values)
+            foreach (Exit exit in Exits.Values)
             {
                 int destX = exit.X - startX;
                 int destY = exit.Y - startY;

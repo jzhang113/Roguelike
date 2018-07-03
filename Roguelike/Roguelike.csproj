@@ -98,7 +98,7 @@
     <Compile Include="Commands\ThrowCommand.cs" />
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
-    <Compile Include="Core\Stair.cs" />
+    <Compile Include="Core\Exit.cs" />
     <Compile Include="Items\ItemCount.cs" />
     <Compile Include="Items\ItemParameter.cs" />
     <Compile Include="Items\ItemStack.cs" />

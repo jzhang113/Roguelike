@@ -5,7 +5,7 @@ using System;
 namespace Roguelike.Core
 {
     [Serializable]
-    public class Stair
+    public class Exit
     {
         public LevelId Destination { get; }
         public Drawable DrawingComponent { get; }
@@ -13,7 +13,7 @@ namespace Roguelike.Core
         public int X { get => DrawingComponent.X; set => DrawingComponent.X = value; }
         public int Y { get => DrawingComponent.Y; set => DrawingComponent.Y = value; }
 
-        public Stair(LevelId destination)
+        public Exit(LevelId destination)
         {
             Destination = destination;
             DrawingComponent = new Drawable
