@@ -13,11 +13,8 @@ namespace Roguelike.State
         private static readonly Lazy<NormalState> _instance = new Lazy<NormalState>(() => new NormalState());
         public static NormalState Instance => _instance.Value;
 
-        private bool _render;
-
         private NormalState()
         {
-            _render = true;
         }
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)
@@ -208,23 +205,23 @@ namespace Roguelike.State
 
         public void Update()
         {
-            while (Game.EventScheduler.Update())
+            ICommand command = Game.StateHandler.HandleInput();
+            if (command == null)
+                return;
+
+            if (EventScheduler.Execute(Game.Player, command))
             {
-                _render = true;
+                Game.EventScheduler.Run();
+                Game.ForceRender();
             }
         }
 
         public void Draw()
         {
-            if (!_render)
-                return;
-
             Game.Map.ClearHighlight();
             Game.MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
             Game.Map.Draw(Game.MapConsole);
             RLConsole.Blit(Game.MapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game.RootConsole, 0, Game.Config.MessageView.Height);
-
-            _render = false;
         }
     }
 }

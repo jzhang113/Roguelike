@@ -11,7 +11,8 @@ namespace Roguelike.Actors
         {
         }
 
-        public override ICommand Act() => Game.StateHandler.HandleInput();
+        // Sentinel so that the EventScheduler breaks if it is the Player's turn to act.
+        public override ICommand Act() => null;
 
         public override void TriggerDeath() => Game.GameOver();
     }

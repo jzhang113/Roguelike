@@ -17,6 +17,9 @@ namespace Roguelike.State
 
         public override ICommand HandleKeyInput(RLKeyPress keyPress)
         {
+            if (keyPress == null)
+                return null;
+
             char keyChar = keyPress.Key.ToChar();
             bool opened = Game.Player.Inventory.OpenStack(keyChar);
             if (opened)

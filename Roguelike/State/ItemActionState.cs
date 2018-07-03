@@ -11,6 +11,9 @@ namespace Roguelike.State
     {
         public virtual ICommand HandleKeyInput(RLKeyPress keyPress)
         {
+            if (keyPress == null)
+                return null;
+
             char keyChar = keyPress.Key.ToChar();
             if (!Game.Player.Inventory.TryGetKey(keyChar, out ItemCount itemCount))
             {
@@ -38,7 +41,10 @@ namespace Roguelike.State
                 return;
 
             if (EventScheduler.Execute(Game.Player, command))
+            {
                 Game.StateHandler.PopState();
+                Game.ForceRender();
+            }
         }
 
         public virtual void Draw()

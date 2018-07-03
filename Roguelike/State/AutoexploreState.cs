@@ -10,7 +10,6 @@ namespace Roguelike.State
     {
         private static readonly Lazy<AutoexploreState> _instance = new Lazy<AutoexploreState>(() => new AutoexploreState());
         public static AutoexploreState Instance => _instance.Value;
-        private static bool _tick;
 
         private AutoexploreState()
         {
@@ -18,10 +17,6 @@ namespace Roguelike.State
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)
         {
-            _tick = !_tick;
-            if (keyPress == null && _tick)
-                return null;
-
             if (Game.Map.Discovered.Any(tile => Game.Map.IsInteresting(tile.X, tile.Y)))
             {
                 Game.StateHandler.PopState();
@@ -39,9 +34,15 @@ namespace Roguelike.State
 
         public void Update()
         {
-            while (Game.EventScheduler.Update())
+            Game.ForceRender();
+            ICommand command = Game.StateHandler.HandleInput();
+            if (command == null)
+                return;
+
+            Systems.EventScheduler.Execute(Game.Player, command);
             {
-                // _render = true;
+                Game.EventScheduler.Run();
+                Game.ForceRender();
             }
         }
 

@@ -52,7 +52,10 @@ namespace Roguelike.State
                 return;
 
             if (EventScheduler.Execute(Game.Player, command))
+            {
                 Game.StateHandler.PopState();
+                Game.ForceRender();
+            }
         }
 
         public void Draw()

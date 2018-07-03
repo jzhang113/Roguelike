@@ -156,21 +156,14 @@ namespace Roguelike
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
-            if (_render)
-            {
-                Map.ClearHighlight();
-                MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
-                Map.Draw(MapConsole);
-                RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.MessageView.Height);
-            }
+            if (!_render)
+                return;
 
-            if (MessageHandler.Redraw || _render)
+            if (MessageHandler.Redraw)
             {
                 _messageConsole.Clear(0, Swatch.DbDeepWater, Colors.TextHeading);
                 MessageHandler.Draw(_messageConsole);
                 RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, RootConsole, 0, 0);
-
-                _render = false;
             }
 
             _statConsole.Clear(0, Swatch.DbOldStone, Colors.TextHeading);
@@ -180,8 +173,15 @@ namespace Roguelike
             LookHandler.Draw(_viewConsole);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.MapView.Width, 0);
 
+
+            Map.ClearHighlight();
+            MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
+            Map.Draw(MapConsole);
+            RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.MessageView.Height);
+
             StateHandler.Draw();
             RootConsole.Draw();
+            _render = false;
         }
     }
 }

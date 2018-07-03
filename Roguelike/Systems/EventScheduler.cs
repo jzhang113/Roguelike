@@ -6,7 +6,8 @@ using System.Collections.Generic;
 namespace Roguelike.Systems
 {
     // Effectively the main game loop. Actions are processed until one becomes null, which should
-    // only occur with the Player.
+    // only occur with the Player. While the Player is in the heap as a sentinel, the actual input
+    // handling is managed by the States.
     class EventScheduler
     {
         private readonly ICollection<ISchedulable> _entities;
@@ -26,43 +27,37 @@ namespace Roguelike.Systems
             _entities.Clear();
         }
 
-        public bool Update()
+        // Run updates for all actors until it is the Player's turn to act again.
+        public void Run()
         {
-            if (_entities.Count == 0)
-                return false;
-
-            _eventSet.Clear();
-            
-            // Check if any actor is already ready to act
-            foreach (ISchedulable entity in _entities)
+            do
             {
-                if (entity.Energy >= Constants.MIN_TURN_ENERGY)
+                // No one is currently ready, so continually apply energy recovery to all entities in the
+                // system, until the queue has at least one entity to execute.
+                while (_eventSet.Count == 0)
                 {
-                    _eventSet.Add(entity);
-                }
-            }
-
-            // No one is currently ready, so continually apply energy recovery to all entities in the
-            // system, until the queue has at least one entity to execute
-            while (_eventSet.Count == 0)
-            {
-                foreach (ISchedulable entity in _entities)
-                {
-                    entity.Energy += entity.RefreshRate;
-
-                    // Once the entity has enough energy, it can be added to the turn queue
-                    // The queue will prioritize entities by their energy ratings, so the entities
-                    // with the most amount of energy will execute their turn first
-                    if (entity.Energy >= Constants.MIN_TURN_ENERGY)
+                    foreach (ISchedulable entity in _entities)
                     {
-                        _eventSet.Add(entity);
+                        // Entities with sufficient energy are placed into the turn queue.
+                        if (entity.Energy > Constants.MIN_TURN_ENERGY)
+                            _eventSet.Add(entity);
+
+                        // and everyone gains some energy
+                        entity.Energy += entity.RefreshRate;
                     }
                 }
-            }
+            } while (Update());
+        }
 
-            // Dequeue and execute the handler for each entities in the turn queue until empty
-            foreach (ISchedulable current in _eventSet)
+        private bool Update()
+        {
+            // Dequeue and execute the handler for each entities in the turn queue until empty.
+            while (_eventSet.Count > 0)
             {
+                // It is correct to remove an actor even if they don't act. Player actions are
+                // already handled elsewhere and don't need to be handled here, while other actions
+                // should not normally return false, so skipping them is fine.
+                ISchedulable current = _eventSet.PopMax();
                 ICommand action = current.Act();
                 if (!Execute(current, action))
                     return false;
@@ -71,6 +66,7 @@ namespace Roguelike.Systems
             return true;
         }
 
+        // Perform a specified action immediately. Support to queue actions may be added as needed.
         internal static bool Execute(ISchedulable current, ICommand action)
         {
             // Break the event loop when there is no Action.
@@ -98,7 +94,7 @@ namespace Roguelike.Systems
                 // perform a wait action to prevent an infinite loop.
                 if (current is Actors.Player)
                 {
-                    Game.MessageHandler.AddMessage("Can't do that.");
+                    Game.MessageHandler.AddMessage("An invalid action was made.", Enums.MessageLevel.Verbose);
                     return false;
                 }
                 else
