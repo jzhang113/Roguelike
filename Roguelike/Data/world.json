@@ -1,36 +1,40 @@
 ﻿{
-    "regions": [
-        {
-            "name": "main",
-            "minLength": 6,
-            "maxLength": 12,
-            "require": true,
-            "unique": true
-        },
-        {
-            "name": "side",
-            "minLength": 3,
-            "maxLength": 5,
-            "require": false,
-            "unique": false
-        }
-    ],
-    "constraints": {
-        "require": [
-            {
-                "from": {
-                    "regionName": "main",
-                    "depth": 4
-                },
-                "to": {
-                    "regionName": "side",
-                    "depth": 1
-                }
-            }
-        ]
+  "regions": [
+    {
+      "type": "main",
+      "minLength": 6,
+      "maxLength": 12,
+      "require": true,
+      "unique": true
     },
-    "startLevel": {
-        "regionName": "main",
-        "depth": 1
+    {
+      "type": "side",
+      "minLength": 3,
+      "maxLength": 5,
+      "require": false,
+      "unique": false,
+      "constraints": {
+        "avoid": [
+          "root"
+        ]
+      }
+    },
+    {
+      "type": "otherside",
+      "minLength": 4,
+      "maxLength": 8,
+      "require": false,
+      "unique": false,
+      "constraints": {
+        "require": [
+          {
+            "regionName": "main",
+            "depth": 3
+          }
+        ]
+      }
     }
+  ],
+  "minWorldSize": 5,
+  "maxWorldSize": 10
 }

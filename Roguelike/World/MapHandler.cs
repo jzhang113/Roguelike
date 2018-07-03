@@ -18,10 +18,12 @@ namespace Roguelike.World
 
         internal Field Field { get; }
 
+        // internal transient helper structures
         internal RLColor[,] Highlight { get; }
         internal RLColor[,] PermHighlight { get; }
         internal float[,] PlayerMap { get; }
         internal float[,] AutoexploreMap { get; }
+        internal ICollection<Terrain> Discovered { get; }
 
         // can't auto serialize these dictionaries
         private IDictionary<int, Actor> Units { get; set; }
@@ -44,6 +46,7 @@ namespace Roguelike.World
             PermHighlight = new RLColor[width, height];
             PlayerMap = new float[width, height];
             AutoexploreMap = new float[width, height];
+            Discovered = new List<Terrain>();
 
             Units = new Dictionary<int, Actor>();
             Items = new Dictionary<int, InventoryHandler>();
@@ -83,6 +86,7 @@ namespace Roguelike.World
             PermHighlight = new RLColor[Width, Height];
             PlayerMap = new float[Width, Height];
             AutoexploreMap = new float[Width, Height];
+            Discovered = new List<Terrain>();
         }
 
         [OnDeserialized]
@@ -425,10 +429,17 @@ namespace Roguelike.World
         #region FOV Methods
         public void ComputeFov(int x, int y, int radius)
         {
+            Discovered.Clear();
+
             // NOTE: slow implementation of fov - replace if needed
             // Set the player square to true and then skip it on future ray traces.
-            Field[x, y].IsVisible = true;
-            Field[x, y].IsExplored = true;
+            Terrain playerTile = Field[x, y];
+            playerTile.IsVisible = true;
+            if (!playerTile.IsExplored)
+            {
+                playerTile.IsExplored = true;
+                Discovered.Add(playerTile);
+            }
 
             foreach (Terrain tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
             {
@@ -439,7 +450,11 @@ namespace Roguelike.World
                     if (visible)
                     {
                         // Update the explored status while we're at it
-                        tt.IsExplored = true;
+                        if (!tt.IsExplored)
+                        {
+                            tt.IsExplored = true;
+                            Discovered.Add(tt);
+                        }
 
                         if (!tt.IsLightable)
                             visible = false;

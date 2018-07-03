@@ -1,13 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Roguelike.World
 {
     [Serializable]
     public struct LevelId
     {
-        public string RegionName { get; set; }
+        public string Name { get; set; }
+        public RegionType RegionName { get; set; }
         public int Depth { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name} ({RegionName} {Depth})";
+        }
 
         #region equality
         public override bool Equals(object obj)
@@ -18,15 +24,18 @@ namespace Roguelike.World
             }
 
             var level = (LevelId)obj;
-            return RegionName == level.RegionName &&
+            return Name == level.Name &&
+                   RegionName == level.RegionName &&
                    Depth == level.Depth;
         }
 
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode()
         {
             var hashCode = 138455800;
             hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(RegionName);
+            hashCode = hashCode * -1521134295 + Name.GetHashCode();
+            hashCode = hashCode * -1521134295 + RegionName.GetHashCode();
             hashCode = hashCode * -1521134295 + Depth.GetHashCode();
             return hashCode;
         }
