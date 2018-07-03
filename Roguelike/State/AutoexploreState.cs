@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using RLNET;
 using Roguelike.Commands;
 using Roguelike.Core;
@@ -9,6 +10,7 @@ namespace Roguelike.State
     {
         private static readonly Lazy<AutoexploreState> _instance = new Lazy<AutoexploreState>(() => new AutoexploreState());
         public static AutoexploreState Instance => _instance.Value;
+        private static bool _tick;
 
         private AutoexploreState()
         {
@@ -16,6 +18,16 @@ namespace Roguelike.State
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)
         {
+            _tick = !_tick;
+            if (keyPress == null && _tick)
+                return null;
+
+            if (Game.Map.Discovered.Any(tile => Game.Map.IsInteresting(tile.X, tile.Y)))
+            {
+                Game.StateHandler.PopState();
+                return null;
+            }
+
             WeightedPoint move = Game.Map.MoveTowardsTarget(Game.Player.X, Game.Player.Y, Game.Map.AutoexploreMap);
             return new MoveCommand(Game.Player, move.X, move.Y);
         }

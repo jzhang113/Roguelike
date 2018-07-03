@@ -291,6 +291,12 @@ namespace Roguelike.World
             return true;
         }
 
+        public bool IsInteresting(int x, int y)
+        {
+            int index = ToIndex(x, y);
+            return Exits.TryGetValue(index, out _);
+        }
+
         #region Tile Selection Methods
         public IEnumerable<WeightedPoint> GetPathToPlayer(int x, int y)
         {
