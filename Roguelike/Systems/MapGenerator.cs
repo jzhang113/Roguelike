@@ -32,7 +32,21 @@ namespace Roguelike.Systems
             _map = new MapHandler(_width, _height);
         }
 
-        public MapHandler FillMap()
+        public MapHandler CreateMap(RegionType regionType)
+        {
+            switch (regionType)
+            {
+                case RegionType.Root:
+                case RegionType.Main:
+                case RegionType.Side:
+                case RegionType.Otherside:
+                    return CreateMapBsp();
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private MapHandler FillMap()
         {
             IList<Room> roomsList = new List<Room>();
             int centerX = _width / 2;
@@ -156,7 +170,7 @@ namespace Roguelike.Systems
             return _map;
         }
 
-        public MapHandler CreateMapBsp()
+        private MapHandler CreateMapBsp()
         {
             TreeNode<Room> root = new TreeNode<Room>(new Room(0, 0, _width, _height));
             TreeNode<Room> roomsPartition = PartitionMapBsp(root, _MAX_ROOM_SIZE, _MAX_ROOM_SIZE);

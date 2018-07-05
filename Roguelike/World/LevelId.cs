@@ -7,12 +7,12 @@ namespace Roguelike.World
     public struct LevelId
     {
         public string Name { get; set; }
-        public RegionType RegionName { get; set; }
+        public RegionType RegionType { get; set; }
         public int Depth { get; set; }
 
         public override string ToString()
         {
-            return $"{Name} ({RegionName} {Depth})";
+            return $"{Name} ({RegionType} {Depth})";
         }
 
         #region equality
@@ -25,7 +25,7 @@ namespace Roguelike.World
 
             var level = (LevelId)obj;
             return Name == level.Name &&
-                   RegionName == level.RegionName &&
+                   RegionType == level.RegionType &&
                    Depth == level.Depth;
         }
 
@@ -35,7 +35,7 @@ namespace Roguelike.World
             var hashCode = 138455800;
             hashCode = hashCode * -1521134295 + base.GetHashCode();
             hashCode = hashCode * -1521134295 + Name.GetHashCode();
-            hashCode = hashCode * -1521134295 + RegionName.GetHashCode();
+            hashCode = hashCode * -1521134295 + RegionType.GetHashCode();
             hashCode = hashCode * -1521134295 + Depth.GetHashCode();
             return hashCode;
         }

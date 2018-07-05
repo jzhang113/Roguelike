@@ -37,7 +37,7 @@ namespace Roguelike.World
             _currentLevel = new LevelId
             {
                 Name = _ROOT_NAME,
-                RegionName = RegionType.Root,
+                RegionType = RegionType.Root,
                 Depth = 1
             };
             Map = CreateLevel(CurrentLevel);
@@ -83,7 +83,7 @@ namespace Roguelike.World
                     new LevelId
                     {
                         Name = _ROOT_NAME,
-                        RegionName = RegionType.Root,
+                        RegionType = RegionType.Root,
                         Depth = 1
                     },
                     new LevelData
@@ -128,11 +128,11 @@ namespace Roguelike.World
             if (region.Constraints.Require != null)
             {
                 parentId = region.Constraints.Require.First();
-                parentLevel = FindLevelByRegion(parentId.RegionName, world);
+                parentLevel = FindLevelByRegion(parentId.RegionType, world);
             }
             else if (region.Constraints.Avoid != null)
             {
-                var remaining = world.Where(kvp => !region.Constraints.Avoid.Contains(kvp.Key.RegionName)).ToList();
+                var remaining = world.Where(kvp => !region.Constraints.Avoid.Contains(kvp.Key.RegionType)).ToList();
                 var keyValuePair = remaining.ElementAt(Random.Next(remaining.Count));
                 parentId = keyValuePair.Key;
                 parentLevel = keyValuePair.Value;
@@ -147,7 +147,7 @@ namespace Roguelike.World
             LevelId firstId = new LevelId
             {
                 Name = levelName,
-                RegionName = region.Type,
+                RegionType = region.Type,
                 Depth = 1
             };
             parentLevel.Exits.Add(firstId);
@@ -162,7 +162,7 @@ namespace Roguelike.World
                     new LevelId
                     {
                         Name = levelName,
-                        RegionName = region.Type,
+                        RegionType = region.Type,
                         Depth = 2
                     }
                 }
@@ -175,7 +175,7 @@ namespace Roguelike.World
                 LevelId id = new LevelId
                 {
                     Name = levelName,
-                    RegionName = region.Type,
+                    RegionType = region.Type,
                     Depth = depth
                 };
                 LevelData level = new LevelData
@@ -186,13 +186,13 @@ namespace Roguelike.World
                         new LevelId
                         {
                             Name = levelName,
-                            RegionName = region.Type,
+                            RegionType = region.Type,
                             Depth = depth - 1
                         },
                         new LevelId
                         {
                             Name = levelName,
-                            RegionName = region.Type,
+                            RegionType = region.Type,
                             Depth = depth + 1
                         }
                     }
@@ -203,7 +203,7 @@ namespace Roguelike.World
             LevelId lastId = new LevelId
             {
                 Name = levelName,
-                RegionName = region.Type,
+                RegionType = region.Type,
                 Depth = maxDepth
             };
             LevelData lastLevel = new LevelData
@@ -214,7 +214,7 @@ namespace Roguelike.World
                     new LevelId
                     {
                         Name = levelName,
-                        RegionName = region.Type,
+                        RegionType = region.Type,
                         Depth = maxDepth - 1
                     }
                 }
@@ -240,11 +240,11 @@ namespace Roguelike.World
             }
         }
 
-        private LevelData FindLevelByRegion(RegionType regionName, Dictionary<LevelId, LevelData> world)
+        private LevelData FindLevelByRegion(RegionType regionType, Dictionary<LevelId, LevelData> world)
         {
             foreach (var kvp in world)
             {
-                if (kvp.Key.RegionName == regionName)
+                if (kvp.Key.RegionType == regionType)
                     return kvp.Value;
             }
 
@@ -263,7 +263,7 @@ namespace Roguelike.World
 
             sw.Start();
             MapGenerator mapGenerator = new MapGenerator(Game.Config.Map.Width, Game.Config.Map.Height, level.Exits, MapRandom);
-            MapHandler map = mapGenerator.CreateMapBsp();
+            MapHandler map = mapGenerator.CreateMap(id.RegionType);
             sw.Stop();
 
             Console.WriteLine($"Map generated in: {sw.Elapsed}");
