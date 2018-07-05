@@ -477,39 +477,28 @@ namespace Roguelike.World
         #region Drawing Methods
         public void Draw(RLConsole mapConsole)
         {
-            int screenWidth = Game.Config.MapView.Width;
-            int screenHeight = Game.Config.MapView.Height;
-            int halfWidth = screenWidth / 2;
-            int halfHeight = screenHeight / 2;
+            Camera.UpdateCamera();
 
-            // set left and top limits for the camera
-            int startX = Math.Max(Game.Player.X - halfWidth, 0);
-            int startY = Math.Max(Game.Player.Y - halfHeight, 0);
-
-            // set right and bottom limits for the camera
-            startX = Math.Min(Width - screenWidth, startX);
-            startY = Math.Min(Height - screenHeight, startY);
-
-            for (int dx = 0; dx < screenWidth; dx++)
+            for (int dx = 0; dx < Game.Config.MapView.Width; dx++)
             {
-                for (int dy = 0; dy < screenHeight; dy++)
+                for (int dy = 0; dy < Game.Config.MapView.Height; dy++)
                 {
-                    DrawTile(mapConsole, startX + dx, startY + dy, dx, dy);
+                    DrawTile(mapConsole, Camera.X + dx, Camera.Y + dy, dx, dy);
                 }
             }
 
             foreach (Door door in Doors.Values)
             {
-                int destX = door.X - startX;
-                int destY = door.Y - startY;
+                int destX = door.X - Camera.X;
+                int destY = door.Y - Camera.Y;
                 door.DrawingComponent.Draw(mapConsole, Field[door.X, door.Y], destX, destY);
             }
 
             foreach (InventoryHandler stack in Items.Values)
             {
                 Item topItem = stack.First().Item;
-                int destX = topItem.X - startX;
-                int destY = topItem.Y - startY;
+                int destX = topItem.X - Camera.X;
+                int destY = topItem.Y - Camera.Y;
                 topItem.DrawingComponent.Draw(mapConsole, Field[topItem.X, topItem.Y], destX, destY);
             }
 
@@ -517,19 +506,19 @@ namespace Roguelike.World
             {
                 if (!unit.IsDead)
                 {
-                    int destX = unit.X - startX;
-                    int destY = unit.Y - startY;
+                    int destX = unit.X - Camera.X;
+                    int destY = unit.Y - Camera.Y;
                     unit.DrawingComponent.Draw(mapConsole, Field[unit.X, unit.Y], destX, destY);
                 }
                 else
                     // HACK: draw some corpses
-                    mapConsole.SetChar(unit.X - startX, unit.Y - startY, '%');
+                    mapConsole.SetChar(unit.X - Camera.X, unit.Y - Camera.Y, '%');
             }
 
             foreach (Exit exit in Exits.Values)
             {
-                int destX = exit.X - startX;
-                int destY = exit.Y - startY;
+                int destX = exit.X - Camera.X;
+                int destY = exit.Y - Camera.Y;
                 exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y], destX, destY);
             }
         }
