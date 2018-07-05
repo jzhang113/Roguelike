@@ -173,13 +173,13 @@ namespace Roguelike
             LookHandler.Draw(_viewConsole);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.MapView.Width, 0);
 
-
             Map.ClearHighlight();
             MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
             Map.Draw(MapConsole);
-            RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.MessageView.Height);
 
             StateHandler.Draw();
+
+            RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.MessageView.Height);
             RootConsole.Draw();
             _render = false;
         }

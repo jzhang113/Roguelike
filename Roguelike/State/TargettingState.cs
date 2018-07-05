@@ -13,13 +13,13 @@ namespace Roguelike.State
     {
         private readonly Actor _targetSource;
         private readonly IAction _targetAction;
-        private readonly Func<IEnumerable<Terrain>, ICommand> _createCommand;
+        private readonly Func<IEnumerable<Terrain>, ICommand> _callback;
 
-        public TargettingState(Actor source, IAction action, Func<IEnumerable<Terrain>, ICommand> func)
+        public TargettingState(Actor source, IAction action, Func<IEnumerable<Terrain>, ICommand> callback)
         {
             _targetSource = source;
             _targetAction = action;
-            _createCommand = func;
+            _callback = callback;
 
             OverlayHandler.DisplayText = "targetting mode";
         }
@@ -50,7 +50,7 @@ namespace Roguelike.State
             }
 
             IEnumerable<Terrain> targets = _targetAction.Area.GetTilesInRange(_targetSource, click);
-            return _createCommand(targets);
+            return _callback(targets);
         }
 
         public void Update()

@@ -5,6 +5,8 @@ using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Systems;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.State
 {
@@ -105,6 +107,23 @@ namespace Roguelike.State
                     return null;
                 case RLKey.O:
                     Game.StateHandler.PushState(AutoexploreState.Instance);
+                    return null;
+                case RLKey.Q:
+                    var hookAction = new HookAction(100);
+                    Game.StateHandler.PushState(new TargettingState(
+                        Game.Player,
+                        hookAction,
+                        returnTarget =>
+                        {
+                            IEnumerable<Terrain> enumerable = returnTarget.ToList();
+                            Game.StateHandler.PushState(new AnimationState(
+                                new Animations.HookAnimation(
+                                    Game.Player,
+                                    enumerable.First()
+                                ),
+                                () => new ActionCommand(Game.Player, hookAction, enumerable)));
+                            return null;
+                        }));
                     return null;
                 case RLKey.R:
                     Game.NewGame();

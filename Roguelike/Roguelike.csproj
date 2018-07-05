@@ -86,8 +86,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\EnchantAction.cs" />
+    <Compile Include="Actions\HookAction.cs" />
     <Compile Include="Actions\MoveAction.cs" />
     <Compile Include="Actors\ActorParameters.cs" />
+    <Compile Include="Animations\HookAnimation.cs" />
+    <Compile Include="Animations\IAnimation.cs" />
     <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\ApplyCommand.cs" />
     <Compile Include="Commands\ChangeLevelCommand.cs" />
@@ -102,6 +105,7 @@
     <Compile Include="Items\ItemCount.cs" />
     <Compile Include="Items\ItemParameter.cs" />
     <Compile Include="Items\ItemStack.cs" />
+    <Compile Include="State\AnimationState.cs" />
     <Compile Include="State\ApplyState.cs" />
     <Compile Include="State\AutoexploreState.cs" />
     <Compile Include="State\DropState.cs" />
@@ -116,6 +120,7 @@
     <Compile Include="Utils\RLKeyExtensions.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="Systems\OverlayHandler.cs" />
+    <Compile Include="Core\Camera.cs" />
     <Compile Include="World\LevelData.cs" />
     <Compile Include="World\LevelId.cs" />
     <Compile Include="World\WorldHandler.cs" />
