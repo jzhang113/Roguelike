@@ -116,6 +116,9 @@ namespace Roguelike.State
                         hookAction,
                         returnTarget => new ActionCommand(Game.Player, hookAction, returnTarget)));
                     return null;
+                case RLKey.W:
+                    Game.StateHandler.PushState(new AnimationState(new Animations.SpinAnimation(Game.Player.X, Game.Player.Y)));
+                    return null;
                 case RLKey.R:
                     Game.NewGame();
                     return null;
