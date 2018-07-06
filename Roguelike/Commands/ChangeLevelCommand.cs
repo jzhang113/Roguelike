@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Systems;
 using Roguelike.World;
 
@@ -8,6 +9,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
+        public IAnimation Animation { get; } = null;
 
         private readonly LevelId _newLevel;
 

@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using System;
 
@@ -9,13 +10,13 @@ namespace Roguelike.Actions
     {
         public int Power { get; }
         public TargetZone Area { get; }
-        public int Speed { get; }
+        public int Speed { get; } = Utils.Constants.FULL_TURN;
+        public IAnimation Animation { get; } = null;
 
         public HealAction(int power, TargetZone targetZone)
         {
             Power = power;
             Area = targetZone;
-            Speed = Utils.Constants.FULL_TURN;
         }
 
         // Heals the target by amount up to its maximum health.

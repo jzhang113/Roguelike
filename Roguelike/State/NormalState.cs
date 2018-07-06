@@ -109,21 +109,12 @@ namespace Roguelike.State
                     Game.StateHandler.PushState(AutoexploreState.Instance);
                     return null;
                 case RLKey.Q:
-                    var hookAction = new HookAction(100);
+                    // NOTE: Player actually gets a double turn when using the hook, but it seems ok.
+                    IAction hookAction = new HookAction(100);
                     Game.StateHandler.PushState(new TargettingState(
                         Game.Player,
                         hookAction,
-                        returnTarget =>
-                        {
-                            IEnumerable<Terrain> enumerable = returnTarget.ToList();
-                            Game.StateHandler.PushState(new AnimationState(
-                                new Animations.HookAnimation(
-                                    Game.Player,
-                                    enumerable.First()
-                                ),
-                                () => new ActionCommand(Game.Player, hookAction, enumerable)));
-                            return null;
-                        }));
+                        returnTarget => new ActionCommand(Game.Player, hookAction, returnTarget)));
                     return null;
                 case RLKey.R:
                     Game.NewGame();
@@ -230,8 +221,12 @@ namespace Roguelike.State
 
             if (EventScheduler.Execute(Game.Player, command))
             {
-                Game.EventScheduler.Run();
                 Game.ForceRender();
+
+                if (command.Animation != null)
+                    Game.StateHandler.PushState(new AnimationState(command.Animation));
+
+                Game.EventScheduler.Run();
             }
         }
 

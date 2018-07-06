@@ -1,5 +1,6 @@
 ﻿using Roguelike.Actions;
 using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Systems;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
+        public IAnimation Animation { get; } = null;
 
         private readonly int _newX;
         private readonly int _newY;

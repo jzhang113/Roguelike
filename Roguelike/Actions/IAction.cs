@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 
 namespace Roguelike.Actions
@@ -8,10 +9,14 @@ namespace Roguelike.Actions
     // has a total time cost.
     public interface IAction
     {
+        // Holds the area that an Action can target.
+        TargetZone Area { get; }
+
         // Energy cost to perform
         int Speed { get; }
 
-        TargetZone Area { get; }
+        // Any visual effects to display.
+        IAnimation Animation { get; }
 
         // Execute the Action. This takes a Terrain as it may have additional environmental effects.
         void Activate(Actor source, Terrain target);

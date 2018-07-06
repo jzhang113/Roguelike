@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands
@@ -7,6 +8,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; }
+        public IAnimation Animation { get; } = null;
 
         public WaitCommand(Actor source)
         {

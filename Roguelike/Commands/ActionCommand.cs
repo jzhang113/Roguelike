@@ -1,5 +1,6 @@
 ﻿using Roguelike.Actions;
 using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Systems;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; }
+        public IAnimation Animation => _action?.Animation;
 
         private readonly IAction _action;
         private readonly bool _singleTarget;

@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Items;
 using Roguelike.Systems;
@@ -10,6 +11,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; }
+        public IAnimation Animation { get; } = null;
 
         private readonly Item _thrownItem;
         private readonly ICollection<Actor> _targetList;

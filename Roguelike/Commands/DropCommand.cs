@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Items;
 using Roguelike.Systems;
 
@@ -8,6 +9,8 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = 0;
+        public IAnimation Animation { get; } = null;
+
         public string Input { get; set; }
 
         private readonly ItemCount _itemCount;

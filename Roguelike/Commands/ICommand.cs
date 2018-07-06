@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands
@@ -12,6 +13,9 @@ namespace Roguelike.Commands
 
         // How long the Action takes to perform.
         int EnergyCost { get; }
+
+        // Visual effects when performing an Action.
+        IAnimation Animation { get; }
 
         // Check if the Action succeed before execution. Invalid actions should be cancelled and
         // not expend energy. Some invalid actions may be redirected to become valid actions.

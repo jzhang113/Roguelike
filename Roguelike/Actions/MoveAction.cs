@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using System;
 
@@ -8,12 +9,12 @@ namespace Roguelike.Actions
     class MoveAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed { get; }
+        public int Speed { get; } = Utils.Constants.FULL_TURN;
+        public IAnimation Animation { get; } = null;
 
         public MoveAction(TargetZone targetZone)
         {
             Area = targetZone;
-            Speed = Utils.Constants.FULL_TURN;
         }
 
         public void Activate(Actor source, Terrain target)

@@ -8,12 +8,10 @@ namespace Roguelike.State
     class AnimationState : IState
     {
         private readonly IAnimation _animation;
-        private readonly Func<ICommand> _callback;
 
-        public AnimationState(IAnimation animation, Func<ICommand> callback)
+        public AnimationState(IAnimation animation)
         {
             _animation = animation;
-            _callback = callback;
         }
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)

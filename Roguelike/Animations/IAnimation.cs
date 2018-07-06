@@ -1,10 +1,14 @@
-﻿namespace Roguelike.Animations
+﻿using System;
+
+namespace Roguelike.Animations
 {
-    interface IAnimation
+    public interface IAnimation
     {
         bool Done { get; }
 
         void Update();
         void Draw();
+
+        event EventHandler Complete;
     }
 }

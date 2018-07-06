@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
@@ -10,6 +11,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
+        public IAnimation Animation => _usableItem?.ApplySkill?.Animation;
 
         private readonly IUsable _usableItem;
         private readonly IEnumerable<Terrain> _target;

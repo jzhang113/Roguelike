@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Items;
 using Roguelike.Systems;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; } = Utils.Constants.HALF_TURN;
+        public IAnimation Animation { get; } = null;
 
         private readonly InventoryHandler _itemStack;
 

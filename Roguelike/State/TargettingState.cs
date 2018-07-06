@@ -64,6 +64,9 @@ namespace Roguelike.State
             {
                 Game.StateHandler.PopState();
                 Game.ForceRender();
+
+                if (command.Animation != null)
+                    Game.StateHandler.PushState(new AnimationState(command.Animation));
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Items;
 using System;
@@ -8,13 +9,15 @@ namespace Roguelike.Actions
     [Serializable]
     class EnchantAction : IAction
     {
-        public int Speed { get; }
         public TargetZone Area { get; }
+        public int Speed { get; } = Utils.Constants.FULL_TURN;
+        public IAnimation Animation { get; } = null;
+
+        IAnimation IAction.Animation => throw new NotImplementedException();
 
         public EnchantAction(TargetZone area)
         {
             Area = area;
-            Speed = Utils.Constants.FULL_TURN;
         }
 
         public void Activate(Actor source, Terrain target)

@@ -44,6 +44,10 @@ namespace Roguelike.State
             {
                 Game.StateHandler.PopState();
                 Game.ForceRender();
+
+                // Q: can any item action events even have animations?
+                if (command.Animation != null)
+                    Game.StateHandler.PushState(new AnimationState(command.Animation));
             }
         }
 
