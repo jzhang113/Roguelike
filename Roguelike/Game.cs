@@ -1,7 +1,6 @@
 ﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
-using Roguelike.State;
 using Roguelike.Systems;
 using Roguelike.Utils;
 using Roguelike.World;
@@ -14,12 +13,6 @@ namespace Roguelike
 {
     static class Game
     {
-        // internal so input handler can change modes
-        public static IState GameState { get; set; }
-        public static bool ShowModal { get; internal set; }
-        public static bool ShowEquipment { get; internal set; }
-        public static bool ShowOverlay { get; internal set; }
-
         public static Configuration Config { get; private set; }
         public static Options Option { get; private set; }
 
@@ -96,14 +89,7 @@ namespace Roguelike
             using (Stream saveFile = File.OpenWrite(Constants.SAVE_FILE))
             {
                 BinaryFormatter serializer = new BinaryFormatter();
-                serializer.Serialize(saveFile, new SaveObject
-                {
-                    GameState = GameState,
-                    ShowEquipment = ShowEquipment,
-                    ShowInventory = ShowModal,
-                    ShowOverlay = ShowOverlay,
-                    World = World
-                });
+                serializer.Serialize(saveFile, World);
             }
         }
 
@@ -118,13 +104,7 @@ namespace Roguelike
                 using (Stream saveFile = File.OpenRead(Constants.SAVE_FILE))
                 {
                     BinaryFormatter deserializer = new BinaryFormatter();
-                    SaveObject saved = (SaveObject)deserializer.Deserialize(saveFile);
-
-                    GameState = saved.GameState;
-                    ShowEquipment = saved.ShowEquipment;
-                    ShowModal = saved.ShowInventory;
-                    ShowOverlay = saved.ShowOverlay;
-                    World = saved.World;
+                    World = (WorldHandler)deserializer.Deserialize(saveFile);
                 }
             }
             catch (Exception ex)

@@ -8,9 +8,6 @@ namespace Roguelike.Core
     class SaveObject
     {
         public IState GameState { get; set; }
-        public bool ShowEquipment { get; set; }
-        public bool ShowInventory { get; set; }
-        public bool ShowOverlay { get; set; }
 
         public WorldHandler World { get; set; }
     }
