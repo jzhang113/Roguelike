@@ -173,7 +173,6 @@ namespace Roguelike
             LookHandler.Draw(_viewConsole);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.MapView.Width, 0);
 
-            Map.ClearHighlight();
             MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
             Map.Draw(MapConsole);
 

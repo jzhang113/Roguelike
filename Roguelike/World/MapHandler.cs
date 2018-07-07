@@ -19,8 +19,6 @@ namespace Roguelike.World
         internal Field Field { get; }
 
         // internal transient helper structures
-        internal RLColor[,] Highlight { get; }
-        internal RLColor[,] PermHighlight { get; }
         internal float[,] PlayerMap { get; }
         internal float[,] AutoexploreMap { get; }
         internal ICollection<Terrain> Discovered { get; }
@@ -42,8 +40,6 @@ namespace Roguelike.World
             Height = height;
 
             Field = new Field(width, height);
-            Highlight = new RLColor[width, height];
-            PermHighlight = new RLColor[width, height];
             PlayerMap = new float[width, height];
             AutoexploreMap = new float[width, height];
             Discovered = new List<Terrain>();
@@ -82,8 +78,6 @@ namespace Roguelike.World
                 Value = (ICollection<Exit>)info.GetValue($"{nameof(Exits)}.values", typeof(ICollection<Exit>))
             };
 
-            Highlight = new RLColor[Width, Height];
-            PermHighlight = new RLColor[Width, Height];
             PlayerMap = new float[Width, Height];
             AutoexploreMap = new float[Width, Height];
             Discovered = new List<Terrain>();
@@ -550,19 +544,6 @@ namespace Roguelike.World
                 else
                 {
                     mapConsole.Set(destX, destY, Colors.Wall, Colors.WallBackground, '#');
-                }
-            }
-
-            mapConsole.SetBackColor(destX, destY, Highlight[srcX, srcY]);
-        }
-
-        internal void ClearHighlight()
-        {
-            for (int x = 0; x < Width; x++)
-            {
-                for (int y = 0; y < Height; y++)
-                {
-                    Highlight[x, y] = RLColor.Black;
                 }
             }
         }

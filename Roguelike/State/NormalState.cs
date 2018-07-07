@@ -5,8 +5,6 @@ using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Systems;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Roguelike.State
 {
@@ -110,7 +108,7 @@ namespace Roguelike.State
                     return null;
                 case RLKey.Q:
                     // NOTE: Player actually gets a double turn when using the hook, but it seems ok.
-                    IAction hookAction = new HookAction(100);
+                    IAction hookAction = new HookAction(10);
                     Game.StateHandler.PushState(new TargettingState(
                         Game.Player,
                         hookAction,
@@ -235,10 +233,8 @@ namespace Roguelike.State
 
         public void Draw()
         {
-            Game.Map.ClearHighlight();
             Game.MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
             Game.Map.Draw(Game.MapConsole);
-            RLConsole.Blit(Game.MapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game.RootConsole, 0, Game.Config.MessageView.Height);
         }
     }
 }
