@@ -1,7 +1,6 @@
 ﻿using RLNET;
 using Roguelike.Animations;
 using Roguelike.Commands;
-using System;
 
 namespace Roguelike.State
 {

@@ -7,12 +7,10 @@ namespace Roguelike.Systems
     {
         public static string DisplayText { get; set; }
         public static RLColor[,] Background { get; }
-        public static RLColor[,] Foreground { get; }
 
         static OverlayHandler()
         {
             Background = new RLColor[Game.Config.Map.Width, Game.Config.Map.Height];
-            Foreground = new RLColor[Game.Config.MapView.Width, Game.Config.MapView.Height];
         }
 
         public static void Draw(RLConsole console)
@@ -23,12 +21,12 @@ namespace Roguelike.Systems
             {
                 for (int j = 0; j < Game.Config.Map.Height; j++)
                 {
-                    console.SetBackColor(i, j, Background[i, j]);
+                    console.SetBackColor(i - Camera.X, j - Camera.Y, Background[i, j]);
                 }
             }
         }
 
-        public static void Clear()
+        public static void ClearBackground()
         {
             for (int i = 0; i < Game.Config.Map.Width; i++)
             {

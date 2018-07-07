@@ -6,10 +6,11 @@ using Roguelike.Core;
 using Roguelike.Systems;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.State
 {
-    class TargettingState: IState
+    class TargettingState : IState
     {
         private readonly Actor _targetSource;
         private readonly IAction _targetAction;
@@ -32,12 +33,35 @@ namespace Roguelike.State
 
         public ICommand HandleMouseInput(RLMouse mouse)
         {
-            foreach (Terrain tile in Game.Map.GetTilesInRadius(_targetSource.X, _targetSource.Y, (int)_targetAction.Area.Range))
+            OverlayHandler.ClearBackground();
+            var inRange = Game.Map.GetTilesInRadius(_targetSource.X, _targetSource.Y, (int)_targetAction.Area.Range).ToList();
+            foreach (Terrain tile in inRange)
             {
-                Game.Map.Highlight[tile.X, tile.Y] = Swatch.DbGrass;
+                if (tile.IsVisible)
+                    OverlayHandler.Background[tile.X, tile.Y] = Swatch.DbGrass;
             }
 
-            if (!MouseHandler.GetClickPosition(mouse, out (int X, int Y) click))
+            if (!MouseHandler.GetHoverPosition(mouse, out (int X, int Y) hover))
+                return null;
+
+            (int X, int Y) click = hover;
+
+            foreach (Terrain highlight in Game.Map.GetStraightLinePath(_targetSource.X, _targetSource.Y,
+                hover.X, hover.Y))
+            {
+                if (!inRange.Contains(highlight))
+                    break;
+
+                OverlayHandler.Background[highlight.X, highlight.Y] = Swatch.DbSun;
+                click = (highlight.X, highlight.Y);
+
+                if (!highlight.IsWalkable)
+                    break;
+            }
+
+            OverlayHandler.Background[click.X, click.Y] = Swatch.DbBlood;
+
+            if (!mouse.GetLeftClick())
                 return null;
 
             int distance = Utils.Distance.EuclideanDistanceSquared(_targetSource.X, _targetSource.Y, click.X, click.Y);

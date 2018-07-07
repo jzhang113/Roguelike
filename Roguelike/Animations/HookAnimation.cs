@@ -10,10 +10,10 @@ namespace Roguelike.Animations
     {
         public bool Done { get; private set; }
 
-        private Actor _source;
-        private Actor _target;
-        private IList<Terrain> _path;
-        private bool _retract;
+        private readonly Actor _source;
+        private readonly Actor _target;
+        private readonly IList<Terrain> _path;
+        private readonly bool _retract;
         private int _counter;
         private bool _hit;
         private Terrain _prevPos;
@@ -40,6 +40,12 @@ namespace Roguelike.Animations
                 {
                     _counter = _path.Count - 1;
                     _hit = true;
+
+                    // Deactivate Actors so duplicates aren't drawn.
+                    if (!_retract)
+                        _source.DrawingComponent.Activated = false;
+                    else if (_target != null)
+                        _target.DrawingComponent.Activated = false;
                 }
             }
             else
@@ -47,6 +53,11 @@ namespace Roguelike.Animations
                 _counter -= 2;
                 if (--_counter <= 0)
                 {
+                    // Reactivate Actors.
+                    _source.DrawingComponent.Activated = true;
+                    if (_target != null)
+                        _target.DrawingComponent.Activated = true;
+
                     _counter = 0;
                     Done = true;
                     OnComplete(EventArgs.Empty);
@@ -78,9 +89,8 @@ namespace Roguelike.Animations
 
                     if (_target != null && _counter > 0)
                     {
-                        // seems like the easiest way to animate the character moving is to physically move them
                         _prevPos = _path[_counter - 1];
-                        Game.Map.SetActorPosition(_target, _prevPos.X, _prevPos.Y);
+                        _target.DrawingComponent.Draw(Game.MapConsole, _prevPos, _prevPos.X - Camera.X, _prevPos.Y - Camera.Y);
                     }
                 }
                 else
@@ -92,16 +102,16 @@ namespace Roguelike.Animations
                         Game.MapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
                     }
 
-                    if (_counter > 0)
+                    if (_counter > 1)
                     {
-                        _prevPos = _path[_path.Count - _counter];
-                        Game.Map.SetActorPosition(_source, _prevPos.X, _prevPos.Y);
+                        _prevPos = _path[_path.Count - _counter + 1];
+                        _source.DrawingComponent.Draw(Game.MapConsole, _prevPos, _prevPos.X - Camera.X, _prevPos.Y - Camera.Y);
                     }
                 }
             }
         }
 
         public event EventHandler Complete;
-        protected virtual void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
+        private void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
     }
 }

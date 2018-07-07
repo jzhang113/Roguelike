@@ -556,7 +556,7 @@ namespace Roguelike.World
                 tile.IsVisible = false;
 
             Player player = Game.Player;
-            ComputeFov(player.X, player.Y, player.Parameters.Awareness);
+            ComputeFov(player.X, player.Y, 100);
         }
 
         private void UpdatePlayerMaps()

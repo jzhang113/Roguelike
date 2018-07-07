@@ -14,8 +14,11 @@ namespace Roguelike.Interfaces
         public int X { get; set; }
         public int Y { get; set; }
 
+        internal bool Activated { get; set; }
+
         public Drawable()
         {
+            Activated = true;
         }
 
         protected Drawable(SerializationInfo info, StreamingContext context)
@@ -25,14 +28,18 @@ namespace Roguelike.Interfaces
             float b = (float)info.GetValue($"{nameof(Color)}.b", typeof(float));
             Color = new RLColor(r, g, b);
 
-            Symbol = (char)info.GetValue(nameof(Symbol), typeof(char));
-            X = (int)info.GetValue(nameof(X), typeof(int));
-            Y = (int)info.GetValue(nameof(Y), typeof(int));
+            Symbol = info.GetChar(nameof(Symbol));
+            X = info.GetInt32(nameof(X));
+            Y = info.GetInt32(nameof(Y));
+            Activated = info.GetBoolean(nameof(Activated));
         }
 
         public void Draw(RLConsole console, Terrain tile, int destX, int destY)
         {
             if (!tile.IsExplored)
+                return;
+
+            if (!Activated)
                 return;
 
             if (tile.IsVisible)
@@ -55,6 +62,7 @@ namespace Roguelike.Interfaces
             info.AddValue(nameof(Symbol), Symbol);
             info.AddValue(nameof(X), X);
             info.AddValue(nameof(Y), Y);
+            info.AddValue(nameof(Activated), Activated);
         }
     }
 }

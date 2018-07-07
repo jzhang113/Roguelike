@@ -51,9 +51,10 @@ namespace Roguelike.Actions
                         Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
                     };
                 }
-                else if (Game.Map.Field[collisionTile.X, collisionTile.Y].IsWall)
+                else
                 {
-                    // If a wall is hit, pull the source to the wall.
+                    // If something else got hit, it must be a wall or door. In either case, pull
+                    // the source towards the target.
                     Animation = new HookAnimation(source, collisionPath, false);
                     Animation.Complete += (sender, arg) =>
                     {
