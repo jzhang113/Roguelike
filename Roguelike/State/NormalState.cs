@@ -216,19 +216,9 @@ namespace Roguelike.State
 
         public void Update()
         {
-            ICommand command = Game.StateHandler.HandleInput();
-            if (command == null)
-                return;
-
-            if (EventScheduler.Execute(Game.Player, command))
-            {
-                Game.ForceRender();
-
-                if (command.Animation != null)
-                    Game.StateHandler.PushState(new AnimationState(command.Animation));
-
-                Game.EventScheduler.Run();
-            }
+            Game.Player.NextCommand = Game.StateHandler.HandleInput();
+            Game.EventScheduler.Run();
+            Game.ForceRender();
         }
 
         public void Draw()

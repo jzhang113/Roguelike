@@ -20,16 +20,14 @@ namespace Roguelike.Animations
 
         public void Update()
         {
-            _frame++;
+            System.Diagnostics.Debug.Assert(!Done);
 
-            if (_frame > 8)
+            if (++_frame >= 8)
                 Done = true;
         }
 
         public void Draw()
         {
-            System.Diagnostics.Debug.Assert(!Done);
-
             switch(_frame)
             {
                 case 1: Game.MapConsole.Set(_x - 1, _y - 1, Swatch.DbBrightWood, null, '\\'); break;

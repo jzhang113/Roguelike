@@ -1,5 +1,4 @@
-﻿using System;
-using RLNET;
+﻿using RLNET;
 using Roguelike.Core;
 
 namespace Roguelike.Systems

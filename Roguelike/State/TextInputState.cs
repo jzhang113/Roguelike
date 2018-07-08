@@ -1,6 +1,5 @@
 ﻿using RLNET;
 using Roguelike.Commands;
-using Roguelike.Systems;
 using Roguelike.Utils;
 using System;
 using System.Text;
@@ -17,11 +16,14 @@ namespace Roguelike.State
             _inputBuffer = new StringBuilder();
             _createCommand = func;
 
-            OverlayHandler.DisplayText = "Drop how many?";
+            Game.OverlayHandler.DisplayText = "Drop how many?";
         }
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)
         {
+            if (keyPress == null)
+                return null;
+
             switch (keyPress.Key)
             {
                 case RLKey.BackSpace:
@@ -35,7 +37,7 @@ namespace Roguelike.State
                     break;
             }
 
-            OverlayHandler.DisplayText = $"Drop how many? {_inputBuffer}";
+            Game.OverlayHandler.DisplayText = $"Drop how many? {_inputBuffer}";
             return null;
         }
 
@@ -51,17 +53,14 @@ namespace Roguelike.State
             if (command == null)
                 return;
 
-            if (EventScheduler.Execute(Game.Player, command))
-            {
-                Game.StateHandler.PopState();
-                Game.ForceRender();
-            }
+            Game.Player.NextCommand = command;
+            Game.EventScheduler.Run();
+            Game.StateHandler.PopState();
         }
 
         public void Draw()
         {
-            OverlayHandler.Draw(Game.MapConsole);
-            RLConsole.Blit(Game.MapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game.RootConsole, 0, Game.Config.MessageView.Height);
+            Game.OverlayHandler.Draw(Game.MapConsole);
         }
     }
 }

@@ -10,11 +10,6 @@ namespace Roguelike.Utils
 
         public int Count { get; private set; }
         public bool IsReadOnly => false;
-        internal T[] GetHeap() => _heap;
-
-        public MaxHeap() : this(16)
-        {
-        }
 
         public MaxHeap(int size)
         {

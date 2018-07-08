@@ -34,6 +34,7 @@ namespace Roguelike.Systems
                 _messages.RemoveAt(0);
 
             Redraw = true;
+            Game.ForceRender();
         }
 
         // Modify the last message by adding additional text.
@@ -43,6 +44,7 @@ namespace Roguelike.Systems
             _messages[prev] += " " + text;
 
             Redraw = true;
+            Game.ForceRender();
         }
 
         public void Clear()

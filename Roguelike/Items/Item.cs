@@ -9,7 +9,7 @@ namespace Roguelike.Items
     [Serializable]
     public class Item
     {
-        public int Enchantment { get; set; } = 0;
+        public int Enchantment { get; set; }
 
         public ItemParameter Parameters { get; }
         public Drawable DrawingComponent { get; }

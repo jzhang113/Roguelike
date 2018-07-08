@@ -10,7 +10,7 @@ namespace Roguelike.Actions
     {
         public TargetZone Area { get; }
         public int Speed { get; } = Utils.Constants.FULL_TURN;
-        public IAnimation Animation { get; private set; } = null;
+        public IAnimation Animation { get; private set; }
 
         public HookAction(int range)
         {

@@ -17,6 +17,12 @@ namespace Roguelike.Systems
             _states.Push(NormalState.Instance);
         }
 
+        public void Reset()
+        {
+            _states.Clear();
+            _states.Push(NormalState.Instance);
+        }
+
         public ICommand HandleInput()
         {
             IState currentState = _states.Peek();

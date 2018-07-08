@@ -25,6 +25,7 @@ namespace Roguelike.Systems
         public void Clear()
         {
             _entities.Clear();
+            _eventSet.Clear();
         }
 
         // Run updates for all actors until it is the Player's turn to act again.
@@ -54,13 +55,12 @@ namespace Roguelike.Systems
             // Dequeue and execute the handler for each entities in the turn queue until empty.
             while (_eventSet.Count > 0)
             {
-                // It is correct to remove an actor even if they don't act. Player actions are
-                // already handled elsewhere and don't need to be handled here, while other actions
-                // should not normally return false, so skipping them is fine.
-                ISchedulable current = _eventSet.PopMax();
+                ISchedulable current = _eventSet.Peek();
                 ICommand action = current.Act();
                 if (!Execute(current, action))
                     return false;
+                else
+                    _eventSet.PopMax();
             }
 
             return true;

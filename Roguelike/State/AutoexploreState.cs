@@ -23,14 +23,12 @@ namespace Roguelike.State
                 if (Game.Map.TryGetExit(tile.X, tile.Y, out Exit exit))
                 {
                     Game.MessageHandler.AddMessage($"You see an exit to {exit.Destination}");
-                    Game.StateHandler.PopState();
                     return null;
                 }
 
                 if (Game.Map.TryGetStack(tile.X, tile.Y, out Systems.InventoryHandler stack))
                 {
                     Game.MessageHandler.AddMessage($"You see {stack}");
-                    Game.StateHandler.PopState();
                     return null;
                 }
             }
@@ -40,7 +38,6 @@ namespace Roguelike.State
                 .Any(tile => Game.Map.TryGetActor(tile.X, tile.Y, out actor) && !(actor is Player)))
             {
                 Game.MessageHandler.AddMessage($"You see a {actor.Name}");
-                Game.StateHandler.PopState();
                 return null;
             }
 
@@ -49,7 +46,6 @@ namespace Roguelike.State
             {
                 // If the best move is to stay still, we must have explored everything reachable
                 // already, so we can end autoexplore.
-                Game.StateHandler.PopState();
                 Game.MessageHandler.AddMessage($"Fully explored {Game.World.CurrentLevel}");
                 return null;
             }
@@ -66,30 +62,30 @@ namespace Roguelike.State
 
         public void Update()
         {
-            Game.ForceRender();
             ICommand command = Game.StateHandler.HandleInput();
             if (command == null)
-                return;
-
-            Systems.EventScheduler.Execute(Game.Player, command);
             {
-                Game.EventScheduler.Run();
-                Game.ForceRender();
+                Game.StateHandler.PopState();
+                return;
             }
+
+            Game.Player.NextCommand = command;
+            Game.EventScheduler.Run();
+            Game.ForceRender();
         }
 
         public void Draw()
         {
-            Game.Map.Draw(Game.MapConsole);
             for (int x = 0; x < Game.Config.MapView.Width; x++)
             {
                 for (int y = 0; y < Game.Config.MapView.Height; y++)
                 {
-                    Game.MapConsole.SetBackColor(x, y, new RLColor(0, 0, 1 - Game.Map.AutoexploreMap[x + Camera.X, y + Camera.Y] / 30));
+                    Game.OverlayHandler.Set(x, y, new RLColor(0, 0, 1 - Game.Map.AutoexploreMap[x + Camera.X, y + Camera.Y] / 30));
                 }
             }
 
-            RLConsole.Blit(Game.MapConsole, 0, 0, Game.Config.MapView.Width, Game.Config.MapView.Height, Game.RootConsole, 0, Game.Config.MessageView.Height);
+            Game.Map.Draw(Game.MapConsole);
+            Game.OverlayHandler.Draw(Game.MapConsole);
         }
     }
 }

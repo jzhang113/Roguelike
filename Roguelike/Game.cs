@@ -18,9 +18,11 @@ namespace Roguelike
 
         public static WorldHandler World { get; private set; }
         public static Player Player { get; internal set; } // internal for deserialization
+
+        public static StateHandler StateHandler { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
-        public static StateHandler StateHandler { get; private set; }
+        public static OverlayHandler OverlayHandler { get; private set; }
 
         public static MapHandler Map => World.Map;
 
@@ -50,8 +52,8 @@ namespace Roguelike
 
             StateHandler = new StateHandler(RootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
-            EventScheduler = new EventScheduler(20);
-            // NewGame();
+            EventScheduler = new EventScheduler(16);
+            OverlayHandler = new OverlayHandler(Config.MapView.Width, Config.MapView.Height);
 
             RootConsole.Update += RootConsoleUpdate;
             RootConsole.Render += RootConsoleRender;
@@ -75,8 +77,13 @@ namespace Roguelike
                 MaxMp = 50,
                 MaxSp = 50
             });
+
+            StateHandler.Reset();
             MessageHandler.Clear();
             EventScheduler.Clear();
+            OverlayHandler.ClearBackground();
+            OverlayHandler.ClearForeground();
+
             World = Option.FixedSeed
                 ? new WorldHandler(worldParameter, Option.Seed)
                 : new WorldHandler(worldParameter);

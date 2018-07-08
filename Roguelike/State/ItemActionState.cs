@@ -2,7 +2,6 @@
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Items;
-using Roguelike.Systems;
 using Roguelike.Utils;
 
 namespace Roguelike.State
@@ -36,19 +35,18 @@ namespace Roguelike.State
 
         public virtual void Update()
         {
+            Game.ForceRender();
             ICommand command = Game.StateHandler.HandleInput();
             if (command == null)
                 return;
 
-            if (EventScheduler.Execute(Game.Player, command))
-            {
-                Game.StateHandler.PopState();
-                Game.ForceRender();
+            Game.Player.NextCommand = command;
+            Game.EventScheduler.Run();
+            Game.StateHandler.PopState();
 
-                // Q: can any item action events even have animations?
-                if (command.Animation != null)
-                    Game.StateHandler.PushState(new AnimationState(command.Animation));
-            }
+            //Q: can any item action events even have animations?
+            if (command.Animation != null)
+                Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
         public virtual void Draw()

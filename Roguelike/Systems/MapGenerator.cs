@@ -544,7 +544,7 @@ namespace Roguelike.Systems
             foreach (LevelId id in _exits)
             {
                 Exit exit = new Exit(id);
-                while (!_map.Field[exit.X, exit.Y].IsWalkable)
+                while (!_map.Field[exit.X, exit.Y].IsWalkable && !_map.TryGetExit(exit.X, exit.Y, out _))
                 {
                     exit.X = _rand.Next(1, Game.Config.Map.Width - 1);
                     exit.Y = _rand.Next(1, Game.Config.Map.Height - 1);
