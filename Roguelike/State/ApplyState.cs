@@ -24,7 +24,7 @@ namespace Roguelike.State
                 IAction action = usableItem.ApplySkill;
                 if (action.Area.InputRequired)
                 {
-                    TargettingState state = new TargettingState(Game.Player, action, returnTarget =>
+                    TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
                     {
                         Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
                         return new ApplyCommand(Game.Player, usableItem, returnTarget);

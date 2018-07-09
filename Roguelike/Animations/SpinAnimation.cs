@@ -7,9 +7,9 @@ namespace Roguelike.Animations
     {
         public bool Done { get; private set; }
 
-        int _x;
-        int _y;
-        int _frame;
+        private readonly int _x;
+        private readonly int _y;
+        private int _frame;
 
         public SpinAnimation(int x, int y)
         {
@@ -23,7 +23,10 @@ namespace Roguelike.Animations
             System.Diagnostics.Debug.Assert(!Done);
 
             if (++_frame >= 8)
+            {
                 Done = true;
+                OnComplete(EventArgs.Empty);
+            }
         }
 
         public void Draw()
@@ -42,6 +45,6 @@ namespace Roguelike.Animations
         }
 
         public event EventHandler Complete;
-        protected virtual void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
+        private void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
     }
 }

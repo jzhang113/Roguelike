@@ -493,8 +493,24 @@ namespace Roguelike.Systems
                 Count = 1
             });
 
+            _map.AddItem(new ItemCount
+            {
+                Item = new Scroll(
+                    new ItemParameter("scroll of fireball", Materials.Paper),
+                    new DamageAction(
+                        200,
+                        new TargetZone(Enums.TargetShape.Range, range: 10, radius: 3)),
+                    Swatch.DbBlood)
+                {
+                    X = Game.Player.X - 2,
+                    Y = Game.Player.Y - 2
+                },
+                Count = 1
+            });
+
+
             Item planks = new Item(
-                new ItemParameter("plank", Materials.Wood), Swatch.DbWood, '\\')
+                    new ItemParameter("plank", Materials.Wood), Swatch.DbWood, '\\')
             {
                 X = Game.Player.X + 2,
                 Y = Game.Player.Y + 2,

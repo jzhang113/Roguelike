@@ -10,20 +10,21 @@ namespace Roguelike.Core
     {
         public TargetShape Shape { get; }
         public double Range { get; }
+        public int Radius { get; }
         public bool Aimed { get; }
         public (int X, int Y)? Target { get; }
 
         public bool InputRequired => Aimed && Target == null;
 
-        public TargetZone(TargetShape shape, (int X, int Y)? target = null, double range = 1.5)
+        public TargetZone(TargetShape shape, (int X, int Y)? target = null, double range = 1.5, int radius = 0)
         {
             Shape = shape;
             Range = range;
+            Radius = radius;
             Target = target;
 
             switch (Shape)
             {
-                case TargetShape.Area:
                 case TargetShape.Self:
                     Aimed = false;
                     break;
@@ -55,16 +56,16 @@ namespace Roguelike.Core
             switch (Shape)
             {
                 case TargetShape.Self:
-                    inRange.Add(Game.Map.Field[current.X, current.Y]);
-                    return inRange;
-                case TargetShape.Area:
-                    foreach (Terrain tile in Game.Map.Field)
+                    foreach (Terrain tile in Game.Map.GetTilesInRadius(current.X, current.Y, Radius))
                     {
                         AddTilesInRange(current, tile.X, tile.Y, inRange);
                     }
                     return inRange;
                 case TargetShape.Range:
-                    AddTilesInRange(current, x, y, inRange);
+                    foreach (Terrain tile in Game.Map.GetTilesInRadius(x, y, Radius))
+                    {
+                        AddTilesInRange(current, tile.X, tile.Y, inRange);
+                    }
                     return inRange;
                 case TargetShape.Ray:
                     return Game.Map.GetStraightLinePath(current.X, current.Y, x, y);
@@ -84,7 +85,7 @@ namespace Roguelike.Core
             }
         }
 
-        public void AddTilesInRange(Actor actor, int x, int y, ICollection<Terrain> tiles)
+        private void AddTilesInRange(Actor actor, int x, int y, ICollection<Terrain> tiles)
         {
             int distance = Utils.Distance.EuclideanDistanceSquared(actor.X, actor.Y, x, y);
             if (distance > 0 && distance <= Range * Range)

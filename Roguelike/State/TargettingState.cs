@@ -1,5 +1,4 @@
 ﻿using RLNET;
-using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
@@ -12,24 +11,29 @@ namespace Roguelike.State
 {
     class TargettingState : IState
     {
-        private readonly Actor _targetSource;
-        private readonly IAction _targetAction;
+        private readonly Actor _source;
+        private readonly TargetZone _targetZone;
         private readonly Func<IEnumerable<Terrain>, ICommand> _callback;
         private readonly IEnumerable<Terrain> _inRange;
 
-        public TargettingState(Actor source, IAction action, Func<IEnumerable<Terrain>, ICommand> callback)
+        public TargettingState(Actor source, TargetZone zone, Func<IEnumerable<Terrain>, ICommand> callback)
         {
-            _targetSource = source;
-            _targetAction = action;
+            _source = source;
+            _targetZone = zone;
             _callback = callback;
 
             Game.OverlayHandler.DisplayText = "targetting mode";
             Game.OverlayHandler.ClearBackground();
-            _inRange = Game.Map.GetTilesInRadius(_targetSource.X, _targetSource.Y, (int)_targetAction.Area.Range).ToList();
+            _inRange = Game.Map.GetTilesInRadius(_source.X, _source.Y, (int)_targetZone.Range).ToList();
             foreach (Terrain tile in _inRange)
             {
-                if (tile.IsVisible)
-                    Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbGrass, true);
+                foreach (Terrain pathTile in Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
+                {
+                    Game.OverlayHandler.Set(pathTile.X, pathTile.Y, Swatch.DbGrass, true);
+
+                    if (!pathTile.IsWalkable)
+                        break;
+                }
             }
         }
 
@@ -45,9 +49,9 @@ namespace Roguelike.State
                 return null;
 
             Game.OverlayHandler.ClearForeground();
-            (int X, int Y) click = (_targetSource.X, _targetSource.Y);
+            (int X, int Y) click = (_source.X, _source.Y);
 
-            foreach (Terrain highlight in Game.Map.GetStraightLinePath(_targetSource.X, _targetSource.Y,
+            foreach (Terrain highlight in Game.Map.GetStraightLinePath(_source.X, _source.Y,
                 hover.X, hover.Y))
             {
                 if (!_inRange.Contains(highlight))
@@ -60,12 +64,17 @@ namespace Roguelike.State
                     break;
             }
 
-            Game.OverlayHandler.Set(click.X, click.Y, Swatch.DbBlood);
+
+            IEnumerable<Terrain> targets = _targetZone.GetTilesInRange(_source, click).ToList();
+            foreach (Terrain tile in targets)
+            {
+                if (tile.IsVisible)
+                    Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbBlood);
+            }
 
             if (!mouse.GetLeftClick())
                 return null;
 
-            IEnumerable<Terrain> targets = _targetAction.Area.GetTilesInRange(_targetSource, click);
             return _callback(targets);
         }
 

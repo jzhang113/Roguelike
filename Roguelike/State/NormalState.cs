@@ -111,7 +111,7 @@ namespace Roguelike.State
                     IAction hookAction = new HookAction(10);
                     Game.StateHandler.PushState(new TargettingState(
                         Game.Player,
-                        hookAction,
+                        hookAction.Area, 
                         returnTarget => new ActionCommand(Game.Player, hookAction, returnTarget)));
                     return null;
                 case RLKey.W:
