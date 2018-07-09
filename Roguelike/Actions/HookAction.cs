@@ -19,7 +19,9 @@ namespace Roguelike.Actions
 
         public void Activate(Actor source, Terrain target)
         {
-            IEnumerable<Terrain> path = Game.Map.GetStraightLinePath(source.X, source.Y, target.X, target.Y).ToList();
+            // Relies on GetTilesInRange being called in the targetting phase.
+            // Also requires the hook to be considered a projectile so that the trail is saved.
+            IEnumerable<Terrain> path = Area.Trail;
             List<Terrain> collisionPath = new List<Terrain>();
 
             // Walk along the path, stopping when something is hit and save the collision tile.

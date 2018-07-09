@@ -59,9 +59,8 @@ namespace Roguelike.Commands
                 if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
 
-                IAction attack = Source.Equipment.PrimaryWeapon.GetBasicAttack(_tile.X, _tile.Y);
-                // should be safe to ask for tiles since we just supplied a target
-                IEnumerable<Terrain> targets = attack.Area.GetTilesInRange(Source);
+                IAction attack = Source.Equipment.PrimaryWeapon.Attack();
+                IEnumerable<Terrain> targets = attack.Area.GetTilesInRange(Source, _tile.X, _tile.Y);
                 return new RedirectMessage(false, new ActionCommand(Source, attack, targets));
             }
 

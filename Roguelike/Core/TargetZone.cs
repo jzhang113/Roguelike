@@ -11,85 +11,115 @@ namespace Roguelike.Core
         public TargetShape Shape { get; }
         public double Range { get; }
         public int Radius { get; }
-        public bool Aimed { get; }
-        public (int X, int Y)? Target { get; }
+        public bool Projectile { get; }
+        public ICollection<Terrain> Trail { get; }
 
-        public bool InputRequired => Aimed && Target == null;
-
-        public TargetZone(TargetShape shape, (int X, int Y)? target = null, double range = 1.5, int radius = 0)
+        public TargetZone(TargetShape shape, double range = 1.5, int radius = 0, bool projectile = true)
         {
             Shape = shape;
             Range = range;
             Radius = radius;
-            Target = target;
-
-            switch (Shape)
-            {
-                case TargetShape.Self:
-                    Aimed = false;
-                    break;
-                case TargetShape.Directional:
-                case TargetShape.Range:
-                case TargetShape.Ray:
-                    Aimed = true;
-                    break;
-                default:
-                    throw new ArgumentException("unknown skill shape");
-            }
+            Projectile = projectile;
+            Trail = new List<Terrain>();
         }
 
-        public IEnumerable<Terrain> GetTilesInRange(Actor current, (int X, int Y)? target = null)
+        public IEnumerable<Terrain> GetTilesInRange(Actor current, int targetX, int targetY)
         {
-            int x = 0, y = 0;
-            if (Aimed)
-            {
-                if (Target != null)
-                    (x, y) = Target.Value;
-                else if (target != null)
-                    (x, y) = target.Value;
-                else
-                    throw new ArgumentException("aimed target destination not supplied");
-            }
-
-            ICollection<Terrain> inRange = new List<Terrain>();
+            ICollection<Terrain> targets = new List<Terrain>();
 
             switch (Shape)
             {
                 case TargetShape.Self:
                     foreach (Terrain tile in Game.Map.GetTilesInRadius(current.X, current.Y, Radius))
                     {
-                        AddTilesInRange(current, tile.X, tile.Y, inRange);
+                        if (InRange(current, tile.X, tile.Y))
+                            targets.Add(Game.Map.Field[tile.X, tile.Y]);
                     }
-                    return inRange;
+                    return targets;
                 case TargetShape.Range:
-                    foreach (Terrain tile in Game.Map.GetTilesInRadius(x, y, Radius))
+                    int collisionX = targetX;
+                    int collisionY = targetY;
+
+                    // for simplicity, assume that the travel path is only 1 tile wide
+                    // TODO: trail should be as wide as the Radius
+                    if (Projectile)
                     {
-                        AddTilesInRange(current, tile.X, tile.Y, inRange);
+                        collisionX = current.X;
+                        collisionY = current.Y;
+                        Trail.Clear();
+
+                        foreach (Terrain tile in Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY))
+                        {
+                            Trail.Add(tile);
+                            collisionX = tile.X;
+                            collisionY = tile.Y;
+
+                            if (!tile.IsWalkable)
+                                break;
+                        }
                     }
-                    return inRange;
+                    
+                    foreach (Terrain tile in Game.Map.GetTilesInRadius(collisionX, collisionY, Radius))
+                    {
+                        if (InRange(current, tile.X, tile.Y))
+                            targets.Add(Game.Map.Field[tile.X, tile.Y]);
+                    }
+                    return targets;
                 case TargetShape.Ray:
-                    return Game.Map.GetStraightLinePath(current.X, current.Y, x, y);
+                    IEnumerable<Terrain> path = Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY);
+                    if (Projectile)
+                    {
+                        foreach (Terrain tile in path)
+                        {
+                            // since each step takes us farther away, we can stop checking as soon as one
+                            // tile falls out of range
+                            if (!InRange(current, tile.X, tile.Y))
+                                break;
+
+                            targets.Add(tile);
+
+                            // projectiles stop at the first blocked tile
+                            if (!tile.IsWalkable)
+                                break;
+                        }
+
+                        return targets;
+                    }
+                    else
+                    {
+                        return path;
+                    }
                 case TargetShape.Directional:
-                    int dx = current.X - x;
-                    int dy = current.Y - y;
-                    int sx = Math.Sign(dx);
-                    int sy = Math.Sign(dy);
-                    int limit = Math.Max(Math.Abs(dx), Math.Abs(dy));
+                    WeightedPoint dir = Utils.Distance.GetOctant(targetX, targetY, current.X, current.Y);
+                    int limit = Math.Max(Math.Abs(targetX - current.X), Math.Abs(targetY - current.Y));
 
-                    for (int i = 0; i < limit; i++)
-                        AddTilesInRange(current, x + i * sx, y + i * sy, inRange);
+                    for (int i = 1; i <= limit; i++)
+                    {
+                        int x = current.X + i * dir.X;
+                        int y = current.Y + i * dir.Y;
 
-                    return inRange;
+                        // since each step takes us farther away, we can stop checking as soon as one
+                        // tile falls out of range
+                        if (!InRange(current, x, y))
+                            break;
+
+                        Terrain tile = Game.Map.Field[x, y];
+                        targets.Add(tile);
+
+                        // projectiles stop at the first blocked tile
+                        if (Projectile && !tile.IsWalkable)
+                            break;
+                    }
+                    return targets;
                 default:
                     throw new ArgumentException("unknown skill shape");
             }
         }
 
-        private void AddTilesInRange(Actor actor, int x, int y, ICollection<Terrain> tiles)
+        private bool InRange(Actor actor, int x, int y)
         {
             int distance = Utils.Distance.EuclideanDistanceSquared(actor.X, actor.Y, x, y);
-            if (distance > 0 && distance <= Range * Range)
-                tiles.Add(Game.Map.Field[x, y]);
+            return distance > 0 && distance <= Range * Range;
         }
     }
 }

@@ -65,14 +65,14 @@ namespace Roguelike.Items
             Game.MessageHandler.AddMessage("That would be unhealthy.");
         }
 
-        public virtual IAction Attack(Actor target)
+        public virtual IAction Attack()
         {
-            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, (target.X, target.Y), Parameters.MeleeRange));
+            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, Parameters.MeleeRange));
         }
 
-        public virtual IAction Throw(Actor target)
+        public virtual IAction Throw()
         {
-            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, (target.X, target.Y), Parameters.ThrowRange));
+            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, Parameters.ThrowRange));
         }
 
         public virtual Item DeepClone()
@@ -80,11 +80,6 @@ namespace Roguelike.Items
             return new Item(this);
         }
         #endregion
-
-        public IAction GetBasicAttack(int targetX, int targetY)
-        {
-            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Directional, (targetX, targetY)));
-        }
 
         public IAction GetAbility(int index)
         {

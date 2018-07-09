@@ -439,7 +439,6 @@ namespace Roguelike.Systems
             };
             _map.AddItem(new ItemCount { Item = spear, Count = 1 });
 
-            IAction rangedDamage = new DamageAction(200, new TargetZone(Enums.TargetShape.Ray, range: 10));
             IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
 
             //var lungeSkill = new List<IAction>()
@@ -463,13 +462,20 @@ namespace Roguelike.Systems
             };
             _map.AddItem(new ItemCount { Item = ha, Count = 1 });
 
-            Scroll magicMissile = new Scroll(
-                new ItemParameter("scroll of magic missile", Materials.Paper), rangedDamage, Swatch.DbSun)
+            _map.AddItem(new ItemCount
             {
-                X = Game.Player.X - 1,
-                Y = Game.Player.Y - 2
-            };
-            _map.AddItem(new ItemCount { Item = magicMissile, Count = 1 });
+                Item = new Scroll(
+                    new ItemParameter("scroll of magic missile", Materials.Paper),
+                    new DamageAction(
+                        200,
+                        new TargetZone(Enums.TargetShape.Directional, range: 10)),
+                    Swatch.DbSun)
+                    {
+                        X = Game.Player.X - 1,
+                        Y = Game.Player.Y - 2
+                    },
+                Count = 1
+            });
 
             Scroll healing = new Scroll(
                 new ItemParameter("scroll of healing", Materials.Paper), heal, Swatch.DbGrass)

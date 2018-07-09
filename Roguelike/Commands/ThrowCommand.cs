@@ -42,7 +42,7 @@ namespace Roguelike.Commands
         {
             foreach (Actor target in _targetList)
             {
-                _thrownItem.Throw(target);
+                _thrownItem.Throw();
             }
         }
     }

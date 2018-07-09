@@ -11,7 +11,7 @@ namespace Roguelike.Actions
         public int Power { get; }
         public TargetZone Area { get; }
         public int Speed { get; } = Utils.Constants.FULL_TURN;
-        public IAnimation Animation { get; } = null;
+        public IAnimation Animation { get; private set; }
 
         public DamageAction(int power, TargetZone targetZone)
         {

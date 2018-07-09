@@ -22,20 +22,13 @@ namespace Roguelike.State
             if (itemCount.Item is IUsable usableItem)
             {
                 IAction action = usableItem.ApplySkill;
-                if (action.Area.InputRequired)
+                TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
                 {
-                    TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
-                    {
-                        Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
-                        return new ApplyCommand(Game.Player, usableItem, returnTarget);
-                    });
-                    Game.StateHandler.PushState(state);
-                    return null;
-                }
-
-                IEnumerable<Terrain> target = action.Area.GetTilesInRange(Game.Player);
-                Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
-                return new ApplyCommand(Game.Player, usableItem, target);
+                    Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
+                    return new ApplyCommand(Game.Player, usableItem, returnTarget);
+                });
+                Game.StateHandler.PushState(state);
+                return null;
             }
 
             Game.MessageHandler.AddMessage($"Cannot apply {itemCount.Item}.");

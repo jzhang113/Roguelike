@@ -13,6 +13,7 @@ namespace Roguelike.Core
         public static WeightedPoint SE { get; } = new WeightedPoint(1, 1, 1.5f);
         public static WeightedPoint SW { get; } = new WeightedPoint(-1, 1, 1.5f);
         public static WeightedPoint NW { get; } = new WeightedPoint(-1, -1, 1.5f);
+        public static WeightedPoint Center { get; } = new WeightedPoint(0, 0, 0);
 
         public static readonly IList<WeightedPoint> Directions = new[]{ N, E, S, W, NE, SE, SW, NW };
     }
