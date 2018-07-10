@@ -13,8 +13,6 @@ namespace Roguelike.Actions
         public int Speed { get; } = Utils.Constants.FULL_TURN;
         public IAnimation Animation { get; } = null;
 
-        IAnimation IAction.Animation => throw new NotImplementedException();
-
         public EnchantAction(TargetZone area)
         {
             Area = area;

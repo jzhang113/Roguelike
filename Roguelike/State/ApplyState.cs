@@ -1,10 +1,8 @@
 ﻿using Roguelike.Actions;
 using Roguelike.Commands;
-using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using System;
-using System.Collections.Generic;
 
 namespace Roguelike.State
 {

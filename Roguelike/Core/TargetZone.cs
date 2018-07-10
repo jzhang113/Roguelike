@@ -58,11 +58,11 @@ namespace Roguelike.Core
                                 break;
                         }
                     }
-                    
+
                     foreach (Terrain tile in Game.Map.GetTilesInRadius(collisionX, collisionY, Radius))
                     {
-                        if (InRange(current, tile.X, tile.Y))
-                            targets.Add(Game.Map.Field[tile.X, tile.Y]);
+                        // TODO: prevent large radius spells from hitting past walls.
+                        targets.Add(Game.Map.Field[tile.X, tile.Y]);
                     }
                     return targets;
                 case TargetShape.Ray:
@@ -119,7 +119,7 @@ namespace Roguelike.Core
         private bool InRange(Actor actor, int x, int y)
         {
             int distance = Utils.Distance.EuclideanDistanceSquared(actor.X, actor.Y, x, y);
-            return distance > 0 && distance <= Range * Range;
+            return distance <= Range * Range;
         }
     }
 }
