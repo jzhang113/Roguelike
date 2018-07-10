@@ -3,6 +3,7 @@ using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
+using Roguelike.Input;
 using Roguelike.Systems;
 using System;
 
@@ -40,91 +41,97 @@ namespace Roguelike.State
         // ReSharper disable once CyclomaticComplexity
         private static ICommand ResolveInput(RLKeyPress keyPress, Actor player)
         {
-            switch (keyPress.Key)
+            NormalInput input = InputMapping.GetNormalInput(keyPress);
+            switch (input)
             {
+                case NormalInput.None:
+                    return null;
+
                 #region Movement Keys
-                case RLKey.Left:
-                case RLKey.Keypad4:
-                case RLKey.H:
+                case NormalInput.MoveW:
                     return new MoveCommand(player, player.X + Direction.W.X, player.Y);
-                case RLKey.Down:
-                case RLKey.Keypad2:
-                case RLKey.J:
+                case NormalInput.MoveS:
                     return new MoveCommand(player, player.X, player.Y + Direction.S.Y);
-                case RLKey.Up:
-                case RLKey.Keypad8:
-                case RLKey.K:
+                case NormalInput.MoveN:
                     return new MoveCommand(player, player.X, player.Y + Direction.N.Y);
-                case RLKey.Right:
-                case RLKey.Keypad6:
-                case RLKey.L:
+                case NormalInput.MoveE:
                     return new MoveCommand(player, player.X + Direction.E.X, player.Y);
-                case RLKey.Keypad7:
-                case RLKey.Y:
+                case NormalInput.MoveNW:
                     return new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
-                case RLKey.Keypad9:
-                case RLKey.U:
+                case NormalInput.MoveNE:
                     return new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
-                case RLKey.Keypad1:
-                case RLKey.B:
+                case NormalInput.MoveSW:
                     return new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
-                case RLKey.Keypad3:
-                case RLKey.N:
+                case NormalInput.MoveSE:
                     return new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
-                case RLKey.Keypad5:
-                case RLKey.Period:
+                case NormalInput.Wait:
                     return new WaitCommand(player);
                 #endregion
 
-                case RLKey.Comma:
+                case NormalInput.Get:
                     // TODO: only grabs top item
                     if (Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack))
                         return new PickupCommand(player, stack);
                     else
-                        return null;
-                case RLKey.BackSlash:
+                        Game.MessageHandler.AddMessage("Nothing to pick up here.");
+                    return null;
+                case NormalInput.ChangeLevel:
                     // HACK: Ad-hoc input handling
                     if (Game.Map.TryChangeLocation(player, out World.LevelId destination))
                         return new ChangeLevelCommand(player, destination);
                     else
-                        return null;
-                case RLKey.A:
+                        Game.MessageHandler.AddMessage("There are no exits here.");
+                    return null;
+                case NormalInput.OpenApply:
                     Game.StateHandler.PushState(ApplyState.Instance);
                     return null;
-                case RLKey.D:
+                case NormalInput.OpenDrop:
                     Game.StateHandler.PushState(DropState.Instance);
                     return null;
-                case RLKey.E:
+                case NormalInput.OpenEquip:
                     Game.StateHandler.PushState(EquipState.Instance);
                     return null;
-                case RLKey.I:
+                case NormalInput.OpenInventory:
                     Game.StateHandler.PushState(InventoryState.Instance);
                     return null;
-                case RLKey.T:
+                case NormalInput.OpenUnequip:
                     Game.StateHandler.PushState(UnequipState.Instance);
                     return null;
-                case RLKey.O:
+                case NormalInput.AutoExplore:
                     Game.StateHandler.PushState(AutoexploreState.Instance);
                     return null;
-                case RLKey.Q:
-                    // NOTE: Player actually gets a double turn when using the hook, but it seems ok.
-                    IAction hookAction = new HookAction(10);
-                    Game.StateHandler.PushState(new TargettingState(
-                        Game.Player,
-                        hookAction.Area, 
-                        returnTarget => new ActionCommand(Game.Player, hookAction, returnTarget)));
-                    return null;
-                case RLKey.W:
-                    Game.StateHandler.PushState(new AnimationState(new Animations.SpinAnimation(Game.Player.X, Game.Player.Y)));
-                    return null;
-                case RLKey.R:
-                    Game.NewGame();
-                    return null;
-                case RLKey.Escape:
+                case NormalInput.OpenMenu:
                     Game.Exit();
                     return null;
-                default: return null;
             }
+
+            // HACK: debugging commands
+            if (keyPress.Key == RLKey.Q)
+            {
+                // NOTE: Movement occurs after the hook is used. This means that using the hook
+                // to pull enemies will often give the Player a first hit on enemies, but using
+                // the hook to escape will give enemies an "attack of opportunity".
+                IAction hookAction = new HookAction(10);
+                Game.StateHandler.PushState(new TargettingState(
+                    Game.Player,
+                    hookAction.Area,
+                    returnTarget => new ActionCommand(Game.Player, hookAction, returnTarget)));
+                return null;
+            }
+
+            if (keyPress.Key == RLKey.W)
+            {
+                Game.StateHandler.PushState(new AnimationState(new Animations.SpinAnimation(Game.Player.X, Game.Player.Y)));
+                return null;
+            }
+
+            if (keyPress.Key == RLKey.R)
+            {
+                Game.NewGame();
+                return null;
+            }
+
+            return null;
         }
 
         // ReSharper disable once CyclomaticComplexity

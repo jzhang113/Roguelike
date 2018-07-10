@@ -105,6 +105,10 @@
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Core\Exit.cs" />
+    <Compile Include="Input\InputMapping.cs" />
+    <Compile Include="Input\KeyMap.cs" />
+    <Compile Include="Input\NormalInput.cs" />
+    <Compile Include="Input\TargettingInput.cs" />
     <Compile Include="Items\ItemCount.cs" />
     <Compile Include="Items\ItemParameter.cs" />
     <Compile Include="Items\ItemStack.cs" />
@@ -119,7 +123,7 @@
     <Compile Include="State\TargettingState.cs" />
     <Compile Include="State\TextInputState.cs" />
     <Compile Include="State\UnequipState.cs" />
-    <Compile Include="Systems\MouseHandler.cs" />
+    <Compile Include="Input\MouseInput.cs" />
     <Compile Include="Utils\RLKeyExtensions.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="Systems\OverlayHandler.cs" />
@@ -182,6 +186,9 @@
     <None Include="config.json">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\keyMap.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\materials.json">

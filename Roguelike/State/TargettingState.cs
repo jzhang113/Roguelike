@@ -2,7 +2,7 @@
 using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
-using Roguelike.Systems;
+using Roguelike.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +57,7 @@ namespace Roguelike.State
 
         public ICommand HandleMouseInput(RLMouse mouse)
         {
-            if (!MouseHandler.GetHoverPosition(mouse, out (int X, int Y) hover))
+            if (!MouseInput.GetHoverPosition(mouse, out (int X, int Y) hover))
                 return null;
 
             int targetX = _source.X;

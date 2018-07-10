@@ -1,9 +1,9 @@
 ﻿using RLNET;
 using Roguelike.Core;
 
-namespace Roguelike.Systems
+namespace Roguelike.Input
 {
-    static class MouseHandler
+    static class MouseInput
     {
         public static bool GetHoverPosition(RLMouse mouse, out (int X, int Y) pos)
         {
