@@ -6,6 +6,7 @@ using Roguelike.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Roguelike.Systems;
 
 namespace Roguelike.State
 {
@@ -16,10 +17,12 @@ namespace Roguelike.State
         private readonly Func<IEnumerable<Terrain>, ICommand> _callback;
         private readonly IEnumerable<Terrain> _inRange;
         private readonly IList<Actor> _targettableActors;
+
         private int _index;
-        private int _keyX;
-        private int _keyY;
-        private bool _useKeyTargetting;
+        private int _targetX;
+        private int _targetY;
+        private int _prevMouseX;
+        private int _prevMouseY;
 
         public TargettingState(Actor source, TargetZone zone, Func<IEnumerable<Terrain>, ICommand> callback)
         {
@@ -30,6 +33,7 @@ namespace Roguelike.State
 
             Game.OverlayHandler.DisplayText = "targetting mode";
             Game.OverlayHandler.ClearBackground();
+            Game.OverlayHandler.ClearForeground();
 
             ICollection<Terrain> tempRange = new HashSet<Terrain>();
             _inRange = Game.Map.GetTilesInRadius(_source.X, _source.Y, (int)_targetZone.Range).ToList();
@@ -37,16 +41,22 @@ namespace Roguelike.State
             // Filter the targettable range down to only the tiles we have a direct line on.
             foreach (Terrain tile in _inRange)
             {
-                foreach (Terrain pathTile in Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
+                Terrain collision = tile;
+                foreach (var current in Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
                 {
-                    Game.OverlayHandler.Set(pathTile.X, pathTile.Y, Swatch.DbGrass, true);
-                    tempRange.Add(pathTile);
-
-                    if (!pathTile.IsWalkable)
+                    if (!current.IsWalkable)
+                    {
+                        collision = current;
                         break;
+                    }
                 }
+
+                Game.OverlayHandler.Set(collision.X, collision.Y, Swatch.DbGrass, true);
+                tempRange.Add(collision);
             }
 
+            // Pick out the interesting targets.
+            // TODO: select items for item targetting spells
             foreach (Terrain tile in tempRange)
             {
                 if (Game.Map.TryGetActor(tile.X, tile.Y, out Actor actor))
@@ -58,17 +68,23 @@ namespace Roguelike.State
             Game.OverlayHandler.Set(source.X, source.Y, Swatch.DbGrass, true);
             _inRange = tempRange;
 
+            // Initialize the targetting to an interesting target.
             Actor firstActor = _targettableActors.FirstOrDefault();
             if (firstActor == null)
             {
-                _keyX = source.X;
-                _keyY = source.Y;
+                _targetX = source.X;
+                _targetY = source.Y;
             }
             else
             {
-                _keyX = firstActor.X;
-                _keyY = firstActor.Y;
+                _targetX = firstActor.X;
+                _targetY = firstActor.Y;
             }
+            DrawTargettedTiles();
+
+            // Initialize the saved mouse position as well.
+            _prevMouseX = _targetX;
+            _prevMouseY = _targetY;
 
             Game.ForceRender();
         }
@@ -81,84 +97,95 @@ namespace Roguelike.State
             {
                 case TargettingInput.None:
                     return null;
+                case TargettingInput.JumpW:
+                    JumpTarget(Direction.W);
+                    break;
+                case TargettingInput.JumpS:
+                    JumpTarget(Direction.S);
+                    break;
+                case TargettingInput.JumpN:
+                    JumpTarget(Direction.N);
+                    break;
+                case TargettingInput.JumpE:
+                    JumpTarget(Direction.E);
+                    break;
+                case TargettingInput.JumpNW:
+                    JumpTarget(Direction.NW);
+                    break;
+                case TargettingInput.JumpNE:
+                    JumpTarget(Direction.NE);
+                    break;
+                case TargettingInput.JumpSW:
+                    JumpTarget(Direction.SW);
+                    break;
+                case TargettingInput.JumpSE:
+                    JumpTarget(Direction.SE);
+                    break;
                 case TargettingInput.MoveW:
-                    if (_inRange.Contains(Game.Map.Field[_keyX - 1, _keyY]))
-                        _keyX--;
+                    MoveTarget(Direction.W);
                     break;
                 case TargettingInput.MoveS:
-                    if (_inRange.Contains(Game.Map.Field[_keyX, _keyY + 1]))
-                        _keyY++;
+                    MoveTarget(Direction.S);
                     break;
                 case TargettingInput.MoveN:
-                    if (_inRange.Contains(Game.Map.Field[_keyX, _keyY - 1]))
-                        _keyY--;
+                    MoveTarget(Direction.N);
                     break;
                 case TargettingInput.MoveE:
-                    if (_inRange.Contains(Game.Map.Field[_keyX + 1, _keyY]))
-                        _keyX++;
+                    MoveTarget(Direction.E);
                     break;
                 case TargettingInput.MoveNW:
-                    if (_inRange.Contains(Game.Map.Field[_keyX - 1, _keyY - 1]))
-                    {
-                        _keyX--;
-                        _keyY--;
-                    }
+                    MoveTarget(Direction.N);
+                    MoveTarget(Direction.W);
                     break;
                 case TargettingInput.MoveNE:
-                    if (_inRange.Contains(Game.Map.Field[_keyX + 1, _keyY - 1]))
-                    {
-                        _keyX++;
-                        _keyY--;
-                    }
+                    MoveTarget(Direction.N);
+                    MoveTarget(Direction.E);
                     break;
                 case TargettingInput.MoveSW:
-                    if (_inRange.Contains(Game.Map.Field[_keyX - 1, _keyY + 1]))
-                    {
-                        _keyX--;
-                        _keyY++;
-                    }
+                    MoveTarget(Direction.S);
+                    MoveTarget(Direction.W);
                     break;
                 case TargettingInput.MoveSE:
-                    if (_inRange.Contains(Game.Map.Field[_keyX + 1, _keyY + 1]))
-                    {
-                        _keyX++;
-                        _keyY++;
-                    }
+                    MoveTarget(Direction.S);
+                    MoveTarget(Direction.E);
                     break;
                 case TargettingInput.NextActor:
                     if (_targettableActors.Any())
                     {
                         Actor nextActor = _targettableActors[++_index % _targettableActors.Count];
-                        _keyX = nextActor.X;
-                        _keyY = nextActor.Y;
+                        _targetX = nextActor.X;
+                        _targetY = nextActor.Y;
                     }
                     else
                     {
-                        _keyX = _source.X;
-                        _keyY = _source.Y;
+                        _targetX = _source.X;
+                        _targetY = _source.Y;
                     }
                     break;
             }
 
-            _useKeyTargetting = true;
-            Game.OverlayHandler.ClearForeground();
-            IEnumerable<Terrain> targets = _targetZone.GetTilesInRange(_source, _keyX, _keyY).ToList();
+            IEnumerable<Terrain> targets = DrawTargettedTiles();
+            return input == TargettingInput.Fire ? _callback(targets) : null;
+        }
 
-            // Draw in the projectile path if any.
-            foreach (Terrain tile in _targetZone.Trail)
+        private void MoveTarget(WeightedPoint direction)
+        {
+            if (Game.Map.Field.IsValid(_targetX + direction.X, _targetY + direction.Y)
+                && _inRange.Contains(Game.Map.Field[_targetX + direction.X, _targetY + direction.Y]))
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbSun);
+                _targetX += direction.X;
+                _targetY += direction.Y;
             }
+        }
 
-            foreach (Terrain tile in targets)
+        private void JumpTarget(WeightedPoint direction)
+        {
+            while (Game.Map.Field.IsValid(_targetX + direction.X, _targetY + direction.Y)
+                   && _inRange.Contains(Game.Map.Field[_targetX + direction.X, _targetY + direction.Y]))
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbBlood);
+                _targetX += direction.X;
+                _targetY += direction.Y;
             }
-
-            if (input == TargettingInput.Fire)
-                return _callback(targets);
-
-            return null;
         }
 
         public ICommand HandleMouseInput(RLMouse mouse)
@@ -166,26 +193,35 @@ namespace Roguelike.State
             if (!MouseInput.GetHoverPosition(mouse, out (int X, int Y) hover))
                 return null;
 
-            if (_useKeyTargetting)
+            // If the mouse didn't get moved, don't do anything.
+            if (hover.X == _prevMouseX && hover.Y == _prevMouseY)
                 return null;
 
-            int targetX = _source.X;
-            int targetY = _source.Y;
-            _useKeyTargetting = false;
+            _prevMouseX = hover.X;
+            _prevMouseY = hover.Y;
 
-            // Walk towards the cursor, stopping when we're out of range to get the closest targettable tile.
+            // Adjust the targetting position so it remains in the targetting range.
+            _targetX = _source.X;
+            _targetY = _source.Y;
+
             foreach (Terrain highlight in Game.Map.GetStraightLinePath(_source.X, _source.Y,
-                hover.X, hover.Y))
+                _prevMouseX, _prevMouseY))
             {
                 if (!_inRange.Contains(highlight))
                     break;
 
-                targetX = highlight.X;
-                targetY = highlight.Y;
+                _targetX = highlight.X;
+                _targetY = highlight.Y;
             }
 
+            IEnumerable<Terrain> targets = DrawTargettedTiles();
+            return mouse.GetLeftClick() ? _callback(targets) : null;
+        }
+
+        private IEnumerable<Terrain> DrawTargettedTiles()
+        {
             Game.OverlayHandler.ClearForeground();
-            IEnumerable<Terrain> targets = _targetZone.GetTilesInRange(_source, targetX, targetY).ToList();
+            IEnumerable<Terrain> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
 
             // Draw in the projectile path if any.
             foreach (Terrain tile in _targetZone.Trail)
@@ -193,15 +229,16 @@ namespace Roguelike.State
                 Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbSun);
             }
 
+            // Draw the targetted tiles.
             foreach (Terrain tile in targets)
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbBlood);
             }
+            
+            // TODO: Replace colors
+            Game.OverlayHandler.Set(_targetX, _targetY, new RLColor(255, 0, 0));
 
-            if (!mouse.GetLeftClick())
-                return null;
-
-            return _callback(targets);
+            return targets;
         }
 
         public void Update()

@@ -57,6 +57,28 @@
         }
     },
     "targettingMap": {
+        "shift": {
+            "Left": "JumpW",
+            "Keypad4": "JumpW",
+            "H": "JumpW",
+            "Down": "JumpS",
+            "Keypad2": "JumpS",
+            "J": "JumpS",
+            "Up": "JumpN",
+            "Keypad8": "JumpN",
+            "K": "JumpN",
+            "Right": "JumpE",
+            "Keypad6": "JumpE",
+            "L": "JumpE",
+            "Keypad7": "JumpNW",
+            "Y": "JumpNW",
+            "Keypad9": "JumpNE",
+            "U": "JumpNE",
+            "Keypad1": "JumpSW",
+            "B": "JumpSW",
+            "Keypad3": "JumpSE",
+            "N": "JumpSE"
+        },
         "none": {
             "Left": "MoveW",
             "Keypad4": "MoveW",

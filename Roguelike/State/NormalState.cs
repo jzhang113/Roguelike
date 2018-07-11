@@ -44,8 +44,8 @@ namespace Roguelike.State
             NormalInput input = InputMapping.GetNormalInput(keyPress);
             switch (input)
             {
-                case NormalInput.None:
-                    return null;
+                //case NormalInput.None:
+                //    return null;
 
                 #region Movement Keys
                 case NormalInput.MoveW:

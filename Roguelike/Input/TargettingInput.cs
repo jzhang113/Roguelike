@@ -6,6 +6,14 @@ namespace Roguelike.Input
     public enum TargettingInput
     {
         None,
+        JumpE,
+        JumpS,
+        JumpN,
+        JumpW,
+        JumpNW,
+        JumpNE,
+        JumpSW,
+        JumpSE,
         MoveE,
         MoveS,
         MoveN,
