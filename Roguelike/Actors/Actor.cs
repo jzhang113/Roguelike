@@ -1,9 +1,9 @@
-﻿using Roguelike.Core;
+﻿using Roguelike.Actions;
+using Roguelike.Commands;
+using Roguelike.Core;
 using Roguelike.Interfaces;
-using Roguelike.Items;
 using Roguelike.Systems;
 using System;
-using Roguelike.Commands;
 
 namespace Roguelike.Actors
 {
@@ -23,7 +23,6 @@ namespace Roguelike.Actors
         public int RefreshRate { get; set; }
 
         public InventoryHandler Inventory { get; }
-        public EquipmentHandler Equipment { get; }
         public Drawable DrawingComponent { get; }
         public ActorParameters Parameters { get; }
 
@@ -52,9 +51,6 @@ namespace Roguelike.Actors
             RefreshRate = Utils.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
 
-            Weapon defaultWeapon = new Weapon(new ItemParameter("fists", MaterialType.Flesh), Colors.TextHeading);
-            Equipment = new EquipmentHandler(defaultWeapon);
-
             DrawingComponent = new Drawable
             {
                 Color = color,
@@ -63,7 +59,6 @@ namespace Roguelike.Actors
 
             BlocksLight = true;
         }
-
 
         public virtual void TriggerDeath()
         {
@@ -79,12 +74,16 @@ namespace Roguelike.Actors
             return SimpleAI.GetAction(this);
         }
 
+        public virtual IAction GetBasicAttack()
+        {
+            return new DamageAction(100, new TargetZone(Enums.TargetShape.Directional));
+        }
+
         public int TakeDamage(int power)
         {
             Hp -= power;
             return power;
         }
-
         public int TakeHealing(int power)
         {
             int restore = Parameters.MaxHp - Hp;

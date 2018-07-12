@@ -59,7 +59,7 @@ namespace Roguelike.Commands
                 if (target == Source)
                     return new RedirectMessage(false, new WaitCommand(Source));
 
-                IAction attack = Source.Equipment.PrimaryWeapon.Attack();
+                IAction attack = Source.GetBasicAttack();
                 IEnumerable<Terrain> targets = attack.Area.GetTilesInRange(Source, _tile.X, _tile.Y);
                 return new RedirectMessage(false, new ActionCommand(Source, attack, targets));
             }

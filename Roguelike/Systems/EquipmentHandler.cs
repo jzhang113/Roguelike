@@ -10,16 +10,12 @@ namespace Roguelike.Systems
     [Serializable]
     public class EquipmentHandler
     {
-        public Weapon DefaultWeapon { get; private set; }
-        public Weapon PrimaryWeapon { get; private set; }
-        public Weapon OffhandWeapon { get; private set; }
+        public Weapon PrimaryWeapon { get; set; }
+        public Weapon OffhandWeapon { get; set; }
         public IDictionary<ArmorType, Armor> Armor { get; }
 
-        public EquipmentHandler(Weapon defaultWeapon)
+        public EquipmentHandler()
         {
-            DefaultWeapon = defaultWeapon;
-            PrimaryWeapon = DefaultWeapon;
-
             Armor = new Dictionary<ArmorType, Armor>
             {
                 [ArmorType.Armor] = null,
@@ -31,11 +27,18 @@ namespace Roguelike.Systems
             };
         }
 
-        public bool IsDefaultWeapon() => PrimaryWeapon == DefaultWeapon && OffhandWeapon == null;
+        public bool IsDefaultWeapon() => PrimaryWeapon == null;
 
         public void Equip(Weapon weapon)
         {
             PrimaryWeapon = weapon;
+        }
+
+        public void Swap()
+        {
+            Weapon temp = PrimaryWeapon;
+            PrimaryWeapon = OffhandWeapon;
+            OffhandWeapon = temp;
         }
 
         public void Equip(Armor armor)
@@ -45,7 +48,7 @@ namespace Roguelike.Systems
 
         public void Unequip()
         {
-            PrimaryWeapon = DefaultWeapon;
+            PrimaryWeapon = null;
         }
 
         public void Unequip(Armor armor)

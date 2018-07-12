@@ -1,14 +1,12 @@
-﻿using Roguelike.Actors;
-
-namespace Roguelike.Interfaces
+﻿namespace Roguelike.Interfaces
 {
     // Represents items that can be equipped.
-    interface IEquipable
+    interface IEquippable
     {
         // Unequip existing items and equip this item.
-        void Equip(Actor actor);
+        void Equip(IEquipped equipped);
 
         // Unequip the item. Fails if the item is already unequipped.
-        void Unequip(Actor actor);
+        void Unequip(IEquipped equipped);
     }
 }

@@ -16,10 +16,10 @@ namespace Roguelike.State
 
         protected override ICommand ResolveInput(ItemCount itemCount)
         {
-            if (itemCount.Item is IEquipable)
+            if (itemCount.Item is IEquippable)
             {
                 ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount {Item = itemCount.Item, Count = 1});
-                IEquipable equipable = splitCount.Item as IEquipable;
+                IEquippable equipable = splitCount.Item as IEquippable;
                 return new EquipCommand(Game.Player, equipable);
             }
 

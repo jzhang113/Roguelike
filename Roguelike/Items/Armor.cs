@@ -1,11 +1,10 @@
-﻿using Roguelike.Actors;
-using Roguelike.Interfaces;
+﻿using Roguelike.Interfaces;
 using System;
 
 namespace Roguelike.Items
 {
     [Serializable]
-    public class Armor : Item, IEquipable
+    public class Armor : Item, IEquippable
     {
         public Enums.ArmorType Type { get; }
 
@@ -19,25 +18,25 @@ namespace Roguelike.Items
             Type = other.Type;
         }
 
-        public void Equip(Actor actor)
+        public void Equip(IEquipped equipped)
         {
-            System.Diagnostics.Debug.Assert(actor != null);
+            System.Diagnostics.Debug.Assert(equipped != null);
 
-            if (actor.Equipment.Armor[Type] != null)
+            if (equipped.Equipment.Armor[Type] != null)
             {
-                Game.MessageHandler.AddMessage($"You are already wearing a {actor.Equipment.Armor[Type]}!");
+                Game.MessageHandler.AddMessage($"You are already wearing a {equipped.Equipment.Armor[Type]}!");
                 return;
             }
 
-            actor.Equipment.Equip(this);
+            equipped.Equipment.Equip(this);
             Game.MessageHandler.AddMessage($"You put on the {Name}.");
         }
 
-        public void Unequip(Actor actor)
+        public void Unequip(IEquipped equipped)
         {
-            System.Diagnostics.Debug.Assert(actor != null);
+            System.Diagnostics.Debug.Assert(equipped != null);
 
-            actor.Equipment.Unequip(this);
+            equipped.Equipment.Unequip(this);
             Game.MessageHandler.AddMessage($"You take off the {Name}.");
         }
 

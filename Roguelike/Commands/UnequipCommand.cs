@@ -11,9 +11,9 @@ namespace Roguelike.Commands
         public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
         public IAnimation Animation { get; } = null;
 
-        private readonly IEquipable _equipableItem;
+        private readonly IEquippable _equipableItem;
 
-        public UnequipCommand(Actor source, IEquipable item)
+        public UnequipCommand(Actor source, IEquippable item)
         {
             Source = source;
             _equipableItem = item;
@@ -21,6 +21,9 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
+            if (!(Source is IEquipped))
+                return new RedirectMessage(false);
+
             // TODO: check item is equipped
             // if (Source.Equipment)
 
@@ -29,7 +32,7 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            _equipableItem.Unequip(Source);
+            _equipableItem.Unequip(Source as IEquipped);
         }
     }
 }

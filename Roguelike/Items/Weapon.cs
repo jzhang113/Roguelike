@@ -1,11 +1,10 @@
-﻿using Roguelike.Actors;
-using Roguelike.Interfaces;
+﻿using Roguelike.Interfaces;
 using System;
 
 namespace Roguelike.Items
 {
     [Serializable]
-    public class Weapon : Item, IEquipable
+    public class Weapon : Item, IEquippable
     {
         public Weapon(ItemParameter parameters, RLNET.RLColor color) : base(parameters, color, '(')
         {
@@ -15,25 +14,25 @@ namespace Roguelike.Items
         {
         }
 
-        public void Equip(Actor actor)
+        public void Equip(IEquipped equipped)
         {
-            System.Diagnostics.Debug.Assert(actor != null);
+            System.Diagnostics.Debug.Assert(equipped != null);
 
-            if (!actor.Equipment.IsDefaultWeapon())
+            if (!equipped.Equipment.IsDefaultWeapon())
             {
-                Game.MessageHandler.AddMessage($"You are already wielding a {actor.Equipment.PrimaryWeapon.Name}!");
+                Game.MessageHandler.AddMessage($"You are already wielding a {equipped.Equipment.PrimaryWeapon.Name}!");
                 return;
             }
 
-            actor.Equipment.Equip(this);
+            equipped.Equipment.Equip(this);
             Game.MessageHandler.AddMessage($"You wield a {Name}.");
         }
         
-        public void Unequip(Actor actor)
+        public void Unequip(IEquipped equipped)
         {
-            System.Diagnostics.Debug.Assert(actor != null);
+            System.Diagnostics.Debug.Assert(equipped != null);
 
-            actor.Equipment.Unequip();
+            equipped.Equipment.Unequip();
             Game.MessageHandler.AddMessage($"You unwield a {Name}.");
         }
 
