@@ -426,7 +426,7 @@ namespace Roguelike.Systems
         private void PlaceItems()
         {
             Weapon spear = new Weapon(
-                new ItemParameter("spear", Materials.Wood)
+                new ItemParameter("spear", MaterialType.Wood)
                 {
                     AttackSpeed = 240,
                     Damage = 200,
@@ -449,7 +449,7 @@ namespace Roguelike.Systems
             spear.AddAbility(new DamageAction(100, new TargetZone(Enums.TargetShape.Directional)));
 
             Armor ha = new Armor(
-                new ItemParameter("heavy armor", Materials.Iron)
+                new ItemParameter("heavy armor", MaterialType.Iron)
                 {
                     AttackSpeed = 1000,
                     Damage = 100,
@@ -465,7 +465,7 @@ namespace Roguelike.Systems
             _map.AddItem(new ItemCount
             {
                 Item = new Scroll(
-                    new ItemParameter("scroll of magic missile", Materials.Paper),
+                    new ItemParameter("scroll of magic missile", MaterialType.Paper),
                     new DamageAction(
                         200,
                         new TargetZone(Enums.TargetShape.Directional, range: 10)),
@@ -478,7 +478,7 @@ namespace Roguelike.Systems
             });
 
             Scroll healing = new Scroll(
-                new ItemParameter("scroll of healing", Materials.Paper), heal, Swatch.DbGrass)
+                new ItemParameter("scroll of healing", MaterialType.Paper), heal, Swatch.DbGrass)
             {
                 X = Game.Player.X + 1,
                 Y = Game.Player.Y + 1
@@ -488,7 +488,7 @@ namespace Roguelike.Systems
             _map.AddItem(new ItemCount
             {
                 Item = new Scroll(
-                    new ItemParameter("scroll of enchantment", Materials.Paper),
+                    new ItemParameter("scroll of enchantment", MaterialType.Paper),
                     new EnchantAction(
                         new TargetZone(Enums.TargetShape.Range, range: 10)),
                     RLColor.LightGreen)
@@ -502,7 +502,7 @@ namespace Roguelike.Systems
             _map.AddItem(new ItemCount
             {
                 Item = new Scroll(
-                    new ItemParameter("scroll of fireball", Materials.Paper),
+                    new ItemParameter("scroll of fireball", MaterialType.Paper),
                     new DamageAction(
                         200,
                         new TargetZone(Enums.TargetShape.Range, range: 10, radius: 3)),
@@ -516,7 +516,7 @@ namespace Roguelike.Systems
 
 
             Item planks = new Item(
-                    new ItemParameter("plank", Materials.Wood), Swatch.DbWood, '\\')
+                    new ItemParameter("plank", MaterialType.Wood), Swatch.DbWood, '\\')
             {
                 X = Game.Player.X + 2,
                 Y = Game.Player.Y + 2,

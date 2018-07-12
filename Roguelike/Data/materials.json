@@ -1,43 +1,34 @@
 ﻿{
+    "bamboo": {
+        "density": 400,
+        "flammability": "medium"
+    },
     "wood": {
-        "strength": 10,
-        "durability": 10,
-        "property": [
-            "flammable"
-        ]
+        "density": 700,
+        "flammability": "low"
     },
     "glass": {
-        "strength": 20,
-        "durability": 5,
-        "property": []
+        "density": 2500,
+        "flammability": "none"
     },
     "iron": {
-        "strength": 20,
-        "durability": 20,
-        "property": []
+        "density": 7860,
+        "flammability": "none"
     },
     "steel": {
-        "strength": 25,
-        "durability": 40,
-        "property": []
+        "density": 7840,
+        "flammability": "none"
     },
     "diamond": {
-        "strength": 100,
-        "durability": 100,
-        "property": []
+        "density": 3500,
+        "flammability": "none"
     },
     "paper": {
-        "strength": 1,
-        "durability": 10,
-        "property": [
-            "flammable"
-        ]
+        "density": 900,
+        "flammability": "medium"
     },
     "flesh": {
-        "strength": 8,
-        "durability": 10,
-        "property": [
-            "flammable"
-        ]
+        "density": 985,
+        "flammability": "low"
     }
 }
