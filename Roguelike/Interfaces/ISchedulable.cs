@@ -10,7 +10,7 @@ namespace Roguelike.Interfaces
         int Energy { get; set; }
 
         // How much energy the Actor regains per game turn. 120 Energy is a standard tick.
-        int RefreshRate { get; set; }
+        int RefreshRate { get; }
 
         // The Action to be scheduled.
         ICommand Act();

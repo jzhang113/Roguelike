@@ -28,11 +28,13 @@ namespace Roguelike.World
         private IDictionary<int, InventoryHandler> Items { get; set; }
         private IDictionary<int, Door> Doors { get; set; }
         private IDictionary<int, Exit> Exits { get; set; }
+        private IDictionary<int, Fire> Fires { get; set; }
 
         private readonly KeyValueHelper<int, Actor> _tempUnits;
         private readonly KeyValueHelper<int, InventoryHandler> _tempItems;
         private readonly KeyValueHelper<int, Door> _tempDoors;
         private readonly KeyValueHelper<int, Exit> _tempExits;
+        private readonly KeyValueHelper<int, Fire> _tempFires;
 
         public MapHandler(int width, int height)
         {
@@ -48,6 +50,7 @@ namespace Roguelike.World
             Items = new Dictionary<int, InventoryHandler>();
             Doors = new Dictionary<int, Door>();
             Exits = new Dictionary<int, Exit>();
+            Fires = new Dictionary<int, Fire>();
         }
 
         #region Serialization Constructor
@@ -77,6 +80,11 @@ namespace Roguelike.World
                 Key = (ICollection<int>)info.GetValue($"{nameof(Exits)}.keys", typeof(ICollection<int>)),
                 Value = (ICollection<Exit>)info.GetValue($"{nameof(Exits)}.values", typeof(ICollection<Exit>))
             };
+            _tempFires = new KeyValueHelper<int, Fire>
+            {
+                Key = (ICollection<int>)info.GetValue($"{nameof(Fires)}.keys", typeof(ICollection<int>)),
+                Value = (ICollection<Fire>)info.GetValue($"{nameof(Fires)}.values", typeof(ICollection<Fire>))
+            };
 
             PlayerMap = new float[Width, Height];
             AutoexploreMap = new float[Width, Height];
@@ -90,6 +98,7 @@ namespace Roguelike.World
             Items = _tempItems.ToDictionary();
             Doors = _tempDoors.ToDictionary();
             Exits = _tempExits.ToDictionary();
+            Fires = _tempFires.ToDictionary();
 
             foreach (Actor actor in Units.Values)
             {
@@ -121,7 +130,6 @@ namespace Roguelike.World
 
             SetActorPosition(unit, unit.X, unit.Y);
             Game.EventScheduler.AddActor(unit);
-
             return true;
         }
 
@@ -132,14 +140,15 @@ namespace Roguelike.World
 
         public bool RemoveActor(Actor unit)
         {
-            bool success = Units.Remove(ToIndex(unit.X, unit.Y));
-            if (!success)
+            if (!Units.Remove(ToIndex(unit.X, unit.Y)))
                 return false;
 
-            unit.State = Enums.ActorState.Dead;
-            Field[unit.X, unit.Y].IsOccupied = false;
-            Field[unit.X, unit.Y].BlocksLight = false;
+            Terrain unitTile = Field[unit.X, unit.Y];
+            unitTile.IsOccupied = false;
+            unitTile.BlocksLight = false;
 
+            unit.State = Enums.ActorState.Dead;
+            Game.EventScheduler.RemoveActor(unit);
             return true;
         }
 
@@ -288,6 +297,30 @@ namespace Roguelike.World
         public bool TryGetExit(int x, int y, out Exit exit)
         {
             return Exits.TryGetValue(ToIndex(x, y), out exit);
+        }
+
+        public bool SetFire(int x, int y)
+        {
+            int index = ToIndex(x, y);
+            if (Fires.TryGetValue(index, out _))
+                return false;
+
+            if (Field[x, y].IsWall)
+                return false;
+
+            Fire fire = new Fire(x, y);
+            Fires.Add(index, fire);
+            Game.EventScheduler.AddActor(fire);
+            return true;
+        }
+
+        public bool RemoveFire(Fire fire)
+        {
+            if (!Fires.Remove(ToIndex(fire.X, fire.Y)))
+                return false;
+
+            Game.EventScheduler.RemoveActor(fire);
+            return true;
         }
 
         #region Tile Selection Methods
@@ -496,6 +529,20 @@ namespace Roguelike.World
                 topItem.DrawingComponent.Draw(mapConsole, Field[topItem.X, topItem.Y], destX, destY);
             }
 
+            foreach (Exit exit in Exits.Values)
+            {
+                int destX = exit.X - Camera.X;
+                int destY = exit.Y - Camera.Y;
+                exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y], destX, destY);
+            }
+
+            foreach (Fire fire in Fires.Values)
+            {
+                int destX = fire.X - Camera.X;
+                int destY = fire.Y - Camera.Y;
+                fire.DrawingComponent.Draw(mapConsole, Field[fire.X, fire.Y], destX, destY);
+            }
+
             foreach (Actor unit in Units.Values)
             {
                 if (!unit.IsDead)
@@ -507,13 +554,6 @@ namespace Roguelike.World
                 else
                     // HACK: draw some corpses
                     mapConsole.SetChar(unit.X - Camera.X, unit.Y - Camera.Y, '%');
-            }
-
-            foreach (Exit exit in Exits.Values)
-            {
-                int destX = exit.X - Camera.X;
-                int destY = exit.Y - Camera.Y;
-                exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y], destX, destY);
             }
         }
 
@@ -636,6 +676,7 @@ namespace Roguelike.World
             info.AddValue(nameof(Width), Width);
             info.AddValue(nameof(Height), Height);
             info.AddValue(nameof(Field), Field);
+            info.AddValue(nameof(Fires), Fires);
 
             // Can't serialize Dictionary or KeyCollection, have to make it a list.
             info.AddValue($"{nameof(Units)}.keys", Units.Keys.ToList());
@@ -646,6 +687,8 @@ namespace Roguelike.World
             info.AddValue($"{nameof(Doors)}.values", Doors.Values.ToList());
             info.AddValue($"{nameof(Exits)}.keys", Exits.Keys.ToList());
             info.AddValue($"{nameof(Exits)}.values", Exits.Values.ToList());
+            info.AddValue($"{nameof(Fires)}.keys", Fires.Keys.ToList());
+            info.AddValue($"{nameof(Fires)}.values", Fires.Values.ToList());
         }
 
         // Temporarily store lists when deserializing dictionaries

@@ -28,7 +28,9 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            Game.Map.Refresh();
+            // whoops, letting everyone refresh the map trashes performance
+            if (Source is Player)
+                Game.Map.Refresh();
         }
     }
 }

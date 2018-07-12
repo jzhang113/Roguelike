@@ -559,6 +559,8 @@ namespace Roguelike.Systems
                 }
                 _map.AddActor(s);
             }
+
+            _map.SetFire(Game.Player.X + 3, Game.Player.Y + 3);
         }
 
         private void PlaceStairs()
