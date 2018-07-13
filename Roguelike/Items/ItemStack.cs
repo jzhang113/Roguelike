@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Roguelike.Core;
 using Roguelike.Utils;
 
 namespace Roguelike.Items
@@ -12,10 +13,11 @@ namespace Roguelike.Items
         public string Name { get; }
         public int Count { get; private set; }
         internal bool Collapsed { get; set; }
-
         public int TypeCount => _itemStack.Count;
 
         private readonly IDictionary<Item, int> _itemStack;
+
+        public bool IsEmpty() => _itemStack.Count == 0;
 
         public ItemStack(Item item, int count)
         {
@@ -99,9 +101,34 @@ namespace Roguelike.Items
             }
         }
 
-        public bool IsEmpty()
+        // Wooden items burn, potions explode, fun
+        public void SetFire()
         {
-            return _itemStack.Count == 0;
+            foreach (KeyValuePair<Item, int> kvp in _itemStack.ToList())
+            {
+                Item item = kvp.Key;
+                int amount = kvp.Value;
+                double burnChance;
+
+                switch (Materials.MaterialList[item.Parameters.Material].Flammability)
+                {
+                    case Flammability.Low: burnChance = Constants.LOW_BURN_PERCENT; break;
+                    case Flammability.Medium: burnChance = Constants.MEDIUM_BURN_PERCENT; break;
+                    case Flammability.High: burnChance = Constants.HIGH_BURN_PERCENT; break;
+                    default: burnChance = 0; break;
+                }
+
+                // Use a binomial distribution to determine the number of items that burn.
+                if (!item.Burning)
+                {
+                    int burningCount = Game.World.Random.NextBinomial(amount, burnChance);
+
+                    // Remove burning items and re-add them as a new type.
+                    ItemCount burningStack = Split(item, burningCount);
+                    burningStack.Item.Burning = true;
+                    //_itemStack.Add(burningStack.Item, burningStack.Count);
+                }
+            }
         }
 
         public IEnumerator<ItemCount> GetEnumerator()

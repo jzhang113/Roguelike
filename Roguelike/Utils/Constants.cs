@@ -16,5 +16,8 @@
         public const int DEFAULT_DAMAGE = 100;
 
         public const int FIRE_DAMAGE = 10;
+        public const double LOW_BURN_PERCENT = 0.2;
+        public const double MEDIUM_BURN_PERCENT = 0.4;
+        public const double HIGH_BURN_PERCENT = 0.8;
     }
 }

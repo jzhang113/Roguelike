@@ -3,6 +3,7 @@ using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Items;
 using Roguelike.Systems;
+using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,13 +104,14 @@ namespace Roguelike.World
             foreach (Actor actor in Units.Values)
             {
                 if (actor is Player player)
-                {
                     Game.Player = player;
-                }
             }
 
             foreach (Actor actor in Units.Values)
                 Game.EventScheduler.AddActor(actor);
+
+            foreach (Fire fire in Fires.Values)
+                Game.EventScheduler.AddActor(fire);
 
             Refresh();
         }
@@ -117,6 +119,7 @@ namespace Roguelike.World
 
         internal void Refresh()
         {
+            Camera.UpdateCamera();
             UpdatePlayerFov();
             UpdatePlayerMaps();
             UpdateAutoExploreMaps();
@@ -233,7 +236,7 @@ namespace Roguelike.World
                 return false;
 
             stack.Remove(itemCount);
-            if (!stack.Any())
+            if (stack.IsEmpty())
                 Items.Remove(index);
             return true;
         }
@@ -251,7 +254,7 @@ namespace Roguelike.World
             System.Diagnostics.Debug.Assert(stack.Contains(itemCount), $"Map does not contain {itemCount.Item.Name}.");
 
             ItemCount split = stack.Split(itemCount);
-            if (!stack.Any())
+            if (stack.IsEmpty())
                 Items.Remove(index);
             return split;
         }
@@ -321,6 +324,37 @@ namespace Roguelike.World
 
             Game.EventScheduler.RemoveActor(fire);
             return true;
+        }
+
+        // Flammable objects have a chance to get set on fire.
+        internal void ProcessFire(Fire fire)
+        {
+            int index = ToIndex(fire.X, fire.Y);
+
+            if (Doors.TryGetValue(index, out Door door))
+            {
+                // TODO: create an actor burning implementation
+                // Q: do doors behave like items or actors when burned?
+                double burnChance;
+
+                switch (Materials.MaterialList[door.Parameters.Material].Flammability)
+                {
+                    case Flammability.Low: burnChance = Constants.LOW_BURN_PERCENT; break;
+                    case Flammability.Medium: burnChance = Constants.MEDIUM_BURN_PERCENT; break;
+                    case Flammability.High: burnChance = Constants.HIGH_BURN_PERCENT; break;
+                    default: burnChance = 0; break;
+                }
+
+                if (Game.World.Random.NextDouble() < burnChance)
+                    OpenDoor(door);
+            }
+
+            if (Items.TryGetValue(index, out InventoryHandler stack))
+            {
+                stack.SetFire();
+                if (stack.IsEmpty())
+                    Items.Remove(index);
+            }
         }
 
         #region Tile Selection Methods
@@ -425,7 +459,7 @@ namespace Roguelike.World
             {
                 for (int j = y - radius; j <= y + radius; j++)
                 {
-                    if (Utils.Distance.EuclideanDistanceSquared(i, j, x, y) <= radius * radius)
+                    if (Distance.EuclideanDistanceSquared(i, j, x, y) <= radius * radius)
                         yield return Field[i, j];
                 }
             }
@@ -504,8 +538,6 @@ namespace Roguelike.World
         #region Drawing Methods
         public void Draw(RLConsole mapConsole)
         {
-            Camera.UpdateCamera();
-
             for (int dx = 0; dx < Game.Config.MapView.Width; dx++)
             {
                 for (int dy = 0; dy < Game.Config.MapView.Height; dy++)
@@ -520,7 +552,7 @@ namespace Roguelike.World
                 int destY = door.Y - Camera.Y;
                 door.DrawingComponent.Draw(mapConsole, Field[door.X, door.Y], destX, destY);
             }
-
+            
             foreach (InventoryHandler stack in Items.Values)
             {
                 Item topItem = stack.First().Item;

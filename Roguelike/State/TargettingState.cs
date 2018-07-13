@@ -6,7 +6,6 @@ using Roguelike.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Roguelike.Systems;
 
 namespace Roguelike.State
 {

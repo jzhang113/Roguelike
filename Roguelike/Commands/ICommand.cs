@@ -1,5 +1,4 @@
 ﻿using Roguelike.Animations;
-using Roguelike.Interfaces;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands

@@ -1,15 +1,14 @@
-﻿using Roguelike.Actions;
+﻿using Pcg;
+using RLNET;
+using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using Roguelike.Items;
 using Roguelike.Utils;
+using Roguelike.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RLNET;
-using Roguelike.World;
-using Pcg;
 
 namespace Roguelike.Systems
 {

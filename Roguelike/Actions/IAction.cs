@@ -1,5 +1,4 @@
-﻿using Roguelike.Actors;
-using Roguelike.Animations;
+﻿using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 

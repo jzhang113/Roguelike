@@ -27,11 +27,11 @@ namespace Roguelike.State
             IAction ability = null;
 
             if (keyPress.Shift)
-                ability = player.Equipment.PrimaryWeapon.GetAbility(0);
+                ability = player.Equipment.PrimaryWeapon?.GetAbility(0);
             else if (keyPress.Alt)
-                ability = player.Equipment.PrimaryWeapon.GetAbility(1);
+                ability = player.Equipment.PrimaryWeapon?.GetAbility(1);
             else if (keyPress.Control)
-                ability = player.Equipment.PrimaryWeapon.GetAbility(2);
+                ability = player.Equipment.PrimaryWeapon?.GetAbility(2);
 
             return ability != null
                 ? ResolveAttackInput(keyPress, player, ability)

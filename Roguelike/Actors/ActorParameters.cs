@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Roguelike.Core;
+using System;
 
 namespace Roguelike.Actors
 {
     [Serializable]
     public class ActorParameters
     {
-        public string Name { get; }
+        public string Type { get; }
+        public MaterialType Material { get; set; }
 
         public int Str { get; set; }
         public int Dex { get; set; }
@@ -20,7 +22,7 @@ namespace Roguelike.Actors
 
         public ActorParameters(string name)
         {
-            Name = name;
+            Type = name;
         }
     }
 }

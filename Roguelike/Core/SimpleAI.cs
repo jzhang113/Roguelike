@@ -22,7 +22,7 @@ namespace Roguelike.Core
                     }
                     else
                     {
-                        WeightedPoint dir = Direction.Directions[Game.World.CombatRandom.Next() % 8];
+                        WeightedPoint dir = Direction.Directions[Game.World.Random.Next(8)];
                         return new MoveCommand(monster, monster.X + dir.X, monster.Y + dir.Y);
                     }
                 case ActorState.Chase:
@@ -47,7 +47,7 @@ namespace Roguelike.Core
                     else
                     {
                         // implement fleeing?
-                        WeightedPoint dir = Direction.Directions[Game.World.CombatRandom.Next() % 8];
+                        WeightedPoint dir = Direction.Directions[Game.World.Random.Next(8)];
                         return new MoveCommand(monster, monster.X + dir.X, monster.Y + dir.Y);
                     }
                 case ActorState.Dead:

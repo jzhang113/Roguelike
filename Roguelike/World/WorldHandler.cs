@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Roguelike.World
@@ -11,18 +12,19 @@ namespace Roguelike.World
     [Serializable]
     class WorldHandler
     {
+        // TODO: generate dynamic world names
         private const string _ROOT_NAME = "root";
         private static int _counter;
 
-        private PcgRandom Random { get; }
-        private PcgRandom MapRandom { get; }
-        public PcgRandom CombatRandom { get; }
-
         public MapHandler Map { get; private set; }
         public LevelId CurrentLevel => _currentLevel;
+        public PcgRandom Random => _random;
 
         private readonly Dictionary<LevelId, LevelData> _levels;
         private LevelId _currentLevel;
+
+        [NonSerialized]
+        private PcgRandom _random;
 
         public WorldHandler(WorldParameter parameters) : this(parameters, (int)DateTime.Now.Ticks)
         {
@@ -30,9 +32,7 @@ namespace Roguelike.World
 
         public WorldHandler(WorldParameter parameters, int seed)
         {
-            Random = new PcgRandom(seed);
-            MapRandom = new PcgRandom(Random.Next());
-            CombatRandom = new PcgRandom(Random.Next());
+            _random = new PcgRandom(seed);
 
             _levels = BuildWorld(parameters);
             _currentLevel = new LevelId
@@ -42,6 +42,12 @@ namespace Roguelike.World
                 Depth = 1
             };
             Map = CreateLevel(CurrentLevel);
+        }
+
+        [OnDeserialized]
+        protected void AfterDeserialize(StreamingContext context)
+        {
+            _random = new PcgRandom((int)DateTime.Now.Ticks);
         }
 
         public bool IsValidLevel(LevelId id)
@@ -90,12 +96,14 @@ namespace Roguelike.World
                     new LevelData
                     {
                         Seen = false,
-                        Exits = new List<LevelId>()
+                        Exits = new List<LevelId>(),
+                        Seed = Random.Next()
                     }
                 }
             };
 
-            foreach (WorldParameter.RegionData region in parameters.Regions.Where(r => r.Require).ToList())
+            foreach (WorldParameter.RegionData region
+                in parameters.Regions.Where(r => r.Require).ToList())
             {
                 BuildLevelConnections(region, world);
                 if (region.Unique)
@@ -107,7 +115,8 @@ namespace Roguelike.World
             for (int i = regionCount; i < maxRegions; i++)
             {
                 // TODO: weighted region probabilities
-                WorldParameter.RegionData region = parameters.Regions.ElementAt(Random.Next(parameters.Regions.Count));
+                WorldParameter.RegionData region
+                    = parameters.Regions.ElementAt(Random.Next(parameters.Regions.Count));
                 BuildLevelConnections(region, world);
                 if (region.Unique)
                     parameters.Regions.Remove(region);
@@ -117,7 +126,8 @@ namespace Roguelike.World
         }
 
         // TODO: potentially connect the end of branches to other areas?
-        private void BuildLevelConnections(WorldParameter.RegionData region, Dictionary<LevelId, LevelData> world)
+        private void BuildLevelConnections(WorldParameter.RegionData region,
+            Dictionary<LevelId, LevelData> world)
         {
             int maxDepth = Random.Next(region.MinLength, region.MaxLength);
             string levelName = GenerateLevelName(region.Type);
@@ -133,7 +143,9 @@ namespace Roguelike.World
             }
             else if (region.Constraints.Avoid != null)
             {
-                var remaining = world.Where(kvp => !region.Constraints.Avoid.Contains(kvp.Key.RegionType)).ToList();
+                var remaining = world
+                    .Where(kvp => !region.Constraints.Avoid.Contains(kvp.Key.RegionType))
+                    .ToList();
                 var keyValuePair = remaining.ElementAt(Random.Next(remaining.Count));
                 parentId = keyValuePair.Key;
                 parentLevel = keyValuePair.Value;
@@ -166,7 +178,8 @@ namespace Roguelike.World
                         RegionType = region.Type,
                         Depth = 2
                     }
-                }
+                },
+                Seed = Random.Next()
             };
             world.Add(firstId, firstLevel);
 
@@ -196,7 +209,8 @@ namespace Roguelike.World
                             RegionType = region.Type,
                             Depth = depth + 1
                         }
-                    }
+                    },
+                    Seed = Random.Next()
                 };
                 world.Add(id, level);
             }
@@ -218,7 +232,8 @@ namespace Roguelike.World
                         RegionType = region.Type,
                         Depth = maxDepth - 1
                     }
-                }
+                },
+                Seed = Random.Next()
             };
             world.Add(lastId, lastLevel);
         }
@@ -241,7 +256,8 @@ namespace Roguelike.World
             }
         }
 
-        private LevelData FindLevelByRegion(RegionType regionType, Dictionary<LevelId, LevelData> world)
+        private LevelData FindLevelByRegion(RegionType regionType,
+            Dictionary<LevelId, LevelData> world)
         {
             foreach (var kvp in world)
             {
@@ -263,7 +279,9 @@ namespace Roguelike.World
             LevelData level = _levels[id];
 
             sw.Start();
-            MapGenerator mapGenerator = new MapGenerator(Game.Config.Map.Width, Game.Config.Map.Height, level.Exits, MapRandom);
+            MapGenerator mapGenerator = new MapGenerator(
+                Game.Config.Map.Width, Game.Config.Map.Height,
+                level.Exits, new PcgRandom(level.Seed));
             MapHandler map = mapGenerator.CreateMap(id.RegionType);
             sw.Stop();
 

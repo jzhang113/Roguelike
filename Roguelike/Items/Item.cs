@@ -10,6 +10,7 @@ namespace Roguelike.Items
     public class Item
     {
         public int Enchantment { get; set; }
+        public bool Burning { get; set; }
 
         public ItemParameter Parameters { get; }
         public Drawable DrawingComponent { get; }

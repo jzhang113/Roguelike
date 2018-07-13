@@ -1,8 +1,6 @@
 ﻿using Roguelike.Actions;
 using Roguelike.Commands;
 using Roguelike.Interfaces;
-using Roguelike.Items;
-using Roguelike.Systems;
 using System;
 
 namespace Roguelike.Core
@@ -38,22 +36,15 @@ namespace Roguelike.Core
             if (--Fuel <= 0)
                 Game.Map.RemoveFire(this);
 
-            if (Game.World.CombatRandom.Next(10) > 1)
+            // TODO: use tile types to determine rate of fire spread
+            // TODO: fuel count comes from tiles so burned tiles don't get set on fire again
+            if (Game.World.Random.Next(10) < 2)
             {
-                WeightedPoint dir = Direction.Directions[Game.World.CombatRandom.Next() % 8];
+                WeightedPoint dir = Direction.Directions[Game.World.Random.Next(8)];
                 Game.Map.SetFire(X + dir.X, Y + dir.Y);
             }
 
-            //if (Game.Map.TryGetDoor(X, Y, out Door door))
-            //{
-            //    // TODO: wooden doors burn
-            //}
-
-            //if (Game.Map.TryGetStack(X, Y, out InventoryHandler stack))
-            //{
-            //    // TODO: items catch fire
-            //    // stack.SetFire();
-            //}
+            Game.Map.ProcessFire(this);
 
             if (Game.Map.TryGetActor(X, Y, out _))
                 return new ActionCommand(this,

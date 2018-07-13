@@ -10,7 +10,7 @@ namespace Roguelike.Actors
     [Serializable]
     public class Actor : ISchedulable
     {
-        public string Name => Parameters.Name;
+        public string Name => Parameters.Type;
         public bool BlocksLight { get; set; }
 
         public int Hp { get; set; }

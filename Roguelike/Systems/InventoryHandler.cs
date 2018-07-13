@@ -156,6 +156,16 @@ namespace Roguelike.Systems
             return true;
         }
 
+        public void SetFire()
+        {
+            foreach (ItemStack stack in _inventory.ToList())
+            {
+                stack.SetFire();
+                if (stack.IsEmpty())
+                    _inventory.Remove(stack);
+            }
+        }
+
         public void Draw(RLConsole console)
         {
             int line = 1;
