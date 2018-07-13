@@ -1,6 +1,7 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
+using Roguelike.Interfaces;
 
 namespace Roguelike.Actions
 {
@@ -19,6 +20,6 @@ namespace Roguelike.Actions
         IAnimation Animation { get; }
 
         // Execute the Action. This takes a Terrain as it may have additional environmental effects.
-        void Activate(Actor source, Terrain target);
+        void Activate(ISchedulable source, Terrain target);
     }
 }

@@ -10,7 +10,7 @@ namespace Roguelike.Commands
     class ApplyCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
+        public int EnergyCost => Utils.Constants.FULL_TURN;
         public IAnimation Animation => _usableItem?.ApplySkill?.Animation;
 
         private readonly IUsable _usableItem;

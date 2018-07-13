@@ -8,8 +8,8 @@ namespace Roguelike.Commands
     class DropCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = 0;
-        public IAnimation Animation { get; } = null;
+        public int EnergyCost => 0;
+        public IAnimation Animation => null;
 
         public string Input { get; set; }
 

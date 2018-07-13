@@ -11,7 +11,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost { get; }
-        public IAnimation Animation { get; } = null;
+        public IAnimation Animation => null;
 
         private readonly Item _thrownItem;
         private readonly ICollection<Actor> _targetList;

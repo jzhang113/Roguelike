@@ -1,6 +1,6 @@
-﻿using Roguelike.Actors;
-using Roguelike.Animations;
+﻿using Roguelike.Animations;
 using Roguelike.Core;
+using Roguelike.Interfaces;
 using Roguelike.Items;
 using System;
 
@@ -10,15 +10,15 @@ namespace Roguelike.Actions
     class EnchantAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed { get; } = Utils.Constants.FULL_TURN;
-        public IAnimation Animation { get; } = null;
+        public int Speed => Utils.Constants.FULL_TURN;
+        public IAnimation Animation => null;
 
         public EnchantAction(TargetZone area)
         {
             Area = area;
         }
 
-        public void Activate(Actor source, Terrain target)
+        public void Activate(ISchedulable source, Terrain target)
         {
             if (target == null)
                 return;

@@ -14,5 +14,7 @@
         public const double DEFAULT_MELEE_RANGE = 1.5;
         public const double DEFAULT_THROW_RANGE = 1.5;
         public const int DEFAULT_DAMAGE = 100;
+
+        public const int FIRE_DAMAGE = 10;
     }
 }

@@ -1,5 +1,5 @@
-﻿using Roguelike.Actors;
-using Roguelike.Animations;
+﻿using Roguelike.Animations;
+using Roguelike.Interfaces;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands
@@ -8,9 +8,6 @@ namespace Roguelike.Commands
     // as opening the inventory, are not Actions.
     public interface ICommand
     {
-        // The Actor performing the Action.
-        Actor Source { get; }
-
         // How long the Action takes to perform.
         int EnergyCost { get; }
 

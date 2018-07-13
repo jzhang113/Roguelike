@@ -11,8 +11,8 @@ namespace Roguelike.Commands
     class MoveCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost { get; } = Utils.Constants.FULL_TURN;
-        public IAnimation Animation { get; } = null;
+        public int EnergyCost => Utils.Constants.FULL_TURN;
+        public IAnimation Animation => null;
 
         private readonly int _newX;
         private readonly int _newY;
@@ -49,7 +49,7 @@ namespace Roguelike.Commands
                 if (!door.IsOpen)
                 {
                     Game.Map.OpenDoor(door);
-                    return new RedirectMessage(false, new WaitCommand(120));
+                    return new RedirectMessage(false, new WaitCommand(door, 120));
                 }
             }
 

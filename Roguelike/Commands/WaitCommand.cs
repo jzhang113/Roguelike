@@ -1,23 +1,25 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Animations;
+using Roguelike.Interfaces;
 using Roguelike.Systems;
 
 namespace Roguelike.Commands
 {
     class WaitCommand : ICommand
     {
-        public Actor Source { get; }
+        public ISchedulable Source { get; }
         public int EnergyCost { get; }
-        public IAnimation Animation { get; } = null;
+        public IAnimation Animation => null;
 
-        public WaitCommand(Actor source)
+        public WaitCommand(ISchedulable source)
         {
             Source = source;
             EnergyCost = source.RefreshRate;
         }
 
-        public WaitCommand(int waitTime)
+        public WaitCommand(ISchedulable source, int waitTime)
         {
+            Source = source;
             EnergyCost = waitTime;
         }
 

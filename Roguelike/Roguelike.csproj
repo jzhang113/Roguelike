@@ -105,7 +105,8 @@
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Core\Exit.cs" />
-    <Compile Include="Actors\Fire.cs" />
+    <Compile Include="Core\Fire.cs" />
+    <Compile Include="Enums\Enums.cs" />
     <Compile Include="Input\InputMapping.cs" />
     <Compile Include="Input\KeyMap.cs" />
     <Compile Include="Input\NormalInput.cs" />
@@ -179,7 +180,6 @@
     <Compile Include="Core\WeightedPoint.cs" />
     <Compile Include="Utils\Constants.cs" />
     <Compile Include="Utils\Distance.cs" />
-    <Compile Include="Enums\Enums.cs" />
     <Compile Include="Utils\TreeNode.cs" />
     <Compile Include="World\WorldParameters.cs" />
   </ItemGroup>

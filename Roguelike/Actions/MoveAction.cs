@@ -1,6 +1,7 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
+using Roguelike.Interfaces;
 using System;
 
 namespace Roguelike.Actions
@@ -9,19 +10,19 @@ namespace Roguelike.Actions
     class MoveAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed { get; } = Utils.Constants.FULL_TURN;
-        public IAnimation Animation { get; } = null;
+        public int Speed => Utils.Constants.FULL_TURN;
+        public IAnimation Animation => null;
 
         public MoveAction(TargetZone targetZone)
         {
             Area = targetZone;
         }
 
-        public void Activate(Actor source, Terrain target)
+        public void Activate(ISchedulable source, Terrain target)
         {
-            if (target.IsWalkable)
+            if (source is Actor actor && target.IsWalkable)
             {
-                Game.Map.SetActorPosition(source, target.X, target.Y);
+                Game.Map.SetActorPosition(actor, target.X, target.Y);
             }
         }
     }

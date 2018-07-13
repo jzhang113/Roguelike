@@ -1,7 +1,7 @@
 ﻿using Roguelike.Actions;
-using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
+using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System.Collections.Generic;
 
@@ -9,7 +9,7 @@ namespace Roguelike.Commands
 {
     class ActionCommand : ICommand
     {
-        public Actor Source { get; }
+        public ISchedulable Source { get; }
         public int EnergyCost { get; }
         public IAnimation Animation => _action?.Animation;
 
@@ -18,7 +18,7 @@ namespace Roguelike.Commands
         private readonly Terrain _target;
         private readonly IEnumerable<Terrain> _targets;
 
-        public ActionCommand(Actor source, IAction action, IEnumerable<Terrain> targets)
+        public ActionCommand(ISchedulable source, IAction action, IEnumerable<Terrain> targets)
         {
             System.Diagnostics.Debug.Assert(action != null);
 
@@ -30,7 +30,7 @@ namespace Roguelike.Commands
             _targets = targets;
         }
 
-        public ActionCommand(Actor source, IAction action, Terrain target)
+        public ActionCommand(ISchedulable source, IAction action, Terrain target)
         {
             System.Diagnostics.Debug.Assert(action != null);
 
