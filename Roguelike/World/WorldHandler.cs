@@ -1,4 +1,5 @@
-﻿using Roguelike.Systems;
+﻿using Pcg;
+using Roguelike.Systems;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,9 +14,9 @@ namespace Roguelike.World
         private const string _ROOT_NAME = "root";
         private static int _counter;
 
-        private Random Random { get; }
-        private Random MapRandom { get; }
-        public Random CombatRandom { get; }
+        private PcgRandom Random { get; }
+        private PcgRandom MapRandom { get; }
+        public PcgRandom CombatRandom { get; }
 
         public MapHandler Map { get; private set; }
         public LevelId CurrentLevel => _currentLevel;
@@ -29,9 +30,9 @@ namespace Roguelike.World
 
         public WorldHandler(WorldParameter parameters, int seed)
         {
-            Random = new Random(seed);
-            MapRandom = new Random(Random.Next());
-            CombatRandom = new Random(Random.Next());
+            Random = new PcgRandom(seed);
+            MapRandom = new PcgRandom(Random.Next());
+            CombatRandom = new PcgRandom(Random.Next());
 
             _levels = BuildWorld(parameters);
             _currentLevel = new LevelId

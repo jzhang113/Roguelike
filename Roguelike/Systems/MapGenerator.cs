@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RLNET;
 using Roguelike.World;
+using Pcg;
 
 namespace Roguelike.Systems
 {
@@ -20,10 +21,10 @@ namespace Roguelike.Systems
         private readonly int _width;
         private readonly int _height;
         private readonly IEnumerable<LevelId> _exits;
-        private readonly Random _rand;
+        private readonly PcgRandom _rand;
         private readonly MapHandler _map;
 
-        public MapGenerator(int width, int height, IEnumerable<LevelId> exits, Random random)
+        public MapGenerator(int width, int height, IEnumerable<LevelId> exits, PcgRandom random)
         {
             _width = width;
             _height = height;
@@ -57,8 +58,8 @@ namespace Roguelike.Systems
                 Room room = new Room(
                     x: _rand.Next(centerX - 5, centerX + 5),
                     y: _rand.Next(centerY - 5, centerY + 5),
-                    width: (int)RandNormal(5, 1),
-                    height: (int)RandNormal(5, 1));
+                    width: (int)_rand.NextNormal(5, 1),
+                    height: (int)_rand.NextNormal(5, 1));
 
                 bool first = true;
                 bool horiz = false;
@@ -576,21 +577,6 @@ namespace Roguelike.Systems
 
                 _map.AddExit(exit);
             }
-        }
-
-        private double RandNormal(double mean, double stdDev)
-        {
-            //uniform(0,1] random doubles
-            double u1 = 1.0 - _rand.NextDouble();
-            double u2 = 1.0 - _rand.NextDouble();
-
-            //random normal(0,1)
-            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
-
-            //random normal(mean,stdDev^2)
-            double randNormal = mean + stdDev * randStdNormal;
-
-            return randNormal;
         }
     }
 }
