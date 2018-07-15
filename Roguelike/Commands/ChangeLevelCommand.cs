@@ -1,5 +1,4 @@
-﻿using Roguelike.Actors;
-using Roguelike.Animations;
+﻿using Roguelike.Animations;
 using Roguelike.Systems;
 using Roguelike.World;
 
@@ -7,15 +6,13 @@ namespace Roguelike.Commands
 {
     class ChangeLevelCommand : ICommand
     {
-        public Actor Source { get; }
         public int EnergyCost => 0;
         public IAnimation Animation => null;
 
         private readonly LevelId _newLevel;
 
-        public ChangeLevelCommand(Actor actor, LevelId newLevel)
+        public ChangeLevelCommand(LevelId newLevel)
         {
-            Source = actor;
             _newLevel = newLevel;
         }
 

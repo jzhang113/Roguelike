@@ -12,20 +12,24 @@ namespace Roguelike.Systems
     {
         private readonly ICollection<ISchedulable> _entities;
         private readonly MaxHeap<ISchedulable> _eventSet;
+        private bool _clearing;
 
         public EventScheduler(int size)
         {
             _entities = new HashSet<ISchedulable>();
             _eventSet = new MaxHeap<ISchedulable>(size);
+            _clearing = false;
         }
 
         public void AddActor(ISchedulable schedulable) => _entities.Add(schedulable);
         public void RemoveActor(ISchedulable schedulable) => _entities.Remove(schedulable);
 
+        // Instead of clearing everything immediately, give everything on the level a chance to
+        // finish processing, then clear it before the next cycle begins.
         public void Clear()
         {
+            _clearing = true;
             _entities.Clear();
-            _eventSet.Clear();
         }
 
         // Run updates for all actors until it is the Player's turn to act again.
@@ -60,7 +64,18 @@ namespace Roguelike.Systems
                 if (!Execute(current, action))
                     return false;
                 else
-                    _eventSet.PopMax();
+                {
+                    if (_clearing)
+                    {
+                        _eventSet.Clear();
+                        _clearing = false;
+                        return false;
+                    }
+                    else
+                    {
+                        _eventSet.PopMax();
+                    }
+                }
             }
 
             return true;

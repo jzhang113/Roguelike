@@ -78,7 +78,7 @@ namespace Roguelike.State
                 case NormalInput.ChangeLevel:
                     // HACK: Ad-hoc input handling
                     if (Game.Map.TryChangeLocation(player, out World.LevelId destination))
-                        return new ChangeLevelCommand(player, destination);
+                        return new ChangeLevelCommand(destination);
                     else
                         Game.MessageHandler.AddMessage("There are no exits here.");
                     return null;
@@ -127,8 +127,9 @@ namespace Roguelike.State
 
             if (keyPress.Key == RLKey.R)
             {
+                Game.EventScheduler.Clear();
                 Game.NewGame();
-                return null;
+                return new WaitCommand(Game.Player);
             }
 
             return null;
