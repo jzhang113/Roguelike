@@ -34,7 +34,7 @@ namespace Roguelike.Interfaces
             Activated = info.GetBoolean(nameof(Activated));
         }
 
-        public void Draw(RLConsole console, Terrain tile, int destX, int destY)
+        public virtual void Draw(RLConsole console, Terrain tile, int destX, int destY)
         {
             if (!tile.IsExplored)
                 return;
@@ -53,7 +53,7 @@ namespace Roguelike.Interfaces
             }
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue($"{nameof(Color)}.r", Color.r);
             info.AddValue($"{nameof(Color)}.g", Color.g);

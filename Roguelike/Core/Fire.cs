@@ -20,9 +20,9 @@ namespace Roguelike.Core
 
         public Fire(int x, int y)
         {
-            DrawingComponent = new Drawable()
+            DrawingComponent = new AnimatedDrawable(Swatch.DbBlood, 0.6)
             {
-                Color = Swatch.DbBlood,
+                Color = new RLNET.RLColor(255, 185, 0),
                 Symbol = '^',
                 X = x,
                 Y = y

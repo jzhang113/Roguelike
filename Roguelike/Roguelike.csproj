@@ -124,6 +124,7 @@
     <Compile Include="Input\KeyMap.cs" />
     <Compile Include="Input\NormalInput.cs" />
     <Compile Include="Input\TargettingInput.cs" />
+    <Compile Include="Interfaces\AnimatedDrawable.cs" />
     <Compile Include="Interfaces\IHasEquipment.cs" />
     <Compile Include="Items\ItemCount.cs" />
     <Compile Include="Items\ItemParameter.cs" />
