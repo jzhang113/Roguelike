@@ -3,6 +3,7 @@ using RLNET;
 using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.Items;
 using Roguelike.Utils;
 using Roguelike.World;
@@ -313,7 +314,7 @@ namespace Roguelike.Systems
                     if (i == 0 || j == 0 || i == _width - 1 || j == _height - 1)
                         continue;
 
-                    _map.Field[i, j].IsWall = false;
+                    _map.Field[i, j].Type = TerrainType.Grass;
                 }
             }
         }
@@ -439,14 +440,14 @@ namespace Roguelike.Systems
             };
             _map.AddItem(new ItemCount { Item = spear, Count = 1 });
 
-            IAction heal = new HealAction(100, new TargetZone(Enums.TargetShape.Self));
+            IAction heal = new HealAction(100, new TargetZone(TargetShape.Self));
 
             //var lungeSkill = new List<IAction>()
             //{
             //    new MoveAction(new TargetZone(Enums.TargetShape.Directional)),
             //    new DamageAction(100, new TargetZone(Enums.TargetShape.Directional))
             //};
-            spear.AddAbility(new DamageAction(100, new TargetZone(Enums.TargetShape.Directional)));
+            spear.AddAbility(new DamageAction(100, new TargetZone(TargetShape.Directional)));
 
             Armor ha = new Armor(
                 new ItemParameter("heavy armor", MaterialType.Iron)
@@ -455,7 +456,7 @@ namespace Roguelike.Systems
                     Damage = 100,
                     MeleeRange = 1,
                     ThrowRange = 3
-                }, Swatch.DbMetal, Enums.ArmorType.Armor)
+                }, Swatch.DbMetal, ArmorType.Armor)
             {
                 X = Game.Player.X - 2,
                 Y = Game.Player.Y - 3
@@ -468,7 +469,7 @@ namespace Roguelike.Systems
                     new ItemParameter("scroll of magic missile", MaterialType.Paper),
                     new DamageAction(
                         200,
-                        new TargetZone(Enums.TargetShape.Directional, range: 10)),
+                        new TargetZone(TargetShape.Directional, range: 10)),
                     Swatch.DbSun)
                     {
                         X = Game.Player.X - 1,
@@ -490,7 +491,7 @@ namespace Roguelike.Systems
                 Item = new Scroll(
                     new ItemParameter("scroll of enchantment", MaterialType.Paper),
                     new EnchantAction(
-                        new TargetZone(Enums.TargetShape.Range, range: 10)),
+                        new TargetZone(TargetShape.Range, range: 10)),
                     RLColor.LightGreen)
                 {
                     X = Game.Player.X - 1,
@@ -505,7 +506,7 @@ namespace Roguelike.Systems
                     new ItemParameter("scroll of fireball", MaterialType.Paper),
                     new DamageAction(
                         200,
-                        new TargetZone(Enums.TargetShape.Range, range: 10, radius: 3)),
+                        new TargetZone(TargetShape.Range, range: 10, radius: 3)),
                     Swatch.DbBlood)
                 {
                     X = Game.Player.X - 2,

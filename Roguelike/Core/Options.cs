@@ -1,9 +1,11 @@
-﻿namespace Roguelike.Core
+﻿using Roguelike.Systems;
+
+namespace Roguelike.Core
 {
     class Options
     {
         // How much text to show.
-        internal Enums.MessageLevel Verbosity { get; set; }
+        internal MessageLevel Verbosity { get; set; }
 
         // Are we using a fixed seed?
         internal bool FixedSeed { get; set; }

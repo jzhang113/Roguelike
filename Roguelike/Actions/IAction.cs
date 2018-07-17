@@ -19,6 +19,6 @@ namespace Roguelike.Actions
         IAnimation Animation { get; }
 
         // Execute the Action. This takes a Terrain as it may have additional environmental effects.
-        void Activate(ISchedulable source, Terrain target);
+        void Activate(ISchedulable source, Tile target);
     }
 }

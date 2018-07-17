@@ -1,0 +1,22 @@
+﻿{
+    "wall": {
+        "moveCost": 1,
+        "flammability": "none"
+    },
+    "grass": {
+        "moveCost": 1,
+        "flammability": "high"
+    },
+    "stone": {
+        "moveCost": 1,
+        "flammability": "medium"
+    },
+    "ice": {
+        "moveCost": 0.5,
+        "flammability": "low"
+    },
+    "water": {
+        "moveCost": 1.5,
+        "flammability": "none"
+    }
+}

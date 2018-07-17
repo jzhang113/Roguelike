@@ -1,5 +1,4 @@
-﻿using Roguelike.Core;
-using Roguelike.Utils;
+﻿using Roguelike.Data;
 using System;
 
 namespace Roguelike.Items

@@ -1,6 +1,5 @@
 ﻿using Roguelike.Commands;
 using Roguelike.Actors;
-using Roguelike.Enums;
 
 namespace Roguelike.Core
 {
@@ -55,7 +54,15 @@ namespace Roguelike.Core
                     monster.TriggerDeath();
                     return new WaitCommand(monster);
                 case ActorState.Sleep:
-                    return new WaitCommand(monster);
+                    if (Game.Map.PlayerMap[monster.X, monster.Y] < monster.Parameters.Awareness)
+                    {
+                        monster.State = ActorState.Chase;
+                        return GetAction(monster);
+                    }
+                    else
+                    {
+                        return new WaitCommand(monster);
+                    }
                 default:
                     // We should not be here
                     System.Diagnostics.Debug.Assert(false);

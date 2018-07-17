@@ -8,7 +8,7 @@ namespace Roguelike.Commands
     class EquipCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost => Utils.Constants.FULL_TURN;
+        public int EnergyCost => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
         private readonly IEquippable _equipableItem;

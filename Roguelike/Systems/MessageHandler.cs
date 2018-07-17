@@ -2,10 +2,16 @@
 using Roguelike.Core;
 using System;
 using System.Collections.Generic;
-using Roguelike.Enums;
 
 namespace Roguelike.Systems
 {
+    enum MessageLevel
+    {
+        Minimal,
+        Normal,
+        Verbose
+    }
+
     // Accepts messages from various systems and displays it in the message console. Also keeps a 
     // rolling history of messages that can be displayed.
     class MessageHandler

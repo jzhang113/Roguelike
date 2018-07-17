@@ -10,7 +10,7 @@ namespace Roguelike.Systems
         {
             Options options = new Options
             {
-                Verbosity = Enums.MessageLevel.Normal
+                Verbosity = MessageLevel.Normal
             };
 
             for (int i = 0; i < args.Length; i++)
@@ -22,10 +22,10 @@ namespace Roguelike.Systems
                         options.Seed = int.Parse(args[++i]);
                         break;
                     case "-q":
-                        options.Verbosity = Enums.MessageLevel.Minimal;
+                        options.Verbosity = MessageLevel.Minimal;
                         break;
                     case "-v":
-                        options.Verbosity = Enums.MessageLevel.Verbose;
+                        options.Verbosity = MessageLevel.Verbose;
                         break;
                     default: throw new Exception($"Option {args[i]} not recognized");
                 }

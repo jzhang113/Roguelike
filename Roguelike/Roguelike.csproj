@@ -117,9 +117,12 @@
     <Compile Include="Commands\ThrowCommand.cs" />
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
+    <Compile Include="Core\ActorState.cs" />
+    <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\Exit.cs" />
     <Compile Include="Core\Fire.cs" />
-    <Compile Include="Enums\Enums.cs" />
+    <Compile Include="Core\Tile.cs" />
+    <Compile Include="Data\Flammability.cs" />
     <Compile Include="Input\InputMapping.cs" />
     <Compile Include="Input\KeyMap.cs" />
     <Compile Include="Input\NormalInput.cs" />
@@ -172,13 +175,13 @@
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Core\SimpleAI.cs" />
     <Compile Include="Actors\Skeleton.cs" />
-    <Compile Include="Core\Materials.cs" />
+    <Compile Include="Data\Materials.cs" />
     <Compile Include="Systems\InventoryHandler.cs" />
     <Compile Include="Systems\LookHandler.cs" />
     <Compile Include="Systems\OptionHandler.cs" />
     <Compile Include="Core\Options.cs" />
     <Compile Include="Systems\RedirectMessage.cs" />
-    <Compile Include="Core\Terrain.cs" />
+    <Compile Include="Data\Terrain.cs" />
     <Compile Include="Interfaces\ISchedulable.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Systems\EventScheduler.cs" />
@@ -193,7 +196,7 @@
     <Compile Include="Core\Configuration.cs" />
     <Compile Include="Utils\MaxHeap.cs" />
     <Compile Include="Core\WeightedPoint.cs" />
-    <Compile Include="Utils\Constants.cs" />
+    <Compile Include="Data\Constants.cs" />
     <Compile Include="Utils\Distance.cs" />
     <Compile Include="Utils\TreeNode.cs" />
     <Compile Include="World\WorldParameters.cs" />
@@ -205,18 +208,21 @@
       <Generator>MSDataSetGenerator</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Data\keyMap.json">
+    <Content Include="Data\keymap.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\materials.json">
+    </Content>
+    <Content Include="Data\materials.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\weapons.json">
+    </Content>
+    <Content Include="Data\terrain.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\world.json">
+    </Content>
+    <Content Include="Data\weapons.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
+    <Content Include="Data\world.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>

@@ -12,13 +12,13 @@ namespace Roguelike.Animations
 
         private readonly Actor _source;
         private readonly Actor _target;
-        private readonly IList<Terrain> _path;
+        private readonly IList<Tile> _path;
         private readonly bool _retract;
         private int _counter;
         private bool _hit;
-        private Terrain _prevPos;
+        private Tile _prevPos;
 
-        public HookAnimation(Actor source, IEnumerable<Terrain> path, bool retract, Actor target = null)
+        public HookAnimation(Actor source, IEnumerable<Tile> path, bool retract, Actor target = null)
         {
             _source = source;
             _path = path.ToList();
@@ -72,7 +72,7 @@ namespace Roguelike.Animations
                 // Animating the hook going out.
                 for (int i = 0; i < _counter; i++)
                 {
-                    Terrain tile = _path[i];
+                    Tile tile = _path[i];
                     Game.MapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
                 }
             }
@@ -83,7 +83,7 @@ namespace Roguelike.Animations
                     // Animating the hook pulling the _target.
                     for (int i = 0; i < _counter - 1; i++)
                     {
-                        Terrain tile = _path[i];
+                        Tile tile = _path[i];
                         Game.MapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
                     }
 
@@ -98,7 +98,7 @@ namespace Roguelike.Animations
                     // Animating the hook pulling the _source along.
                     for (int i = _path.Count - 1; i > _path.Count - _counter; i--)
                     {
-                        Terrain tile = _path[i];
+                        Tile tile = _path[i];
                         Game.MapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
                     }
 

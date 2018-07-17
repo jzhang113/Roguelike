@@ -2,6 +2,7 @@
 using Roguelike.Commands;
 using Roguelike.Interfaces;
 using System;
+using Roguelike.Data;
 
 namespace Roguelike.Core
 {
@@ -16,7 +17,7 @@ namespace Roguelike.Core
 
         public string Name => "fire";
         public int Energy { get; set; }
-        public int RefreshRate => Utils.Constants.DEFAULT_REFRESH_RATE;
+        public int RefreshRate => Constants.DEFAULT_REFRESH_RATE;
 
         public Fire(int x, int y)
         {
@@ -33,22 +34,22 @@ namespace Roguelike.Core
 
         public ICommand Act()
         {
-            if (--Fuel <= 0)
-                Game.Map.RemoveFire(this);
-
-            // TODO: use tile types to determine rate of fire spread
-            // TODO: fuel count comes from tiles so burned tiles don't get set on fire again
-            if (Game.World.Random.Next(10) < 2)
+            Tile tile = Game.Map.Field[X, Y];
+            if (--tile.Fuel <= 0)
             {
-                WeightedPoint dir = Direction.Directions[Game.World.Random.Next(8)];
-                Game.Map.SetFire(X + dir.X, Y + dir.Y);
+                Game.Map.RemoveFire(this);
+                tile.Type = TerrainType.Stone; // Q: does everything burn into stone?
+                return new WaitCommand(this);
             }
+
+            WeightedPoint dir = Direction.Directions[Game.World.Random.Next(8)];
+            Game.Map.SetFire(X + dir.X, Y + dir.Y);
 
             Game.Map.ProcessFire(this);
 
             if (Game.Map.TryGetActor(X, Y, out _))
                 return new ActionCommand(this,
-                    new DamageAction(Utils.Constants.FIRE_DAMAGE, new TargetZone(Enums.TargetShape.Self)),
+                    new DamageAction(Constants.FIRE_DAMAGE, new TargetZone(TargetShape.Self)),
                     Game.Map.Field[X, Y]);
 
             return new WaitCommand(this);

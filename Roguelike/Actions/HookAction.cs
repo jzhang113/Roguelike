@@ -10,27 +10,27 @@ namespace Roguelike.Actions
     class HookAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed => Utils.Constants.FULL_TURN;
+        public int Speed => Data.Constants.FULL_TURN;
         public IAnimation Animation { get; private set; }
 
         public HookAction(int range)
         {
-            Area = new TargetZone(Enums.TargetShape.Range, range: range);
+            Area = new TargetZone(TargetShape.Range, range: range);
         }
 
-        public void Activate(ISchedulable source, Terrain target)
+        public void Activate(ISchedulable source, Tile target)
         {
             if (!(source is Actor sourceActor))
                 return;
 
             // Relies on GetTilesInRange being called in the targetting phase.
             // Also requires the hook to be considered a projectile so that the trail is saved.
-            IEnumerable<Terrain> path = Area.Trail;
-            List<Terrain> collisionPath = new List<Terrain>();
+            IEnumerable<Tile> path = Area.Trail;
+            List<Tile> collisionPath = new List<Tile>();
 
             // Walk along the path, stopping when something is hit and save the collision tile.
-            Terrain collisionTile = null;
-            foreach (Terrain tile in path)
+            Tile collisionTile = null;
+            foreach (Tile tile in path)
             {
                 if (!tile.IsWalkable)
                 {
@@ -53,7 +53,7 @@ namespace Roguelike.Actions
                     Animation = new HookAnimation(sourceActor, collisionPath, true, actor);
                     Animation.Complete += (sender, args) =>
                     {
-                        Terrain depositTile = collisionPath.First();
+                        Tile depositTile = collisionPath.First();
                         Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
                     };
                 }
@@ -64,7 +64,7 @@ namespace Roguelike.Actions
                     Animation = new HookAnimation(sourceActor, collisionPath, false);
                     Animation.Complete += (sender, arg) =>
                     {
-                        Terrain depositTile = collisionPath.Last();
+                        Tile depositTile = collisionPath.Last();
                         Game.Map.SetActorPosition(sourceActor, depositTile.X, depositTile.Y);
                     };
                 }

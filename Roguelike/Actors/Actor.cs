@@ -17,7 +17,7 @@ namespace Roguelike.Actors
         public int Mp { get; set; }
         public int Sp { get; set; }
 
-        public Enums.ActorState State { get; set; }
+        public ActorState State { get; set; }
 
         public int Energy { get; set; }
         public int RefreshRate { get; set; }
@@ -48,7 +48,7 @@ namespace Roguelike.Actors
             Mp = Parameters.MaxMp;
 
             Energy = 0;
-            RefreshRate = Utils.Constants.DEFAULT_REFRESH_RATE;
+            RefreshRate = Data.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
 
             DrawingComponent = new Drawable
@@ -66,7 +66,10 @@ namespace Roguelike.Actors
             Game.EventScheduler.RemoveActor(this);
 
             if (Game.Map.Field[X, Y].IsVisible)
+            {
                 Game.MessageHandler.AddMessage($"{Name} dies");
+                Game.Map.Refresh();
+            }
         }
 
         public virtual ICommand Act()
@@ -76,7 +79,7 @@ namespace Roguelike.Actors
 
         public virtual IAction GetBasicAttack()
         {
-            return new DamageAction(100, new TargetZone(Enums.TargetShape.Directional));
+            return new DamageAction(100, new TargetZone(TargetShape.Directional));
         }
 
         public int TakeDamage(int power)

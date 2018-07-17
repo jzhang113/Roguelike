@@ -11,7 +11,7 @@ namespace Roguelike.Actions
     {
         public int Power { get; }
         public TargetZone Area { get; }
-        public int Speed => Utils.Constants.FULL_TURN;
+        public int Speed => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
         public HealAction(int power, TargetZone targetZone)
@@ -21,7 +21,7 @@ namespace Roguelike.Actions
         }
 
         // Heals the target by amount up to its maximum health.
-        public void Activate(ISchedulable source, Terrain target)
+        public void Activate(ISchedulable source, Tile target)
         {
             if (target == null)
                 return;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Roguelike.Core
+namespace Roguelike.Data
 {
     public enum MaterialType
     {
@@ -12,14 +12,6 @@ namespace Roguelike.Core
         Diamond,
         Paper,
         Flesh
-    }
-
-    public enum Flammability
-    {
-        None,
-        Low,
-        Medium,
-        High
     }
 
     struct MaterialProperty

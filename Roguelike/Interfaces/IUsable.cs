@@ -12,6 +12,6 @@ namespace Roguelike.Interfaces
         IAction ApplySkill { get; }
 
         // Perform the action.
-        void Apply(Actor source, IEnumerable<Terrain> targets);
+        void Apply(Actor source, IEnumerable<Tile> targets);
     }
 }

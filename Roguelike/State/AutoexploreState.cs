@@ -18,7 +18,7 @@ namespace Roguelike.State
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)
         {
-            foreach (Terrain tile in Game.Map.Discovered)
+            foreach (Tile tile in Game.Map.Discovered)
             {
                 if (Game.Map.TryGetExit(tile.X, tile.Y, out Exit exit))
                 {

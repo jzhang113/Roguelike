@@ -10,11 +10,11 @@ namespace Roguelike.Animations
     {
         public bool Done { get; private set; }
 
-        private readonly IList<Terrain> _path;
+        private readonly IList<Tile> _path;
         private readonly RLColor _color;
         private int _counter;
 
-        public TrailAnimation(IEnumerable<Terrain> path, RLColor color)
+        public TrailAnimation(IEnumerable<Tile> path, RLColor color)
         {
             _path = path.ToList();
             _color = color;
@@ -40,7 +40,7 @@ namespace Roguelike.Animations
                 return;
 
             Game.OverlayHandler.ClearForeground();
-            Terrain tile = _path[_counter];
+            Tile tile = _path[_counter];
             Game.OverlayHandler.Set(tile.X, tile.Y, _color);
             Game.OverlayHandler.Draw(Game.MapConsole);
         }

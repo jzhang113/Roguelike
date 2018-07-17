@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Roguelike.Data;
+using Roguelike.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Roguelike.Core;
-using Roguelike.Utils;
 
 namespace Roguelike.Items
 {
@@ -108,20 +108,11 @@ namespace Roguelike.Items
             {
                 Item item = kvp.Key;
                 int amount = kvp.Value;
-                double burnChance;
-
-                switch (Materials.MaterialList[item.Parameters.Material].Flammability)
-                {
-                    case Flammability.Low: burnChance = Constants.LOW_BURN_PERCENT; break;
-                    case Flammability.Medium: burnChance = Constants.MEDIUM_BURN_PERCENT; break;
-                    case Flammability.High: burnChance = Constants.HIGH_BURN_PERCENT; break;
-                    default: burnChance = 0; break;
-                }
 
                 // Use a binomial distribution to determine the number of items that burn.
                 if (!item.Burning)
                 {
-                    int burningCount = Game.World.Random.NextBinomial(amount, burnChance);
+                    int burningCount = Game.World.Random.NextBinomial(amount, Materials.MaterialList[item.Parameters.Material].Flammability.ToIgniteChance());
 
                     // Remove burning items and re-add them as a new type.
                     ItemCount burningStack = Split(item, burningCount);

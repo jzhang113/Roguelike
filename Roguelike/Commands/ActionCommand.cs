@@ -15,10 +15,10 @@ namespace Roguelike.Commands
 
         private readonly IAction _action;
         private readonly bool _singleTarget;
-        private readonly Terrain _target;
-        private readonly IEnumerable<Terrain> _targets;
+        private readonly Tile _target;
+        private readonly IEnumerable<Tile> _targets;
 
-        public ActionCommand(ISchedulable source, IAction action, IEnumerable<Terrain> targets)
+        public ActionCommand(ISchedulable source, IAction action, IEnumerable<Tile> targets)
         {
             System.Diagnostics.Debug.Assert(action != null);
 
@@ -30,7 +30,7 @@ namespace Roguelike.Commands
             _targets = targets;
         }
 
-        public ActionCommand(ISchedulable source, IAction action, Terrain target)
+        public ActionCommand(ISchedulable source, IAction action, Tile target)
         {
             System.Diagnostics.Debug.Assert(action != null);
 
@@ -55,7 +55,7 @@ namespace Roguelike.Commands
             }
             else
             {
-                foreach (Terrain tile in _targets)
+                foreach (Tile tile in _targets)
                 {
                     _action.Activate(Source, tile);
                 }

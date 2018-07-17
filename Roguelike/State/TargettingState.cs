@@ -13,8 +13,8 @@ namespace Roguelike.State
     {
         private readonly Actor _source;
         private readonly TargetZone _targetZone;
-        private readonly Func<IEnumerable<Terrain>, ICommand> _callback;
-        private readonly IEnumerable<Terrain> _inRange;
+        private readonly Func<IEnumerable<Tile>, ICommand> _callback;
+        private readonly IEnumerable<Tile> _inRange;
         private readonly IList<Actor> _targettableActors;
 
         private int _index;
@@ -23,7 +23,7 @@ namespace Roguelike.State
         private int _prevMouseX;
         private int _prevMouseY;
 
-        public TargettingState(Actor source, TargetZone zone, Func<IEnumerable<Terrain>, ICommand> callback)
+        public TargettingState(Actor source, TargetZone zone, Func<IEnumerable<Tile>, ICommand> callback)
         {
             _source = source;
             _targetZone = zone;
@@ -34,13 +34,13 @@ namespace Roguelike.State
             Game.OverlayHandler.ClearBackground();
             Game.OverlayHandler.ClearForeground();
 
-            ICollection<Terrain> tempRange = new HashSet<Terrain>();
+            ICollection<Tile> tempRange = new HashSet<Tile>();
             _inRange = Game.Map.GetTilesInRadius(_source.X, _source.Y, (int)_targetZone.Range).ToList();
 
             // Filter the targettable range down to only the tiles we have a direct line on.
-            foreach (Terrain tile in _inRange)
+            foreach (Tile tile in _inRange)
             {
-                Terrain collision = tile;
+                Tile collision = tile;
                 foreach (var current in Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
                 {
                     if (!current.IsWalkable)
@@ -56,7 +56,7 @@ namespace Roguelike.State
 
             // Pick out the interesting targets.
             // TODO: select items for item targetting spells
-            foreach (Terrain tile in tempRange)
+            foreach (Tile tile in tempRange)
             {
                 if (Game.Map.TryGetActor(tile.X, tile.Y, out Actor actor))
                     _targettableActors.Add(actor);
@@ -163,7 +163,7 @@ namespace Roguelike.State
                     break;
             }
 
-            IEnumerable<Terrain> targets = DrawTargettedTiles();
+            IEnumerable<Tile> targets = DrawTargettedTiles();
             return input == TargettingInput.Fire ? _callback(targets) : null;
         }
 
@@ -203,7 +203,7 @@ namespace Roguelike.State
             _targetX = _source.X;
             _targetY = _source.Y;
 
-            foreach (Terrain highlight in Game.Map.GetStraightLinePath(_source.X, _source.Y,
+            foreach (Tile highlight in Game.Map.GetStraightLinePath(_source.X, _source.Y,
                 _prevMouseX, _prevMouseY))
             {
                 if (!_inRange.Contains(highlight))
@@ -213,23 +213,23 @@ namespace Roguelike.State
                 _targetY = highlight.Y;
             }
 
-            IEnumerable<Terrain> targets = DrawTargettedTiles();
+            IEnumerable<Tile> targets = DrawTargettedTiles();
             return mouse.GetLeftClick() ? _callback(targets) : null;
         }
 
-        private IEnumerable<Terrain> DrawTargettedTiles()
+        private IEnumerable<Tile> DrawTargettedTiles()
         {
             Game.OverlayHandler.ClearForeground();
-            IEnumerable<Terrain> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
+            IEnumerable<Tile> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
 
             // Draw in the projectile path if any.
-            foreach (Terrain tile in _targetZone.Trail)
+            foreach (Tile tile in _targetZone.Trail)
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbSun);
             }
 
             // Draw the targetted tiles.
-            foreach (Terrain tile in targets)
+            foreach (Tile tile in targets)
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbBlood);
             }

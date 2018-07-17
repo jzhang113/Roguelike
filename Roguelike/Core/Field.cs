@@ -6,9 +6,9 @@ using System.Linq;
 namespace Roguelike.Core
 {
     [Serializable]
-    class Field : IEnumerable<Terrain>
+    class Field : IEnumerable<Tile>
     {
-        private readonly Terrain[][] _field;
+        private readonly Tile[][] _field;
         private readonly int _width;
         private readonly int _height;
 
@@ -17,22 +17,17 @@ namespace Roguelike.Core
             _width = width;
             _height = height;
 
-            _field = new Terrain[width][];
+            _field = new Tile[width][];
             for (int i = 0; i < width; i++)
             {
-                _field[i] = new Terrain[height];
+                _field[i] = new Tile[height];
 
                 for (int j = 0; j < height; j++)
-                {
-                    _field[i][j] = new Terrain(i, j)
-                    {
-                        IsWall = true
-                    };
-                }
+                    _field[i][j] = new Tile(i, j, Data.TerrainType.Wall);
             }
         }
 
-        public Terrain this[int i, int j]
+        public Tile this[int i, int j]
         {
             get
             {
@@ -53,7 +48,7 @@ namespace Roguelike.Core
 
         public bool IsValid(int i, int j) => i >= 0 && i < _width && j >= 0 && j < _height;
 
-        public IEnumerator<Terrain> GetEnumerator()
+        public IEnumerator<Tile> GetEnumerator()
         {
             return _field.SelectMany(row => row).GetEnumerator();
         }

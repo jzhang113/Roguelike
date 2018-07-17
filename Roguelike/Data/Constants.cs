@@ -1,4 +1,4 @@
-﻿namespace Roguelike.Utils
+﻿namespace Roguelike.Data
 {
     static class Constants
     {

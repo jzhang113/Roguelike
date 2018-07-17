@@ -11,7 +11,7 @@ namespace Roguelike.Actions
     {
         public int Power { get; }
         public TargetZone Area { get; }
-        public int Speed => Utils.Constants.FULL_TURN;
+        public int Speed => Data.Constants.FULL_TURN;
         public IAnimation Animation { get; private set; }
 
         public DamageAction(int power, TargetZone targetZone)
@@ -21,7 +21,7 @@ namespace Roguelike.Actions
         }
 
         // Deals tamage to the target.
-        public void Activate(ISchedulable source, Terrain target)
+        public void Activate(ISchedulable source, Tile target)
         {
             if (target == null)
                 return;
@@ -32,7 +32,7 @@ namespace Roguelike.Actions
             int damage = targetUnit.TakeDamage(Power);
 
             if (targetUnit.IsDead)
-                targetUnit.State = Enums.ActorState.Dead;
+                targetUnit.State = ActorState.Dead;
 
             Game.MessageHandler.AddMessage($"{source.Name} hits {targetUnit.Name} for {damage} damage");
         }

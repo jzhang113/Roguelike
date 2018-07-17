@@ -26,7 +26,7 @@ namespace Roguelike.Interfaces
             _alpha = info.GetDouble(nameof(_alpha));
         }
 
-        public override void Draw(RLConsole console, Terrain tile, int destX, int destY)
+        public override void Draw(RLConsole console, Tile tile, int destX, int destY)
         {
             if (!tile.IsExplored)
                 return;

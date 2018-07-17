@@ -44,7 +44,7 @@ namespace Roguelike.Systems
                     foreach (ISchedulable entity in _entities)
                     {
                         // Entities with sufficient energy are placed into the turn queue.
-                        if (entity.Energy > Constants.MIN_TURN_ENERGY)
+                        if (entity.Energy > Data.Constants.MIN_TURN_ENERGY)
                             _eventSet.Add(entity);
 
                         // and everyone gains some energy
@@ -109,7 +109,7 @@ namespace Roguelike.Systems
                 // perform a wait action to prevent an infinite loop.
                 if (current is Actors.Player)
                 {
-                    Game.MessageHandler.AddMessage("An invalid action was made.", Enums.MessageLevel.Verbose);
+                    Game.MessageHandler.AddMessage("An invalid action was made.", MessageLevel.Verbose);
                     return false;
                 }
                 else

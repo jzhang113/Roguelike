@@ -1,8 +1,8 @@
 ﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.Systems;
-using Roguelike.Utils;
 using Roguelike.World;
 using System;
 using System.ComponentModel;
@@ -123,7 +123,7 @@ namespace Roguelike
 
         internal static void GameOver()
         {
-            MessageHandler.AddMessage("Game Over.", Enums.MessageLevel.Minimal);
+            MessageHandler.AddMessage("Game Over.", MessageLevel.Minimal);
         }
 
         internal static void Exit()

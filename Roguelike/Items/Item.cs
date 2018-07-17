@@ -1,8 +1,9 @@
-﻿using Roguelike.Actors;
+﻿using Roguelike.Actions;
+using Roguelike.Actors;
+using Roguelike.Core;
 using Roguelike.Interfaces;
-using Roguelike.Actions;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
@@ -68,12 +69,12 @@ namespace Roguelike.Items
 
         public virtual IAction Attack()
         {
-            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, Parameters.MeleeRange));
+            return new DamageAction(Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.MeleeRange));
         }
 
         public virtual IAction Throw()
         {
-            return new DamageAction(Parameters.Damage, new Core.TargetZone(Enums.TargetShape.Range, Parameters.ThrowRange));
+            return new DamageAction(Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.ThrowRange));
         }
 
         public virtual Item DeepClone()

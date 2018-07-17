@@ -15,9 +15,9 @@ namespace Roguelike.Commands
 
         private readonly Item _thrownItem;
         private readonly ICollection<Actor> _targetList;
-        private readonly IEnumerable<Terrain> _target;
+        private readonly IEnumerable<Tile> _target;
 
-        public ThrowCommand(Actor source, Item item, IEnumerable<Terrain> targets)
+        public ThrowCommand(Actor source, Item item, IEnumerable<Tile> targets)
         {
             Source = source;
             EnergyCost = item.Parameters.AttackSpeed;
@@ -29,7 +29,7 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate()
         {
-            foreach (Terrain tile in _target)
+            foreach (Tile tile in _target)
             {
                 if (Game.Map.TryGetActor(tile.X, tile.Y, out Actor target))
                     _targetList.Add(target);

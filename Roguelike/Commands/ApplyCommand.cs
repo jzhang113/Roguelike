@@ -10,13 +10,13 @@ namespace Roguelike.Commands
     class ApplyCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost => Utils.Constants.FULL_TURN;
+        public int EnergyCost => Data.Constants.FULL_TURN;
         public IAnimation Animation => _usableItem?.ApplySkill?.Animation;
 
         private readonly IUsable _usableItem;
-        private readonly IEnumerable<Terrain> _target;
+        private readonly IEnumerable<Tile> _target;
 
-        public ApplyCommand(Actor source, IUsable item, IEnumerable<Terrain> targets)
+        public ApplyCommand(Actor source, IUsable item, IEnumerable<Tile> targets)
         {
             Source = source;
 

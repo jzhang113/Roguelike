@@ -10,7 +10,7 @@ namespace Roguelike.Actions
     class MoveAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed => Utils.Constants.FULL_TURN;
+        public int Speed => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
         public MoveAction(TargetZone targetZone)
@@ -18,7 +18,7 @@ namespace Roguelike.Actions
             Area = targetZone;
         }
 
-        public void Activate(ISchedulable source, Terrain target)
+        public void Activate(ISchedulable source, Tile target)
         {
             if (source is Actor actor && target.IsWalkable)
             {

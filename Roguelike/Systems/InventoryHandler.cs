@@ -85,7 +85,7 @@ namespace Roguelike.Systems
                 }
             }
 
-            Game.MessageHandler.AddMessage($"{itemCount.Item.Name} not found, can't split it", Enums.MessageLevel.Verbose);
+            Game.MessageHandler.AddMessage($"{itemCount.Item.Name} not found, can't split it", MessageLevel.Verbose);
             System.Diagnostics.Debug.Assert(false, $"Cannot split non-existant item, {itemCount.Item.Name}, from inventory");
             return null;
         }

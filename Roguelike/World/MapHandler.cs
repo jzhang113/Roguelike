@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.Items;
 using Roguelike.Systems;
 using Roguelike.Utils;
@@ -22,7 +23,7 @@ namespace Roguelike.World
         // internal transient helper structures
         internal float[,] PlayerMap { get; }
         internal float[,] AutoexploreMap { get; }
-        internal ICollection<Terrain> Discovered { get; }
+        internal ICollection<Tile> Discovered { get; }
 
         // can't auto serialize these dictionaries
         private IDictionary<int, Actor> Units { get; set; }
@@ -45,7 +46,7 @@ namespace Roguelike.World
             Field = new Field(width, height);
             PlayerMap = new float[width, height];
             AutoexploreMap = new float[width, height];
-            Discovered = new List<Terrain>();
+            Discovered = new List<Tile>();
 
             Units = new Dictionary<int, Actor>();
             Items = new Dictionary<int, InventoryHandler>();
@@ -89,7 +90,7 @@ namespace Roguelike.World
 
             PlayerMap = new float[Width, Height];
             AutoexploreMap = new float[Width, Height];
-            Discovered = new List<Terrain>();
+            Discovered = new List<Tile>();
         }
 
         [OnDeserialized]
@@ -146,11 +147,11 @@ namespace Roguelike.World
             if (!Units.Remove(ToIndex(unit.X, unit.Y)))
                 return false;
 
-            Terrain unitTile = Field[unit.X, unit.Y];
+            Tile unitTile = Field[unit.X, unit.Y];
             unitTile.IsOccupied = false;
             unitTile.BlocksLight = false;
 
-            unit.State = Enums.ActorState.Dead;
+            unit.State = ActorState.Dead;
             Game.EventScheduler.RemoveActor(unit);
             return true;
         }
@@ -284,6 +285,9 @@ namespace Roguelike.World
             door.IsOpen = true;
             Field[door.X, door.Y].IsOccupied = false;
             Field[door.X, door.Y].BlocksLight = false;
+
+            // reflect that the door is open immediately
+            UpdatePlayerFov();
         }
         #endregion
 
@@ -308,13 +312,22 @@ namespace Roguelike.World
             if (Fires.TryGetValue(index, out _))
                 return false;
 
-            if (Field[x, y].IsWall)
+            Tile tile = Field[x, y];
+            if (tile.IsWall)
                 return false;
 
-            Fire fire = new Fire(x, y);
-            Fires.Add(index, fire);
-            Game.EventScheduler.AddActor(fire);
-            return true;
+            if (Game.World.Random.NextDouble() < Terrain.TerrainList[tile.Type].Flammability.ToIgniteChance())
+            {
+                Fire fire = new Fire(x, y);
+                Fires.Add(index, fire);
+                Game.EventScheduler.AddActor(fire);
+                return true;
+            }
+            else
+
+            {
+                return false;
+            }
         }
 
         public bool RemoveFire(Fire fire)
@@ -335,17 +348,7 @@ namespace Roguelike.World
             {
                 // TODO: create an actor burning implementation
                 // Q: do doors behave like items or actors when burned?
-                double burnChance;
-
-                switch (Materials.MaterialList[door.Parameters.Material].Flammability)
-                {
-                    case Flammability.Low: burnChance = Constants.LOW_BURN_PERCENT; break;
-                    case Flammability.Medium: burnChance = Constants.MEDIUM_BURN_PERCENT; break;
-                    case Flammability.High: burnChance = Constants.HIGH_BURN_PERCENT; break;
-                    default: burnChance = 0; break;
-                }
-
-                if (Game.World.Random.NextDouble() < burnChance)
+                if (Game.World.Random.NextDouble() < Materials.MaterialList[door.Parameters.Material].Flammability.ToIgniteChance())
                     OpenDoor(door);
             }
 
@@ -414,15 +417,15 @@ namespace Roguelike.World
             return new WeightedPoint(nextX, nextY, nearest);
         }
 
-        public IEnumerable<Terrain> GetStraightPathToPlayer(int x, int y)
+        public IEnumerable<Tile> GetStraightPathToPlayer(int x, int y)
         {
             System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
-            return Field[x, y].IsVisible ? GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y) : new List<Terrain>();
+            return Field[x, y].IsVisible ? GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y) : new List<Tile>();
         }
 
         // Returns a straight line from the source to target. Does not check if the path is actually
         // walkable.
-        public IEnumerable<Terrain> GetStraightLinePath(int sourceX, int sourceY, int targetX, int targetY)
+        public IEnumerable<Tile> GetStraightLinePath(int sourceX, int sourceY, int targetX, int targetY)
         {
             int dx = Math.Abs(targetX - sourceX);
             int dy = Math.Abs(targetY - sourceY);
@@ -452,7 +455,7 @@ namespace Roguelike.World
             }
         }
 
-        public IEnumerable<Terrain> GetTilesInRadius(int x, int y, int radius)
+        public IEnumerable<Tile> GetTilesInRadius(int x, int y, int radius)
         {
             // NOTE: lazy implementation - replace if needed
             for (int i = x - radius; i <= x + radius; i++)
@@ -465,7 +468,7 @@ namespace Roguelike.World
             }
         }
 
-        public IEnumerable<Terrain> GetTilesInRectangle(int x, int y, int width, int height)
+        public IEnumerable<Tile> GetTilesInRectangle(int x, int y, int width, int height)
         {
             for (int i = x; i <= x + width; i++)
             {
@@ -476,7 +479,7 @@ namespace Roguelike.World
             }
         }
 
-        public IEnumerable<Terrain> GetTilesInRectangleBorder(int x, int y, int width, int height)
+        public IEnumerable<Tile> GetTilesInRectangleBorder(int x, int y, int width, int height)
         {
             for (int i = x + 1; i < x + width; i++)
             {
@@ -499,7 +502,7 @@ namespace Roguelike.World
 
             // NOTE: slow implementation of fov - replace if needed
             // Set the player square to true and then skip it on future ray traces.
-            Terrain playerTile = Field[x, y];
+            Tile playerTile = Field[x, y];
             playerTile.IsVisible = true;
             if (!playerTile.IsExplored)
             {
@@ -507,10 +510,10 @@ namespace Roguelike.World
                 Discovered.Add(playerTile);
             }
 
-            foreach (Terrain tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
+            foreach (Tile tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
             {
                 bool visible = true;
-                foreach (Terrain tt in GetStraightLinePath(x, y, tile.X, tile.Y))
+                foreach (Tile tt in GetStraightLinePath(x, y, tile.X, tile.Y))
                 {
                     tt.IsVisible = visible;
                     if (visible)
@@ -528,7 +531,7 @@ namespace Roguelike.World
                 }
             }
 
-            foreach (Terrain tile in GetTilesInRectangle(x - radius / 2, y - radius / 2, radius, radius))
+            foreach (Tile tile in GetTilesInRectangle(x - radius / 2, y - radius / 2, radius, radius))
             {
                 // TODO: post processing to remove visual artifacts.
             }
@@ -542,7 +545,16 @@ namespace Roguelike.World
             {
                 for (int dy = 0; dy < Game.Config.MapView.Height; dy++)
                 {
-                    DrawTile(mapConsole, Camera.X + dx, Camera.Y + dy, dx, dy);
+                    Tile tile = Field[Camera.X + dx, Camera.Y + dy];
+                    if (!tile.IsExplored)
+                        continue;
+
+                    if (tile.IsVisible)
+                        tile.DrawingComponent.Draw(mapConsole, tile, dx, dy);
+                    else if (tile.IsWall)
+                        mapConsole.Set(dx, dy, Colors.Wall, null, '#');
+                    else
+                        mapConsole.Set(dx, dy, Colors.Floor, null, '.');
                 }
             }
 
@@ -552,7 +564,7 @@ namespace Roguelike.World
                 int destY = door.Y - Camera.Y;
                 door.DrawingComponent.Draw(mapConsole, Field[door.X, door.Y], destX, destY);
             }
-            
+
             foreach (InventoryHandler stack in Items.Values)
             {
                 Item topItem = stack.First().Item;
@@ -588,43 +600,12 @@ namespace Roguelike.World
                     mapConsole.SetChar(unit.X - Camera.X, unit.Y - Camera.Y, '%');
             }
         }
-
-        private void DrawTile(RLConsole mapConsole, int srcX, int srcY, int destX, int destY)
-        {
-            Terrain tile = Field[srcX, srcY];
-            if (!tile.IsExplored)
-                return;
-
-            if (tile.IsVisible)
-            {
-                if (!tile.IsWall)
-                {
-                    mapConsole.Set(destX, destY, Colors.FloorFov, Colors.FloorBackgroundFov, '.');
-                    // mapConsole.SetColor(tile.X, tile.Y, new RLColor(1, 1 - PlayerMap[tile.X, tile.Y] / 20, 0));
-                }
-                else
-                {
-                    mapConsole.Set(destX, destY, Colors.WallFov, Colors.WallBackgroundFov, '#');
-                }
-            }
-            else
-            {
-                if (!tile.IsWall)
-                {
-                    mapConsole.Set(destX, destY, Colors.Floor, Colors.FloorBackground, '.');
-                }
-                else
-                {
-                    mapConsole.Set(destX, destY, Colors.Wall, Colors.WallBackground, '#');
-                }
-            }
-        }
         #endregion
 
         private void UpdatePlayerFov()
         {
             // Clear vision from last turn
-            foreach (Terrain tile in Field)
+            foreach (Tile tile in Field)
                 tile.IsVisible = false;
 
             Player player = Game.Player;
@@ -663,7 +644,7 @@ namespace Roguelike.World
             }
 
             Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
-            foreach (Terrain tile in Field)
+            foreach (Tile tile in Field)
             {
                 if (!tile.IsExplored)
                 {
@@ -686,7 +667,7 @@ namespace Roguelike.World
                     int newX = p.X + dir.X;
                     int newY = p.Y + dir.Y;
                     float newWeight = p.Weight + dir.Weight;
-                    Terrain tile = Field[newX, newY];
+                    Tile tile = Field[newX, newY];
 
                     if (Field.IsValid(newX, newY) && !tile.IsWall &&
                         (double.IsNaN(mapWeights[newX, newY]) || newWeight < mapWeights[newX, newY]))

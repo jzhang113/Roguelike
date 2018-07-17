@@ -22,9 +22,9 @@ namespace Roguelike.Items
             ApplySkill = other.ApplySkill;
         }
 
-        public void Apply(Actor source, IEnumerable<Terrain> targets)
+        public void Apply(Actor source, IEnumerable<Tile> targets)
         {
-            foreach (Terrain tile in targets)
+            foreach (Tile tile in targets)
             {
                 ApplySkill.Activate(source, tile);
             }

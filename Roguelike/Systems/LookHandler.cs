@@ -9,7 +9,7 @@ namespace Roguelike.Systems
     {
         private static Actor _displayActor;
         private static Item _displayItem;
-        private static Terrain _displayTile;
+        private static Tile _displayTile;
         private static bool _showActorInfo;
         private static bool _showItemInfo;
         private static bool _showTile;
@@ -28,7 +28,7 @@ namespace Roguelike.Systems
             _showActorInfo = false;
         }
 
-        internal static void DisplayTerrain(Terrain tile)
+        internal static void DisplayTerrain(Tile tile)
         {
             _displayTile = tile;
             _showTile = (tile != null);

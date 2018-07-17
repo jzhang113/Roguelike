@@ -34,7 +34,7 @@ namespace Roguelike.Interfaces
             Activated = info.GetBoolean(nameof(Activated));
         }
 
-        public virtual void Draw(RLConsole console, Terrain tile, int destX, int destY)
+        public virtual void Draw(RLConsole console, Tile tile, int destX, int destY)
         {
             if (!tile.IsExplored)
                 return;

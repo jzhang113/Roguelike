@@ -11,12 +11,12 @@ namespace Roguelike.Commands
     class MoveCommand : ICommand
     {
         public Actor Source { get; }
-        public int EnergyCost => Utils.Constants.FULL_TURN;
+        public int EnergyCost => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
         private readonly int _newX;
         private readonly int _newY;
-        private readonly Terrain _tile;
+        private readonly Tile _tile;
 
         public MoveCommand(Actor source, int x, int y)
         {
@@ -60,7 +60,7 @@ namespace Roguelike.Commands
                     return new RedirectMessage(false, new WaitCommand(Source));
 
                 IAction attack = Source.GetBasicAttack();
-                IEnumerable<Terrain> targets = attack.Area.GetTilesInRange(Source, _tile.X, _tile.Y);
+                IEnumerable<Tile> targets = attack.Area.GetTilesInRange(Source, _tile.X, _tile.Y);
                 return new RedirectMessage(false, new ActionCommand(Source, attack, targets));
             }
 
@@ -70,7 +70,7 @@ namespace Roguelike.Commands
         public void Execute()
         {
             System.Diagnostics.Debug.Assert(_tile.IsWalkable);
-            Game.MessageHandler.AddMessage($"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy", Enums.MessageLevel.Verbose);
+            Game.MessageHandler.AddMessage($"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy", MessageLevel.Verbose);
 
             if (Source is Player)
             {

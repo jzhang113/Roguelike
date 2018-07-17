@@ -1,10 +1,17 @@
 ﻿using Roguelike.Actors;
 using System;
 using System.Collections.Generic;
-using Roguelike.Enums;
 
 namespace Roguelike.Core
 {
+    public enum TargetShape
+    {
+        Self,
+        Range,
+        Ray,
+        Directional
+    }
+
     [Serializable]
     public class TargetZone
     {
@@ -12,7 +19,7 @@ namespace Roguelike.Core
         public double Range { get; }
         public int Radius { get; }
         public bool Projectile { get; }
-        public ICollection<Terrain> Trail { get; }
+        public ICollection<Tile> Trail { get; }
 
         public TargetZone(TargetShape shape, double range = 1.5, int radius = 0, bool projectile = true)
         {
@@ -20,17 +27,17 @@ namespace Roguelike.Core
             Range = range;
             Radius = radius;
             Projectile = projectile;
-            Trail = new List<Terrain>();
+            Trail = new List<Tile>();
         }
 
-        public IEnumerable<Terrain> GetTilesInRange(Actor current, int targetX, int targetY)
+        public IEnumerable<Tile> GetTilesInRange(Actor current, int targetX, int targetY)
         {
-            ICollection<Terrain> targets = new List<Terrain>();
+            ICollection<Tile> targets = new List<Tile>();
 
             switch (Shape)
             {
                 case TargetShape.Self:
-                    foreach (Terrain tile in Game.Map.GetTilesInRadius(current.X, current.Y, Radius))
+                    foreach (Tile tile in Game.Map.GetTilesInRadius(current.X, current.Y, Radius))
                     {
                         if (InRange(current, tile.X, tile.Y))
                             targets.Add(Game.Map.Field[tile.X, tile.Y]);
@@ -48,7 +55,7 @@ namespace Roguelike.Core
                         collisionY = current.Y;
                         Trail.Clear();
 
-                        foreach (Terrain tile in Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY))
+                        foreach (Tile tile in Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY))
                         {
                             Trail.Add(tile);
                             collisionX = tile.X;
@@ -59,17 +66,17 @@ namespace Roguelike.Core
                         }
                     }
 
-                    foreach (Terrain tile in Game.Map.GetTilesInRadius(collisionX, collisionY, Radius))
+                    foreach (Tile tile in Game.Map.GetTilesInRadius(collisionX, collisionY, Radius))
                     {
                         // TODO: prevent large radius spells from hitting past walls.
                         targets.Add(Game.Map.Field[tile.X, tile.Y]);
                     }
                     return targets;
                 case TargetShape.Ray:
-                    IEnumerable<Terrain> path = Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY);
+                    IEnumerable<Tile> path = Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY);
                     if (Projectile)
                     {
-                        foreach (Terrain tile in path)
+                        foreach (Tile tile in path)
                         {
                             // since each step takes us farther away, we can stop checking as soon as one
                             // tile falls out of range
@@ -103,7 +110,7 @@ namespace Roguelike.Core
                         if (!InRange(current, x, y))
                             break;
 
-                        Terrain tile = Game.Map.Field[x, y];
+                        Tile tile = Game.Map.Field[x, y];
                         targets.Add(tile);
 
                         // projectiles stop at the first blocked tile

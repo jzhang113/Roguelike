@@ -3,7 +3,6 @@ using Roguelike.Core;
 using Roguelike.Items;
 using System.Collections.Generic;
 using System;
-using Roguelike.Enums;
 
 namespace Roguelike.Systems
 {
