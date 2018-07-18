@@ -70,7 +70,9 @@ namespace Roguelike.Commands
         public void Execute()
         {
             System.Diagnostics.Debug.Assert(_tile.IsWalkable);
-            Game.MessageHandler.AddMessage($"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy", MessageLevel.Verbose);
+            Game.MessageHandler.AddMessage(
+                $"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy",
+                MessageLevel.Verbose);
 
             if (Source is Player)
             {

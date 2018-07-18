@@ -248,11 +248,14 @@ namespace Roguelike.World
             int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
             {
-                System.Diagnostics.Debug.Assert(false, $"Could not split {itemCount.Item.Name} on the map.");
+                System.Diagnostics.Debug.Assert(
+                    false, $"Could not split {itemCount.Item.Name} on the map.");
                 return null;
             }
 
-            System.Diagnostics.Debug.Assert(stack.Contains(itemCount), $"Map does not contain {itemCount.Item.Name}.");
+            System.Diagnostics.Debug.Assert(
+                stack.Contains(itemCount),
+                $"Map does not contain {itemCount.Item.Name}.");
 
             ItemCount split = stack.Split(itemCount);
             if (stack.IsEmpty())
@@ -316,7 +319,8 @@ namespace Roguelike.World
             if (tile.IsWall)
                 return false;
 
-            if (Game.World.Random.NextDouble() < Terrain.TerrainList[tile.Type].Flammability.ToIgniteChance())
+            TerrainProperty terrain = tile.Type.ToProperty();
+            if (Game.World.Random.NextDouble() < terrain.Flammability.ToIgniteChance())
             {
                 Fire fire = new Fire(x, y);
                 Fires.Add(index, fire);
@@ -348,7 +352,8 @@ namespace Roguelike.World
             {
                 // TODO: create an actor burning implementation
                 // Q: do doors behave like items or actors when burned?
-                if (Game.World.Random.NextDouble() < Materials.MaterialList[door.Parameters.Material].Flammability.ToIgniteChance())
+                MaterialProperty material = door.Parameters.Material.ToProperty();
+                if (Game.World.Random.NextDouble() < material.Flammability.ToIgniteChance())
                     OpenDoor(door);
             }
 
@@ -420,7 +425,9 @@ namespace Roguelike.World
         public IEnumerable<Tile> GetStraightPathToPlayer(int x, int y)
         {
             System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
-            return Field[x, y].IsVisible ? GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y) : new List<Tile>();
+            return Field[x, y].IsVisible
+                ? GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y)
+                : new List<Tile>();
         }
 
         // Returns a straight line from the source to target. Does not check if the path is actually
@@ -510,7 +517,8 @@ namespace Roguelike.World
                 Discovered.Add(playerTile);
             }
 
-            foreach (Tile tile in GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
+            foreach (Tile tile in
+                GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
             {
                 bool visible = true;
                 foreach (Tile tt in GetStraightLinePath(x, y, tile.X, tile.Y))

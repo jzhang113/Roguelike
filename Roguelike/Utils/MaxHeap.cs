@@ -67,15 +67,20 @@ namespace Roguelike.Utils
             if (array == null)
                 throw new ArgumentNullException(nameof(array));
             if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex), "arrayIndex is less than 0.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(arrayIndex),
+                    "arrayIndex is less than 0.");
             if (array.Rank > 1)
                 throw new ArgumentException("array is multidimensional.");
             if (Count == 0)
                 return;
             if (arrayIndex >= array.Length)
-                throw new ArgumentException("arrayIndex is equal to or greater than the length of the array.");
-            if (Count > (array.Length - arrayIndex))
-                throw new ArgumentException("The number of elements in the source ICollection is greater than the available space from arrayIndex to the end of the destination array.");
+                throw new ArgumentException(
+                    "arrayIndex is equal to or greater than the length of the array.");
+            if (Count > array.Length - arrayIndex)
+                throw new ArgumentException(
+                    "The number of elements in the source ICollection is greater than the" +
+                    " available space from arrayIndex to the end of the destination array.");
 
             for (int i = 0; i < Count; i++)
             {

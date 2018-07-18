@@ -45,7 +45,7 @@ namespace Roguelike.Systems
                 console.Print(1, 2, "HP: " + _displayActor.Hp + " / " + _displayActor.Parameters.MaxHp, Colors.TextHeading);
                 console.Print(1, 3, "MP: " + _displayActor.Mp + " / " + _displayActor.Parameters.MaxMp, Colors.TextHeading);
                 console.Print(1, 4, "SP: " + _displayActor.Sp + " / " + _displayActor.Parameters.MaxSp, Colors.TextHeading);
-                console.Print(1, 5, "Energy: " + _displayActor.Energy.ToString(), Colors.TextHeading);
+                console.Print(1, 5, "Energy: " + _displayActor.Energy, Colors.TextHeading);
                 console.Print(1, 6, "State: " + _displayActor.State, Colors.TextHeading);
             }
 

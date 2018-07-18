@@ -20,7 +20,8 @@ namespace Roguelike.Items
 
             if (!equipped.Equipment.IsDefaultWeapon())
             {
-                Game.MessageHandler.AddMessage($"You are already wielding a {equipped.Equipment.PrimaryWeapon.Name}!");
+                Game.MessageHandler.AddMessage(
+                    $"You are already wielding a {equipped.Equipment.PrimaryWeapon.Name}!");
                 return;
             }
 

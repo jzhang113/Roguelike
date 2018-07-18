@@ -33,7 +33,8 @@ namespace Roguelike.Core
                     }
                     else
                     {
-                        WeightedPoint nextMove = Game.Map.MoveTowardsTarget(monster.X, monster.Y, Game.Map.PlayerMap);
+                        WeightedPoint nextMove = Game.Map.MoveTowardsTarget(
+                            monster.X, monster.Y, Game.Map.PlayerMap);
                         return new MoveCommand(monster, nextMove.X, nextMove.Y);
                     }
                 case ActorState.Flee:

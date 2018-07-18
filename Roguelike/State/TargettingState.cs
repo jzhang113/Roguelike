@@ -41,7 +41,8 @@ namespace Roguelike.State
             foreach (Tile tile in _inRange)
             {
                 Tile collision = tile;
-                foreach (var current in Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
+                foreach (var current in
+                    Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
                 {
                     if (!current.IsWalkable)
                     {
@@ -222,7 +223,8 @@ namespace Roguelike.State
             Game.OverlayHandler.ClearForeground();
             IEnumerable<Tile> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
 
-            // Draw in the projectile path if any.
+            // Draw
+            // the projectile path if any.
             foreach (Tile tile in _targetZone.Trail)
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbSun);

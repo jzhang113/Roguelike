@@ -19,8 +19,8 @@ namespace Roguelike.Actors
             Equipment = new EquipmentHandler();
         }
 
-        // Wait for the input system to set NextCommand. Since Commands don't repeat, clear NextCommand
-        // once it has been sent.
+        // Wait for the input system to set NextCommand. Since Commands don't repeat, clear
+        // NextCommand once it has been sent.
         public override ICommand Act()
         {
             ICommand action = NextCommand;

@@ -12,7 +12,8 @@ namespace Roguelike.Input
             int mapLeft = 0;
             int mapRight = Game.Config.MapView.Width;
 
-            if (mouse.X >= mapLeft && mouse.X <= mapRight - 1 && mouse.Y >= mapTop && mouse.Y <= mapBottom - 1)
+            if (mouse.X >= mapLeft && mouse.X <= mapRight - 1
+                && mouse.Y >= mapTop && mouse.Y <= mapBottom - 1)
             {
                 int xPos = mouse.X - mapLeft + Camera.X;
                 int yPos = mouse.Y - mapTop + Camera.Y;

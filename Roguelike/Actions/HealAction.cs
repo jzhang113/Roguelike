@@ -9,14 +9,15 @@ namespace Roguelike.Actions
     [Serializable]
     class HealAction : IAction
     {
-        public int Power { get; }
         public TargetZone Area { get; }
         public int Speed => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
+        private readonly int _power;
+
         public HealAction(int power, TargetZone targetZone)
         {
-            Power = power;
+            _power = power;
             Area = targetZone;
         }
 
@@ -29,8 +30,9 @@ namespace Roguelike.Actions
             if (!Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
                 return;
 
-            int healing = targetUnit.TakeHealing(Power);
-            Game.MessageHandler.AddMessage($"{source.Name} healed {targetUnit.Name} by {healing} damage");
+            int healing = targetUnit.TakeHealing(_power);
+            Game.MessageHandler.AddMessage(
+                $"{source.Name} healed {targetUnit.Name} by {healing} damage");
         }
     }
 }

@@ -25,7 +25,8 @@ namespace Roguelike.Items
 
             if (equipped.Equipment.Armor[Type] != null)
             {
-                Game.MessageHandler.AddMessage($"You are already wearing a {equipped.Equipment.Armor[Type]}!");
+                Game.MessageHandler.AddMessage(
+                    $"You are already wearing a {equipped.Equipment.Armor[Type]}!");
                 return;
             }
 

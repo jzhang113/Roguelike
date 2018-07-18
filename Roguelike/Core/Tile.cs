@@ -18,7 +18,7 @@ namespace Roguelike.Core
             {
                 _type = value;
 
-                TerrainProperty terrain = Terrain.TerrainList[value];
+                TerrainProperty terrain = value.ToProperty();
                 DrawingComponent.Color = terrain.Color;
                 DrawingComponent.Symbol = terrain.Symbol;
             }
@@ -41,8 +41,8 @@ namespace Roguelike.Core
             X = x;
             Y = y;
             Fuel = 10;
-            TerrainProperty terrain = Terrain.TerrainList[type];
 
+            TerrainProperty terrain = type.ToProperty();
             DrawingComponent = new Drawable
             {
                 Color = terrain.Color,

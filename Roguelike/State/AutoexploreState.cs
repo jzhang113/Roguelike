@@ -44,7 +44,8 @@ namespace Roguelike.State
                 return null;
             }
 
-            WeightedPoint move = Game.Map.MoveTowardsTarget(Game.Player.X, Game.Player.Y, Game.Map.AutoexploreMap);
+            WeightedPoint move = Game.Map.MoveTowardsTarget(
+                Game.Player.X, Game.Player.Y, Game.Map.AutoexploreMap);
             if (move.X == Game.Player.X && move.Y == Game.Player.Y)
             {
                 // If the best move is to stay still, we must have explored everything reachable
@@ -77,16 +78,7 @@ namespace Roguelike.State
 
         public void Draw()
         {
-            for (int x = 0; x < Game.Config.MapView.Width; x++)
-            {
-                for (int y = 0; y < Game.Config.MapView.Height; y++)
-                {
-                    Game.OverlayHandler.Set(x, y, new RLColor(0, 0, 1 - Game.Map.AutoexploreMap[x + Camera.X, y + Camera.Y] / 30));
-                }
-            }
-
             Game.Map.Draw(Game.MapConsole);
-            Game.OverlayHandler.Draw(Game.MapConsole);
         }
     }
 }

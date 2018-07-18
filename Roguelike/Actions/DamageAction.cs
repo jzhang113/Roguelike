@@ -9,14 +9,15 @@ namespace Roguelike.Actions
     [Serializable]
     class DamageAction : IAction
     {
-        public int Power { get; }
         public TargetZone Area { get; }
         public int Speed => Data.Constants.FULL_TURN;
-        public IAnimation Animation { get; private set; }
+        public IAnimation Animation => null;
+
+        private readonly int _power;
 
         public DamageAction(int power, TargetZone targetZone)
         {
-            Power = power;
+            _power = power;
             Area = targetZone;
         }
 
@@ -29,12 +30,13 @@ namespace Roguelike.Actions
             if (!Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
                 return;
 
-            int damage = targetUnit.TakeDamage(Power);
+            int damage = targetUnit.TakeDamage(_power);
 
             if (targetUnit.IsDead)
                 targetUnit.State = ActorState.Dead;
 
-            Game.MessageHandler.AddMessage($"{source.Name} hits {targetUnit.Name} for {damage} damage");
+            Game.MessageHandler.AddMessage(
+                $"{source.Name} hits {targetUnit.Name} for {damage} damage");
         }
     }
 }

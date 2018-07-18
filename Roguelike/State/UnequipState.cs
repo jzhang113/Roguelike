@@ -18,7 +18,11 @@ namespace Roguelike.State
         {
             if (itemCount.Item is IEquippable)
             {
-                ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount {Item = itemCount.Item, Count = 1});
+                ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount
+                {
+                    Item = itemCount.Item,
+                    Count = 1
+                });
                 IEquippable equipable = splitCount.Item as IEquippable;
                 return new UnequipCommand(Game.Player, equipable);
             }

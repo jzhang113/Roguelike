@@ -109,22 +109,27 @@ namespace Roguelike.Items
                 Item item = kvp.Key;
                 int amount = kvp.Value;
 
-                // Use a binomial distribution to determine the number of items that burn.
-                if (!item.Burning)
-                {
-                    int burningCount = Game.World.Random.NextBinomial(amount, Materials.MaterialList[item.Parameters.Material].Flammability.ToIgniteChance());
+                // Skip if it's already burning.
+                if (item.Burning)
+                    continue;
 
-                    // Remove burning items and re-add them as a new type.
-                    ItemCount burningStack = Split(item, burningCount);
-                    burningStack.Item.Burning = true;
-                    //_itemStack.Add(burningStack.Item, burningStack.Count);
-                }
+                // Use a binomial distribution to determine the number of items that burn.
+                MaterialProperty material = item.Parameters.Material.ToProperty();
+                int burningCount = Game.World.Random.NextBinomial(
+                    amount,
+                    material.Flammability.ToIgniteChance());
+
+                // Remove burning items and re-add them as a new type.
+                ItemCount burningStack = Split(item, burningCount);
+                burningStack.Item.Burning = true;
+                //_itemStack.Add(burningStack.Item, burningStack.Count);
             }
         }
 
         public IEnumerator<ItemCount> GetEnumerator()
         {
-            return _itemStack.Select(kvp => new ItemCount { Item = kvp.Key, Count = kvp.Value }).GetEnumerator();
+            return _itemStack.Select(
+                kvp => new ItemCount { Item = kvp.Key, Count = kvp.Value }).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

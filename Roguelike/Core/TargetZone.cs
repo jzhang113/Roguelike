@@ -55,7 +55,8 @@ namespace Roguelike.Core
                         collisionY = current.Y;
                         Trail.Clear();
 
-                        foreach (Tile tile in Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY))
+                        foreach (Tile tile in
+                            Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY))
                         {
                             Trail.Add(tile);
                             collisionX = tile.X;
@@ -73,13 +74,14 @@ namespace Roguelike.Core
                     }
                     return targets;
                 case TargetShape.Ray:
-                    IEnumerable<Tile> path = Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY);
+                    IEnumerable<Tile> path = Game.Map.GetStraightLinePath(
+                        current.X, current.Y, targetX, targetY);
                     if (Projectile)
                     {
                         foreach (Tile tile in path)
                         {
-                            // since each step takes us farther away, we can stop checking as soon as one
-                            // tile falls out of range
+                            // since each step takes us farther away, we can stop checking as soon
+                            // as one tile falls out of range
                             if (!InRange(current, tile.X, tile.Y))
                                 break;
 

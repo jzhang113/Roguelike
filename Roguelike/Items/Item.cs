@@ -69,12 +69,14 @@ namespace Roguelike.Items
 
         public virtual IAction Attack()
         {
-            return new DamageAction(Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.MeleeRange));
+            return new DamageAction(
+                Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.MeleeRange));
         }
 
         public virtual IAction Throw()
         {
-            return new DamageAction(Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.ThrowRange));
+            return new DamageAction(
+                Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.ThrowRange));
         }
 
         public virtual Item DeepClone()

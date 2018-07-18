@@ -27,7 +27,7 @@ namespace Roguelike.Systems
                     case "-v":
                         options.Verbosity = MessageLevel.Verbose;
                         break;
-                    default: throw new Exception($"Option {args[i]} not recognized");
+                    default: throw new ArgumentException($"Option {args[i]} not recognized");
                 }
             }
 

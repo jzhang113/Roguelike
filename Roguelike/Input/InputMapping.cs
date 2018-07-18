@@ -2,11 +2,11 @@
 {
     static partial class InputMapping
     {
-        private static KeyMap KeyMap { get; }
+        private static readonly KeyMap _keyMap;
 
         static InputMapping()
         {
-            KeyMap = Program.LoadData<KeyMap>("keyMap");
+            _keyMap = Program.LoadData<KeyMap>("keyMap");
         }
     }
 }

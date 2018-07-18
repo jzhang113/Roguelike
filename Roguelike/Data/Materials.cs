@@ -21,13 +21,15 @@ namespace Roguelike.Data
         public Flammability Flammability { get; set; }
     }
 
-    static class Materials
+    static class MaterialExtensions
     {
-        public static IDictionary<MaterialType, MaterialProperty> MaterialList { get; set; }
+        private static readonly IDictionary<MaterialType, MaterialProperty> _materialList;
 
-        static Materials()
+        static MaterialExtensions()
         {
-            MaterialList = Program.LoadData<IDictionary<MaterialType, MaterialProperty>>("materials");
+            _materialList = Program.LoadData<IDictionary<MaterialType, MaterialProperty>>("materials");
         }
+
+        public static MaterialProperty ToProperty(this MaterialType type) => _materialList[type];
     }
 }

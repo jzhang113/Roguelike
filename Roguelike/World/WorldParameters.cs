@@ -2,6 +2,14 @@
 
 namespace Roguelike.World
 {
+    public enum RegionType
+    {
+        Root,
+        Main,
+        Side,
+        Otherside
+    }
+
     struct WorldParameter
     {
         public ICollection<RegionData> Regions { get; set; }
@@ -35,13 +43,5 @@ namespace Roguelike.World
             public LevelId From { get; set; }
             public LevelId To { get; set; }
         }
-    }
-
-    public enum RegionType
-    {
-        Root,
-        Main,
-        Side,
-        Otherside
     }
 }

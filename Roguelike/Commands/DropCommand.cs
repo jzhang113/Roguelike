@@ -34,8 +34,12 @@ namespace Roguelike.Commands
             System.Diagnostics.Debug.Assert(_dropAmount > 0);
             if (_dropAmount > _itemCount.Count)
                 _dropAmount = _itemCount.Count;
-            ItemCount dropped = Source.Inventory.Split(new ItemCount { Item = _itemCount.Item, Count = _dropAmount });
 
+            ItemCount dropped = Source.Inventory.Split(new ItemCount
+            {
+                Item = _itemCount.Item,
+                Count = _dropAmount
+            });
             dropped.Item.X = Source.X;
             dropped.Item.Y = Source.Y;
             Game.Map.AddItem(dropped);

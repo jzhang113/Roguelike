@@ -17,11 +17,10 @@ namespace Roguelike.World
         private static int _counter;
 
         public MapHandler Map { get; private set; }
-        public LevelId CurrentLevel => _currentLevel;
+        public LevelId CurrentLevel { get; private set; }
         public PcgRandom Random => _random;
 
         private readonly Dictionary<LevelId, LevelData> _levels;
-        private LevelId _currentLevel;
 
         [NonSerialized]
         private PcgRandom _random;
@@ -35,7 +34,7 @@ namespace Roguelike.World
             _random = new PcgRandom(seed);
 
             _levels = BuildWorld(parameters);
-            _currentLevel = new LevelId
+            CurrentLevel = new LevelId
             {
                 Name = _ROOT_NAME,
                 RegionType = RegionType.Root,
@@ -75,7 +74,7 @@ namespace Roguelike.World
 
             bool seen = _levels[id].Seen;
             Map = seen ? LoadLevel(id) : CreateLevel(id);
-            _currentLevel = id;
+            CurrentLevel = id;
         }
 
         private Dictionary<LevelId, LevelData> BuildWorld(WorldParameter parameters)
@@ -102,8 +101,8 @@ namespace Roguelike.World
                 }
             };
 
-            foreach (WorldParameter.RegionData region
-                in parameters.Regions.Where(r => r.Require).ToList())
+            foreach (WorldParameter.RegionData region in
+                parameters.Regions.Where(r => r.Require).ToList())
             {
                 BuildLevelConnections(region, world);
                 if (region.Unique)

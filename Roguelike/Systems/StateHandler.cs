@@ -31,9 +31,6 @@ namespace Roguelike.Systems
                 return command;
 
             RLKeyPress keyPress = _console.Keyboard.GetKeyPress();
-            //if (keyPress == null)
-                //return null;
-
             if (keyPress?.Key == RLKey.Escape)
             {
                 switch (currentState)

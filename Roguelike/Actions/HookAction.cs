@@ -15,7 +15,7 @@ namespace Roguelike.Actions
 
         public HookAction(int range)
         {
-            Area = new TargetZone(TargetShape.Range, range: range);
+            Area = new TargetZone(TargetShape.Range, range);
         }
 
         public void Activate(ISchedulable source, Tile target)

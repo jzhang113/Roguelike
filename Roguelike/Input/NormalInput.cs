@@ -43,13 +43,13 @@ namespace Roguelike.Input
 
             if (keyPress.Shift)
             {
-                if (KeyMap.NormalMap.Shift.TryGetValue(keyPress.Key, out string action)
+                if (_keyMap.NormalMap.Shift.TryGetValue(keyPress.Key, out string action)
                     && Enum.TryParse(action, out NormalInput input))
                     return input;
             }
             else
             {
-                if (KeyMap.NormalMap.None.TryGetValue(keyPress.Key, out string action)
+                if (_keyMap.NormalMap.None.TryGetValue(keyPress.Key, out string action)
                     && Enum.TryParse(action, out NormalInput input))
                     return input;
             }

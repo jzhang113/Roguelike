@@ -1,4 +1,6 @@
-﻿namespace Roguelike.Data
+﻿using System;
+
+namespace Roguelike.Data
 {
     public enum Flammability
     {
@@ -14,6 +16,8 @@
         {
             switch (flammability)
             {
+                case Flammability.None:
+                    return 0;
                 case Flammability.Low:
                     return Constants.LOW_BURN_PERCENT;
                 case Flammability.Medium:
@@ -21,7 +25,7 @@
                 case Flammability.High:
                     return Constants.HIGH_BURN_PERCENT;
                 default:
-                    return 0;
+                    throw new ArgumentOutOfRangeException(nameof(flammability));
             }
         }
     }
