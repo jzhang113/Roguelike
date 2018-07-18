@@ -41,7 +41,7 @@ namespace Roguelike.State
             foreach (Tile tile in _inRange)
             {
                 Tile collision = tile;
-                foreach (var current in
+                foreach (Tile current in
                     Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
                 {
                     if (!current.IsWalkable)
@@ -204,8 +204,8 @@ namespace Roguelike.State
             _targetX = _source.X;
             _targetY = _source.Y;
 
-            foreach (Tile highlight in Game.Map.GetStraightLinePath(_source.X, _source.Y,
-                _prevMouseX, _prevMouseY))
+            foreach (Tile highlight in
+                Game.Map.GetStraightLinePath(_source.X, _source.Y, _prevMouseX, _prevMouseY))
             {
                 if (!_inRange.Contains(highlight))
                     break;
@@ -223,22 +223,19 @@ namespace Roguelike.State
             Game.OverlayHandler.ClearForeground();
             IEnumerable<Tile> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
 
-            // Draw
-            // the projectile path if any.
+            // Draw the projectile path if any.
             foreach (Tile tile in _targetZone.Trail)
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbSun);
+                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.PathColor);
             }
 
             // Draw the targetted tiles.
             foreach (Tile tile in targets)
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Swatch.DbBlood);
+                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.TargetColor);
             }
             
-            // TODO: Replace colors
-            Game.OverlayHandler.Set(_targetX, _targetY, new RLColor(255, 0, 0));
-
+            Game.OverlayHandler.Set(_targetX, _targetY, Colors.Cursor);
             return targets;
         }
 

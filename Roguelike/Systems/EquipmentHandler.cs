@@ -57,6 +57,7 @@ namespace Roguelike.Systems
 
         public void Draw(RLConsole console)
         {
+            console.Print(1, console.Width / 2 - 8, "== Equipment ==", Colors.TextHeading);
             console.Print(1, 1, "Weapon - " + PrimaryWeapon.Name, Colors.TextHeading);
             console.Print(1, 2, "Offhand - " + (OffhandWeapon?.Name ?? "none"), Colors.TextHeading);
             console.Print(1, 3, "Armor - " + (Armor[ArmorType.Armor]?.Name ?? "none"), Colors.TextHeading);

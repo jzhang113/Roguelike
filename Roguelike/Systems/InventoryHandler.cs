@@ -130,8 +130,8 @@ namespace Roguelike.Systems
                 return false;
             }
 
-           item = _inventory[key - 'a'].First();
-           return true;
+            item = _inventory[key - 'a'].First();
+            return true;
         }
 
         public bool OpenStack(char key)
@@ -172,7 +172,9 @@ namespace Roguelike.Systems
 
         public void Draw(RLConsole console)
         {
-            int line = 1;
+            console.Print(console.Width / 2 - 8, 1, "== Inventory ==", Colors.TextHeading);
+
+            int line = 3;
             char letter = 'a';
 
             foreach (ItemStack itemStack in _inventory)
@@ -181,15 +183,13 @@ namespace Roguelike.Systems
                 line++;
                 letter++;
 
-                if (!itemStack.Collapsed)
+                if (itemStack.Collapsed)
+                    continue;
+
+                foreach (ItemCount itemCount in itemStack)
                 {
-                    char subletter = 'a';
-                    foreach (ItemCount itemCount in itemStack)
-                    {
-                        console.Print(3, line, $"{letter} {subletter} - {itemCount}", Colors.TextHeading);
-                        line++;
-                        subletter++;
-                    }
+                    console.Print(3, line, $"- {itemCount}", Colors.TextHeading);
+                    line++;
                 }
             }
         }

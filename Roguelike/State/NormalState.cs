@@ -4,8 +4,11 @@ using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Input;
+using Roguelike.Items;
 using Roguelike.Systems;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.State
 {
@@ -178,52 +181,48 @@ namespace Roguelike.State
 
         public ICommand HandleMouseInput(RLMouse mouse)
         {
-            //    map.ClearHighlight();
-            //    Terrain current = map.Field[mousePos.X, mousePos.Y];
+            if (!MouseInput.GetHoverPosition(mouse, out (int X, int Y) mousePos))
+                return null;
 
-            //        // TODO: Path may end up broken because an enemy is in the way.
-            //        IEnumerable<WeightedPoint> path = map.GetPathToPlayer(mousePos.X, mousePos.Y).Reverse();
-            //        bool exploredPathExists = false;
+            Tile current = Game.Map.Field[mousePos.X, mousePos.Y];
+            if (!current.IsExplored)
+                return null;
 
-            //        foreach (WeightedPoint p in path)
-            //        {
-            //            if (!exploredPathExists)
-            //                exploredPathExists = true;
+            // TODO: Path may end up broken because an enemy is in the way.
+            IEnumerable<WeightedPoint> path = Game.Map.GetPathToPlayer(mousePos.X, mousePos.Y).Reverse();
+            bool exploredPathExists = false;
 
-            //            if (!map.Field[p.X, p.Y].IsExplored)
-            //            {
-            //                exploredPathExists = false;
-            //                break;
-            //            }
+            foreach (WeightedPoint p in path)
+            {
+                if (!exploredPathExists)
+                    exploredPathExists = true;
 
-            //            map.Highlight[p.X, p.Y] = RLColor.Red;
-            //        }
+                if (!Game.Map.Field[p.X, p.Y].IsExplored)
+                {
+                    exploredPathExists = false;
+                    break;
+                }
 
-            //        if (current.IsWalkable && exploredPathExists)
-            //            map.Highlight[mousePos.X, mousePos.Y] = RLColor.Red;
-            //    
+                Game.OverlayHandler.Set(p.X, p.Y, Colors.PathColor);
+            }
 
-            //    //if (_console.Mouse.GetLeftClick())
-            //    //{
-            //    //    List<IAction> moves = new List<IAction>();
+            Game.OverlayHandler.Set(current.X, current.Y, Colors.Cursor);
 
-            //    //    foreach (WeightedPoint p in path)
-            //    //        moves.Add(new MoveAction(new TargetZone(TargetShape.Range, (p.X, p.Y))));
+            if (Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))
+                LookHandler.DisplayActor(displayActor);
+            else if (Game.Map.TryGetItem(current.X, current.Y, out ItemCount displayItem))
+                LookHandler.DisplayItem(displayItem);
+            else
+                LookHandler.Clear();
 
-            //    //    return new AttackCommand(player, new ActionSequence(100, moves));
-            //    //}
-            //    if (map.TryGetActor(mousePos.X, mousePos.Y, out Actor displayActor))
-            //        LookHandler.DisplayActor(displayActor);
+            LookHandler.DisplayTerrain(Game.Map.Field[current.X, current.Y]);
 
-            //    if (map.TryGetItem(mousePos.X, mousePos.Y, out ItemCount displayItem))
-            //        LookHandler.DisplayItem(displayItem);
-
-            //    LookHandler.DisplayTerrain(map.Field[mousePos.X, mousePos.Y]);
             return null;
         }
 
         public void Update()
         {
+            Game.OverlayHandler.ClearForeground();
             Game.Player.NextCommand = Game.StateHandler.HandleInput();
             Game.EventScheduler.Run();
             Game.ForceRender();
@@ -231,8 +230,8 @@ namespace Roguelike.State
 
         public void Draw()
         {
-            Game.MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
             Game.Map.Draw(Game.MapConsole);
+            Game.OverlayHandler.Draw(Game.MapConsole);
         }
     }
 }
