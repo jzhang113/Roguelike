@@ -43,10 +43,8 @@ namespace Roguelike.Core
             Fuel = 10;
 
             TerrainProperty terrain = type.ToProperty();
-            DrawingComponent = new Drawable
+            DrawingComponent = new Drawable(terrain.Color, terrain.Symbol)
             {
-                Color = terrain.Color,
-                Symbol = terrain.Symbol,
                 X = x,
                 Y = y
             };

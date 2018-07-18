@@ -35,11 +35,7 @@ namespace Roguelike.Items
         public Item(ItemParameter parameters, RLNET.RLColor color, char symbol)
         {
             Parameters = parameters;
-            DrawingComponent = new Drawable
-            {
-                Color = color,
-                Symbol = symbol
-            };
+            DrawingComponent = new Drawable(color, symbol);
 
             _abilities = new List<IAction>();
         }
@@ -50,12 +46,10 @@ namespace Roguelike.Items
             Enchantment = other.Enchantment;
 
             Parameters = other.Parameters;
-            DrawingComponent = new Drawable
+            DrawingComponent = new Drawable(other.DrawingComponent.Color, other.DrawingComponent.Symbol)
             {
                 X = other.X,
                 Y = other.Y,
-                Color = other.DrawingComponent.Color,
-                Symbol = other.DrawingComponent.Symbol
             };
             
             _abilities = new List<IAction>(other._abilities);

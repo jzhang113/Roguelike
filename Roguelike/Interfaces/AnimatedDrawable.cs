@@ -11,9 +11,10 @@ namespace Roguelike.Interfaces
         private readonly RLColor _accentColor;
         private readonly double _alpha;
 
-        public AnimatedDrawable(RLColor color, double luminosity)
+        public AnimatedDrawable(RLColor color, char symbol, RLColor accentColor, double luminosity)
+            : base(color, symbol)
         {
-            _accentColor = color;
+            _accentColor = accentColor;
             _alpha = luminosity;
         }
 

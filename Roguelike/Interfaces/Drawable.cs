@@ -8,16 +8,18 @@ namespace Roguelike.Interfaces
     [Serializable]
     public class Drawable : ISerializable
     {
-        public RLColor Color { get; protected internal set; }
-        public char Symbol { get; protected internal set; }
+        public RLColor Color { get; internal set; }
+        public char Symbol { get; internal set; }
 
         public int X { get; set; }
         public int Y { get; set; }
 
         internal bool Activated { get; set; }
 
-        public Drawable()
+        public Drawable(RLColor color, char symbol)
         {
+            Color = color;
+            Symbol = symbol;
             Activated = true;
         }
 
