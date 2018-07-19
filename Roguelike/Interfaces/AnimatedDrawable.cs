@@ -35,8 +35,8 @@ namespace Roguelike.Interfaces
             if (!Activated)
                 return;
 
-            RLColor newColor = Color + (_accentColor - Color)
-                               * (float)(Game.World.Random.NextDouble() * _alpha);
+            RLColor newColor = RLColor.Blend(Color, _accentColor,
+                (float) (Game.World.Random.NextDouble() * _alpha));
             if (tile.IsVisible)
             {
                 console.Set(destX, destY, newColor, null, Symbol);

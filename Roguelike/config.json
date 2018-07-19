@@ -1,33 +1,33 @@
 ﻿{
-	"fontName": "ccc12x12.png",
-	"fontSize": 12,
-	"screen": {
-		"height": 70,
-		"width": 80
-	},
-	"map": {
-		"height": 40,
-		"width": 60
-	},
-	"mapView": {
-		"height": 40,
-		"width": 60
-	},
-	"messageMaxCount": 100,
-	"messageView": {
-		"height": 21,
-		"width": 60
-	},
-	"statView": {
-		"height": 9,
-		"width": 60
-	},
-	"inventoryView": {
-		"height": 70,
-		"width": 30
-	},
-	"viewWindow": {
-		"height": 60,
-		"width": 20
-	}
+    "fontName": "ccc12x12.png",
+    "fontSize": 12,
+    "screen": {
+        "height": 70,
+        "width": 80
+    },
+    "map": {
+        "height": 100,
+        "width": 100
+    },
+    "mapView": {
+        "height": 60,
+        "width": 60
+    },
+    "messageMaxCount": 100,
+    "messageView": {
+        "height": 7,
+        "width": 60
+    },
+    "statView": {
+        "height": 3,
+        "width": 60
+    },
+    "inventoryView": {
+        "height": 70,
+        "width": 30
+    },
+    "viewWindow": {
+        "height": 70,
+        "width": 20
+    }
 }

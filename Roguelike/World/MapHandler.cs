@@ -677,7 +677,7 @@ namespace Roguelike.World
                     float newWeight = p.Weight + dir.Weight;
                     Tile tile = Field[newX, newY];
 
-                    if (Field.IsValid(newX, newY) && !tile.IsWall &&
+                    if (Field.IsValid(newX, newY) && !tile.IsWall && tile.IsExplored &&
                         (double.IsNaN(mapWeights[newX, newY]) || newWeight < mapWeights[newX, newY]))
                     {
                         mapWeights[newX, newY] = newWeight;

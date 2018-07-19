@@ -74,7 +74,7 @@ namespace Roguelike.Actors
 
         public virtual IAction GetBasicAttack()
         {
-            return new DamageAction(100, new TargetZone(TargetShape.Directional));
+            return new DamageAction(5, new TargetZone(TargetShape.Directional));
         }
 
         public int TakeDamage(int power)

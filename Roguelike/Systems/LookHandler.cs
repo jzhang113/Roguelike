@@ -1,5 +1,4 @@
-﻿using System;
-using RLNET;
+﻿using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Items;
@@ -18,14 +17,14 @@ namespace Roguelike.Systems
         public static void DisplayActor(Actor actor)
         {
             _displayActor = actor;
-            _showActorInfo = (actor != null);
+            _showActorInfo = true;
             _showItemInfo = false;
         }
 
         public static void DisplayItem(ItemCount itemCount)
         {
-            _displayItem = itemCount?.Item;
-            _showItemInfo = (itemCount?.Item != null) && (itemCount.Count > 0);
+            _displayItem = itemCount.Item;
+            _showItemInfo = true;
             _showActorInfo = false;
         }
 
@@ -38,7 +37,7 @@ namespace Roguelike.Systems
         internal static void DisplayTerrain(Tile tile)
         {
             _displayTile = tile;
-            _showTile = (tile != null);
+            _showTile = tile != null;
         }
 
         public static void Draw(RLConsole console)

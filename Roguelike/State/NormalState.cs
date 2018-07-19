@@ -185,32 +185,22 @@ namespace Roguelike.State
                 return null;
 
             Tile current = Game.Map.Field[mousePos.X, mousePos.Y];
-            if (!current.IsExplored)
+            if (!current.IsExplored || current.IsWall)
                 return null;
 
-            // TODO: Path may end up broken because an enemy is in the way.
             IEnumerable<WeightedPoint> path = Game.Map.GetPathToPlayer(mousePos.X, mousePos.Y).Reverse();
-            bool exploredPathExists = false;
-
             foreach (WeightedPoint p in path)
             {
-                if (!exploredPathExists)
-                    exploredPathExists = true;
-
-                if (!Game.Map.Field[p.X, p.Y].IsExplored)
-                {
-                    exploredPathExists = false;
-                    break;
-                }
-
-                Game.OverlayHandler.Set(p.X, p.Y, Colors.PathColor);
+                if (Game.Map.Field[p.X, p.Y].IsExplored)
+                    Game.OverlayHandler.Set(p.X, p.Y, Colors.PathColor);
             }
 
             Game.OverlayHandler.Set(current.X, current.Y, Colors.Cursor);
 
             if (Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))
                 LookHandler.DisplayActor(displayActor);
-            else if (Game.Map.TryGetItem(current.X, current.Y, out ItemCount displayItem))
+            else if (Game.Map.TryGetItem(current.X, current.Y, out ItemCount displayItem)
+                && displayItem.Count > 0)
                 LookHandler.DisplayItem(displayItem);
             else
                 LookHandler.Clear();
