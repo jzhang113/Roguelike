@@ -16,6 +16,7 @@ namespace Roguelike.Actors
         public int Hp { get; set; }
         public int Mp { get; set; }
         public int Sp { get; set; }
+        public int Armor { get; set; }
 
         public ActorState State { get; set; }
 
@@ -46,6 +47,8 @@ namespace Roguelike.Actors
             Hp = Parameters.MaxHp;
             Sp = Parameters.MaxSp;
             Mp = Parameters.MaxMp;
+            // TODO: calculate armor from equipment
+            Armor = 30;
 
             Energy = 0;
             RefreshRate = Data.Constants.DEFAULT_REFRESH_RATE;
@@ -79,8 +82,11 @@ namespace Roguelike.Actors
 
         public int TakeDamage(int power)
         {
-            Hp -= power;
-            return power;
+            int blocked = power * Armor / 30;
+            int damage = power - blocked;
+            Armor -= blocked;
+            Hp -= damage;
+            return damage;
         }
         public int TakeHealing(int power)
         {

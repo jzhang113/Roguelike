@@ -150,11 +150,13 @@ namespace Roguelike
             {
                 _messageConsole.Clear(0, RLColor.Black, Colors.TextHeading);
                 MessageHandler.Draw(_messageConsole);
-                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width, Config.MessageView.Height, RootConsole, 0, 0);
+                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width,
+                    Config.MessageView.Height, RootConsole, 0, Config.StatView.Height + Config.MapView.Height);
             }
 
             _statConsole.Clear(0, RLColor.Black, Colors.TextHeading);
-            int hpWidth = 10;
+            int stepSize = 5;
+            int hpWidth = Player.Parameters.MaxHp / stepSize;
             int hpFilled = hpWidth * Player.Hp / Player.Parameters.MaxHp;
             string health = $"{Player.Hp}/{Player.Parameters.MaxHp}";
             _statConsole.Print((hpWidth - health.Length) / 2 + 2, 1, health, Colors.TextHeading);
@@ -163,16 +165,20 @@ namespace Roguelike
             for (int i = hpFilled + 1; i <= hpWidth; i++)
                 _statConsole.SetBackColor(i + 1, 1, Swatch.DbOldBlood);
 
-            int mpWidth = 10;
+            int armorWidth = Player.Armor / stepSize;
+            for (int i = 0; i <= armorWidth; i++)
+                _statConsole.SetBackColor(i + hpWidth + 3, 1, Swatch.DbMetal);
+
+            int mpWidth = Player.Parameters.MaxMp / stepSize;
             int mpFilled = mpWidth * Player.Mp / Player.Parameters.MaxMp;
             string mana = $"{Player.Mp}/{Player.Parameters.MaxMp}";
-            _statConsole.Print((mpWidth - mana.Length) / 2 + 16, 1, mana, Colors.TextHeading);
+            _statConsole.Print((mpWidth - mana.Length) / 2 + 2, 2, mana, Colors.TextHeading);
             for (int i = 0; i <= mpFilled; i++)
-                _statConsole.SetBackColor(i + 15, 1, Swatch.DbWater);
+                _statConsole.SetBackColor(i + 1, 2, Swatch.DbWater);
             for (int i = mpFilled + 1; i <= mpWidth; i++)
-                _statConsole.SetBackColor(i + 15, 1, Swatch.DbDeepWater);
+                _statConsole.SetBackColor(i + 1, 2, Swatch.DbDeepWater);
 
-            RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, RootConsole, 0, Config.MessageView.Height + Config.MapView.Height);
+            RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, RootConsole, 0, 0);
 
             _viewConsole.Clear(0, RLColor.Black, Colors.TextHeading);
             LookHandler.Draw(_viewConsole);
@@ -183,7 +189,7 @@ namespace Roguelike
 
             StateHandler.Draw();
 
-            RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.MessageView.Height);
+            RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.StatView.Height);
             RootConsole.Draw();
             _render = false;
         }

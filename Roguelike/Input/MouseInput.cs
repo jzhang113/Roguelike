@@ -7,8 +7,8 @@ namespace Roguelike.Input
     {
         public static bool GetHoverPosition(RLMouse mouse, out (int X, int Y) pos)
         {
-            int mapTop = Game.Config.MessageView.Height;
-            int mapBottom = Game.Config.MessageView.Height + Game.Config.MapView.Height;
+            int mapTop = Game.Config.StatView.Height;
+            int mapBottom = Game.Config.StatView.Height + Game.Config.MapView.Height;
             int mapLeft = 0;
             int mapRight = Game.Config.MapView.Width;
 
