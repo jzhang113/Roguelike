@@ -1,20 +1,74 @@
-﻿using System.Collections.Generic;
-// ReSharper disable InconsistentNaming
+﻿using System;
 
 namespace Roguelike.Core
 {
-    struct Direction
+    public enum Direction
     {
-        public static WeightedPoint N { get; } = new WeightedPoint(0, -1, 1);
-        public static WeightedPoint E { get; } = new WeightedPoint(1, 0, 1);
-        public static WeightedPoint S { get; } = new WeightedPoint(0, 1, 1);
-        public static WeightedPoint W { get; } = new WeightedPoint(-1, 0, 1);
-        public static WeightedPoint NE { get; } = new WeightedPoint(1, -1, 1.5f);
-        public static WeightedPoint SE { get; } = new WeightedPoint(1, 1, 1.5f);
-        public static WeightedPoint SW { get; } = new WeightedPoint(-1, 1, 1.5f);
-        public static WeightedPoint NW { get; } = new WeightedPoint(-1, -1, 1.5f);
-        public static WeightedPoint Center { get; } = new WeightedPoint(0, 0, 0);
+        N,
+        E,
+        S,
+        W,
+        NE,
+        SE,
+        SW,
+        NW,
+        Center
+    }
 
-        public static readonly IList<WeightedPoint> Directions = new[]{ N, E, S, W, NE, SE, SW, NW };
+    static class DirectionExtensions
+    {
+        public static readonly Direction[] DirectionList = new Direction[]
+        {
+            Direction.N,
+            Direction.E,
+            Direction.S,
+            Direction.W,
+            Direction.NE,
+            Direction.SE,
+            Direction.SW,
+            Direction.NW
+        };
+
+        public static int GetX(this Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.NW:
+                case Direction.W:
+                case Direction.SW:
+                    return -1;
+                case Direction.N:
+                case Direction.Center:
+                case Direction.S:
+                    return 0;
+                case Direction.NE:
+                case Direction.E:
+                case Direction.SE:
+                    return 1;
+                default:
+                    throw new ArgumentOutOfRangeException("unknown direction");
+            }
+        }
+
+        public static int GetY(this Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.NE:
+                case Direction.N:
+                case Direction.NW:
+                    return -1;
+                case Direction.E:
+                case Direction.Center:
+                case Direction.W:
+                    return 0;
+                case Direction.SE:
+                case Direction.S:
+                case Direction.SW:
+                    return 1;
+                default:
+                    throw new ArgumentOutOfRangeException("unknown direction");
+            }
+        }
     }
 }

@@ -168,23 +168,29 @@ namespace Roguelike.State
             return input == TargettingInput.Fire ? _callback(targets) : null;
         }
 
-        private void MoveTarget(WeightedPoint direction)
+        private void MoveTarget(Direction direction)
         {
-            if (Game.Map.Field.IsValid(_targetX + direction.X, _targetY + direction.Y)
-                && _inRange.Contains(Game.Map.Field[_targetX + direction.X, _targetY + direction.Y]))
+            int dx = direction.GetX();
+            int dy = direction.GetY();
+
+            if (Game.Map.Field.IsValid(_targetX + dx, _targetY + dy)
+                && _inRange.Contains(Game.Map.Field[_targetX + dx, _targetY + dy]))
             {
-                _targetX += direction.X;
-                _targetY += direction.Y;
+                _targetX += dx;
+                _targetY += dy;
             }
         }
 
-        private void JumpTarget(WeightedPoint direction)
+        private void JumpTarget(Direction direction)
         {
-            while (Game.Map.Field.IsValid(_targetX + direction.X, _targetY + direction.Y)
-                   && _inRange.Contains(Game.Map.Field[_targetX + direction.X, _targetY + direction.Y]))
+            int dx = direction.GetX();
+            int dy = direction.GetY();
+
+            while (Game.Map.Field.IsValid(_targetX + dx, _targetY + dy)
+                   && _inRange.Contains(Game.Map.Field[_targetX + dx, _targetY + dy]))
             {
-                _targetX += direction.X;
-                _targetY += direction.Y;
+                _targetX += dx;
+                _targetY += dx;
             }
         }
 

@@ -99,13 +99,13 @@ namespace Roguelike.Core
                         return path;
                     }
                 case TargetShape.Directional:
-                    WeightedPoint dir = Utils.Distance.GetOctant(targetX, targetY, current.X, current.Y);
+                    Direction dir = Utils.Distance.GetNearestDirection(targetX, targetY, current.X, current.Y);
                     int limit = Math.Max(Math.Abs(targetX - current.X), Math.Abs(targetY - current.Y));
 
                     for (int i = 1; i <= limit; i++)
                     {
-                        int x = current.X + i * dir.X;
-                        int y = current.Y + i * dir.Y;
+                        int x = current.X + i * dir.GetX();
+                        int y = current.Y + i * dir.GetY();
 
                         // since each step takes us farther away, we can stop checking as soon as one
                         // tile falls out of range

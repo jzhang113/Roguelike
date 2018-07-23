@@ -397,10 +397,10 @@ namespace Roguelike.World
             int nextY = currentY;
             float nearest = goalMap[currentX, currentY];
 
-            foreach (WeightedPoint dir in Direction.Directions)
+            foreach (Direction dir in DirectionExtensions.DirectionList)
             {
-                int newX = currentX + dir.X;
-                int newY = currentY + dir.Y;
+                int newX = currentX + dir.GetX();
+                int newY = currentY + dir.GetY();
 
                 if (Field.IsValid(newX, newY) && goalMap[newX, newY] < nearest)
                 {
@@ -500,6 +500,47 @@ namespace Roguelike.World
                 yield return Field[x + width, j];
             }
         }
+
+        // Octants are identified by the direction of the right edge. Returns a row starting from
+        // the straight edge.
+        private IEnumerable<Tile> GetRowInOctant(int x, int y, int distance, Direction dir)
+        {
+            if (dir is Direction.Center)
+                yield break;
+
+            for (int i = 0; i <= distance; i++)
+            {
+                switch (dir)
+                {
+                    case Direction.N:
+                        yield return Field[x - i, y - distance];
+                        break;
+                    case Direction.NW:
+                        yield return Field[x - distance, y - i];
+                        break;
+                    case Direction.W:
+                        yield return Field[x - distance, y + i];
+                        break;
+                    case Direction.SW:
+                        yield return Field[x - i, y + distance];
+                        break;
+                    case Direction.S:
+                        yield return Field[x + i, y + distance];
+                        break;
+                    case Direction.SE:
+                        yield return Field[x + distance, y + i];
+                        break;
+                    case Direction.E:
+                        yield return Field[x + distance, y - i];
+                        break;
+                    case Direction.NE:
+                        yield return Field[x + i, y - distance];
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("unknown direction");
+                }
+            }
+        }
         #endregion
 
         #region FOV Methods
@@ -507,42 +548,89 @@ namespace Roguelike.World
         {
             Discovered.Clear();
 
-            // NOTE: slow implementation of fov - replace if needed
-            // Set the player square to true and then skip it on future ray traces.
-            Tile playerTile = Field[x, y];
-            playerTile.IsVisible = true;
-            if (!playerTile.IsExplored)
+            Tile origin = Field[x, y];
+            origin.IsVisible = true;
+            if (!origin.IsExplored)
             {
-                playerTile.IsExplored = true;
-                Discovered.Add(playerTile);
+                origin.IsExplored = true;
+                Discovered.Add(origin);
             }
 
-            foreach (Tile tile in
-                GetTilesInRectangleBorder(x - radius / 2, y - radius / 2, radius, radius))
+            foreach (Direction dir in DirectionExtensions.DirectionList)
             {
-                bool visible = true;
-                foreach (Tile tt in GetStraightLinePath(x, y, tile.X, tile.Y))
+                Queue<AngleRange> visibleRange = new Queue<AngleRange>();
+                visibleRange.Enqueue(new AngleRange()
                 {
-                    tt.IsVisible = visible;
-                    if (visible)
-                    {
-                        // Update the explored status while we're at it
-                        if (!tt.IsExplored)
-                        {
-                            tt.IsExplored = true;
-                            Discovered.Add(tt);
-                        }
+                    Distance = 1,
+                    MinAngle = 0,
+                    MaxAngle = 1
+                });
 
-                        if (!tt.IsLightable)
-                            visible = false;
-                    }
+                while (visibleRange.Count > 0)
+                {
+                    AngleRange range = visibleRange.Dequeue();
+                    if (range.Distance > radius)
+                        continue;
+
+                    double delta = 0.5 / range.Distance;
+                    IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
+                    CheckFovInRange(range, row, delta, visibleRange);
                 }
             }
+        }
 
-            foreach (Tile tile in GetTilesInRectangle(x - radius / 2, y - radius / 2, radius, radius))
+        private void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
+            Queue<AngleRange> queue)
+        {
+            double currentAngle = 0;
+            double newMinAngle = range.MinAngle;
+            bool prevLit = false;
+
+            foreach (Tile tile in row)
             {
-                // TODO: post processing to remove visual artifacts.
+                if (currentAngle > range.MaxAngle)
+                    break;
+
+                if (currentAngle >= range.MinAngle)
+                {
+                    tile.IsVisible = true;
+                    tile.IsExplored = true;
+
+                    if (!prevLit)
+                    {
+                        newMinAngle = currentAngle;
+                    }
+                    else if (!tile.IsLightable)
+                    {
+                        queue.Enqueue(new AngleRange()
+                        {
+                            Distance = range.Distance + 1,
+                            MinAngle = newMinAngle,
+                            MaxAngle = currentAngle - delta
+                        });
+                    }
+                }
+
+                prevLit = tile.IsLightable;
+                currentAngle += 2 * delta;
             }
+
+            if (prevLit)
+            {
+                queue.Enqueue(new AngleRange()
+                {
+                    Distance = range.Distance + 1,
+                    MinAngle = newMinAngle,
+                    MaxAngle = range.MaxAngle
+                });
+            }
+        }
+
+        private struct AngleRange
+        {
+            internal int Distance { get; set; }
+            internal double MinAngle { get; set; }
+            internal double MaxAngle { get; set; }
         }
         #endregion
 
@@ -670,11 +758,11 @@ namespace Roguelike.World
             {
                 WeightedPoint p = goals.Dequeue();
 
-                foreach (WeightedPoint dir in Direction.Directions)
+                foreach (Direction dir in DirectionExtensions.DirectionList)
                 {
-                    int newX = p.X + dir.X;
-                    int newY = p.Y + dir.Y;
-                    float newWeight = p.Weight + dir.Weight;
+                    int newX = p.X + dir.GetX();
+                    int newY = p.Y + dir.GetY();
+                    float newWeight = p.Weight + 1;
                     Tile tile = Field[newX, newY];
 
                     if (Field.IsValid(newX, newY) && !tile.IsWall && tile.IsExplored &&

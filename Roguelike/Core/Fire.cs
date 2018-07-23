@@ -40,8 +40,8 @@ namespace Roguelike.Core
                 return new WaitCommand(this);
             }
 
-            WeightedPoint dir = Direction.Directions[Game.World.Random.Next(8)];
-            Game.Map.SetFire(X + dir.X, Y + dir.Y);
+            Direction dir = DirectionExtensions.DirectionList[Game.World.Random.Next(8)];
+            Game.Map.SetFire(X + dir.GetX(), Y + dir.GetY());
 
             Game.Map.ProcessFire(this);
 

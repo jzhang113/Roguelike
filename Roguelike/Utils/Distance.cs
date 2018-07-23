@@ -6,7 +6,7 @@ namespace Roguelike.Utils
     // Helper methods for calculating distances
     static class Distance
     {
-        public static WeightedPoint GetOctant(int x1, int y1, int x2, int y2)
+        public static Direction GetNearestDirection(int x1, int y1, int x2, int y2)
         {
             int dx = x1 - x2;
             int dy = y1 - y2;
@@ -34,13 +34,13 @@ namespace Roguelike.Utils
                 case 2: return Direction.N;
                 case 3: return Direction.NE;
                 case 4: return Direction.W;
+                case 5: return Direction.Center;
                 case 6: return Direction.E;
                 case 7: return Direction.SW;
                 case 8: return Direction.S;
                 case 9: return Direction.SE;
+                default: throw new ArgumentOutOfRangeException();
             }
-
-            return new WeightedPoint(0, 0);
         }
 
         public static double EuclideanDistance(int x1, int y1, int x2, int y2)
