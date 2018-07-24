@@ -549,7 +549,7 @@ namespace Roguelike.World
             Discovered.Clear();
 
             Tile origin = Field[x, y];
-            origin.IsVisible = true;
+            origin.Light = 1;
             if (!origin.IsExplored)
             {
                 origin.IsExplored = true;
@@ -559,12 +559,7 @@ namespace Roguelike.World
             foreach (Direction dir in DirectionExtensions.DirectionList)
             {
                 Queue<AngleRange> visibleRange = new Queue<AngleRange>();
-                visibleRange.Enqueue(new AngleRange()
-                {
-                    Distance = 1,
-                    MinAngle = 0,
-                    MaxAngle = 1
-                });
+                visibleRange.Enqueue(new AngleRange(1, 0, 1));
 
                 while (visibleRange.Count > 0)
                 {
@@ -584,31 +579,29 @@ namespace Roguelike.World
         {
             double currentAngle = 0;
             double newMinAngle = range.MinAngle;
+            double newMaxAngle = range.MaxAngle;
             bool prevLit = false;
 
             foreach (Tile tile in row)
             {
                 if (currentAngle > range.MaxAngle)
+                {
+                    tile.Light = range.MaxAngle - currentAngle + delta;
+                    if (!tile.IsLightable)
+                        newMaxAngle = currentAngle - delta;
                     break;
+                }
 
                 if (currentAngle >= range.MinAngle)
                 {
-                    tile.IsVisible = true;
+                    tile.Light = 1;
                     tile.IsExplored = true;
 
                     if (!prevLit)
-                    {
                         newMinAngle = currentAngle;
-                    }
                     else if (!tile.IsLightable)
-                    {
-                        queue.Enqueue(new AngleRange()
-                        {
-                            Distance = range.Distance + 1,
-                            MinAngle = newMinAngle,
-                            MaxAngle = currentAngle - delta
-                        });
-                    }
+                        queue.Enqueue(
+                            new AngleRange(range.Distance + 1, newMinAngle, currentAngle - delta));
                 }
 
                 prevLit = tile.IsLightable;
@@ -616,21 +609,21 @@ namespace Roguelike.World
             }
 
             if (prevLit)
-            {
-                queue.Enqueue(new AngleRange()
-                {
-                    Distance = range.Distance + 1,
-                    MinAngle = newMinAngle,
-                    MaxAngle = range.MaxAngle
-                });
-            }
+                queue.Enqueue(new AngleRange(range.Distance + 1, newMinAngle, newMaxAngle));
         }
 
         private struct AngleRange
         {
-            internal int Distance { get; set; }
-            internal double MinAngle { get; set; }
-            internal double MaxAngle { get; set; }
+            internal int Distance { get; }
+            internal double MinAngle { get; }
+            internal double MaxAngle { get; }
+
+            public AngleRange(int distance, double minAngle, double maxAngle)
+            {
+                Distance = distance;
+                MinAngle = minAngle;
+                MaxAngle = maxAngle;
+            }
         }
         #endregion
 
@@ -701,8 +694,9 @@ namespace Roguelike.World
         private void UpdatePlayerFov()
         {
             // Clear vision from last turn
+            // TODO: if we know the last move, we might be able to do an incremental update
             foreach (Tile tile in Field)
-                tile.IsVisible = false;
+                tile.Light = 0;
 
             Player player = Game.Player;
             ComputeFov(player.X, player.Y, 100);

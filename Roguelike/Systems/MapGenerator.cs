@@ -166,8 +166,6 @@ namespace Roguelike.Systems
                 //Console.WriteLine(i + " " + room.X + " " + room.Y + " " + room.Width + " " + room.Height); 
             }
 
-            AsciiPrint();
-
             return _map;
         }
 
@@ -206,11 +204,13 @@ namespace Roguelike.Systems
 
                 int split = _rand.Next(_MIN_ROOM_SIZE, room.Width - _MIN_ROOM_SIZE + 1);
                 Room left = new Room(room.X, room.Y, split, room.Height);
-                var leftChild = PartitionMapBsp(new TreeNode<Room>(current, left), minWidth, minHeight);
+                TreeNode<Room> leftChild = PartitionMapBsp(new TreeNode<Room>(current, left),
+                    minWidth, minHeight);
                 current.AddChild(leftChild);
 
                 Room right = new Room(room.X + split, room.Y, room.Width - split, room.Height);
-                var rightChild = PartitionMapBsp(new TreeNode<Room>(current, right), minWidth, minHeight);
+                TreeNode<Room> rightChild = PartitionMapBsp(new TreeNode<Room>(current, right),
+                    minWidth, minHeight);
                 current.AddChild(rightChild);
             }
             else
@@ -224,11 +224,13 @@ namespace Roguelike.Systems
 
                 int split = _rand.Next(_MIN_ROOM_SIZE, room.Height - _MIN_ROOM_SIZE + 1);
                 Room top = new Room(room.X, room.Y, room.Width, split);
-                var topChild = PartitionMapBsp(new TreeNode<Room>(current, top), minWidth, minHeight);
+                TreeNode<Room> topChild = PartitionMapBsp(new TreeNode<Room>(current, top),
+                    minWidth, minHeight);
                 current.AddChild(topChild);
 
                 Room bottom = new Room(room.X, room.Y + split, room.Width, room.Height - split);
-                var bottomChild = PartitionMapBsp(new TreeNode<Room>(current, bottom), minWidth, minHeight);
+                TreeNode<Room> bottomChild = PartitionMapBsp(new TreeNode<Room>(current, bottom),
+                    minWidth, minHeight);
                 current.AddChild(bottomChild);
             }
 
@@ -240,15 +242,14 @@ namespace Roguelike.Systems
             IList<(int X, int Y)> allocated = new List<(int X, int Y)>();
             IList<(int X, int Y)> connections = new List<(int X, int Y)>();
 
-            foreach (var child in root.Children)
+            foreach (TreeNode<Room> child in root.Children)
             {
-                var suballocated = MakeRoomsBsp(child, ref roomsList);
+                IList<(int X, int Y)> suballocated = MakeRoomsBsp(child, ref roomsList);
 
                 if (suballocated.Count <= 0)
                     continue;
 
-                var point = suballocated[_rand.Next(suballocated.Count)];
-
+                (int X, int Y) point = suballocated[_rand.Next(suballocated.Count)];
                 connections.Add(point);
                 allocated = allocated.Concat(suballocated).ToList();
             }
@@ -286,22 +287,6 @@ namespace Roguelike.Systems
             }
 
             return allocated;
-        }
-
-        private void AsciiPrint()
-        {
-            using (var writer = new System.IO.StreamWriter("map"))
-            {
-                for (int a = 0; a < _height; a++)
-                {
-                    for (int b = 0; b < _width; b++)
-                    {
-                        writer.Write(_map.Field[b, a].IsWalkable ? "." : "#");
-                    }
-
-                    writer.WriteLine();
-                }
-            }
         }
 
         private void CreateRoom(Room room)
