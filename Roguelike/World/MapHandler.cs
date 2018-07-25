@@ -397,10 +397,10 @@ namespace Roguelike.World
             int nextY = currentY;
             float nearest = goalMap[currentX, currentY];
 
-            foreach (Direction dir in DirectionExtensions.DirectionList)
+            foreach ((int dx, int dy) in Direction.DirectionList)
             {
-                int newX = currentX + dir.GetX();
-                int newY = currentY + dir.GetY();
+                int newX = currentX + dx;
+                int newY = currentY + dy;
 
                 if (Field.IsValid(newX, newY) && goalMap[newX, newY] < nearest)
                 {
@@ -503,42 +503,29 @@ namespace Roguelike.World
 
         // Octants are identified by the direction of the right edge. Returns a row starting from
         // the straight edge.
-        private IEnumerable<Tile> GetRowInOctant(int x, int y, int distance, Direction dir)
+        private IEnumerable<Tile> GetRowInOctant(int x, int y, int distance, (int X, int Y) dir)
         {
-            if (dir is Direction.Center)
+            if (dir.X == 0 && dir.Y == 0)
                 yield break;
 
             for (int i = 0; i <= distance; i++)
             {
-                switch (dir)
-                {
-                    case Direction.N:
-                        yield return Field[x - i, y - distance];
-                        break;
-                    case Direction.NW:
-                        yield return Field[x - distance, y - i];
-                        break;
-                    case Direction.W:
-                        yield return Field[x - distance, y + i];
-                        break;
-                    case Direction.SW:
-                        yield return Field[x - i, y + distance];
-                        break;
-                    case Direction.S:
-                        yield return Field[x + i, y + distance];
-                        break;
-                    case Direction.SE:
-                        yield return Field[x + distance, y + i];
-                        break;
-                    case Direction.E:
-                        yield return Field[x + distance, y - i];
-                        break;
-                    case Direction.NE:
-                        yield return Field[x + i, y - distance];
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException("unknown direction");
-                }
+                if (dir.X == Direction.N.X && dir.Y == Direction.N.Y)
+                    yield return Field[x - i, y - distance];
+                else if (dir.X == Direction.NW.X && dir.Y == Direction.NW.Y)
+                    yield return Field[x - distance, y - i];
+                else if (dir.X == Direction.W.X && dir.Y == Direction.W.Y)
+                    yield return Field[x - distance, y + i];
+                else if (dir.X == Direction.SW.X && dir.Y == Direction.SW.Y)
+                    yield return Field[x - i, y + distance];
+                else if (dir.X == Direction.S.X && dir.Y == Direction.S.Y)
+                    yield return Field[x + i, y + distance];
+                else if (dir.X == Direction.SE.X && dir.Y == Direction.SE.Y)
+                    yield return Field[x + distance, y + i];
+                else if (dir.X == Direction.E.X && dir.Y == Direction.E.Y)
+                    yield return Field[x + distance, y - i];
+                else if (dir.X == Direction.NE.X && dir.Y == Direction.NE.Y)
+                    yield return Field[x + i, y - distance];
             }
         }
         #endregion
@@ -556,7 +543,7 @@ namespace Roguelike.World
                 Discovered.Add(origin);
             }
 
-            foreach (Direction dir in DirectionExtensions.DirectionList)
+            foreach ((int X, int Y) dir in Direction.DirectionList)
             {
                 Queue<AngleRange> visibleRange = new Queue<AngleRange>();
                 visibleRange.Enqueue(new AngleRange(1, 0, 1));
@@ -574,7 +561,8 @@ namespace Roguelike.World
             }
         }
 
-        private void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
+        // Sweep across a row and update the set of unblocked angles for the next row.
+        private static void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
             Queue<AngleRange> queue)
         {
             double currentAngle = 0;
@@ -586,6 +574,8 @@ namespace Roguelike.World
             {
                 if (currentAngle > range.MaxAngle)
                 {
+                    // The line to the current tile falls outside the maximum angle. Partially
+                    // light the tile and lower the maximum angle if we hit a wall.
                     tile.Light = range.MaxAngle - currentAngle + delta;
                     if (!tile.IsLightable)
                         newMaxAngle = currentAngle - delta;
@@ -594,9 +584,14 @@ namespace Roguelike.World
 
                 if (currentAngle >= range.MinAngle)
                 {
+                    // The current tile is in range, so set it as visible.
                     tile.Light = 1;
                     tile.IsExplored = true;
 
+                    // If we are transitioning from a blocked tile to an unblocked tile, we need
+                    // to raise the minimum angle. On the other hand, if we are transitioning
+                    // from an unblocked tile to a blocked tile, we need to lower the maximum
+                    // angle for the next row.
                     if (!prevLit)
                         newMinAngle = currentAngle;
                     else if (!tile.IsLightable)
@@ -752,10 +747,10 @@ namespace Roguelike.World
             {
                 WeightedPoint p = goals.Dequeue();
 
-                foreach (Direction dir in DirectionExtensions.DirectionList)
+                foreach ((int dx, int dy) in Direction.DirectionList)
                 {
-                    int newX = p.X + dir.GetX();
-                    int newY = p.Y + dir.GetY();
+                    int newX = p.X + dx;
+                    int newY = p.Y + dy;
                     float newWeight = p.Weight + 1;
                     Tile tile = Field[newX, newY];
 

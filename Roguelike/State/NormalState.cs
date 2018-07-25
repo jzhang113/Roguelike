@@ -52,21 +52,21 @@ namespace Roguelike.State
 
                 #region Movement Keys
                 case NormalInput.MoveW:
-                    return new MoveCommand(player, player.X + Direction.W.GetX(), player.Y);
+                    return new MoveCommand(player, player.X + Direction.W.X, player.Y);
                 case NormalInput.MoveS:
-                    return new MoveCommand(player, player.X, player.Y + Direction.S.GetY());
+                    return new MoveCommand(player, player.X, player.Y + Direction.S.Y);
                 case NormalInput.MoveN:
-                    return new MoveCommand(player, player.X, player.Y + Direction.N.GetY());
+                    return new MoveCommand(player, player.X, player.Y + Direction.N.Y);
                 case NormalInput.MoveE:
-                    return new MoveCommand(player, player.X + Direction.E.GetX(), player.Y);
+                    return new MoveCommand(player, player.X + Direction.E.X, player.Y);
                 case NormalInput.MoveNW:
-                    return new MoveCommand(player, player.X + Direction.NW.GetX(), player.Y + Direction.NW.GetY());
+                    return new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
                 case NormalInput.MoveNE:
-                    return new MoveCommand(player, player.X + Direction.NE.GetX(), player.Y + Direction.NE.GetY());
+                    return new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
                 case NormalInput.MoveSW:
-                    return new MoveCommand(player, player.X + Direction.SW.GetX(), player.Y + Direction.SW.GetY());
+                    return new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
                 case NormalInput.MoveSE:
-                    return new MoveCommand(player, player.X + Direction.SE.GetX(), player.Y + Direction.SE.GetY());
+                    return new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
                 case NormalInput.Wait:
                     return new WaitCommand(player);
                 #endregion
@@ -146,25 +146,25 @@ namespace Roguelike.State
             switch (input)
             {
                 case NormalInput.AttackW:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.W.GetX(), player.Y]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.W.X, player.Y]);
                 case NormalInput.AttackN:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.GetY()]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.Y]);
                 case NormalInput.AttackE:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.GetY()]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.Y]);
                 case NormalInput.AttackS:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.E.GetX(), player.Y]);
+                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.E.X, player.Y]);
                 case NormalInput.AttackNW:
                     return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.NW.GetX(), player.Y + Direction.NW.GetY()]);
+                        Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y]);
                 case NormalInput.AttackNE:
                     return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.NE.GetX(), player.Y + Direction.NE.GetY()]);
+                        Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y]);
                 case NormalInput.AttackSW:
                     return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.SW.GetX(), player.Y + Direction.SW.GetY()]);
+                        Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y]);
                 case NormalInput.AttackSE:
                     return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.SE.GetX(), player.Y + Direction.SE.GetY()]);
+                        Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y]);
                 default: return null;
             }
         }

@@ -168,10 +168,9 @@ namespace Roguelike.State
             return input == TargettingInput.Fire ? _callback(targets) : null;
         }
 
-        private void MoveTarget(Direction direction)
+        private void MoveTarget((int X, int Y) direction)
         {
-            int dx = direction.GetX();
-            int dy = direction.GetY();
+            (int dx, int dy) = direction;
 
             if (Game.Map.Field.IsValid(_targetX + dx, _targetY + dy)
                 && _inRange.Contains(Game.Map.Field[_targetX + dx, _targetY + dy]))
@@ -181,10 +180,9 @@ namespace Roguelike.State
             }
         }
 
-        private void JumpTarget(Direction direction)
+        private void JumpTarget((int X, int Y) direction)
         {
-            int dx = direction.GetX();
-            int dy = direction.GetY();
+            (int dx, int dy) = direction;
 
             while (Game.Map.Field.IsValid(_targetX + dx, _targetY + dy)
                    && _inRange.Contains(Game.Map.Field[_targetX + dx, _targetY + dy]))

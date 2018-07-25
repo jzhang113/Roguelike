@@ -1,6 +1,5 @@
-﻿using Roguelike.Commands;
-using Roguelike.Actors;
-using System;
+﻿using Roguelike.Actors;
+using Roguelike.Commands;
 
 namespace Roguelike.Core
 {
@@ -22,8 +21,8 @@ namespace Roguelike.Core
                     }
                     else
                     {
-                        Direction dir = DirectionExtensions.DirectionList[Game.World.Random.Next(8)];
-                        return new MoveCommand(monster, monster.X + dir.GetX(), monster.Y + dir.GetY());
+                        (int dx, int dy) = Direction.DirectionList[Game.World.Random.Next(8)];
+                        return new MoveCommand(monster, monster.X + dx, monster.Y + dy);
                     }
                 case ActorState.Chase:
                     // TODO: set dynamic threshold
@@ -48,8 +47,8 @@ namespace Roguelike.Core
                     else
                     {
                         // implement fleeing?
-                        Direction dir = DirectionExtensions.DirectionList[Game.World.Random.Next(8)];
-                        return new MoveCommand(monster, monster.X + dir.GetX(), monster.Y + dir.GetY());
+                        (int dx, int dy) = Direction.DirectionList[Game.World.Random.Next(8)];
+                        return new MoveCommand(monster, monster.X + dx, monster.Y + dy);
                     }
                 case ActorState.Dead:
                     // Remove dead things if they die before they finish acting.

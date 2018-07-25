@@ -40,8 +40,8 @@ namespace Roguelike.Core
                 return new WaitCommand(this);
             }
 
-            Direction dir = DirectionExtensions.DirectionList[Game.World.Random.Next(8)];
-            Game.Map.SetFire(X + dir.GetX(), Y + dir.GetY());
+            (int dx, int dy) = Direction.DirectionList[Game.World.Random.Next(8)];
+            Game.Map.SetFire(X + dx, Y + dy);
 
             Game.Map.ProcessFire(this);
 

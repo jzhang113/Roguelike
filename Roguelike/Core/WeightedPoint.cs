@@ -1,4 +1,6 @@
-﻿namespace Roguelike.Core
+﻿using System;
+
+namespace Roguelike.Core
 {
     public struct WeightedPoint
     {
@@ -31,7 +33,7 @@
             WeightedPoint point = (WeightedPoint) obj;
             return X == point.X &&
                    Y == point.Y &&
-                   Weight == point.Weight;
+                   Math.Abs(Weight - point.Weight) < 0.001;
         }
 
         public override int GetHashCode()
