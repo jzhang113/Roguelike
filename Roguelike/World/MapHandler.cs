@@ -572,21 +572,34 @@ namespace Roguelike.World
 
             foreach (Tile tile in row)
             {
-                if (currentAngle > range.MaxAngle)
+                if (currentAngle > range.MaxAngle && Math.Abs(currentAngle - range.MaxAngle) > 0.001)
                 {
                     // The line to the current tile falls outside the maximum angle. Partially
                     // light the tile and lower the maximum angle if we hit a wall.
-                    tile.Light = range.MaxAngle - currentAngle + delta;
+                    tile.Light = (float)((range.MaxAngle - currentAngle) / (2 * delta) + 0.05);
+                    if (tile.Light < 0)
+                        tile.Light = 0;
+
                     if (!tile.IsLightable)
                         newMaxAngle = currentAngle - delta;
                     break;
                 }
 
-                if (currentAngle >= range.MinAngle)
+                if (currentAngle > range.MinAngle || Math.Abs(currentAngle - range.MinAngle) < 0.001)
                 {
-                    // The current tile is in range, so set it as visible.
-                    tile.Light = 1;
                     tile.IsExplored = true;
+
+                    // Set the light level to the percent of tile visible. Tiles on diagonals
+                    // are always set to 1 as only half of the tile is considered in a sweep.
+                    // To be accurate, we would need to track the diagonal tiles and increment
+                    // by the light value instead of assigning it a value.
+                    double endAngle = currentAngle + delta;
+                    if (endAngle > 1)
+                        tile.Light = 1;
+                    else if (endAngle > range.MaxAngle)
+                        tile.Light = (float)((range.MaxAngle - currentAngle) / (2 * delta) + 0.5);
+                    else
+                        tile.Light = 1;
 
                     // If we are transitioning from a blocked tile to an unblocked tile, we need
                     // to raise the minimum angle. On the other hand, if we are transitioning

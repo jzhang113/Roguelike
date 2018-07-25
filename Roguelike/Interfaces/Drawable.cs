@@ -46,10 +46,12 @@ namespace Roguelike.Interfaces
 
             if (tile.IsVisible)
             {
-                console.Set(destX, destY, Color, null, Symbol);
+                RLColor color = RLColor.Blend(Color, Colors.FloorBackground, tile.Light);
+                console.Set(destX, destY, color, null, Symbol);
             }
             else
             {
+                // TODO: remembered items and terrain features should still be drawn
                 //console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
                 console.Set(destX, destY, Color, null, Symbol);
             }
