@@ -16,11 +16,16 @@ namespace Roguelike.Interfaces
 
         internal bool Activated { get; set; }
 
-        public Drawable(RLColor color, char symbol)
+        private bool _remember;
+        private int _rememberX;
+        private int _rememberY;
+
+        public Drawable(RLColor color, char symbol, bool remember)
         {
             Color = color;
             Symbol = symbol;
             Activated = true;
+            _remember = remember;
         }
 
         protected Drawable(SerializationInfo info, StreamingContext context)
@@ -34,9 +39,13 @@ namespace Roguelike.Interfaces
             X = info.GetInt32(nameof(X));
             Y = info.GetInt32(nameof(Y));
             Activated = info.GetBoolean(nameof(Activated));
+
+            _remember = info.GetBoolean(nameof(_remember));
+            _rememberX = info.GetInt32(nameof(_rememberX));
+            _rememberY = info.GetInt32(nameof(_rememberY));
         }
 
-        public virtual void Draw(RLConsole console, Tile tile, int destX, int destY)
+        public virtual void Draw(RLConsole console, Tile tile)
         {
             if (!tile.IsExplored)
                 return;
@@ -44,16 +53,26 @@ namespace Roguelike.Interfaces
             if (!Activated)
                 return;
 
+            int destX = X - Camera.X;
+            int destY = Y - Camera.Y;
+
             if (tile.IsVisible)
             {
                 RLColor color = RLColor.Blend(Color, Colors.FloorBackground, tile.Light);
                 console.Set(destX, destY, color, null, Symbol);
+
+                _rememberX = X;
+                _rememberY = Y;
+            }
+            else if (_remember)
+            {
+                RLColor color = RLColor.Blend(Color, Colors.FloorBackground,
+                    Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
+                console.Set(_rememberX - Camera.X, _rememberY - Camera.Y, color, null, Symbol);
             }
             else
             {
-                // TODO: remembered items and terrain features should still be drawn
-                //console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
-                console.Set(destX, destY, Color, null, Symbol);
+                console.Set(destX, destY, Colors.Floor, null, '.');
             }
         }
 
@@ -67,6 +86,10 @@ namespace Roguelike.Interfaces
             info.AddValue(nameof(X), X);
             info.AddValue(nameof(Y), Y);
             info.AddValue(nameof(Activated), Activated);
+
+            info.AddValue(nameof(_remember), _remember);
+            info.AddValue(nameof(_rememberX), _rememberX);
+            info.AddValue(nameof(_rememberY), _rememberY);
         }
     }
 }

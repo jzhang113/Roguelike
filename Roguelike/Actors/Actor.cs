@@ -54,7 +54,7 @@ namespace Roguelike.Actors
             RefreshRate = Data.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
 
-            DrawingComponent = new Drawable(color, symbol);
+            DrawingComponent = new Drawable(color, symbol, false);
             BlocksLight = true;
         }
 

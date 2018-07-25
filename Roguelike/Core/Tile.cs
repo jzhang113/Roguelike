@@ -24,18 +24,32 @@ namespace Roguelike.Core
             }
         }
 
+        public float Light
+        {
+            get => _light;
+            internal set
+            {
+                if (value < 0)
+                    _light = 0;
+                else if (value > 1)
+                    _light = 1;
+                else
+                    _light = value;
+            }
+        }
+
         public int Fuel { get; internal set; }
         public bool IsExplored { get; internal set; }
-        public float Light { get; internal set; }
+        public bool IsVisible { get; internal set; }
         public bool IsOccupied { get; internal set; }
         public bool BlocksLight { get; internal set; }
 
-        public bool IsVisible => Light > 0.25;
         public bool IsWall => _type == TerrainType.Wall;
         public bool IsWalkable => !IsWall && !IsOccupied;
         public bool IsLightable => !IsWall && !BlocksLight;
 
         private TerrainType _type;
+        private float _light;
 
         public Tile(int x, int y, TerrainType type)
         {
@@ -44,7 +58,7 @@ namespace Roguelike.Core
             Fuel = 10;
 
             TerrainProperty terrain = type.ToProperty();
-            DrawingComponent = new Drawable(terrain.Color, terrain.Symbol)
+            DrawingComponent = new Drawable(terrain.Color, terrain.Symbol, true)
             {
                 X = x,
                 Y = y

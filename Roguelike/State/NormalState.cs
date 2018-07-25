@@ -187,7 +187,8 @@ namespace Roguelike.State
 
             Game.OverlayHandler.Set(current.X, current.Y, Colors.Cursor);
 
-            if (Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))
+            if (Game.Map.Field[current.X, current.Y].IsVisible
+                && Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))
                 LookHandler.DisplayActor(displayActor);
             else if (Game.Map.TryGetItem(current.X, current.Y, out ItemCount displayItem)
                 && displayItem.Count > 0)

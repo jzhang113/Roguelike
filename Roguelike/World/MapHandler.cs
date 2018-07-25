@@ -531,39 +531,23 @@ namespace Roguelike.World
         #endregion
 
         #region FOV Methods
-        public void ComputeFov(int x, int y, int radius)
+        public void ComputeFovInOctant(int x, int y, double lightDecay, (int X, int Y) dir)
         {
-            Discovered.Clear();
+            Queue<AngleRange> visibleRange = new Queue<AngleRange>();
+            visibleRange.Enqueue(new AngleRange(1, 0, 1, 1));
 
-            Tile origin = Field[x, y];
-            origin.Light = 1;
-            if (!origin.IsExplored)
+            while (visibleRange.Count > 0)
             {
-                origin.IsExplored = true;
-                Discovered.Add(origin);
-            }
-
-            foreach ((int X, int Y) dir in Direction.DirectionList)
-            {
-                Queue<AngleRange> visibleRange = new Queue<AngleRange>();
-                visibleRange.Enqueue(new AngleRange(1, 0, 1));
-
-                while (visibleRange.Count > 0)
-                {
-                    AngleRange range = visibleRange.Dequeue();
-                    if (range.Distance > radius)
-                        continue;
-
-                    double delta = 0.5 / range.Distance;
-                    IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
-                    CheckFovInRange(range, row, delta, visibleRange);
-                }
+                AngleRange range = visibleRange.Dequeue();
+                double delta = 0.5 / range.Distance;
+                IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
+                CheckFovInRange(range, row, delta, lightDecay, visibleRange);
             }
         }
 
         // Sweep across a row and update the set of unblocked angles for the next row.
         private static void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
-            Queue<AngleRange> queue)
+            double lightDecay, Queue<AngleRange> queue)
         {
             double currentAngle = 0;
             double newMinAngle = range.MinAngle;
@@ -576,9 +560,13 @@ namespace Roguelike.World
                 {
                     // The line to the current tile falls outside the maximum angle. Partially
                     // light the tile and lower the maximum angle if we hit a wall.
-                    tile.Light = (float)((range.MaxAngle - currentAngle) / (2 * delta) + 0.05);
-                    if (tile.Light < 0)
-                        tile.Light = 0;
+                    double visiblePercent = (range.MaxAngle - currentAngle) / (2 * delta) + 0.5;
+                    float change = (float)(visiblePercent * range.LightLevel);
+                    if (change > 0)
+                        tile.Light += change;
+
+                    if (tile.Light > Constants.MIN_VISIBLE_LIGHT_LEVEL)
+                        tile.IsVisible = true;
 
                     if (!tile.IsLightable)
                         newMaxAngle = currentAngle - delta;
@@ -587,29 +575,43 @@ namespace Roguelike.World
 
                 if (currentAngle > range.MinAngle || Math.Abs(currentAngle - range.MinAngle) < 0.001)
                 {
-                    tile.IsExplored = true;
-
-                    // Set the light level to the percent of tile visible. Tiles on diagonals
-                    // are always set to 1 as only half of the tile is considered in a sweep.
-                    // To be accurate, we would need to track the diagonal tiles and increment
-                    // by the light value instead of assigning it a value.
-                    double endAngle = currentAngle + delta;
-                    if (endAngle > 1)
-                        tile.Light = 1;
-                    else if (endAngle > range.MaxAngle)
-                        tile.Light = (float)((range.MaxAngle - currentAngle) / (2 * delta) + 0.5);
+                    // Set the light level to the percent of tile visible. Note that tiles in a
+                    // straight line from the center have their light values halved as each octant
+                    // only covers half of the cells on the edges.
+                    if (currentAngle + delta > range.MaxAngle)
+                    {
+                        double visiblePercent = (range.MaxAngle - currentAngle) / (2 * delta) + 0.5;
+                        tile.Light += (float)(visiblePercent * range.LightLevel);
+                    }
+                    else if (currentAngle - delta < range.MinAngle)
+                    {
+                        double visiblePercent = (currentAngle - range.MinAngle) / (2 * delta) + 0.5;
+                        tile.Light += (float)(visiblePercent * range.LightLevel);
+                    }
                     else
-                        tile.Light = 1;
+                    {
+                        tile.Light += (float)range.LightLevel;
+                    }
+
+                    tile.IsExplored = true;
+                    if (tile.Light > Constants.MIN_VISIBLE_LIGHT_LEVEL)
+                        tile.IsVisible = true;
 
                     // If we are transitioning from a blocked tile to an unblocked tile, we need
                     // to raise the minimum angle. On the other hand, if we are transitioning
                     // from an unblocked tile to a blocked tile, we need to lower the maximum
                     // angle for the next row.
                     if (!prevLit)
+                    {
                         newMinAngle = currentAngle;
+                    }
                     else if (!tile.IsLightable)
-                        queue.Enqueue(
-                            new AngleRange(range.Distance + 1, newMinAngle, currentAngle - delta));
+                    {
+                        int newDist = range.Distance + 1;
+                        double beginAngle = currentAngle - delta;
+                        double light = range.LightLevel * lightDecay;
+                        queue.Enqueue(new AngleRange(newDist, newMinAngle, beginAngle, light));
+                    }
                 }
 
                 prevLit = tile.IsLightable;
@@ -617,7 +619,11 @@ namespace Roguelike.World
             }
 
             if (prevLit)
-                queue.Enqueue(new AngleRange(range.Distance + 1, newMinAngle, newMaxAngle));
+            {
+                int newDist = range.Distance + 1;
+                double light = range.LightLevel * lightDecay;
+                queue.Enqueue(new AngleRange(newDist, newMinAngle, newMaxAngle, light));
+            }
         }
 
         private struct AngleRange
@@ -625,12 +631,14 @@ namespace Roguelike.World
             internal int Distance { get; }
             internal double MinAngle { get; }
             internal double MaxAngle { get; }
+            internal double LightLevel { get; }
 
-            public AngleRange(int distance, double minAngle, double maxAngle)
+            public AngleRange(int distance, double minAngle, double maxAngle, double lightLevel)
             {
                 Distance = distance;
                 MinAngle = minAngle;
                 MaxAngle = maxAngle;
+                LightLevel = lightLevel;
             }
         }
         #endregion
@@ -647,7 +655,7 @@ namespace Roguelike.World
                         continue;
 
                     if (tile.IsVisible)
-                        tile.DrawingComponent.Draw(mapConsole, tile, dx, dy);
+                        tile.DrawingComponent.Draw(mapConsole, tile);
                     else if (tile.IsWall)
                         mapConsole.Set(dx, dy, Colors.Wall, null, '#');
                     else
@@ -657,41 +665,29 @@ namespace Roguelike.World
 
             foreach (Door door in Doors.Values)
             {
-                int destX = door.X - Camera.X;
-                int destY = door.Y - Camera.Y;
-                door.DrawingComponent.Draw(mapConsole, Field[door.X, door.Y], destX, destY);
+                door.DrawingComponent.Draw(mapConsole, Field[door.X, door.Y]);
             }
 
             foreach (InventoryHandler stack in Items.Values)
             {
                 Item topItem = stack.First().Item;
-                int destX = topItem.X - Camera.X;
-                int destY = topItem.Y - Camera.Y;
-                topItem.DrawingComponent.Draw(mapConsole, Field[topItem.X, topItem.Y], destX, destY);
+                topItem.DrawingComponent.Draw(mapConsole, Field[topItem.X, topItem.Y]);
             }
 
             foreach (Exit exit in Exits.Values)
             {
-                int destX = exit.X - Camera.X;
-                int destY = exit.Y - Camera.Y;
-                exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y], destX, destY);
+                exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y]);
             }
 
             foreach (Fire fire in Fires.Values)
             {
-                int destX = fire.X - Camera.X;
-                int destY = fire.Y - Camera.Y;
-                fire.DrawingComponent.Draw(mapConsole, Field[fire.X, fire.Y], destX, destY);
+                fire.DrawingComponent.Draw(mapConsole, Field[fire.X, fire.Y]);
             }
 
             foreach (Actor unit in Units.Values)
             {
                 if (!unit.IsDead)
-                {
-                    int destX = unit.X - Camera.X;
-                    int destY = unit.Y - Camera.Y;
-                    unit.DrawingComponent.Draw(mapConsole, Field[unit.X, unit.Y], destX, destY);
-                }
+                    unit.DrawingComponent.Draw(mapConsole, Field[unit.X, unit.Y]);
                 else
                     // HACK: draw some corpses
                     mapConsole.SetChar(unit.X - Camera.X, unit.Y - Camera.Y, '%');
@@ -704,10 +700,27 @@ namespace Roguelike.World
             // Clear vision from last turn
             // TODO: if we know the last move, we might be able to do an incremental update
             foreach (Tile tile in Field)
+            {
                 tile.Light = 0;
+                tile.IsVisible = false;
+            }
 
-            Player player = Game.Player;
-            ComputeFov(player.X, player.Y, 100);
+            Discovered.Clear();
+
+            Tile origin = Field[Game.Player.X, Game.Player.Y];
+            origin.Light = 1;
+            origin.IsVisible = true;
+
+            if (!origin.IsExplored)
+            {
+                origin.IsExplored = true;
+                Discovered.Add(origin);
+            }
+
+            foreach ((int X, int Y) dir in Direction.DirectionList)
+            {
+                ComputeFovInOctant(Game.Player.X, Game.Player.Y, 0.9, dir);
+            }
         }
 
         private void UpdatePlayerMaps()

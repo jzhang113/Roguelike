@@ -12,7 +12,7 @@ namespace Roguelike.Interfaces
         private readonly double _alpha;
 
         public AnimatedDrawable(RLColor color, char symbol, RLColor accentColor, double luminosity)
-            : base(color, symbol)
+            : base(color, symbol, false)
         {
             _accentColor = accentColor;
             _alpha = luminosity;
@@ -27,13 +27,16 @@ namespace Roguelike.Interfaces
             _alpha = info.GetDouble(nameof(_alpha));
         }
 
-        public override void Draw(RLConsole console, Tile tile, int destX, int destY)
+        public override void Draw(RLConsole console, Tile tile)
         {
             if (!tile.IsExplored)
                 return;
 
             if (!Activated)
                 return;
+
+            int destX = X - Camera.X;
+            int destY = Y - Camera.Y;
 
             RLColor newColor = RLColor.Blend(Color, _accentColor,
                 (float) (Game.World.Random.NextDouble() * _alpha));

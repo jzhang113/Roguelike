@@ -19,5 +19,7 @@
         public const double LOW_BURN_PERCENT = 0.2;
         public const double MEDIUM_BURN_PERCENT = 0.4;
         public const double HIGH_BURN_PERCENT = 0.8;
+
+        public const float MIN_VISIBLE_LIGHT_LEVEL = 0.25f;
     }
 }

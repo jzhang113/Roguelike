@@ -90,7 +90,7 @@ namespace Roguelike.Animations
                     if (_target != null && _counter > 0)
                     {
                         _prevPos = _path[_counter - 1];
-                        _target.DrawingComponent.Draw(Game.MapConsole, _prevPos, _prevPos.X - Camera.X, _prevPos.Y - Camera.Y);
+                        _target.DrawingComponent.Draw(Game.MapConsole, _prevPos);
                     }
                 }
                 else
@@ -105,7 +105,7 @@ namespace Roguelike.Animations
                     if (_counter > 1)
                     {
                         _prevPos = _path[_path.Count - _counter + 1];
-                        _source.DrawingComponent.Draw(Game.MapConsole, _prevPos, _prevPos.X - Camera.X, _prevPos.Y - Camera.Y);
+                        _source.DrawingComponent.Draw(Game.MapConsole, _prevPos);
                     }
                 }
             }
