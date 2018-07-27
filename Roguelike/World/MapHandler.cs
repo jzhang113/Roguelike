@@ -363,6 +363,11 @@ namespace Roguelike.World
                 if (stack.IsEmpty())
                     Items.Remove(index);
             }
+
+            foreach (var dir in Direction.DirectionList)
+            {
+                ComputeFovInOctant(fire.X, fire.Y, 0.1, dir, false);
+            }
         }
 
         #region Tile Selection Methods
@@ -531,7 +536,8 @@ namespace Roguelike.World
         #endregion
 
         #region FOV Methods
-        public void ComputeFovInOctant(int x, int y, double lightDecay, (int X, int Y) dir)
+        public void ComputeFovInOctant(int x, int y, double lightDecay, (int X, int Y) dir,
+            bool setVisible)
         {
             Queue<AngleRange> visibleRange = new Queue<AngleRange>();
             visibleRange.Enqueue(new AngleRange(1, 0, 1, 1));
@@ -539,20 +545,26 @@ namespace Roguelike.World
             while (visibleRange.Count > 0)
             {
                 AngleRange range = visibleRange.Dequeue();
+                // If we don't care about setting visibility, we can stop once lightLevel reachese
+                // 0. Otherwise, we need to continue to check if los exists.
+                if (!setVisible && range.LightLevel < 0)
+                    continue;
+
                 double delta = 0.5 / range.Distance;
                 IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
-                CheckFovInRange(range, row, delta, lightDecay, visibleRange);
+                CheckFovInRange(range, row, delta, lightDecay, visibleRange, setVisible);
             }
         }
 
         // Sweep across a row and update the set of unblocked angles for the next row.
         private static void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
-            double lightDecay, Queue<AngleRange> queue)
+            double lightDecay, Queue<AngleRange> queue, bool setVisible)
         {
             double currentAngle = 0;
             double newMinAngle = range.MinAngle;
             double newMaxAngle = range.MaxAngle;
             bool prevLit = false;
+            bool first = true;
 
             foreach (Tile tile in row)
             {
@@ -561,12 +573,11 @@ namespace Roguelike.World
                     // The line to the current tile falls outside the maximum angle. Partially
                     // light the tile and lower the maximum angle if we hit a wall.
                     double visiblePercent = (range.MaxAngle - currentAngle) / (2 * delta) + 0.5;
-                    float change = (float)(visiblePercent * range.LightLevel);
-                    if (change > 0)
-                        tile.Light += change;
+                    if (visiblePercent > 0)
+                        tile.Light += (float)(visiblePercent * range.LightLevel);
 
-                    if (tile.Light > Constants.MIN_VISIBLE_LIGHT_LEVEL)
-                        tile.IsVisible = true;
+                    if (setVisible)
+                        tile.LosExists = true;
 
                     if (!tile.IsLightable)
                         newMaxAngle = currentAngle - delta;
@@ -575,15 +586,18 @@ namespace Roguelike.World
 
                 if (currentAngle > range.MinAngle || Math.Abs(currentAngle - range.MinAngle) < 0.001)
                 {
+                    double beginAngle = currentAngle - delta;
+                    double endAngle = currentAngle + delta;
+
                     // Set the light level to the percent of tile visible. Note that tiles in a
                     // straight line from the center have their light values halved as each octant
                     // only covers half of the cells on the edges.
-                    if (currentAngle + delta > range.MaxAngle)
+                    if (endAngle > range.MaxAngle)
                     {
                         double visiblePercent = (range.MaxAngle - currentAngle) / (2 * delta) + 0.5;
                         tile.Light += (float)(visiblePercent * range.LightLevel);
                     }
-                    else if (currentAngle - delta < range.MinAngle)
+                    else if (beginAngle < range.MinAngle)
                     {
                         double visiblePercent = (currentAngle - range.MinAngle) / (2 * delta) + 0.5;
                         tile.Light += (float)(visiblePercent * range.LightLevel);
@@ -594,23 +608,35 @@ namespace Roguelike.World
                     }
 
                     tile.IsExplored = true;
-                    if (tile.Light > Constants.MIN_VISIBLE_LIGHT_LEVEL)
-                        tile.IsVisible = true;
+                    if (setVisible)
+                        tile.LosExists = true;
 
-                    // If we are transitioning from a blocked tile to an unblocked tile, we need
-                    // to raise the minimum angle. On the other hand, if we are transitioning
-                    // from an unblocked tile to a blocked tile, we need to lower the maximum
-                    // angle for the next row.
-                    if (!prevLit)
+                    // For the first tile in a row, we only need to consider whether the current
+                    // tile is blocked or not.
+                    if (first)
                     {
-                        newMinAngle = currentAngle;
+                        first = false;
+                        newMinAngle = !tile.IsLightable ? endAngle : range.MinAngle;
                     }
-                    else if (!tile.IsLightable)
+                    else
                     {
-                        int newDist = range.Distance + 1;
-                        double beginAngle = currentAngle - delta;
-                        double light = range.LightLevel * lightDecay;
-                        queue.Enqueue(new AngleRange(newDist, newMinAngle, beginAngle, light));
+                        // If we are transitioning from an unblocked tile to a blocked tile, we need
+                        // to lower the maximum angle for the next row.
+                        if (prevLit && !tile.IsLightable)
+                        {
+                            int newDist = range.Distance + 1;
+                            double light = range.LightLevel - lightDecay;
+                            queue.Enqueue(new AngleRange(newDist, newMinAngle, beginAngle, light));
+
+                            // Update the minAngle to deal with single width walls in hallways.
+                            newMinAngle = endAngle;
+                        }
+                        else if (!tile.IsLightable)
+                        {
+                            // If we are transitioning from a blocked tile to an unblocked tile, we
+                            // need to raise the minimum angle.
+                            newMinAngle = endAngle;
+                        }
                     }
                 }
 
@@ -621,7 +647,7 @@ namespace Roguelike.World
             if (prevLit)
             {
                 int newDist = range.Distance + 1;
-                double light = range.LightLevel * lightDecay;
+                double light = range.LightLevel - lightDecay;
                 queue.Enqueue(new AngleRange(newDist, newMinAngle, newMaxAngle, light));
             }
         }
@@ -702,14 +728,14 @@ namespace Roguelike.World
             foreach (Tile tile in Field)
             {
                 tile.Light = 0;
-                tile.IsVisible = false;
+                tile.LosExists = false;
             }
 
             Discovered.Clear();
 
             Tile origin = Field[Game.Player.X, Game.Player.Y];
             origin.Light = 1;
-            origin.IsVisible = true;
+            origin.LosExists = true;
 
             if (!origin.IsExplored)
             {
@@ -717,9 +743,9 @@ namespace Roguelike.World
                 Discovered.Add(origin);
             }
 
-            foreach ((int X, int Y) dir in Direction.DirectionList)
+            foreach (var dir in Direction.DirectionList)
             {
-                ComputeFovInOctant(Game.Player.X, Game.Player.Y, 0.9, dir);
+                ComputeFovInOctant(Game.Player.X, Game.Player.Y, 0.1, dir, true);
             }
         }
 

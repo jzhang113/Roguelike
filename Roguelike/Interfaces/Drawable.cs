@@ -53,22 +53,29 @@ namespace Roguelike.Interfaces
             if (!Activated)
                 return;
 
+            RLColor color = RLColor.Blend(Color, Colors.Floor,
+                tile.IsVisible
+                    ? tile.Light
+                    : Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
+
+            DrawTile(console, color, null, tile.IsVisible);
+        }
+
+        protected void DrawTile(RLConsole console, RLColor foreground, RLColor? background, bool visible)
+        {
             int destX = X - Camera.X;
             int destY = Y - Camera.Y;
 
-            if (tile.IsVisible)
+            if (visible)
             {
-                RLColor color = RLColor.Blend(Color, Colors.FloorBackground, tile.Light);
-                console.Set(destX, destY, color, null, Symbol);
-
+                console.Set(destX, destY, foreground, background, Symbol);
                 _rememberX = X;
                 _rememberY = Y;
             }
             else if (_remember)
             {
-                RLColor color = RLColor.Blend(Color, Colors.FloorBackground,
-                    Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
-                console.Set(_rememberX - Camera.X, _rememberY - Camera.Y, color, null, Symbol);
+                console.Set(_rememberX - Camera.X, _rememberY - Camera.Y,
+                    foreground, background, Symbol);
             }
             else
             {

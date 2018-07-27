@@ -39,11 +39,12 @@ namespace Roguelike.Core
         }
 
         public int Fuel { get; internal set; }
-        public bool IsExplored { get; internal set; }
-        public bool IsVisible { get; internal set; }
         public bool IsOccupied { get; internal set; }
+        public bool IsExplored { get; internal set; }
         public bool BlocksLight { get; internal set; }
+        public bool LosExists { get; internal set; }
 
+        public bool IsVisible => LosExists && Light > Constants.MIN_VISIBLE_LIGHT_LEVEL;
         public bool IsWall => _type == TerrainType.Wall;
         public bool IsWalkable => !IsWall && !IsOccupied;
         public bool IsLightable => !IsWall && !BlocksLight;

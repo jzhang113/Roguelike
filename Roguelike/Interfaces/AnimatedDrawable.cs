@@ -35,20 +35,15 @@ namespace Roguelike.Interfaces
             if (!Activated)
                 return;
 
-            int destX = X - Camera.X;
-            int destY = Y - Camera.Y;
+            RLColor mixColor = RLColor.Blend(Color, _accentColor,
+                (float)(Game.World.Random.NextDouble() * _alpha));
 
-            RLColor newColor = RLColor.Blend(Color, _accentColor,
-                (float) (Game.World.Random.NextDouble() * _alpha));
-            if (tile.IsVisible)
-            {
-                console.Set(destX, destY, newColor, null, Symbol);
-            }
-            else
-            {
-                //console.Set(X, Y, Colors.Floor, Colors.FloorBackground, '.');
-                console.Set(destX, destY, newColor, null, Symbol);
-            }
+            RLColor color = tile.IsVisible
+                ? RLColor.Blend(mixColor, Colors.Floor, tile.Light)
+                : RLColor.Blend(Color, Colors.Floor,
+                    Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
+
+            DrawTile(console, color, null, tile.IsVisible);
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
