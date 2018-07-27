@@ -21,5 +21,17 @@ namespace Roguelike.Core
 
             return new WaitCommand(this);
         }
+
+        public void Open()
+        {
+            DrawingComponent.Symbol = '-';
+            IsOpen = true;
+
+            Game.Map.Field[X, Y].IsOccupied = false;
+            Game.Map.Field[X, Y].BlocksLight = false;
+
+            // reflect that the door is open immediately
+            Game.Map.UpdatePlayerFov();
+        }
     }
 }

@@ -119,6 +119,7 @@
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Core\ActorState.cs" />
     <Compile Include="Core\ArmorType.cs" />
+    <Compile Include="Core\ColorInterval.cs" />
     <Compile Include="Core\Exit.cs" />
     <Compile Include="Core\Fire.cs" />
     <Compile Include="Core\Tile.cs" />

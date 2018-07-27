@@ -1,4 +1,5 @@
-﻿using RLNET;
+﻿using Pcg;
+using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Data;
@@ -15,6 +16,8 @@ namespace Roguelike
     {
         public static Configuration Config { get; private set; }
         public static Options Option { get; private set; }
+        public static PcgRandom Random { get; private set; }
+        public static PcgRandom VisualRandom { get; private set; }
 
         public static WorldHandler World { get; private set; }
         public static Player Player { get; internal set; } // internal for deserialization
@@ -40,6 +43,8 @@ namespace Roguelike
         {
             Config = configs;
             Option = options;
+            Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
+            VisualRandom = new PcgRandom(Random.Next());
 
             string consoleTitle = "Roguelike";
 
@@ -68,7 +73,8 @@ namespace Roguelike
 
         public static void NewGame()
         {
-            WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
+            Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
+            VisualRandom = new PcgRandom(Random.Next());
 
             Player = new Player(new ActorParameters("Player")
             {
@@ -84,9 +90,8 @@ namespace Roguelike
             OverlayHandler.ClearBackground();
             OverlayHandler.ClearForeground();
 
-            World = Option.FixedSeed
-                ? new WorldHandler(worldParameter, Option.Seed)
-                : new WorldHandler(worldParameter);
+            WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
+            World = new WorldHandler(worldParameter);
 
             ForceRender();
         }

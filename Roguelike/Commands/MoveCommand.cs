@@ -48,7 +48,7 @@ namespace Roguelike.Commands
                 // HACK: need an open door command
                 if (!door.IsOpen)
                 {
-                    Game.Map.OpenDoor(door);
+                    door.Open();
                     return new RedirectMessage(false, new WaitCommand(door, 120));
                 }
             }

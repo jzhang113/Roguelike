@@ -8,23 +8,31 @@ namespace Roguelike.Interfaces
     [Serializable]
     class AnimatedDrawable : Drawable
     {
-        private readonly RLColor _accentColor;
-        private readonly double _alpha;
+        private readonly ColorInterval _foreground;
+        private readonly ColorInterval _background;
+        private readonly bool _drawBackground;
 
-        public AnimatedDrawable(RLColor color, char symbol, RLColor accentColor, double luminosity)
-            : base(color, symbol, false)
+        public AnimatedDrawable(ColorInterval foreground, ColorInterval? background, char symbol)
+            : base(foreground.Primary, symbol, false)
         {
-            _accentColor = accentColor;
-            _alpha = luminosity;
+            _foreground = foreground;
+
+            if (background != null)
+            {
+                _background = background.Value;
+                _drawBackground = true;
+            }
+            else
+            {
+                _drawBackground = false;
+            }
         }
 
         public AnimatedDrawable(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            float r = (float)info.GetValue($"{nameof(_accentColor)}.r", typeof(float));
-            float g = (float)info.GetValue($"{nameof(_accentColor)}.g", typeof(float));
-            float b = (float)info.GetValue($"{nameof(_accentColor)}.b", typeof(float));
-            _accentColor = new RLColor(r, g, b);
-            _alpha = info.GetDouble(nameof(_alpha));
+            _foreground = (ColorInterval)info.GetValue(nameof(_foreground), typeof(ColorInterval));
+            _background = (ColorInterval)info.GetValue(nameof(_background), typeof(ColorInterval));
+            _drawBackground = info.GetBoolean(nameof(_drawBackground));
         }
 
         public override void Draw(RLConsole console, Tile tile)
@@ -35,24 +43,25 @@ namespace Roguelike.Interfaces
             if (!Activated)
                 return;
 
-            RLColor mixColor = RLColor.Blend(Color, _accentColor,
-                (float)(Game.World.Random.NextDouble() * _alpha));
+            RLColor foreColor = tile.IsVisible
+                ? RLColor.Blend(_foreground.GetColor(Game.VisualRandom), Colors.Floor, tile.Light)
+                : RLColor.Blend(Color, Colors.Floor, Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
 
-            RLColor color = tile.IsVisible
-                ? RLColor.Blend(mixColor, Colors.Floor, tile.Light)
-                : RLColor.Blend(Color, Colors.Floor,
-                    Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
+            RLColor? backColor = null;
+            if (_drawBackground && tile.IsVisible)
+                backColor = RLColor.Blend(_background.GetColor(Game.VisualRandom),
+                    Colors.Floor, tile.Light);
 
-            DrawTile(console, color, null, tile.IsVisible);
+            DrawTile(console, foreColor, backColor, tile.IsVisible);
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
-            info.AddValue($"{nameof(_accentColor)}.r", _accentColor.r);
-            info.AddValue($"{nameof(_accentColor)}.g", _accentColor.g);
-            info.AddValue($"{nameof(_accentColor)}.b", _accentColor.b);
-            info.AddValue(nameof(_alpha), _alpha);
+
+            info.AddValue(nameof(_foreground), _foreground);
+            info.AddValue(nameof(_background), _background);
+            info.AddValue(nameof(_drawBackground), _drawBackground);
         }
     }
 }

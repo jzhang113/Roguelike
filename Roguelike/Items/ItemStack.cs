@@ -115,7 +115,7 @@ namespace Roguelike.Items
 
                 // Use a binomial distribution to determine the number of items that burn.
                 MaterialProperty material = item.Parameters.Material.ToProperty();
-                int burningCount = Game.World.Random.NextBinomial(
+                int burningCount = Game.Random.NextBinomial(
                     amount,
                     material.Flammability.ToIgniteChance());
 

@@ -45,7 +45,7 @@ namespace Roguelike.Commands
                     itemCount = _itemStack.First();
                     Source.Inventory.Add(itemCount);
 
-                    Game.Map.RemoveItem(itemCount);
+                    Game.Map.SplitItem(itemCount);
                     Game.MessageHandler.AddMessage($"You pick up {itemCount}.");
                     break;
                 default:
@@ -55,7 +55,7 @@ namespace Roguelike.Commands
                         itemCount = _itemStack.First();
                         Source.Inventory.Add(itemCount);
 
-                        Game.Map.RemoveItem(itemCount);
+                        Game.Map.SplitItem(itemCount);
                         Game.MessageHandler.AddMessage($"You pick up {itemCount}.");
                     }
                     else
@@ -64,7 +64,7 @@ namespace Roguelike.Commands
                         itemCount = _itemStack.First();
                         Source.Inventory.Add(itemCount);
 
-                        Game.Map.RemoveItem(itemCount);
+                        Game.Map.SplitItem(itemCount);
 
                         // TODO: Tell the player only if they can see / notice this
                         Game.MessageHandler.AddMessage($"{Source} picks up {itemCount}.");

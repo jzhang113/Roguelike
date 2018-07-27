@@ -21,7 +21,7 @@ namespace Roguelike.Core
                     }
                     else
                     {
-                        (int dx, int dy) = Direction.DirectionList[Game.World.Random.Next(8)];
+                        (int dx, int dy) = Direction.DirectionList[Game.Random.Next(8)];
                         return new MoveCommand(monster, monster.X + dx, monster.Y + dy);
                     }
                 case ActorState.Chase:
@@ -47,7 +47,7 @@ namespace Roguelike.Core
                     else
                     {
                         // implement fleeing?
-                        (int dx, int dy) = Direction.DirectionList[Game.World.Random.Next(8)];
+                        (int dx, int dy) = Direction.DirectionList[Game.Random.Next(8)];
                         return new MoveCommand(monster, monster.X + dx, monster.Y + dy);
                     }
                 case ActorState.Dead:

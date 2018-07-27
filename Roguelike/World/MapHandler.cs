@@ -118,6 +118,8 @@ namespace Roguelike.World
         }
         #endregion
 
+        // Recalculate the state of the world after movements happen. If only light recalculations
+        // needed, call UpdatePlayerFov() instead.
         internal void Refresh()
         {
             Camera.UpdateCamera();
@@ -171,9 +173,6 @@ namespace Roguelike.World
             Field[x, y].BlocksLight = actor.BlocksLight;
             Units.Add(ToIndex(x, y), actor);
 
-            if (actor is Player)
-                Refresh();
-
             return true;
         }
 
@@ -226,23 +225,21 @@ namespace Roguelike.World
             return Items.TryGetValue(ToIndex(x, y), out stack);
         }
 
-        // Take an entire stack of item off of the map.
-        public bool RemoveItem(ItemCount itemCount)
+        // Clean up the items list by removing empty stacks.
+        internal bool RemoveStackIfEmpty(int x, int y)
         {
-            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
+            int index = ToIndex(x, y);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
                 return false;
 
-            if (!stack.Contains(itemCount))
+            if (!stack.IsEmpty())
                 return false;
 
-            stack.Remove(itemCount);
-            if (stack.IsEmpty())
-                Items.Remove(index);
+            Items.Remove(index);
             return true;
         }
 
-        // Take only part of a stack from the map.
+        // Take items off of the map.
         public ItemCount SplitItem(ItemCount itemCount)
         {
             int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
@@ -281,17 +278,6 @@ namespace Roguelike.World
         {
             return Doors.TryGetValue(ToIndex(x, y), out door);
         }
-
-        public void OpenDoor(Door door)
-        {
-            door.DrawingComponent.Symbol = '-';
-            door.IsOpen = true;
-            Field[door.X, door.Y].IsOccupied = false;
-            Field[door.X, door.Y].BlocksLight = false;
-
-            // reflect that the door is open immediately
-            UpdatePlayerFov();
-        }
         #endregion
 
         public bool AddExit(Exit exit)
@@ -320,7 +306,7 @@ namespace Roguelike.World
                 return false;
 
             TerrainProperty terrain = tile.Type.ToProperty();
-            if (Game.World.Random.NextDouble() < terrain.Flammability.ToIgniteChance())
+            if (Game.Random.NextDouble() < terrain.Flammability.ToIgniteChance())
             {
                 Fire fire = new Fire(x, y);
                 Fires.Add(index, fire);
@@ -328,7 +314,6 @@ namespace Roguelike.World
                 return true;
             }
             else
-
             {
                 return false;
             }
@@ -341,33 +326,6 @@ namespace Roguelike.World
 
             Game.EventScheduler.RemoveActor(fire);
             return true;
-        }
-
-        // Flammable objects have a chance to get set on fire.
-        internal void ProcessFire(Fire fire)
-        {
-            int index = ToIndex(fire.X, fire.Y);
-
-            if (Doors.TryGetValue(index, out Door door))
-            {
-                // TODO: create an actor burning implementation
-                // Q: do doors behave like items or actors when burned?
-                MaterialProperty material = door.Parameters.Material.ToProperty();
-                if (Game.World.Random.NextDouble() < material.Flammability.ToIgniteChance())
-                    OpenDoor(door);
-            }
-
-            if (Items.TryGetValue(index, out InventoryHandler stack))
-            {
-                stack.SetFire();
-                if (stack.IsEmpty())
-                    Items.Remove(index);
-            }
-
-            foreach (var dir in Direction.DirectionList)
-            {
-                ComputeFovInOctant(fire.X, fire.Y, 0.1, dir, false);
-            }
         }
 
         #region Tile Selection Methods
@@ -721,7 +679,7 @@ namespace Roguelike.World
         }
         #endregion
 
-        private void UpdatePlayerFov()
+        internal void UpdatePlayerFov()
         {
             // Clear vision from last turn
             // TODO: if we know the last move, we might be able to do an incremental update
