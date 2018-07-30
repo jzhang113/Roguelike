@@ -15,6 +15,6 @@ namespace Roguelike.State
         void Update();
 
         // Draw to the screen.
-        void Draw();
+        void Draw(RLConsole console);
     }
 }

@@ -209,10 +209,11 @@ namespace Roguelike.State
             Game.ForceRender();
         }
 
-        public void Draw()
+        public void Draw(RLConsole mapConsole)
         {
-            Game.Map.Draw(Game.MapConsole);
-            Game.OverlayHandler.Draw(Game.MapConsole);
+            mapConsole.Clear(0, RLColor.Black, Colors.TextHeading);
+            Game.Map.Draw(mapConsole);
+            Game.OverlayHandler.Draw(mapConsole);
         }
     }
 }

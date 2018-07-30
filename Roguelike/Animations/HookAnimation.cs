@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using RLNET;
+using Roguelike.Actors;
 using Roguelike.Core;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw()
+        public void Draw(RLConsole mapConsole)
         {
             if (!_hit)
             {
@@ -73,7 +74,7 @@ namespace Roguelike.Animations
                 for (int i = 0; i < _counter; i++)
                 {
                     Tile tile = _path[i];
-                    Game.MapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
+                    mapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
                 }
             }
             else
@@ -84,13 +85,13 @@ namespace Roguelike.Animations
                     for (int i = 0; i < _counter - 1; i++)
                     {
                         Tile tile = _path[i];
-                        Game.MapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
+                        mapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
                     }
 
                     if (_target != null && _counter > 0)
                     {
                         _prevPos = _path[_counter - 1];
-                        _target.DrawingComponent.Draw(Game.MapConsole, _prevPos);
+                        _target.DrawingComponent.Draw(mapConsole, _prevPos);
                     }
                 }
                 else
@@ -99,13 +100,13 @@ namespace Roguelike.Animations
                     for (int i = _path.Count - 1; i > _path.Count - _counter; i--)
                     {
                         Tile tile = _path[i];
-                        Game.MapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
+                        mapConsole.Set(tile.X - Camera.X, tile.Y - Camera.Y, Swatch.DbLight, null, '~');
                     }
 
                     if (_counter > 1)
                     {
                         _prevPos = _path[_path.Count - _counter + 1];
-                        _source.DrawingComponent.Draw(Game.MapConsole, _prevPos);
+                        _source.DrawingComponent.Draw(mapConsole, _prevPos);
                     }
                 }
             }

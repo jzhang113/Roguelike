@@ -258,9 +258,9 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
-        public void Draw()
+        public void Draw(RLConsole mapConsole)
         {
-            Game.OverlayHandler.Draw(Game.MapConsole);
+            Game.OverlayHandler.Draw(mapConsole);
         }
     }
 }

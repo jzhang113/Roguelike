@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RLNET;
+using System;
 
 namespace Roguelike.Animations
 {
@@ -7,7 +8,7 @@ namespace Roguelike.Animations
         bool Done { get; }
 
         void Update();
-        void Draw();
+        void Draw(RLConsole console);
 
         event EventHandler Complete;
     }

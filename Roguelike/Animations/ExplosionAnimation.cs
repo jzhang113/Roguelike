@@ -34,14 +34,14 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw()
+        public void Draw(RLConsole mapConsole)
         {
             Game.OverlayHandler.ClearForeground();
             foreach (Tile tile in Game.Map.GetTilesInRadius(_x, _y, _counter))
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, _color);
             }
-            Game.OverlayHandler.Draw(Game.MapConsole);
+            Game.OverlayHandler.Draw(mapConsole);
         }
 
         public event EventHandler Complete;

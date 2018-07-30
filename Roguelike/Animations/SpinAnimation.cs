@@ -1,4 +1,5 @@
-﻿using Roguelike.Core;
+﻿using RLNET;
+using Roguelike.Core;
 using System;
 
 namespace Roguelike.Animations
@@ -29,18 +30,18 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw()
+        public void Draw(RLConsole mapConsole)
         {
             switch(_frame)
             {
-                case 1: Game.MapConsole.Set(_x - 1, _y - 1, Swatch.DbBrightWood, null, '\\'); break;
-                case 2: Game.MapConsole.Set(_x - 1, _y, Swatch.DbBrightWood, null, '-'); break;
-                case 3: Game.MapConsole.Set(_x - 1, _y + 1, Swatch.DbBrightWood, null, '/'); break;
-                case 4: Game.MapConsole.Set(_x, _y + 1, Swatch.DbBrightWood, null, '|'); break;
-                case 5: Game.MapConsole.Set(_x + 1, _y + 1, Swatch.DbBrightWood, null, '\\'); break;
-                case 6: Game.MapConsole.Set(_x + 1, _y, Swatch.DbBrightWood, null, '-'); break;
-                case 7: Game.MapConsole.Set(_x + 1, _y - 1, Swatch.DbBrightWood, null, '/'); break;
-                case 8: Game.MapConsole.Set(_x, _y - 1, Swatch.DbBrightWood, null, '|'); break;
+                case 1: mapConsole.Set(_x - 1, _y - 1, Swatch.DbBrightWood, null, '\\'); break;
+                case 2: mapConsole.Set(_x - 1, _y, Swatch.DbBrightWood, null, '-'); break;
+                case 3: mapConsole.Set(_x - 1, _y + 1, Swatch.DbBrightWood, null, '/'); break;
+                case 4: mapConsole.Set(_x, _y + 1, Swatch.DbBrightWood, null, '|'); break;
+                case 5: mapConsole.Set(_x + 1, _y + 1, Swatch.DbBrightWood, null, '\\'); break;
+                case 6: mapConsole.Set(_x + 1, _y, Swatch.DbBrightWood, null, '-'); break;
+                case 7: mapConsole.Set(_x + 1, _y - 1, Swatch.DbBrightWood, null, '/'); break;
+                case 8: mapConsole.Set(_x, _y - 1, Swatch.DbBrightWood, null, '|'); break;
             }
         }
 

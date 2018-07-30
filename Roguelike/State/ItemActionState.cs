@@ -49,11 +49,10 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
-        public virtual void Draw()
+        public virtual void Draw(RLConsole inventoryConsole)
         {
-            Game.InventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
-            Game.Player.Inventory.Draw(Game.InventoryConsole);
-            RLConsole.Blit(Game.InventoryConsole, 0, 0, Game.Config.InventoryView.Width, Game.Config.InventoryView.Height, Game.RootConsole, Game.Config.MapView.Width - 10, 0);
+            inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
+            Game.Player.Inventory.Draw(inventoryConsole);
         }
     }
 }

@@ -30,8 +30,9 @@ namespace Roguelike
         public static MapHandler Map => World.Map;
 
         public static RLRootConsole RootConsole { get; private set; }
-        public static RLConsole MapConsole { get; private set; }
-        public static RLConsole InventoryConsole { get; private set; }
+        public static ConsoleInfo MapConsole { get; private set; }
+        public static ConsoleInfo InventoryConsole { get; private set; }
+        public static ConsoleInfo FullConsole { get; private set; }
 
         private static RLConsole _messageConsole;
         private static RLConsole _statConsole;
@@ -49,8 +50,16 @@ namespace Roguelike
             string consoleTitle = "Roguelike";
 
             RootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
-            MapConsole = new RLConsole(Config.MapView.Width, Config.MapView.Height);
-            InventoryConsole = new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height);
+            MapConsole = new ConsoleInfo(
+                new RLConsole(Config.MapView.Width, Config.MapView.Height),
+                0, Config.StatView.Height);
+            InventoryConsole = new ConsoleInfo(
+                new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height),
+                Config.Screen.Width - configs.InventoryView.Width, 0);
+            FullConsole = new ConsoleInfo(
+                new RLConsole(Config.Screen.Width, Config.Screen.Height),
+                0, 0);
+
             _messageConsole = new RLConsole(Config.MessageView.Width, Config.MessageView.Height);
             _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
             _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
@@ -189,12 +198,7 @@ namespace Roguelike
             LookHandler.Draw(_viewConsole);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.MapView.Width, 0);
 
-            MapConsole.Clear(0, RLColor.Black, Colors.TextHeading, 0);
-            Map.Draw(MapConsole);
-
             StateHandler.Draw();
-
-            RLConsole.Blit(MapConsole, 0, 0, Config.MapView.Width, Config.MapView.Height, RootConsole, 0, Config.StatView.Height);
             RootConsole.Draw();
             _render = false;
         }

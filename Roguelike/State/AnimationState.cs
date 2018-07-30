@@ -36,9 +36,9 @@ namespace Roguelike.State
             }
         }
 
-        public void Draw()
+        public void Draw(RLConsole mapConsole)
         {
-            _animation.Draw();
+            _animation.Draw(mapConsole);
         }
     }
 }

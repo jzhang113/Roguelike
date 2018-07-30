@@ -1,20 +1,38 @@
 ﻿using RLNET;
 using Roguelike.Commands;
+using Roguelike.Core;
 using Roguelike.State;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
     class StateHandler
     {
-        private readonly RLRootConsole _console;
+        private readonly RLRootConsole _rootConsole;
         private readonly Stack<IState> _states;
+        private readonly IDictionary<Type, ConsoleInfo> _consoles;
 
         public StateHandler(RLRootConsole console)
         {
-            _console = console;
+            _rootConsole = console;
             _states = new Stack<IState>();
             _states.Push(NormalState.Instance);
+
+            _consoles = new Dictionary<Type, ConsoleInfo>
+            {
+                [typeof(AnimationState)] = Game.MapConsole,
+                [typeof(ApplyState)] = Game.InventoryConsole,
+                [typeof(AutoexploreState)] = Game.MapConsole,
+                [typeof(CharSelectState)] = Game.FullConsole,
+                [typeof(DropState)] = Game.InventoryConsole,
+                [typeof(EquipState)] = Game.InventoryConsole,
+                [typeof(InventoryState)] = Game.InventoryConsole,
+                [typeof(NormalState)] = Game.MapConsole,
+                [typeof(TargettingState)] = Game.MapConsole,
+                [typeof(TextInputState)] = Game.MapConsole,
+                [typeof(UnequipState)] = Game.InventoryConsole
+            };
         }
 
         public void Reset()
@@ -26,11 +44,11 @@ namespace Roguelike.Systems
         public ICommand HandleInput()
         {
             IState currentState = _states.Peek();
-            ICommand command = currentState.HandleMouseInput(_console.Mouse);
+            ICommand command = currentState.HandleMouseInput(_rootConsole.Mouse);
             if (command != null)
                 return command;
 
-            RLKeyPress keyPress = _console.Keyboard.GetKeyPress();
+            RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
             if (keyPress?.Key == RLKey.Escape)
             {
                 switch (currentState)
@@ -67,7 +85,12 @@ namespace Roguelike.Systems
 
         public void Draw()
         {
-            _states.Peek().Draw();
+            IState current = _states.Peek();
+            ConsoleInfo info = _consoles[current.GetType()];
+            RLConsole console = info.Console;
+
+            current.Draw(info.Console);
+            RLConsole.Blit(console, 0, 0, console.Width, console.Height, _rootConsole, info.X, info.Y);
         }
     }
 }

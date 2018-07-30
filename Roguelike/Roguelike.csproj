@@ -72,14 +72,15 @@
     <Reference Include="RLNET, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RLNET.1.0.6\lib\RLNET.dll</HintPath>
     </Reference>
-    <Reference Include="RogueSharp, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RogueSharp.3.0.0\lib\portable-net40+sl50+win+wpa81+wp80\RogueSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.5.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.Memory, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.1\lib\netstandard2.0\System.Memory.dll</HintPath>
     </Reference>
@@ -120,6 +121,7 @@
     <Compile Include="Core\ActorState.cs" />
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\ColorInterval.cs" />
+    <Compile Include="Core\ConsoleInfo.cs" />
     <Compile Include="Core\Exit.cs" />
     <Compile Include="Core\Fire.cs" />
     <Compile Include="Core\Tile.cs" />
@@ -136,6 +138,7 @@
     <Compile Include="State\AnimationState.cs" />
     <Compile Include="State\ApplyState.cs" />
     <Compile Include="State\AutoexploreState.cs" />
+    <Compile Include="State\CharSelectState.cs" />
     <Compile Include="State\DropState.cs" />
     <Compile Include="State\EquipState.cs" />
     <Compile Include="State\InventoryState.cs" />
@@ -145,6 +148,8 @@
     <Compile Include="State\TextInputState.cs" />
     <Compile Include="State\UnequipState.cs" />
     <Compile Include="Input\MouseInput.cs" />
+    <Compile Include="Utils\ColorInfo.cs" />
+    <Compile Include="Utils\ImageConvert.cs" />
     <Compile Include="Utils\Random.cs" />
     <Compile Include="Utils\RLKeyExtensions.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
@@ -223,7 +228,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="OpenTK.dll.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="ccc12x12.png">
