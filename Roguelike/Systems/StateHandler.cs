@@ -18,6 +18,7 @@ namespace Roguelike.Systems
             _rootConsole = console;
             _states = new Stack<IState>();
             _states.Push(NormalState.Instance);
+            _states.Push(CharSelectState.Instance);
 
             _consoles = new Dictionary<Type, ConsoleInfo>
             {
