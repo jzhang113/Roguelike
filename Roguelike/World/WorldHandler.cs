@@ -57,6 +57,8 @@ namespace Roguelike.World
             bool seen = _levels[id].Seen;
             Map = seen ? LoadLevel(id) : CreateLevel(id);
             CurrentLevel = id;
+
+            Map.Refresh();
         }
 
         private Dictionary<LevelId, LevelData> BuildWorld(WorldParameter parameters)

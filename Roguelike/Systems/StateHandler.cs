@@ -17,8 +17,14 @@ namespace Roguelike.Systems
         {
             _rootConsole = console;
             _states = new Stack<IState>();
-            _states.Push(NormalState.Instance);
-            _states.Push(CharSelectState.Instance);
+
+            MenuState mainMenu = new MenuState(new MenuButton[]
+            {
+                new MenuButton(1, 10, "Continue", () => Game.LoadGame()),
+                new MenuButton(1, 20, "New Game", () => Game.NewGame()),
+                new MenuButton(1, 30, "Exit", () => Game.Exit())
+            });
+            _states.Push(mainMenu);
 
             _consoles = new Dictionary<Type, ConsoleInfo>
             {
@@ -29,6 +35,7 @@ namespace Roguelike.Systems
                 [typeof(DropState)] = Game.InventoryConsole,
                 [typeof(EquipState)] = Game.InventoryConsole,
                 [typeof(InventoryState)] = Game.InventoryConsole,
+                [typeof(MenuState)] = Game.FullConsole,
                 [typeof(NormalState)] = Game.MapConsole,
                 [typeof(TargettingState)] = Game.MapConsole,
                 [typeof(TextInputState)] = Game.MapConsole,
@@ -52,16 +59,12 @@ namespace Roguelike.Systems
             RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
             if (keyPress?.Key == RLKey.Escape)
             {
-                switch (currentState)
-                {
-                    case NormalState _:
-                        Game.Exit();
-                        return null;
-                    default:
-                        PopState();
-                        Game.ForceRender();
-                        return null;
-                }
+                PopState();
+                if (_states.Count == 0)
+                    Game.Exit();
+
+                Game.ForceRender();
+                return null;
             }
 
             return currentState.HandleKeyInput(keyPress);
@@ -81,16 +84,22 @@ namespace Roguelike.Systems
 
         public void Update()
         {
+            if (_states.Count == 0)
+                return;
+
             _states.Peek().Update();
         }
 
         public void Draw()
         {
+            if (_states.Count == 0)
+                return;
+
             IState current = _states.Peek();
             ConsoleInfo info = _consoles[current.GetType()];
             RLConsole console = info.Console;
 
-            current.Draw(info.Console);
+            current.Draw(console);
             RLConsole.Blit(console, 0, 0, console.Width, console.Height, _rootConsole, info.X, info.Y);
         }
     }

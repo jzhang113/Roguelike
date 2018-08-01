@@ -119,6 +119,7 @@
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Core\ActorState.cs" />
+    <Compile Include="Core\Alignment.cs" />
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\ColorInterval.cs" />
     <Compile Include="Core\ConsoleInfo.cs" />
@@ -143,6 +144,8 @@
     <Compile Include="State\EquipState.cs" />
     <Compile Include="State\InventoryState.cs" />
     <Compile Include="State\ItemActionState.cs" />
+    <Compile Include="Core\MenuButton.cs" />
+    <Compile Include="State\MenuState.cs" />
     <Compile Include="State\NormalState.cs" />
     <Compile Include="State\TargettingState.cs" />
     <Compile Include="State\TextInputState.cs" />

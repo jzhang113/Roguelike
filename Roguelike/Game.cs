@@ -71,7 +71,6 @@ namespace Roguelike
 
             RootConsole.Update += RootConsoleUpdate;
             RootConsole.Render += RootConsoleRender;
-            RootConsole.OnLoad += StartGame;
             RootConsole.OnClosing += SaveGame;
         }
 
@@ -105,16 +104,7 @@ namespace Roguelike
             ForceRender();
         }
 
-        private static void SaveGame(object sender, CancelEventArgs e)
-        {
-            using (Stream saveFile = File.OpenWrite(Constants.SAVE_FILE))
-            {
-                BinaryFormatter serializer = new BinaryFormatter();
-                serializer.Serialize(saveFile, World);
-            }
-        }
-
-        private static void StartGame(object sender, EventArgs e)
+        public static void LoadGame()
         {
             if (!File.Exists(Constants.SAVE_FILE))
                 NewGame();
@@ -127,11 +117,25 @@ namespace Roguelike
                     BinaryFormatter deserializer = new BinaryFormatter();
                     World = (WorldHandler)deserializer.Deserialize(saveFile);
                 }
+
+                StateHandler.Reset();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
                 NewGame();
+            }
+        }
+
+        private static void SaveGame(object sender, CancelEventArgs e)
+        {
+            if (World == null)
+                return;
+
+            using (Stream saveFile = File.OpenWrite(Constants.SAVE_FILE))
+            {
+                BinaryFormatter serializer = new BinaryFormatter();
+                serializer.Serialize(saveFile, World);
             }
         }
 
@@ -168,31 +172,31 @@ namespace Roguelike
                     Config.MessageView.Height, RootConsole, 0, Config.StatView.Height + Config.MapView.Height);
             }
 
-            _statConsole.Clear(0, RLColor.Black, Colors.TextHeading);
-            int stepSize = 5;
-            int hpWidth = Player.Parameters.MaxHp / stepSize;
-            int hpFilled = hpWidth * Player.Hp / Player.Parameters.MaxHp;
-            string health = $"{Player.Hp}/{Player.Parameters.MaxHp}";
-            _statConsole.Print((hpWidth - health.Length) / 2 + 2, 1, health, Colors.TextHeading);
-            for (int i = 0; i <= hpFilled; i++)
-                _statConsole.SetBackColor(i + 1, 1, Swatch.DbBlood);
-            for (int i = hpFilled + 1; i <= hpWidth; i++)
-                _statConsole.SetBackColor(i + 1, 1, Swatch.DbOldBlood);
+            //_statConsole.Clear(0, RLColor.Black, Colors.TextHeading);
+            //int stepSize = 5;
+            //int hpWidth = Player.Parameters.MaxHp / stepSize;
+            //int hpFilled = hpWidth * Player.Hp / Player.Parameters.MaxHp;
+            //string health = $"{Player.Hp}/{Player.Parameters.MaxHp}";
+            //_statConsole.Print((hpWidth - health.Length) / 2 + 2, 1, health, Colors.TextHeading);
+            //for (int i = 0; i <= hpFilled; i++)
+            //    _statConsole.SetBackColor(i + 1, 1, Swatch.DbBlood);
+            //for (int i = hpFilled + 1; i <= hpWidth; i++)
+            //    _statConsole.SetBackColor(i + 1, 1, Swatch.DbOldBlood);
 
-            int armorWidth = Player.Armor / stepSize;
-            for (int i = 0; i <= armorWidth; i++)
-                _statConsole.SetBackColor(i + hpWidth + 3, 1, Swatch.DbMetal);
+            //int armorWidth = Player.Armor / stepSize;
+            //for (int i = 0; i <= armorWidth; i++)
+            //    _statConsole.SetBackColor(i + hpWidth + 3, 1, Swatch.DbMetal);
 
-            int mpWidth = Player.Parameters.MaxMp / stepSize;
-            int mpFilled = mpWidth * Player.Mp / Player.Parameters.MaxMp;
-            string mana = $"{Player.Mp}/{Player.Parameters.MaxMp}";
-            _statConsole.Print((mpWidth - mana.Length) / 2 + 2, 2, mana, Colors.TextHeading);
-            for (int i = 0; i <= mpFilled; i++)
-                _statConsole.SetBackColor(i + 1, 2, Swatch.DbWater);
-            for (int i = mpFilled + 1; i <= mpWidth; i++)
-                _statConsole.SetBackColor(i + 1, 2, Swatch.DbDeepWater);
+            //int mpWidth = Player.Parameters.MaxMp / stepSize;
+            //int mpFilled = mpWidth * Player.Mp / Player.Parameters.MaxMp;
+            //string mana = $"{Player.Mp}/{Player.Parameters.MaxMp}";
+            //_statConsole.Print((mpWidth - mana.Length) / 2 + 2, 2, mana, Colors.TextHeading);
+            //for (int i = 0; i <= mpFilled; i++)
+            //    _statConsole.SetBackColor(i + 1, 2, Swatch.DbWater);
+            //for (int i = mpFilled + 1; i <= mpWidth; i++)
+            //    _statConsole.SetBackColor(i + 1, 2, Swatch.DbDeepWater);
 
-            RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, RootConsole, 0, 0);
+            //RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, RootConsole, 0, 0);
 
             _viewConsole.Clear(0, RLColor.Black, Colors.TextHeading);
             LookHandler.Draw(_viewConsole);
