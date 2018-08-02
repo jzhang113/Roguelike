@@ -67,7 +67,7 @@ namespace Roguelike.Systems
 
             for (int i = 0; i < maxCount; i++)
             {
-                console.Print(1, yPos, _messages[_messages.Count - i - 1], Colors.TextHeading);
+                console.Print(1, yPos, _messages[_messages.Count - i - 1], Colors.Text);
                 yPos -= 2;
             }
 

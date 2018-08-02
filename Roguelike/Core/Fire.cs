@@ -23,10 +23,7 @@ namespace Roguelike.Core
 
         public Fire(int x, int y)
         {
-            ColorInterval foreground = new ColorInterval(new RLNET.RLColor(255, 185, 0), Swatch.DbBlood, 0.6);
-            ColorInterval background = new ColorInterval(new RLNET.RLColor(200, 185, 0),
-                new RLNET.RLColor(255, 185, 0), 0.6);
-
+            ColorInterval foreground = new ColorInterval(Colors.Fire, Colors.FireAccent, 0.6);
             DrawingComponent = new AnimatedDrawable(foreground, null, '^')
             {
                 X = x,

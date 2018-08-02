@@ -78,7 +78,7 @@ namespace Roguelike.State
 
         public void Draw(RLConsole mapConsole)
         {
-            mapConsole.Clear(0, RLColor.Black, Colors.TextHeading);
+            mapConsole.Clear(0, RLColor.Black, Colors.Text);
             Game.Map.Draw(mapConsole);
         }
     }

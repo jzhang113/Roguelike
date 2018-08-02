@@ -30,27 +30,27 @@ namespace Roguelike.Data
             _terrainList = Program.LoadData<IDictionary<TerrainType, TerrainProperty>>("terrain");
 
             TerrainProperty wall = _terrainList[TerrainType.Wall];
-            wall.Color = Swatch.SecondaryLighter;
+            wall.Color = Colors.Wall;
             wall.Symbol = '#';
             _terrainList[TerrainType.Wall] = wall;
 
             TerrainProperty grass = _terrainList[TerrainType.Grass];
-            grass.Color = Swatch.DbGrass;
+            grass.Color = Colors.Grass;
             grass.Symbol = '"';
             _terrainList[TerrainType.Grass] = grass;
 
             TerrainProperty stone = _terrainList[TerrainType.Stone];
-            stone.Color = Swatch.DbStone;
+            stone.Color = Colors.Stone;
             stone.Symbol = '.';
             _terrainList[TerrainType.Stone] = stone;
 
             TerrainProperty ice = _terrainList[TerrainType.Ice];
-            ice.Color = Swatch.DbWater;
+            ice.Color = Colors.Water;
             ice.Symbol = '.';
             _terrainList[TerrainType.Ice] = ice;
 
             TerrainProperty water = _terrainList[TerrainType.Water];
-            water.Color = Swatch.DbDeepWater;
+            water.Color = Colors.Water;
             water.Symbol = '\x00f8';
             _terrainList[TerrainType.Water] = water;
         }

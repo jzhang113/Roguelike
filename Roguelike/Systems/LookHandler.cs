@@ -43,25 +43,25 @@ namespace Roguelike.Systems
         public static void Draw(RLConsole console)
         {
             if (_showItemInfo)
-                console.Print(1, 1, _displayItem.Name, Colors.TextHeading);
+                console.Print(1, 1, _displayItem.Name, Colors.Text);
 
             if (_showActorInfo)
             {
-                console.Print(1, 1, _displayActor.Name, Colors.TextHeading);
-                console.Print(1, 2, "HP: " + _displayActor.Hp + " / " + _displayActor.Parameters.MaxHp, Colors.TextHeading);
-                console.Print(1, 3, "MP: " + _displayActor.Mp + " / " + _displayActor.Parameters.MaxMp, Colors.TextHeading);
-                console.Print(1, 4, "SP: " + _displayActor.Sp + " / " + _displayActor.Parameters.MaxSp, Colors.TextHeading);
-                console.Print(1, 5, "Energy: " + _displayActor.Energy, Colors.TextHeading);
-                console.Print(1, 6, "State: " + _displayActor.State, Colors.TextHeading);
+                console.Print(1, 1, _displayActor.Name, Colors.Text);
+                console.Print(1, 2, "HP: " + _displayActor.Hp + " / " + _displayActor.Parameters.MaxHp, Colors.Text);
+                console.Print(1, 3, "MP: " + _displayActor.Mp + " / " + _displayActor.Parameters.MaxMp, Colors.Text);
+                console.Print(1, 4, "SP: " + _displayActor.Sp + " / " + _displayActor.Parameters.MaxSp, Colors.Text);
+                console.Print(1, 5, "Energy: " + _displayActor.Energy, Colors.Text);
+                console.Print(1, 6, "State: " + _displayActor.State, Colors.Text);
             }
 
             if (_showTile)
             {
                 // console.Print(1, 8, "Move cost: " + _displayTile.MoveCost.ToString(), Colors.TextHeading);
-                console.Print(1, 9, "Occupied: " + _displayTile.IsOccupied, Colors.TextHeading);
-                console.Print(1, 9, "Walkable: " + _displayTile.IsWalkable, Colors.TextHeading);
-                console.Print(1, 10, "Wall: " + _displayTile.IsWall, Colors.TextHeading);
-                console.Print(1, 11, $"Position: ({_displayTile.X}, {_displayTile.Y})", Colors.TextHeading);
+                console.Print(1, 9, "Occupied: " + _displayTile.IsOccupied, Colors.Text);
+                console.Print(1, 9, "Walkable: " + _displayTile.IsWalkable, Colors.Text);
+                console.Print(1, 10, "Wall: " + _displayTile.IsWall, Colors.Text);
+                console.Print(1, 11, $"Position: ({_displayTile.X}, {_displayTile.Y})", Colors.Text);
             }
         }
     }

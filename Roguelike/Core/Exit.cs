@@ -16,7 +16,7 @@ namespace Roguelike.Core
         public Exit(LevelId destination)
         {
             Destination = destination;
-            DrawingComponent = new Drawable(Swatch.DbSky, '*', true);
+            DrawingComponent = new Drawable(Colors.Exit, '*', true);
         }
     }
 }

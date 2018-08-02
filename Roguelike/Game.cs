@@ -166,7 +166,7 @@ namespace Roguelike
 
             if (MessageHandler.Redraw)
             {
-                _messageConsole.Clear(0, RLColor.Black, Colors.TextHeading);
+                _messageConsole.Clear(0, RLColor.Black, Colors.Text);
                 MessageHandler.Draw(_messageConsole);
                 RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width,
                     Config.MessageView.Height, RootConsole, 0, Config.StatView.Height + Config.MapView.Height);
@@ -198,7 +198,7 @@ namespace Roguelike
 
             //RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, RootConsole, 0, 0);
 
-            _viewConsole.Clear(0, RLColor.Black, Colors.TextHeading);
+            _viewConsole.Clear(0, RLColor.Black, Colors.Text);
             LookHandler.Draw(_viewConsole);
             RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.MapView.Width, 0);
 

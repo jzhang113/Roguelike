@@ -51,7 +51,7 @@ namespace Roguelike.State
 
         public virtual void Draw(RLConsole inventoryConsole)
         {
-            inventoryConsole.Clear(0, Colors.FloorBackground, Colors.TextHeading);
+            inventoryConsole.Clear(0, Colors.FloorBackground, Colors.Text);
             Game.Player.Inventory.Draw(inventoryConsole);
         }
     }

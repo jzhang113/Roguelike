@@ -51,7 +51,7 @@ namespace Roguelike.State
                     }
                 }
 
-                Game.OverlayHandler.Set(collision.X, collision.Y, Swatch.DbGrass, true);
+                Game.OverlayHandler.Set(collision.X, collision.Y, Colors.TargetBackground, true);
                 tempRange.Add(collision);
             }
 
@@ -65,7 +65,7 @@ namespace Roguelike.State
 
             // Add the current tile into the targettable range as well.
             tempRange.Add(Game.Map.Field[source.X, source.Y]);
-            Game.OverlayHandler.Set(source.X, source.Y, Swatch.DbGrass, true);
+            Game.OverlayHandler.Set(source.X, source.Y, Colors.TargetBackground, true);
             _inRange = tempRange;
 
             // Initialize the targetting to an interesting target.
@@ -230,13 +230,13 @@ namespace Roguelike.State
             // Draw the projectile path if any.
             foreach (Tile tile in _targetZone.Trail)
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.PathColor);
+                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.Path);
             }
 
             // Draw the targetted tiles.
             foreach (Tile tile in targets)
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.TargetColor);
+                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.Target);
             }
             
             Game.OverlayHandler.Set(_targetX, _targetY, Colors.Cursor);

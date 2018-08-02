@@ -172,14 +172,14 @@ namespace Roguelike.Systems
 
         public void Draw(RLConsole console)
         {
-            console.Print(console.Width / 2 - 8, 1, "== Inventory ==", Colors.TextHeading);
+            console.Print(console.Width / 2 - 8, 1, "== Inventory ==", Colors.Text);
 
             int line = 3;
             char letter = 'a';
 
             foreach (ItemStack itemStack in _inventory)
             {
-                console.Print(1, line, $"{letter}) {itemStack}", Colors.TextHeading);
+                console.Print(1, line, $"{letter}) {itemStack}", Colors.Text);
                 line++;
                 letter++;
 
@@ -188,7 +188,7 @@ namespace Roguelike.Systems
 
                 foreach (ItemCount itemCount in itemStack)
                 {
-                    console.Print(3, line, $"- {itemCount}", Colors.TextHeading);
+                    console.Print(3, line, $"- {itemCount}", Colors.Text);
                     line++;
                 }
             }

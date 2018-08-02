@@ -53,10 +53,15 @@ namespace Roguelike.Interfaces
             if (!Activated)
                 return;
 
-            RLColor color = RLColor.Blend(Color, Colors.Floor,
-                tile.IsVisible
-                    ? tile.Light
-                    : Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
+            // Don't blend wall colors
+            RLColor color = Color;
+            if (!tile.IsWall)
+            {
+                color = RLColor.Blend(Color, Colors.Floor,
+                    tile.IsVisible
+                        ? tile.Light
+                        : Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
+            }
 
             DrawTile(console, color, null, tile.IsVisible);
         }

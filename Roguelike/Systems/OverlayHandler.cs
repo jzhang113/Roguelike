@@ -1,4 +1,5 @@
-﻿using RLNET;
+﻿using System;
+using RLNET;
 using Roguelike.Core;
 
 namespace Roguelike.Systems
@@ -46,7 +47,7 @@ namespace Roguelike.Systems
 
         public void Draw(RLConsole console)
         {
-            console.Print(1, 1, DisplayText, Colors.TextHeading);
+            console.Print(1, 1, DisplayText, Colors.Text);
 
             for (int i = 0; i <= Game.Config.MapView.Width; i++)
             {
@@ -59,6 +60,11 @@ namespace Roguelike.Systems
                         console.SetBackColor(i, j, Foreground[i, j]);
                 }
             }
+        }
+
+        internal void Set(int x, int y, object targetBackground, bool v)
+        {
+            throw new NotImplementedException();
         }
 
         public void ClearBackground()

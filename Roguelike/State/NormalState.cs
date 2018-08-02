@@ -182,7 +182,7 @@ namespace Roguelike.State
             foreach (WeightedPoint p in path)
             {
                 if (Game.Map.Field[p.X, p.Y].IsExplored)
-                    Game.OverlayHandler.Set(p.X, p.Y, Colors.PathColor);
+                    Game.OverlayHandler.Set(p.X, p.Y, Colors.Path);
             }
 
             Game.OverlayHandler.Set(current.X, current.Y, Colors.Cursor);
@@ -211,7 +211,7 @@ namespace Roguelike.State
 
         public void Draw(RLConsole mapConsole)
         {
-            mapConsole.Clear(0, RLColor.Black, Colors.TextHeading);
+            mapConsole.Clear(0, RLColor.Black, Colors.Text);
             Game.Map.Draw(mapConsole);
             Game.OverlayHandler.Draw(mapConsole);
         }

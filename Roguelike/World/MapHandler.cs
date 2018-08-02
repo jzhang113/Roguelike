@@ -641,9 +641,9 @@ namespace Roguelike.World
                     if (tile.IsVisible)
                         tile.DrawingComponent.Draw(mapConsole, tile);
                     else if (tile.IsWall)
-                        mapConsole.Set(dx, dy, Colors.Wall, null, '#');
+                        mapConsole.Set(dx, dy, Colors.WallBackground, null, '#');
                     else
-                        mapConsole.Set(dx, dy, Colors.Floor, null, '.');
+                        mapConsole.Set(dx, dy, Colors.FloorBackground, null, '.');
                 }
             }
 

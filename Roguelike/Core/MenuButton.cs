@@ -34,10 +34,11 @@ namespace Roguelike.Core
             Width = text.Length + 4;
             Height = 5;
 
-            BackgroundColor = Swatch.AlternateDarker;
-            BorderColor = Colors.TextHeading;
-            HoverColor = Swatch.AlternateDarkest;
-            TextColor = Colors.TextHeading;
+            BackgroundColor = Colors.ButtonBackground;
+            BorderColor = Colors.ButtonBorder;
+
+            HoverColor = Colors.ButtonHover;
+            TextColor = Colors.Text;
 
             _border = border;
             _align = alignment;

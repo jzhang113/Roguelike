@@ -9,7 +9,7 @@ namespace Roguelike.Core
     {
         public bool IsOpen { get; set; }
 
-        public Door(bool open = false) : base(new ActorParameters("Door"), Swatch.DbWood, '+')
+        public Door(bool open = false) : base(new ActorParameters("Door"), Colors.Door, '+')
         {
             IsOpen = open;
         }

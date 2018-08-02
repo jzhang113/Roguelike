@@ -6,7 +6,7 @@ namespace Roguelike.Actors
     [Serializable]
     class Skeleton : Actor
     {
-        public Skeleton(ActorParameters parameters) : base(parameters, Colors.TextHeading, 'S')
+        public Skeleton(ActorParameters parameters) : base(parameters, Colors.Text, 'S')
         {
         }
     }
