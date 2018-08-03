@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Core
 {
-    struct Room
+    class Room
     {
         public int X { get; internal set; }
         public int Y { get; internal set; }

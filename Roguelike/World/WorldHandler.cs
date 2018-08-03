@@ -1,5 +1,4 @@
 ﻿using Pcg;
-using Roguelike.Systems;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -262,10 +261,10 @@ namespace Roguelike.World
             LevelData level = _levels[id];
 
             sw.Start();
-            MapGenerator mapGenerator = new MapGenerator(
+            MapGenerator mapGenerator = new JaggedMapGenerator(
                 Game.Config.Map.Width, Game.Config.Map.Height,
                 level.Exits, new PcgRandom(level.Seed));
-            MapHandler map = mapGenerator.CreateMap(id.RegionType);
+            MapHandler map = mapGenerator.CreateMap();
             sw.Stop();
 
             Console.WriteLine($"Map generated in: {sw.Elapsed}");

@@ -55,6 +55,7 @@ namespace Roguelike.Actions
                     {
                         Tile depositTile = collisionPath.First();
                         Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
+                        Game.Map.Refresh();
                     };
                 }
                 else
@@ -66,6 +67,7 @@ namespace Roguelike.Actions
                     {
                         Tile depositTile = collisionPath.Last();
                         Game.Map.SetActorPosition(sourceActor, depositTile.X, depositTile.Y);
+                        Game.Map.Refresh();
                     };
                 }
             }

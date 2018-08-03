@@ -18,11 +18,11 @@ namespace Roguelike.Systems
             _rootConsole = console;
             _states = new Stack<IState>();
 
-            MenuState mainMenu = new MenuState(new MenuButton[]
+            MenuState mainMenu = new MenuState(new[]
             {
-                new MenuButton(1, 10, "Continue", () => Game.LoadGame()),
-                new MenuButton(1, 20, "New Game", () => Game.NewGame()),
-                new MenuButton(1, 30, "Exit", () => Game.Exit())
+                new MenuButton(5, 50, "Continue", Game.LoadGame),
+                new MenuButton(5, 55, "New Game", Game.NewGame),
+                new MenuButton(5, 60, "  Exit  ", Game.Exit)
             });
             _states.Push(mainMenu);
 

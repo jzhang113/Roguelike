@@ -197,6 +197,13 @@ namespace Roguelike.State
             if (!MouseInput.GetHoverPosition(mouse, out (int X, int Y) hover))
                 return null;
 
+            // Handle clicks before checking for movement.
+            if (mouse.GetLeftClick())
+            {
+                IEnumerable<Tile> targets = DrawTargettedTiles();
+                return _callback(targets);
+            }
+
             // If the mouse didn't get moved, don't do anything.
             if (hover.X == _prevMouseX && hover.Y == _prevMouseY)
                 return null;
@@ -218,8 +225,8 @@ namespace Roguelike.State
                 _targetY = highlight.Y;
             }
 
-            IEnumerable<Tile> targets = DrawTargettedTiles();
-            return mouse.GetLeftClick() ? _callback(targets) : null;
+            DrawTargettedTiles();
+            return null;
         }
 
         private IEnumerable<Tile> DrawTargettedTiles()

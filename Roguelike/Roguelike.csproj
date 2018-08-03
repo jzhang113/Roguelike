@@ -153,11 +153,13 @@
     <Compile Include="Input\MouseInput.cs" />
     <Compile Include="Utils\ColorInfo.cs" />
     <Compile Include="Utils\ImageConvert.cs" />
-    <Compile Include="Utils\Random.cs" />
+    <Compile Include="Utils\RandomExtensions.cs" />
     <Compile Include="Utils\RLKeyExtensions.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="Systems\OverlayHandler.cs" />
     <Compile Include="Core\Camera.cs" />
+    <Compile Include="World\BspMapGenerator.cs" />
+    <Compile Include="World\JaggedMapGenerator.cs" />
     <Compile Include="World\LevelData.cs" />
     <Compile Include="World\LevelId.cs" />
     <Compile Include="World\WorldHandler.cs" />
@@ -200,7 +202,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="Interfaces\Drawable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Systems\MapGenerator.cs" />
+    <Compile Include="World\MapGenerator.cs" />
     <Compile Include="Systems\MessageHandler.cs" />
     <Compile Include="Core\Configuration.cs" />
     <Compile Include="Utils\MaxHeap.cs" />

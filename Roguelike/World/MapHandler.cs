@@ -508,6 +508,11 @@ namespace Roguelike.World
                 if (!setVisible && range.LightLevel < 0)
                     continue;
 
+                // There is really no need to check past 100 or something.
+                // TODO: put safeguards for when map gen borks and excavates the edges of the map
+                if (range.Distance > 100)
+                    continue;
+
                 double delta = 0.5 / range.Distance;
                 IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
                 CheckFovInRange(range, row, delta, lightDecay, visibleRange, setVisible);
@@ -635,15 +640,15 @@ namespace Roguelike.World
                 for (int dy = 0; dy < Game.Config.MapView.Height; dy++)
                 {
                     Tile tile = Field[Camera.X + dx, Camera.Y + dy];
-                    if (!tile.IsExplored)
-                        continue;
+                    //if (!tile.IsExplored)
+                    //    continue;
 
                     if (tile.IsVisible)
                         tile.DrawingComponent.Draw(mapConsole, tile);
                     else if (tile.IsWall)
                         mapConsole.Set(dx, dy, Colors.WallBackground, null, '#');
                     else
-                        mapConsole.Set(dx, dy, Colors.FloorBackground, null, '.');
+                        mapConsole.Set(dx, dy, tile.DrawingComponent.Color, null, tile.DrawingComponent.Symbol);
                 }
             }
 

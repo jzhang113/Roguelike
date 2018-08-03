@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using Pcg;
 using System;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
 namespace Roguelike.Core
@@ -36,6 +37,7 @@ namespace Roguelike.Core
             _alpha = info.GetDouble(nameof(_alpha));
         }
 
+        [Pure]
         public RLColor GetColor(PcgRandom random) =>
             RLColor.Blend(_primary, _secondary, (float)(random.NextDouble() * _alpha));
 

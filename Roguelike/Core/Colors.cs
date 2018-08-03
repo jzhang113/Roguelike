@@ -15,9 +15,9 @@ namespace Roguelike.Core
 
         // UI
         public static RLColor Path = Swatch.Alternate;
-        public static RLColor Target = Swatch.Primary;
+        public static RLColor Target = Swatch.PrimaryDarker;
         public static RLColor TargetBackground = Swatch.Secondary;
-        public static RLColor Cursor = Swatch.PrimaryDarker;
+        public static RLColor Cursor = Swatch.PrimaryDarkest;
 
         public static RLColor Text = Swatch.DbLight;
         public static RLColor ButtonBackground = Swatch.Primary;
