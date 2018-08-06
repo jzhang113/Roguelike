@@ -1,15 +1,15 @@
 ﻿using Pcg;
 using Roguelike.Core;
 using Roguelike.Utils;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.World
 {
     class JaggedMapGenerator : MapGenerator
     {
-        private const int _ROOM_SIZE = 5;
-        private const int _ROOM_VARIANCE = 2;
+        private const int _ROOM_SIZE = 8;
+        private const int _ROOM_VARIANCE = 3;
 
         public JaggedMapGenerator(int width, int height, IEnumerable<LevelId> exits, PcgRandom random)
             : base(width, height, exits, random)
@@ -27,75 +27,51 @@ namespace Roguelike.World
 
             // Maintain a list of points bordering the current list of rooms so we can attach
             // more rooms. Also track of the facing of the wall the point comes from.
-            IList<(int x, int y, WallFacing dir)> openPoints = new List<(int x, int y, WallFacing dir)>();
-            openPoints = AddOpenPoints(first, openPoints);
+            IList<(int x, int y)> openPoints = new List<(int x, int y)>();
 
-            // Randomly choose an open point, place a room there, and update the list of points.
-            for (int i = 0; i < 10; i++)
+            // Also keep track of the rooms and where they are.
+            IList<Room> roomList = new List<Room>();
+            int[,] occupied = new int[Width, Height];
+            int counter = 0;
+
+            // Ensure that the first room is on the map.
+            if (first.Right >= Width)
+                first.X -= first.Right - Width + 1;
+
+            if (first.Bottom >= Height)
+                first.Y -= first.Bottom - Height + 1;
+
+            if (first.Left < 0)
+                first.X = 0;
+
+            if (first.Top < 0)
+                first.Y = 0;
+
+            TrackRoom(first, roomList, ++counter, ref occupied);
+            AddOpenPoints(first, openPoints, occupied);
+
+            for (int i = 0; i < 1000; i++)
             {
-                (int availX, int availY, WallFacing dir) = openPoints[Rand.Next(openPoints.Count)];
+                if (openPoints.Count <= 0)
+                    break;
 
-                if (dir != WallFacing.E)
-                    continue;
+                (int availX, int availY) = openPoints[Rand.Next(openPoints.Count)];
 
-                Room room;
                 int width = (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE);
                 int height = (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE);
+                Room room = AdjustRoom(availX, availY, width, height, occupied);
 
-                Console.WriteLine($"x: {availX}\ty: {availY}\t{width} x {height}");
-
-                switch (dir)
-                {
-                    case WallFacing.E:
-                        for (int j = height; j > 0; j--)
-                        {
-                            if (!PointOnMap(availX + 1, availY + j + 1) || !Map.Field[availX + 1, availY + j + 1].IsWall)
-                            {
-                                if (PointOnMap(availX + 1, availY - 2) && Map.Field[availX + 1, availY - 2].IsWall)
-                                    availY--;
-                                else
-                                    height--;
-                            }
-                        }
-
-                        room = new Room(availX + 1, availY, width, height);
-                        for (int dy = -1; dy <= room.Height; dy++)
-                        {
-                            openPoints.Remove((room.Left - 1, room.Y + dy, dir));
-                        }
-                        break;
-                    case WallFacing.S:
-                        room = new Room(availX, availY + 1, width, height);
-                        for (int dx = 0; dx < room.Width; dx++)
-                        {
-                            openPoints.Remove((room.X + dx, room.Top, dir));
-                        }
-                        break;
-                    case WallFacing.W:
-                        room = new Room(availX - width, availY - height, width, height);
-                        for (int dy = 0; dy < room.Height; dy++)
-                        {
-                            openPoints.Remove((room.Right, room.Y + dy, dir));
-                        }
-                        break;
-                    case WallFacing.N:
-                        room = new Room(availX - width, availY - height, width, height);
-                        for (int dx = 0; dx < room.Width; dx++)
-                        {
-                            openPoints.Remove((room.X + dx, room.Bottom, dir));
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(dir));
-                }
-
-                CreateRoom(room);
-                //openPoints = AddOpenPoints(room, openPoints);
+                RemoveOpenPoints(room, openPoints);
+                TrackRoom(room, roomList, ++counter, ref occupied);
+                AddOpenPoints(room, openPoints, occupied);
             }
 
-            foreach (var vv in openPoints)
+            // Use the largest areas as rooms and triangulate them to calculate hallways.
+            var enumerable = roomList.OrderByDescending(r => r.Area).Take((int) (roomList.Count * 0.3));
+
+            foreach (Room room in enumerable)
             {
-                Map.Field[vv.x, vv.y].Type = Data.TerrainType.Ice;
+                CreateRoom(room);
             }
 
             PlaceActors();
@@ -103,39 +79,116 @@ namespace Roguelike.World
             return Map;
         }
 
-        private IList<(int x, int y, WallFacing dir)> AddOpenPoints(Room room,
-            IList<(int x, int y, WallFacing dir)> openPoints)
+        // Try to fit the largest room possible up to width x height around ( availX, availY).
+        // Note that this still fails sometimes and gives a collision when the shape is concave.
+        private Room AdjustRoom(int availX, int availY, int width, int height,
+            int[,] occupied)
         {
-            for (int x = room.Left; x < room.Right; x++)
+            int left = availX;
+            int right = availX;
+            int top = availY;
+            int bottom = availY;
+
+            for (int dx = 1; dx < width; dx++)
             {
-                int yTop = room.Top - 1;
-                int yBottom = room.Bottom;
-
-                if (PointOnMap(x, yTop) && Map.Field[x, yTop].IsWall)
-                    openPoints.Add((x, yTop, WallFacing.N));
-
-                if (PointOnMap(x, yBottom) && Map.Field[x, yBottom].IsWall)
-                    openPoints.Add((x, yBottom, WallFacing.S));
+                if (PointOnMap(availX + dx, availY) && occupied[availX + dx, availY] == 0)
+                    right = availX + dx;
+                else
+                    break;
             }
 
-            for (int y = room.Top; y < room.Bottom; y++)
+            for (int dx = 1; dx < width - right + availX; dx++)
             {
-                int xLeft = room.Left - 1;
-                int xRight = room.Right;
-
-                if (PointOnMap(xLeft, y) && Map.Field[xLeft, y].IsWall)
-                    openPoints.Add((xLeft, y, WallFacing.W));
-
-                if (PointOnMap(xRight, y) && Map.Field[xRight, y].IsWall)
-                    openPoints.Add((xRight, y, WallFacing.E));
+                if (PointOnMap(availX - dx, availY) && occupied[availX - dx, availY] == 0)
+                    left = availX - dx;
+                else
+                    break;
             }
 
-            return openPoints;
+            for (int dy = 1; dy < height; dy++)
+            {
+                if (PointOnMap(availX, availY + dy) && occupied[availX, availY + dy] == 0)
+                    bottom = availY + dy;
+                else
+                    break;
+            }
+
+            for (int dy = 1; dy < height - bottom + availY; dy++)
+            {
+                if (PointOnMap(availX, availY - dy) && occupied[availX, availY - dy] == 0)
+                    top = availY - dy;
+                else
+                    break;
+            }
+
+            int newWidth = right - left;
+            int newHeight = bottom  -top;
+            return new Room(left, top, newWidth, newHeight);
         }
 
-        private enum WallFacing
+        private static void TrackRoom(Room room, IList<Room> roomList, int counter,
+            ref int[,] occupied)
         {
-            N, E, S, W
+            int area = 0;
+            for (int x = room.Left; x <= room.Right; x++)
+            {
+                for (int y = room.Top; y <= room.Bottom; y++)
+                {
+                    if (occupied[x, y] != 0)
+                        continue;
+
+                    occupied[x, y] = counter;
+                    area++;
+                }
+            }
+
+            if (area > 0)
+                roomList.Add(room);
+        }
+
+        private void AddOpenPoints(Room room,
+            ICollection<(int x, int y)> openPoints, int[,] occupied)
+        {
+            for (int x = room.Left; x <= room.Right; x++)
+            {
+                int yTop = room.Top - 1;
+                int yBottom = room.Bottom + 1;
+
+                if (PointOnMap(x, yTop) && occupied[x, yTop] == 0)
+                    openPoints.Add((x, yTop));
+
+                if (PointOnMap(x, yBottom) && occupied[x, yBottom] == 0)
+                    openPoints.Add((x, yBottom));
+            }
+
+            for (int y = room.Top; y <= room.Bottom; y++)
+            {
+                int xLeft = room.Left - 1;
+                int xRight = room.Right + 1;
+
+                if (PointOnMap(xLeft, y) && occupied[xLeft, y] == 0)
+                    openPoints.Add((xLeft, y));
+
+                if (PointOnMap(xRight, y) && occupied[xRight, y] == 0)
+                    openPoints.Add((xRight, y));
+            }
+        }
+
+        private static void RemoveOpenPoints(Room room,
+            ICollection<(int x, int y)> openPoints)
+        {
+            // Only need to check the edges since the adjust step already fits the rectangles.
+            for (int x = room.Left; x <= room.Right; x++)
+            {
+                openPoints.Remove((x, room.Top));
+                openPoints.Remove((x, room.Bottom));
+            }
+
+            for (int y = room.Top; y <= room.Bottom; y++)
+            {
+                openPoints.Remove((room.Left, y));
+                openPoints.Remove((room.Right, y));
+            }
         }
     }
 }
