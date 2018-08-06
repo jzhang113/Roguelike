@@ -640,15 +640,15 @@ namespace Roguelike.World
                 for (int dy = 0; dy < Game.Config.MapView.Height; dy++)
                 {
                     Tile tile = Field[Camera.X + dx, Camera.Y + dy];
-                    //if (!tile.IsExplored)
-                    //    continue;
+                    if (!tile.IsExplored)
+                        continue;
 
                     if (tile.IsVisible)
                         tile.DrawingComponent.Draw(mapConsole, tile);
                     else if (tile.IsWall)
                         mapConsole.Set(dx, dy, Colors.WallBackground, null, '#');
                     else
-                        mapConsole.Set(dx, dy, tile.DrawingComponent.Color, null, tile.DrawingComponent.Symbol);
+                        mapConsole.Set(dx, dy, Colors.FloorBackground, null, '.');
                 }
             }
 

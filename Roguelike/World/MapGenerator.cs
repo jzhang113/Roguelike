@@ -27,7 +27,18 @@ namespace Roguelike.World
             Map = new MapHandler(width, height);
         }
 
-        public abstract MapHandler CreateMap();
+        public MapHandler Generate()
+        {
+            CreateMap();
+
+            PlaceActors();
+            PlaceItems();
+            PlaceStairs();
+
+            return Map;
+        }
+
+        protected abstract void CreateMap();
 
         protected void CreateRoom(Room room)
         {
@@ -36,6 +47,19 @@ namespace Roguelike.World
                 for (int j = room.Top; j < room.Bottom; j++)
                 {
                     // Don't excavate the edges of the map
+                    if (PointOnMap(i, j))
+                        Map.Field[i, j].Type = TerrainType.Stone;
+                }
+            }
+        }
+
+        // Similar to CreateRoom, but doesn't leave a border.
+        protected void CreateRoomWithoutBorder(Room room)
+        {
+            for (int i = room.Left; i <= room.Right; i++)
+            {
+                for (int j = room.Top; j <= room.Bottom; j++)
+                {
                     if (PointOnMap(i, j))
                         Map.Field[i, j].Type = TerrainType.Stone;
                 }

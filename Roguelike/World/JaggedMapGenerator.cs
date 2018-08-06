@@ -1,22 +1,28 @@
 ﻿using Pcg;
 using Roguelike.Core;
 using Roguelike.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using TriangleNet.Geometry;
+using TriangleNet.Meshing;
 
 namespace Roguelike.World
 {
     class JaggedMapGenerator : MapGenerator
     {
-        private const int _ROOM_SIZE = 8;
-        private const int _ROOM_VARIANCE = 3;
+        private const int _ROOM_SIZE = 5;
+        private const int _ROOM_VARIANCE = 2;
+        private const int _ROOM_ATTEMPTS = 1000;
+        private const double _FILL_PERCENT = 0.05;
+        private const double _LOOP_CHANCE = 0.15;
 
         public JaggedMapGenerator(int width, int height, IEnumerable<LevelId> exits, PcgRandom random)
             : base(width, height, exits, random)
         {
         }
 
-        public override MapHandler CreateMap()
+        protected override void CreateMap()
         {
             // Place an initial room somewhere on the map.
             Room first = new Room(
@@ -47,11 +53,13 @@ namespace Roguelike.World
             if (first.Top < 0)
                 first.Y = 0;
 
-            TrackRoom(first, roomList, ++counter, ref occupied);
+            if (TrackRoom(first, roomList, counter + 1, ref occupied))
+                counter++;
             AddOpenPoints(first, openPoints, occupied);
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < _ROOM_ATTEMPTS; i++)
             {
+                // Nowhere else to put rooms, so we are done.
                 if (openPoints.Count <= 0)
                     break;
 
@@ -62,21 +70,52 @@ namespace Roguelike.World
                 Room room = AdjustRoom(availX, availY, width, height, occupied);
 
                 RemoveOpenPoints(room, openPoints);
-                TrackRoom(room, roomList, ++counter, ref occupied);
+                if (TrackRoom(room, roomList, counter + 1, ref occupied))
+                    counter++;
                 AddOpenPoints(room, openPoints, occupied);
             }
 
             // Use the largest areas as rooms and triangulate them to calculate hallways.
-            var enumerable = roomList.OrderByDescending(r => r.Area).Take((int) (roomList.Count * 0.3));
+            var roomCenters = roomList
+                .OrderByDescending(r => r.Area)
+                .Take((int)(roomList.Count * _FILL_PERCENT))
+                .Select(r => new Vertex(r.Center.X, r.Center.Y));
 
-            foreach (Room room in enumerable)
+            Polygon polygon = new Polygon();
+            foreach (Vertex vertex in roomCenters)
             {
-                CreateRoom(room);
+                polygon.Add(vertex);
+            }
+            IMesh delaunay = polygon.Triangulate();
+
+            IList<(int X, int Y)> vertices = new (int X, int Y)[delaunay.Vertices.Count];
+            foreach (Vertex vertex in delaunay.Vertices)
+            {
+                vertices[vertex.ID] = ((int)vertex.X, (int)vertex.Y);
             }
 
-            PlaceActors();
+            // Reduce the number of edges and clear out rooms along the remaining edges.
+            foreach (Edge edge in TrimEdges(delaunay.Edges, vertices))
+            {
+                (int x0, int y0) = vertices[edge.P0];
+                (int x1, int y1) = vertices[edge.P1];
+                IEnumerable<Tile> path = Map.GetStraightLinePath(x0, y0, x1, y1);
 
-            return Map;
+                foreach (Tile tile in path)
+                {
+                    if (!tile.IsWall)
+                        continue;
+
+                    // Zero corresponds to an unfilled tile, so we need to reduce the ID by 1.
+                    int roomID = occupied[tile.X, tile.Y] - 1;
+                    if (roomID >= 0)
+                        CreateRoomWithoutBorder(roomList[roomID]);
+                    else
+                        // Room may not be fully tiled, so clear out any untouched squares to avoid
+                        // disconnected regions.
+                        tile.Type = Data.TerrainType.Stone;
+                }
+            }
         }
 
         // Try to fit the largest room possible up to width x height around ( availX, availY).
@@ -122,11 +161,13 @@ namespace Roguelike.World
             }
 
             int newWidth = right - left;
-            int newHeight = bottom  -top;
+            int newHeight = bottom - top;
             return new Room(left, top, newWidth, newHeight);
         }
 
-        private static void TrackRoom(Room room, IList<Room> roomList, int counter,
+        // Add a non-zero size room to the room list and update the occupied matrix. Returns false
+        // if a room was not added.
+        private static bool TrackRoom(Room room, IList<Room> roomList, int counter,
             ref int[,] occupied)
         {
             int area = 0;
@@ -143,7 +184,14 @@ namespace Roguelike.World
             }
 
             if (area > 0)
+            {
                 roomList.Add(room);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void AddOpenPoints(Room room,
@@ -188,6 +236,106 @@ namespace Roguelike.World
             {
                 openPoints.Remove((room.Left, y));
                 openPoints.Remove((room.Right, y));
+            }
+        }
+
+        // Use Prim's algorithm to generate a MST of edges.
+        private IEnumerable<Edge> TrimEdges(IEnumerable<Edge> edges,
+            IList<(int X, int Y)> vertices)
+        {
+            IEnumerable<int>[] adjacency = BuildAdjacencyList(edges, vertices.Count);
+            // Comparator for MapVertex is defined to give negated
+            MaxHeap<MapVertex> pq = new MaxHeap<MapVertex>(vertices.Count);
+            
+            var (firstX, firstY) = vertices[0];
+            pq.Add(new MapVertex(0, firstX, firstY, 0));
+
+            bool[] inMst = new bool[vertices.Count];
+            double[] weight = new double[vertices.Count];
+            int[] parent = new int[vertices.Count];
+            
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                weight[i] = double.MaxValue;
+                parent[i] = -1;
+            }
+
+            while (pq.Count > 0)
+            {
+                MapVertex min = pq.PopMax();
+                inMst[min.ID] = true;
+
+                foreach (int neighborID in adjacency[min.ID])
+                {
+                    if (inMst[neighborID])
+                        continue;
+
+                    var (neighborX, neighborY) = vertices[neighborID];
+                    double newWeight = Distance.EuclideanDistanceSquared(min.X, min.Y,
+                        neighborX, neighborY);
+
+                    if (weight[neighborID] > newWeight)
+                    {
+                        weight[neighborID] = newWeight;
+                        pq.Add(new MapVertex(neighborID, neighborX, neighborY, newWeight));
+                        parent[neighborID] = min.ID;
+                    }
+                }
+            }
+
+            ICollection<Edge> graph = new HashSet<Edge>();
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                if (parent[i] != -1)
+                    graph.Add(new Edge(i, parent[i]));
+            }
+
+            // Add back some edges so that there are some loops.
+            // TODO: smarter checking to add edges between the farthest rooms.
+            List<Edge> allEdges = edges.ToList();
+            for (int i = 0; i < allEdges.Count * _LOOP_CHANCE; i++)
+            {
+                graph.Add(allEdges[Rand.Next(allEdges.Count)]);
+            }
+
+            return graph;
+        }
+
+        private IEnumerable<int>[] BuildAdjacencyList(IEnumerable<Edge> edges, int size)
+        {
+            ICollection<int>[] adjacency = new List<int>[size];
+            for (int i = 0; i < size; i++)
+            {
+                adjacency[i] = new List<int>();
+            }
+
+            foreach (Edge edge in edges)
+            {
+                adjacency[edge.P0].Add(edge.P1);
+                adjacency[edge.P1].Add(edge.P0);
+            }
+
+            return adjacency;
+        }
+
+        private struct MapVertex : IComparable<MapVertex>
+        {
+            public int ID { get; }
+            public int X { get; }
+            public int Y { get; }
+            public double Weight { get; }
+
+            public MapVertex(int id, int x, int y, double weight)
+            {
+                ID = id;
+                X = x;
+                Y = y;
+                Weight = weight;
+            }
+
+            public int CompareTo(MapVertex other)
+            {
+                return (int)(other.Weight - Weight);
             }
         }
     }

@@ -264,7 +264,7 @@ namespace Roguelike.World
             MapGenerator mapGenerator = new JaggedMapGenerator(
                 Game.Config.Map.Width, Game.Config.Map.Height,
                 level.Exits, new PcgRandom(level.Seed));
-            MapHandler map = mapGenerator.CreateMap();
+            MapHandler map = mapGenerator.Generate();
             sw.Stop();
 
             Console.WriteLine($"Map generated in: {sw.Elapsed}");

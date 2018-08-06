@@ -8,9 +8,7 @@
         public int Height { get; }
 
         public int Area => Width * Height;
-        public (int, int) Center => (X + Width / 2, Y + Height / 2);
-        public (int, int) TopLeft => (X, Y);
-        public (int, int) BottomRight => (X + Width, Y + Height);
+        public (int X, int Y) Center => (X + Width / 2, Y + Height / 2);
 
         public int Left => X;
         public int Right => X + Width;

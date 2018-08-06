@@ -16,7 +16,7 @@ namespace Roguelike.World
         {
         }
 
-        public override MapHandler CreateMap()
+        protected override void CreateMap()
         {
             TreeNode<Room> root = new TreeNode<Room>(new Room(0, 0, Width, Height));
             TreeNode<Room> roomsPartition = PartitionMapBsp(root, _MAX_ROOM_SIZE, _MAX_ROOM_SIZE);
@@ -27,12 +27,6 @@ namespace Roguelike.World
             {
                 PlaceDoors(r);
             }
-
-            PlaceActors();
-            PlaceItems();
-            PlaceStairs();
-
-            return Map;
         }
 
         private TreeNode<Room> PartitionMapBsp(TreeNode<Room> current, int minWidth, int minHeight, int dir = -1)
