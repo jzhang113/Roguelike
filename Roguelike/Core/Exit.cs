@@ -13,10 +13,10 @@ namespace Roguelike.Core
         public int X { get => DrawingComponent.X; set => DrawingComponent.X = value; }
         public int Y { get => DrawingComponent.Y; set => DrawingComponent.Y = value; }
 
-        public Exit(LevelId destination)
+        public Exit(LevelId destination, char symbol)
         {
             Destination = destination;
-            DrawingComponent = new Drawable(Colors.Exit, '*', true);
+            DrawingComponent = new Drawable(Colors.Exit, symbol, true);
         }
     }
 }

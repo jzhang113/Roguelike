@@ -29,7 +29,23 @@ namespace Roguelike.World
 
         public MapHandler Generate()
         {
-            CreateMap();
+            int retry = 2;
+            while (true)
+            {
+                try
+                {
+                    CreateMap();
+                    break;
+                }
+                catch (Exception)
+                {
+                    // Delaunay triangulation fails sometimes, so retry.
+                    if (--retry < 0)
+                        throw;
+                    else
+                        CreateMap();
+                }
+            }
 
             PlaceActors();
             PlaceItems();
@@ -218,10 +234,10 @@ namespace Roguelike.World
                         200,
                         new TargetZone(TargetShape.Directional, range: 10)),
                     Swatch.DbSun)
-                    {
-                        X = Game.Player.X - 1,
-                        Y = Game.Player.Y - 2
-                    },
+                {
+                    X = Game.Player.X - 1,
+                    Y = Game.Player.Y - 2
+                },
                 Count = 1
             });
 
@@ -315,7 +331,12 @@ namespace Roguelike.World
         {
             foreach (LevelId id in Exits)
             {
-                Exit exit = new Exit(id);
+                LevelId current = Game.World.CurrentLevel;
+                char symbol = '*';
+                if (id.Name == current.Name)
+                    symbol = id.Depth > current.Depth ? '>' : '<';
+
+                Exit exit = new Exit(id, symbol);
                 while (!Map.Field[exit.X, exit.Y].IsWalkable && !Map.TryGetExit(exit.X, exit.Y, out _))
                 {
                     exit.X = Rand.Next(1, Game.Config.Map.Width - 1);

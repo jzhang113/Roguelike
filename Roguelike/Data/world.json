@@ -28,8 +28,8 @@
       "constraints": {
         "require": [
           {
-            "regionName": "main",
-            "depth": 3
+            "regionType": "main",
+            "minDepth": 3
           }
         ]
       }

@@ -28,7 +28,7 @@ namespace Roguelike.World
 
         internal struct ConnectionConstraint
         {
-            public ICollection<LevelId> Require { get; set; }
+            public ICollection<RequireId> Require { get; set; }
             public ICollection<RegionType> Avoid { get; set; }
         }
 
@@ -38,10 +38,10 @@ namespace Roguelike.World
             public RegionData To { get; set; }
         }
 
-        internal struct LevelConnection
+        internal struct RequireId
         {
-            public LevelId From { get; set; }
-            public LevelId To { get; set; }
+            public RegionType RegionType { get; set; }
+            public int MinDepth { get; set; }
         }
     }
 }

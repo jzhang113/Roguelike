@@ -295,6 +295,21 @@ namespace Roguelike.World
             return Exits.TryGetValue(ToIndex(x, y), out exit);
         }
 
+        public bool TryGetExit(LevelId levelId, out Exit exit)
+        {
+            foreach (Exit ex in Exits.Values)
+            {
+                if (ex.Destination == levelId)
+                {
+                    exit = ex;
+                    return true;
+                }
+            }
+
+            exit = null;
+            return false;
+        }
+
         public bool SetFire(int x, int y)
         {
             int index = ToIndex(x, y);

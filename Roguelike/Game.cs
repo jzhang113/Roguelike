@@ -100,6 +100,7 @@ namespace Roguelike
 
             WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
             World = new WorldHandler(worldParameter);
+            World.Initialize();
 
             ForceRender();
         }
