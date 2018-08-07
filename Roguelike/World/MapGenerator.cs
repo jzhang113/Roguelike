@@ -349,7 +349,7 @@ namespace Roguelike.World
 
         protected bool PointOnMap(int x, int y)
         {
-            return x > 0 && y > 0 && x < Width - 1 && y < Width - 1;
+            return x > 0 && y > 0 && x < Width - 1 && y < Height - 1;
         }
     }
 }

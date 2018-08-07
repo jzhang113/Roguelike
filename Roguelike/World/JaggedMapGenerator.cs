@@ -24,13 +24,6 @@ namespace Roguelike.World
 
         protected override void CreateMap()
         {
-            // Place an initial room somewhere on the map.
-            Room first = new Room(
-                Rand.Next(Width - _ROOM_SIZE), Rand.Next(Height - _ROOM_SIZE),
-                (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE),
-                (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE));
-            CreateRoom(first);
-
             // Maintain a list of points bordering the current list of rooms so we can attach
             // more rooms. Also track of the facing of the wall the point comes from.
             IList<(int x, int y)> openPoints = new List<(int x, int y)>();
@@ -38,24 +31,9 @@ namespace Roguelike.World
             // Also keep track of the rooms and where they are.
             IList<Room> roomList = new List<Room>();
             int[,] occupied = new int[Width, Height];
-            int counter = 0;
 
-            // Ensure that the first room is on the map.
-            if (first.Right >= Width)
-                first.X -= first.Right - Width + 1;
-
-            if (first.Bottom >= Height)
-                first.Y -= first.Bottom - Height + 1;
-
-            if (first.Left < 0)
-                first.X = 0;
-
-            if (first.Top < 0)
-                first.Y = 0;
-
-            if (TrackRoom(first, roomList, counter + 1, ref occupied))
-                counter++;
-            AddOpenPoints(first, openPoints, occupied);
+            // Set up the initial placement of the map. Include special features, if any.
+            int counter = InitialPlacement(roomList, openPoints, ref occupied);
 
             for (int i = 0; i < _ROOM_ATTEMPTS; i++)
             {
@@ -63,12 +41,16 @@ namespace Roguelike.World
                 if (openPoints.Count <= 0)
                     break;
 
+                // Choose a random point to create a room around;
                 (int availX, int availY) = openPoints[Rand.Next(openPoints.Count)];
 
+                // Fit a room around the point as best as possible. AdjustRoom should avoid most
+                // collisions between rooms.
                 int width = (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE);
                 int height = (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE);
                 Room room = AdjustRoom(availX, availY, width, height, occupied);
 
+                // Update the room list, the open point list, and the location grid.
                 RemoveOpenPoints(room, openPoints);
                 if (TrackRoom(room, roomList, counter + 1, ref occupied))
                     counter++;
@@ -118,8 +100,42 @@ namespace Roguelike.World
             }
         }
 
+        // Set up any special features on the level. After setup is complete, return the value the
+        // room ID counter should start at.
+        private int InitialPlacement(ICollection<Room> roomList,
+            ICollection<(int x, int y)> openPoints,
+            ref int[,] occupied)
+        {
+            // TODO: load starting layouts from json / xp
+            Room first = new Room(
+                Rand.Next(Width - _ROOM_SIZE), Rand.Next(Height - _ROOM_SIZE),
+                (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE),
+                (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE));
+
+            // Ensure that the first room is on the map.
+            if (first.Right >= Width)
+                first.X -= first.Right - Width + 1;
+
+            if (first.Bottom >= Height)
+                first.Y -= first.Bottom - Height + 1;
+
+            if (first.Left < 0)
+                first.X = 0;
+
+            if (first.Top < 0)
+                first.Y = 0;
+
+            if (TrackRoom(first, roomList, 1, ref occupied))
+                return 0;
+            else
+            {
+                AddOpenPoints(first, openPoints, occupied);
+                return 1;
+            }
+        }
+
         // Try to fit the largest room possible up to width x height around ( availX, availY).
-        // Note that this still fails sometimes and gives a collision when the shape is concave.
+        // TODO: rewrite AdjustRoom to grow the room with a radial sweepline to avoid collision
         private Room AdjustRoom(int availX, int availY, int width, int height,
             int[,] occupied)
         {
@@ -167,7 +183,7 @@ namespace Roguelike.World
 
         // Add a non-zero size room to the room list and update the occupied matrix. Returns false
         // if a room was not added.
-        private static bool TrackRoom(Room room, IList<Room> roomList, int counter,
+        private static bool TrackRoom(Room room, ICollection<Room> roomList, int counter,
             ref int[,] occupied)
         {
             int area = 0;
@@ -243,7 +259,8 @@ namespace Roguelike.World
         private IEnumerable<Edge> TrimEdges(IEnumerable<Edge> edges,
             IList<(int X, int Y)> vertices)
         {
-            IEnumerable<int>[] adjacency = BuildAdjacencyList(edges, vertices.Count);
+            List<Edge> allEdges = edges.ToList();
+            ICollection<int>[] adjacency = BuildAdjacencyList(allEdges, vertices.Count);
             // Comparator for MapVertex is defined to give negated
             MaxHeap<MapVertex> pq = new MaxHeap<MapVertex>(vertices.Count);
             
@@ -292,7 +309,6 @@ namespace Roguelike.World
 
             // Add back some edges so that there are some loops.
             // TODO: smarter checking to add edges between the farthest rooms.
-            List<Edge> allEdges = edges.ToList();
             for (int i = 0; i < allEdges.Count * _LOOP_CHANCE; i++)
             {
                 graph.Add(allEdges[Rand.Next(allEdges.Count)]);
@@ -301,9 +317,9 @@ namespace Roguelike.World
             return graph;
         }
 
-        private IEnumerable<int>[] BuildAdjacencyList(IEnumerable<Edge> edges, int size)
+        private static ICollection<int>[] BuildAdjacencyList(IEnumerable<Edge> edges, int size)
         {
-            ICollection<int>[] adjacency = new List<int>[size];
+            ICollection<int>[] adjacency = new ICollection<int>[size];
             for (int i = 0; i < size; i++)
             {
                 adjacency[i] = new List<int>();
@@ -323,7 +339,7 @@ namespace Roguelike.World
             public int ID { get; }
             public int X { get; }
             public int Y { get; }
-            public double Weight { get; }
+            private double Weight { get; }
 
             public MapVertex(int id, int x, int y, double weight)
             {

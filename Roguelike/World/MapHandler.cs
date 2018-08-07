@@ -585,9 +585,15 @@ namespace Roguelike.World
                         tile.Light += (float)range.LightLevel;
                     }
 
-                    tile.IsExplored = true;
                     if (setVisible)
+                    {
                         tile.LosExists = true;
+
+                        // Since this method calculates LOS at the same time as player lighting,
+                        // only set what the player can see as explored.
+                        if (tile.Light > Constants.MIN_VISIBLE_LIGHT_LEVEL)
+                            tile.IsExplored = true;
+                    }
 
                     // For the first tile in a row, we only need to consider whether the current
                     // tile is blocked or not.
