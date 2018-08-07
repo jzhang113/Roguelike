@@ -14,11 +14,8 @@ namespace Roguelike.Core
             IsOpen = open;
         }
 
-        public override ICommand Act()
+        public override ICommand GetAction()
         {
-            if (IsDead)
-                TriggerDeath();
-
             return new WaitCommand(this);
         }
 

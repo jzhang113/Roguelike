@@ -160,8 +160,8 @@ namespace Roguelike.World
 
         public bool SetActorPosition(Actor actor, int x, int y)
         {
-            if (!Field[x, y].IsWalkable)
-                return false;
+            //if (!Field[x, y].IsWalkable)
+            //    return false;
 
             Field[actor.X, actor.Y].IsOccupied = false;
             Field[actor.X, actor.Y].BlocksLight = false;

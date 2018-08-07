@@ -2,6 +2,7 @@
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
+using Roguelike.Statuses;
 using Roguelike.Systems;
 using System;
 
@@ -26,6 +27,7 @@ namespace Roguelike.Actors
         public InventoryHandler Inventory { get; }
         public Drawable DrawingComponent { get; }
         public ActorParameters Parameters { get; }
+        public StatusHandler StatusHandler { get; }
 
         public int X
         {
@@ -53,6 +55,8 @@ namespace Roguelike.Actors
             Energy = 0;
             RefreshRate = Data.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
+            StatusHandler = new StatusHandler();
+            StatusHandler.AddStatus(StatusType.Phasing, 10);
 
             DrawingComponent = new Drawable(color, symbol, false);
             BlocksLight = true;
@@ -70,7 +74,20 @@ namespace Roguelike.Actors
             }
         }
 
-        public virtual ICommand Act()
+        public ICommand Act()
+        {
+            ICommand command = GetAction();
+            if (command == null)
+                return null;
+
+            StatusHandler.Process();
+            if (IsDead)
+                TriggerDeath();
+
+            return command;
+        }
+
+        public virtual ICommand GetAction()
         {
             return SimpleAI.GetAction(this);
         }

@@ -2,6 +2,7 @@
 using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
+using Roguelike.Statuses;
 using Roguelike.Systems;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +33,8 @@ namespace Roguelike.Commands
             if (!Game.Map.Field.IsValid(_newX, _newY))
                 return new RedirectMessage(false, new WaitCommand(Source));
 
-            // Don't walk into walls.
-            if (_tile.IsWall)
+            // Don't walk into walls, unless the Actor is currently phasing.
+            if (_tile.IsWall && !Source.StatusHandler.TryGetStatus(StatusType.Phasing, out _))
             {
                 // Don't penalize the player for walking into walls, but monsters should wait if 
                 // they will walk into a wall.
@@ -69,7 +70,6 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            System.Diagnostics.Debug.Assert(_tile.IsWalkable);
             Game.MessageHandler.AddMessage(
                 $"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy",
                 MessageLevel.Verbose);

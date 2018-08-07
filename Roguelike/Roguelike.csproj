@@ -155,6 +155,9 @@
     <Compile Include="State\TextInputState.cs" />
     <Compile Include="State\UnequipState.cs" />
     <Compile Include="Input\MouseInput.cs" />
+    <Compile Include="Statuses\StatusInfo.cs" />
+    <Compile Include="Statuses\StatusType.cs" />
+    <Compile Include="Statuses\StatusHandler.cs" />
     <Compile Include="Utils\ColorInfo.cs" />
     <Compile Include="Utils\ImageConvert.cs" />
     <Compile Include="Utils\RandomExtensions.cs" />

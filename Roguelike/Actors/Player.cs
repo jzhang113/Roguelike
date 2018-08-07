@@ -21,7 +21,7 @@ namespace Roguelike.Actors
 
         // Wait for the input system to set NextCommand. Since Commands don't repeat, clear
         // NextCommand once it has been sent.
-        public override ICommand Act()
+        public override ICommand GetAction()
         {
             ICommand action = NextCommand;
             NextCommand = null;
