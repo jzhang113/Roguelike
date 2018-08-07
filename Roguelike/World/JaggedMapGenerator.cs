@@ -47,7 +47,7 @@ namespace Roguelike.World
                 // Fit a room around the point as best as possible. AdjustRoom should avoid most
                 // collisions between rooms.
                 int width = (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE);
-                int height = (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE);
+                int height = (int)Rand.NextNormal(1.5 * _ROOM_SIZE, 1.22 * _ROOM_VARIANCE);
                 Room room = AdjustRoom(availX, availY, width, height, occupied);
 
                 // Update the room list, the open point list, and the location grid.
@@ -58,46 +58,53 @@ namespace Roguelike.World
             }
 
             // Use the largest areas as rooms and triangulate them to calculate hallways.
-            var roomCenters = roomList
+            List<Vertex> roomCenters = roomList
                 .OrderByDescending(r => r.Area)
                 .Take((int)(roomList.Count * _FILL_PERCENT))
-                .Select(r => new Vertex(r.Center.X, r.Center.Y));
+                .Select(r => new Vertex(r.Center.X, r.Center.Y))
+                .ToList();
 
-            Polygon polygon = new Polygon();
-            foreach (Vertex vertex in roomCenters)
+            // If we don't get enough rooms, we can't (and don't need to) triangulate, so just
+            // draw in what we have.
+            if (roomCenters.Count == 1)
             {
-                polygon.Add(vertex);
+                Vertex v0 = roomCenters[0];
+                CreateRoomWithoutBorder(roomList[occupied[(int)v0.X, (int)v0.Y]]);
             }
-            IMesh delaunay = polygon.Triangulate();
-
-            IList<(int X, int Y)> vertices = new (int X, int Y)[delaunay.Vertices.Count];
-            foreach (Vertex vertex in delaunay.Vertices)
+            else if (roomCenters.Count == 2)
             {
-                vertices[vertex.ID] = ((int)vertex.X, (int)vertex.Y);
+                Vertex v0 = roomCenters[0];
+                Vertex v1 = roomCenters[1];
+                IEnumerable<Tile> path = Map.GetStraightLinePath((int)v0.X, (int)v0.Y,
+                    (int)v1.X, (int)v1.Y);
+                ClearRoomsAlongPath(path, roomList, occupied);
             }
-
-            // Reduce the number of edges and clear out rooms along the remaining edges.
-            foreach (Edge edge in TrimEdges(delaunay.Edges, vertices))
+            else
             {
-                (int x0, int y0) = vertices[edge.P0];
-                (int x1, int y1) = vertices[edge.P1];
-                IEnumerable<Tile> path = Map.GetStraightLinePath(x0, y0, x1, y1);
-
-                foreach (Tile tile in path)
+                Polygon polygon = new Polygon();
+                foreach (Vertex vertex in roomCenters)
                 {
-                    if (!tile.IsWall)
-                        continue;
+                    polygon.Add(vertex);
+                }
+                IMesh delaunay = polygon.Triangulate();
 
-                    // Zero corresponds to an unfilled tile, so we need to reduce the ID by 1.
-                    int roomID = occupied[tile.X, tile.Y] - 1;
-                    if (roomID >= 0)
-                        CreateRoomWithoutBorder(roomList[roomID]);
-                    else
-                        // Room may not be fully tiled, so clear out any untouched squares to avoid
-                        // disconnected regions.
-                        tile.Type = Data.TerrainType.Stone;
+                IList<(int X, int Y)> vertices = new(int X, int Y)[delaunay.Vertices.Count];
+                foreach (Vertex vertex in delaunay.Vertices)
+                {
+                    vertices[vertex.ID] = ((int)vertex.X, (int)vertex.Y);
+                }
+
+                // Reduce the number of edges and clear out rooms along the remaining edges.
+                foreach (Edge edge in TrimEdges(delaunay.Edges, vertices))
+                {
+                    (int x0, int y0) = vertices[edge.P0];
+                    (int x1, int y1) = vertices[edge.P1];
+                    IEnumerable<Tile> path = Map.GetStraightLinePath(x0, y0, x1, y1);
+                    ClearRoomsAlongPath(path, roomList, occupied);
                 }
             }
+
+            PostProcess();
         }
 
         // Set up any special features on the level. After setup is complete, return the value the
@@ -126,15 +133,95 @@ namespace Roguelike.World
                 first.Y = 0;
 
             if (TrackRoom(first, roomList, 1, ref occupied))
-                return 0;
-            else
             {
                 AddOpenPoints(first, openPoints, occupied);
                 return 1;
             }
+            else
+            {
+                return 0;
+            }
         }
 
-        // Try to fit the largest room possible up to width x height around ( availX, availY).
+        private void ClearRoomsAlongPath(IEnumerable<Tile> path, IList<Room> roomList, int[,] occupied)
+        {
+            foreach (Tile tile in path)
+            {
+                if (!tile.IsWall)
+                    continue;
+
+                // Zero corresponds to an unfilled tile, so we need to reduce the ID by 1.
+                int roomID = occupied[tile.X, tile.Y] - 1;
+                if (roomID >= 0)
+                    CreateRoomWithoutBorder(roomList[roomID]);
+                else
+                    // Map may not be fully tiled, so clear out any untouched squares to avoid
+                    // disconnected regions.
+                    tile.Type = Data.TerrainType.Stone;
+            }
+        }
+
+        // Clean up the map by removing stray walls.
+        private void PostProcess()
+        {
+            // Sweep from top to bottom.
+            for (int x = 1; x < Width - 1; x++)
+            {
+                // Start the wall count at an arbitrarily high number so walls near edges don't get
+                // removed unnecessarily.
+                int wallCount = 10;
+                for (int y = 3; y < Height - 3; y++)
+                {
+                    if (Map.Field[x, y].IsWall)
+                    {
+                        wallCount++;
+                    }
+                    else
+                    {
+                        if (wallCount == 1)
+                        {
+                            Map.Field[x, y - 1].Type = Data.TerrainType.Stone;
+                        }
+                        else if (wallCount == 2)
+                        {
+                            Map.Field[x, y - 1].Type = Data.TerrainType.Stone;
+                            Map.Field[x, y - 2].Type = Data.TerrainType.Stone;
+                        }
+
+                        wallCount = 0;
+                    }
+                }
+            }
+
+            // Sweep from left to right.
+            for (int y = 1; y < Height - 1; y++)
+            {
+                int wallCount = 10;
+                for (int x = 3; x < Width - 3; x++)
+                {
+                    if (Map.Field[x, y].IsWall)
+                    {
+                        wallCount++;
+                    }
+                    else
+                    {
+                        if (wallCount == 1)
+                        {
+                            Map.Field[x - 1, y].Type = Data.TerrainType.Stone;
+                        }
+                        else if (wallCount == 2)
+                        {
+                            Map.Field[x - 1, y].Type = Data.TerrainType.Stone;
+                            Map.Field[x - 2, y].Type = Data.TerrainType.Stone;
+                        }
+
+                        wallCount = 0;
+                    }
+                }
+            }
+        }
+
+        // Try to fit the largest room possible up to width x height around (availX, availY).
         // TODO: rewrite AdjustRoom to grow the room with a radial sweepline to avoid collision
         private Room AdjustRoom(int availX, int availY, int width, int height,
             int[,] occupied)
@@ -263,14 +350,14 @@ namespace Roguelike.World
             ICollection<int>[] adjacency = BuildAdjacencyList(allEdges, vertices.Count);
             // Comparator for MapVertex is defined to give negated
             MaxHeap<MapVertex> pq = new MaxHeap<MapVertex>(vertices.Count);
-            
+
             var (firstX, firstY) = vertices[0];
             pq.Add(new MapVertex(0, firstX, firstY, 0));
 
             bool[] inMst = new bool[vertices.Count];
             double[] weight = new double[vertices.Count];
             int[] parent = new int[vertices.Count];
-            
+
             for (int i = 0; i < vertices.Count; i++)
             {
                 weight[i] = double.MaxValue;

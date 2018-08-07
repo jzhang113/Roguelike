@@ -42,8 +42,6 @@ namespace Roguelike.World
                     // Delaunay triangulation fails sometimes, so retry.
                     if (--retry < 0)
                         throw;
-                    else
-                        CreateMap();
                 }
             }
 
