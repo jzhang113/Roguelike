@@ -11,9 +11,6 @@ namespace Roguelike.Interfaces
         public RLColor Color { get; internal set; }
         public char Symbol { get; internal set; }
 
-        public int X { get; set; }
-        public int Y { get; set; }
-
         internal bool Activated { get; set; }
 
         private bool _remember;
@@ -36,8 +33,6 @@ namespace Roguelike.Interfaces
             Color = new RLColor(r, g, b);
 
             Symbol = info.GetChar(nameof(Symbol));
-            X = info.GetInt32(nameof(X));
-            Y = info.GetInt32(nameof(Y));
             Activated = info.GetBoolean(nameof(Activated));
 
             _remember = info.GetBoolean(nameof(_remember));
@@ -63,19 +58,19 @@ namespace Roguelike.Interfaces
                         : Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
             }
 
-            DrawTile(console, color, null, tile.IsVisible);
+            DrawTile(console, color, null, tile.IsVisible, tile.X, tile.Y);
         }
 
-        protected void DrawTile(RLConsole console, RLColor foreground, RLColor? background, bool visible)
+        protected void DrawTile(RLConsole console, RLColor foreground, RLColor? background, bool visible, int x, int y)
         {
-            int destX = X - Camera.X;
-            int destY = Y - Camera.Y;
+            int destX = x - Camera.X;
+            int destY = y - Camera.Y;
 
             if (visible)
             {
                 console.Set(destX, destY, foreground, background, Symbol);
-                _rememberX = X;
-                _rememberY = Y;
+                _rememberX = x;
+                _rememberY = y;
             }
             else if (_remember)
             {
@@ -95,8 +90,6 @@ namespace Roguelike.Interfaces
             info.AddValue($"{nameof(Color)}.b", Color.b);
 
             info.AddValue(nameof(Symbol), Symbol);
-            info.AddValue(nameof(X), X);
-            info.AddValue(nameof(Y), Y);
             info.AddValue(nameof(Activated), Activated);
 
             info.AddValue(nameof(_remember), _remember);

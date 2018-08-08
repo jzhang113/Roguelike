@@ -1,5 +1,5 @@
-﻿using RLNET;
-using Roguelike.Core;
+﻿using Roguelike.Core;
+using Roguelike.Interfaces;
 using System.Collections.Generic;
 
 namespace Roguelike.Data
@@ -15,8 +15,6 @@ namespace Roguelike.Data
 
     struct TerrainProperty
     {
-        public RLColor Color { get; set; }
-        public char Symbol { get; set; }
         public double MoveCost { get; set; }
         public Flammability Flammability { get; set; }
     }
@@ -24,37 +22,23 @@ namespace Roguelike.Data
     static class TerrainExtensions
     {
         private static readonly IDictionary<TerrainType, TerrainProperty> _terrainList;
+        private static readonly IDictionary<TerrainType, Drawable> _drawableList;
 
         static TerrainExtensions()
         {
             _terrainList = Program.LoadData<IDictionary<TerrainType, TerrainProperty>>("terrain");
 
-            TerrainProperty wall = _terrainList[TerrainType.Wall];
-            wall.Color = Colors.Wall;
-            wall.Symbol = '#';
-            _terrainList[TerrainType.Wall] = wall;
-
-            TerrainProperty grass = _terrainList[TerrainType.Grass];
-            grass.Color = Colors.Grass;
-            grass.Symbol = '"';
-            _terrainList[TerrainType.Grass] = grass;
-
-            TerrainProperty stone = _terrainList[TerrainType.Stone];
-            stone.Color = Colors.Stone;
-            stone.Symbol = '.';
-            _terrainList[TerrainType.Stone] = stone;
-
-            TerrainProperty ice = _terrainList[TerrainType.Ice];
-            ice.Color = Colors.Water;
-            ice.Symbol = '.';
-            _terrainList[TerrainType.Ice] = ice;
-
-            TerrainProperty water = _terrainList[TerrainType.Water];
-            water.Color = Colors.Water;
-            water.Symbol = '\x00f8';
-            _terrainList[TerrainType.Water] = water;
+            _drawableList = new Dictionary<TerrainType, Drawable>
+            {
+                [TerrainType.Wall] = new Drawable(Colors.Wall, '#', true),
+                [TerrainType.Grass] = new Drawable(Colors.Grass, '"', true),
+                [TerrainType.Stone] = new Drawable(Colors.Stone, '.', true),
+                [TerrainType.Ice] = new Drawable(Colors.Water, '.', true),
+                [TerrainType.Water] = new Drawable(Colors.Water, '\x00f8', true)
+            };
         }
 
         public static TerrainProperty ToProperty(this TerrainType type) => _terrainList[type];
+        public static Drawable ToDrawable(this TerrainType type) => _drawableList[type];
     }
 }

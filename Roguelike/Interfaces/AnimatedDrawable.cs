@@ -52,7 +52,7 @@ namespace Roguelike.Interfaces
                 backColor = RLColor.Blend(_background.GetColor(Game.VisualRandom),
                     Colors.Floor, tile.Light);
 
-            DrawTile(console, foreColor, backColor, tile.IsVisible);
+            DrawTile(console, foreColor, backColor, tile.IsVisible, tile.X, tile.Y);
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

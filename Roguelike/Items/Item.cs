@@ -16,17 +16,8 @@ namespace Roguelike.Items
         public ItemParameter Parameters { get; }
         public Drawable DrawingComponent { get; }
         
-        public int X
-        {
-            get => DrawingComponent.X;
-            set => DrawingComponent.X = value;
-        }
-
-        public int Y
-        {
-            get => DrawingComponent.Y;
-            set => DrawingComponent.Y = value;
-        }
+        public int X { get; set; }
+        public int Y { get; set; }
 
         public string Name => Parameters.Name;
 
@@ -47,11 +38,7 @@ namespace Roguelike.Items
 
             Parameters = other.Parameters;
             DrawingComponent = new Drawable(
-                other.DrawingComponent.Color, other.DrawingComponent.Symbol, true)
-            {
-                X = other.X,
-                Y = other.Y,
-            };
+                other.DrawingComponent.Color, other.DrawingComponent.Symbol, true);
             
             _abilities = new List<IAction>(other._abilities);
         }

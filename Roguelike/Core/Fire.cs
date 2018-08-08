@@ -11,11 +11,9 @@ namespace Roguelike.Core
     [Serializable]
     public class Fire : ISchedulable
     {
-        public int Fuel { get; private set; }
-
         public Drawable DrawingComponent { get; }
-        public int X { get => DrawingComponent.X; set => DrawingComponent.X = value; }
-        public int Y { get => DrawingComponent.Y; set => DrawingComponent.Y = value; }
+        public int X { get; set; }
+        public int Y { get; set; }
 
         public string Name => "fire";
         public int Energy { get; set; }
@@ -24,13 +22,7 @@ namespace Roguelike.Core
         public Fire(int x, int y)
         {
             ColorInterval foreground = new ColorInterval(Colors.Fire, Colors.FireAccent, 0.6);
-            DrawingComponent = new AnimatedDrawable(foreground, null, '^')
-            {
-                X = x,
-                Y = y
-            };
-
-            Fuel = 10;
+            DrawingComponent = new AnimatedDrawable(foreground, null, '^');
         }
 
         public ICommand Act()

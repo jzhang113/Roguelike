@@ -29,17 +29,8 @@ namespace Roguelike.Actors
         public ActorParameters Parameters { get; }
         public StatusHandler StatusHandler { get; }
 
-        public int X
-        {
-            get => DrawingComponent.X;
-            set => DrawingComponent.X = value;
-        }
-
-        public int Y
-        {
-            get => DrawingComponent.Y;
-            set => DrawingComponent.Y = value;
-        }
+        public int X { get; set; }
+        public int Y { get; set; }
 
         public bool IsDead => Hp < 0;
 

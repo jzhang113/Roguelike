@@ -33,8 +33,10 @@ namespace Roguelike.Commands
             if (!Game.Map.Field.IsValid(_newX, _newY))
                 return new RedirectMessage(false, new WaitCommand(Source));
 
-            // Don't walk into walls, unless the Actor is currently phasing.
-            if (_tile.IsWall && !Source.StatusHandler.TryGetStatus(StatusType.Phasing, out _))
+            // Don't walk into walls, unless the Actor is currently phasing or we are already
+            // inside a wall (to prevent getting stuck).
+            if (_tile.IsWall && !Source.StatusHandler.TryGetStatus(StatusType.Phasing, out _)
+                && !Game.Map.Field[Source.X, Source.Y].IsWall)
             {
                 // Don't penalize the player for walking into walls, but monsters should wait if 
                 // they will walk into a wall.

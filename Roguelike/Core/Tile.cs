@@ -9,20 +9,7 @@ namespace Roguelike.Core
     {
         public int X { get; }
         public int Y { get; }
-        public Drawable DrawingComponent { get; }
-
-        public TerrainType Type
-        {
-            get => _type;
-            set
-            {
-                _type = value;
-
-                TerrainProperty terrain = value.ToProperty();
-                DrawingComponent.Color = terrain.Color;
-                DrawingComponent.Symbol = terrain.Symbol;
-            }
-        }
+        public Drawable DrawingComponent { get; private set; }
 
         public float Light
         {
@@ -38,6 +25,16 @@ namespace Roguelike.Core
             }
         }
 
+        public TerrainType Type
+        {
+            get => _type;
+            internal set
+            {
+                _type = value;
+                DrawingComponent = value.ToDrawable();
+            }
+        }
+
         public int Fuel { get; internal set; }
         public bool IsOccupied { get; internal set; }
         public bool IsExplored { get; internal set; }
@@ -45,12 +42,12 @@ namespace Roguelike.Core
         public bool LosExists { get; internal set; }
 
         public bool IsVisible => LosExists && Light > Constants.MIN_VISIBLE_LIGHT_LEVEL;
-        public bool IsWall => _type == TerrainType.Wall;
+        public bool IsWall => Type == TerrainType.Wall;
         public bool IsWalkable => !IsWall && !IsOccupied;
         public bool IsLightable => !IsWall && !BlocksLight;
 
-        private TerrainType _type;
         private float _light;
+        private TerrainType _type;
 
         public Tile(int x, int y, TerrainType type)
         {
@@ -58,12 +55,8 @@ namespace Roguelike.Core
             Y = y;
             Fuel = 10;
 
-            TerrainProperty terrain = type.ToProperty();
-            DrawingComponent = new Drawable(terrain.Color, terrain.Symbol, true)
-            {
-                X = x,
-                Y = y
-            };
+            Type = type;
+            DrawingComponent = type.ToDrawable();
         }
     }
 }
