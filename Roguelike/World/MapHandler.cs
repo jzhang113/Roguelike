@@ -1,4 +1,5 @@
-﻿using RLNET;
+﻿using MessagePack;
+using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Data;
@@ -8,35 +9,37 @@ using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace Roguelike.World
 {
-    [Serializable]
-    public class MapHandler : ISerializable
+    [MessagePackObject]
+    public class MapHandler
     {
+        [Key(0)]
         public int Width { get; }
+        [Key(1)]
         public int Height { get; }
-
+        [Key(2)]
         internal Field Field { get; }
 
         // internal transient helper structures
+        [IgnoreMember]
         internal float[,] PlayerMap { get; }
+        [IgnoreMember]
         internal float[,] AutoexploreMap { get; }
+        [IgnoreMember]
         internal ICollection<Tile> Discovered { get; }
 
-        // can't auto serialize these dictionaries
-        private IDictionary<int, Actor> Units { get; set; }
-        private IDictionary<int, InventoryHandler> Items { get; set; }
-        private IDictionary<int, Door> Doors { get; set; }
-        private IDictionary<int, Exit> Exits { get; set; }
-        private IDictionary<int, Fire> Fires { get; set; }
-
-        private readonly KeyValueHelper<int, Actor> _tempUnits;
-        private readonly KeyValueHelper<int, InventoryHandler> _tempItems;
-        private readonly KeyValueHelper<int, Door> _tempDoors;
-        private readonly KeyValueHelper<int, Exit> _tempExits;
-        private readonly KeyValueHelper<int, Fire> _tempFires;
+        [Key(3)]
+        private IDictionary<int, Actor> Units { get; }
+        [Key(4)]
+        private IDictionary<int, InventoryHandler> Items { get; }
+        [Key(5)]
+        private IDictionary<int, Door> Doors { get; }
+        [Key(6)]
+        private IDictionary<int, Exit> Exits { get; }
+        [Key(7)]
+        private IDictionary<int, Fire> Fires { get; }
 
         public MapHandler(int width, int height)
         {
@@ -53,70 +56,21 @@ namespace Roguelike.World
             Doors = new Dictionary<int, Door>();
             Exits = new Dictionary<int, Exit>();
             Fires = new Dictionary<int, Fire>();
+
+            //foreach (Actor actor in Units.Values)
+            //{
+            //    //if (actor is Player player)
+            //    //    Game.Player = player;
+            //}
+
+            //foreach (Actor actor in Units.Values)
+            //    Game.EventScheduler.AddActor(actor);
+
+            //foreach (Fire fire in Fires.Values)
+            //    Game.EventScheduler.AddActor(fire);
+
+            //Refresh();
         }
-
-        #region Serialization Constructor
-        protected MapHandler(SerializationInfo info, StreamingContext context)
-        {
-            Width = info.GetInt32(nameof(Width));
-            Height = info.GetInt32(nameof(Height));
-            Field = (Field)info.GetValue(nameof(Field), typeof(Field));
-
-            _tempUnits = new KeyValueHelper<int, Actor>
-            {
-                Key = (ICollection<int>)info.GetValue($"{nameof(Units)}.keys", typeof(ICollection<int>)),
-                Value = (ICollection<Actor>)info.GetValue($"{nameof(Units)}.values", typeof(ICollection<Actor>))
-            };
-            _tempItems = new KeyValueHelper<int, InventoryHandler>
-            {
-                Key = (ICollection<int>)info.GetValue($"{nameof(Items)}.keys", typeof(ICollection<int>)),
-                Value = (ICollection<InventoryHandler>)info.GetValue($"{nameof(Items)}.values", typeof(ICollection<InventoryHandler>))
-            };
-            _tempDoors = new KeyValueHelper<int, Door>
-            {
-                Key = (ICollection<int>)info.GetValue($"{nameof(Doors)}.keys", typeof(ICollection<int>)),
-                Value = (ICollection<Door>)info.GetValue($"{nameof(Doors)}.values", typeof(ICollection<Door>))
-            };
-            _tempExits = new KeyValueHelper<int, Exit>
-            {
-                Key = (ICollection<int>)info.GetValue($"{nameof(Exits)}.keys", typeof(ICollection<int>)),
-                Value = (ICollection<Exit>)info.GetValue($"{nameof(Exits)}.values", typeof(ICollection<Exit>))
-            };
-            _tempFires = new KeyValueHelper<int, Fire>
-            {
-                Key = (ICollection<int>)info.GetValue($"{nameof(Fires)}.keys", typeof(ICollection<int>)),
-                Value = (ICollection<Fire>)info.GetValue($"{nameof(Fires)}.values", typeof(ICollection<Fire>))
-            };
-
-            PlayerMap = new float[Width, Height];
-            AutoexploreMap = new float[Width, Height];
-            Discovered = new List<Tile>();
-        }
-
-        [OnDeserialized]
-        protected void AfterDeserialize(StreamingContext context)
-        {
-            Units = _tempUnits.ToDictionary();
-            Items = _tempItems.ToDictionary();
-            Doors = _tempDoors.ToDictionary();
-            Exits = _tempExits.ToDictionary();
-            Fires = _tempFires.ToDictionary();
-
-            foreach (Actor actor in Units.Values)
-            {
-                if (actor is Player player)
-                    Game.Player = player;
-            }
-
-            foreach (Actor actor in Units.Values)
-                Game.EventScheduler.AddActor(actor);
-
-            foreach (Fire fire in Fires.Values)
-                Game.EventScheduler.AddActor(fire);
-
-            Refresh();
-        }
-        #endregion
 
         // Recalculate the state of the world after movements happen. If only light recalculations
         // needed, call UpdatePlayerFov() instead.
@@ -696,7 +650,7 @@ namespace Roguelike.World
 
             foreach (Actor unit in Units.Values)
             {
-                if (!unit.IsDead)
+                if (!unit.IsDead())
                     unit.DrawingComponent.Draw(mapConsole, Field[unit.X, unit.Y]);
                 else
                     // HACK: draw some corpses
@@ -803,39 +757,6 @@ namespace Roguelike.World
         private int ToIndex(int x, int y)
         {
             return x + Width * y;
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(Width), Width);
-            info.AddValue(nameof(Height), Height);
-            info.AddValue(nameof(Field), Field);
-            info.AddValue(nameof(Fires), Fires);
-
-            // Can't serialize Dictionary or KeyCollection, have to make it a list.
-            info.AddValue($"{nameof(Units)}.keys", Units.Keys.ToList());
-            info.AddValue($"{nameof(Units)}.values", Units.Values.ToList());
-            info.AddValue($"{nameof(Items)}.keys", Items.Keys.ToList());
-            info.AddValue($"{nameof(Items)}.values", Items.Values.ToList());
-            info.AddValue($"{nameof(Doors)}.keys", Doors.Keys.ToList());
-            info.AddValue($"{nameof(Doors)}.values", Doors.Values.ToList());
-            info.AddValue($"{nameof(Exits)}.keys", Exits.Keys.ToList());
-            info.AddValue($"{nameof(Exits)}.values", Exits.Values.ToList());
-            info.AddValue($"{nameof(Fires)}.keys", Fires.Keys.ToList());
-            info.AddValue($"{nameof(Fires)}.values", Fires.Values.ToList());
-        }
-
-        // Temporarily store lists when deserializing dictionaries
-        private class KeyValueHelper<TKey, TValue>
-        {
-            public ICollection<TKey> Key { private get; set; }
-            public ICollection<TValue> Value { private get; set; }
-
-            public IDictionary<TKey, TValue> ToDictionary()
-            {
-                return Key.Zip(Value, (k, v) => new { Key = k, Value = v })
-                    .ToDictionary(x => x.Key, x => x.Value);
-            }
         }
     }
 }

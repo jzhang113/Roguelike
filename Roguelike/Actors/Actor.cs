@@ -1,38 +1,59 @@
-﻿using Roguelike.Actions;
+﻿using MessagePack;
+using Roguelike.Actions;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Statuses;
 using Roguelike.Systems;
-using System;
 
 namespace Roguelike.Actors
 {
-    [Serializable]
+    [MessagePackObject]
     public class Actor : ISchedulable
     {
+        [IgnoreMember]
         public string Name => Parameters.Type;
+        [Key(0)]
         public bool BlocksLight { get; set; }
 
+        [Key(1)]
         public int Hp { get; set; }
+        [Key(2)]
         public int Mp { get; set; }
+        [Key(3)]
         public int Sp { get; set; }
+        [Key(4)]
         public int Armor { get; set; }
 
+        [Key(5)]
         public ActorState State { get; set; }
 
+        [Key(6)]
         public int Energy { get; set; }
+        [Key(7)]
         public int RefreshRate { get; set; }
 
+        [Key(8)]
         public InventoryHandler Inventory { get; }
+        [Key(9)]
         public Drawable DrawingComponent { get; }
+        [Key(10)]
         public ActorParameters Parameters { get; }
+        [Key(11)]
         public StatusHandler StatusHandler { get; }
 
+        [Key(12)]
         public int X { get; set; }
+        [Key(13)]
         public int Y { get; set; }
 
-        public bool IsDead => Hp < 0;
+        [IgnoreMember]
+        public virtual IAction BasicAttack => new DamageAction(5, new TargetZone(TargetShape.Directional));
+
+        // Deserialization constructor
+        public Actor()
+        {
+        }
 
         public Actor(ActorParameters parameters, RLNET.RLColor color, char symbol)
         {
@@ -72,21 +93,15 @@ namespace Roguelike.Actors
                 return null;
 
             StatusHandler.Process();
-            if (IsDead)
+            if (IsDead())
                 TriggerDeath();
 
             return command;
         }
 
-        public virtual ICommand GetAction()
-        {
-            return SimpleAI.GetAction(this);
-        }
+        public bool IsDead() => Hp < 0;
 
-        public virtual IAction GetBasicAttack()
-        {
-            return new DamageAction(5, new TargetZone(TargetShape.Directional));
-        }
+        public virtual ICommand GetAction() => SimpleAI.GetAction(this);
 
         public int TakeDamage(int power)
         {

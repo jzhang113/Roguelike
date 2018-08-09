@@ -1,15 +1,18 @@
-﻿using RLNET;
+﻿using MessagePack;
+using RLNET;
 using Roguelike.Core;
 using System;
-using System.Runtime.Serialization;
 
 namespace Roguelike.Interfaces
 {
-    [Serializable]
+    [MessagePackObject]
     class AnimatedDrawable : Drawable
     {
+        [Key(0)]
         private readonly ColorInterval _foreground;
+        [Key(1)]
         private readonly ColorInterval _background;
+        [Key(2)]
         private readonly bool _drawBackground;
 
         public AnimatedDrawable(ColorInterval foreground, ColorInterval? background, char symbol)
@@ -26,13 +29,6 @@ namespace Roguelike.Interfaces
             {
                 _drawBackground = false;
             }
-        }
-
-        public AnimatedDrawable(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-            _foreground = (ColorInterval)info.GetValue(nameof(_foreground), typeof(ColorInterval));
-            _background = (ColorInterval)info.GetValue(nameof(_background), typeof(ColorInterval));
-            _drawBackground = info.GetBoolean(nameof(_drawBackground));
         }
 
         public override void Draw(RLConsole console, Tile tile)
@@ -53,15 +49,6 @@ namespace Roguelike.Interfaces
                     Colors.Floor, tile.Light);
 
             DrawTile(console, foreColor, backColor, tile.IsVisible, tile.X, tile.Y);
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue(nameof(_foreground), _foreground);
-            info.AddValue(nameof(_background), _background);
-            info.AddValue(nameof(_drawBackground), _drawBackground);
         }
     }
 }

@@ -1,17 +1,17 @@
-﻿using Roguelike.Actions;
+﻿using MessagePack;
+using Roguelike.Actions;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
-using System;
 
 namespace Roguelike.Actors
 {
-    [Serializable]
     class Player : Actor, IEquipped
     {
         public EquipmentHandler Equipment { get; }
 
+        [IgnoreMember]
         public ICommand NextCommand { private get; set; }
 
         public Player(ActorParameters parameters) : base(parameters, Colors.Player, '@')
@@ -29,12 +29,15 @@ namespace Roguelike.Actors
         }
 
         public override void TriggerDeath() => Game.GameOver();
-        public override IAction GetBasicAttack()
+        public override IAction BasicAttack
         {
-            if (Equipment.IsDefaultWeapon())
-                return base.GetBasicAttack();
-            else
-                return Equipment.PrimaryWeapon.Attack();
+            get
+            {
+                if (Equipment.IsDefaultWeapon())
+                    return base.BasicAttack;
+                else
+                    return Equipment.PrimaryWeapon.Attack();
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using RLNET;
+﻿using MessagePack;
+using RLNET;
 using Roguelike.Core;
 using Roguelike.Items;
 using System;
@@ -9,12 +10,15 @@ using System.Linq;
 namespace Roguelike.Systems
 {
     // Handles all stacks of items in the game, such as the player inventory and piles of loot.
-    [Serializable]
+    [MessagePackObject]
     public class InventoryHandler : ICollection<ItemCount>
     {
+        [Key(0)]
         private readonly IList<ItemStack> _inventory;
 
+        [IgnoreMember]
         public int Count => _inventory.Count;
+        [IgnoreMember]
         public bool IsReadOnly => false;
 
         public bool IsEmpty() => _inventory.Count == 0;

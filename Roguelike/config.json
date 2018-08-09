@@ -3,7 +3,7 @@
     "fontSize": 12,
     "screen": {
         "height": 70,
-        "width": 80
+        "width": 130
     },
     "map": {
         "height": 100,
@@ -11,7 +11,7 @@
     },
     "mapView": {
         "height": 60,
-        "width": 60
+        "width": 110
     },
     "messageMaxCount": 100,
     "messageView": {

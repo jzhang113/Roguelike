@@ -2,18 +2,20 @@
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
-using System;
 
 namespace Roguelike.Actions
 {
-    [Serializable]
-    class DamageAction : IAction
+    public class DamageAction : IAction
     {
         public TargetZone Area { get; }
         public int Speed => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
         private readonly int _power;
+
+        public DamageAction()
+        {
+        }
 
         public DamageAction(int power, TargetZone targetZone)
         {
@@ -32,7 +34,7 @@ namespace Roguelike.Actions
 
             int damage = targetUnit.TakeDamage(_power);
 
-            if (targetUnit.IsDead)
+            if (targetUnit.IsDead())
                 targetUnit.State = ActorState.Dead;
 
             Game.MessageHandler.AddMessage(

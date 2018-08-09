@@ -1,9 +1,7 @@
 ﻿using Roguelike.Data;
-using System;
 
 namespace Roguelike.Actors
 {
-    [Serializable]
     public class ActorParameters
     {
         public string Type { get; }
@@ -19,6 +17,10 @@ namespace Roguelike.Actors
 
         public int Awareness { get; set; }
         public int Speed { get; set; }
+
+        public ActorParameters()
+        {
+        }
 
         public ActorParameters(string name)
         {

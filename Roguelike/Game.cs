@@ -1,4 +1,6 @@
-﻿using Pcg;
+﻿using MessagePack;
+using MessagePack.Resolvers;
+using Pcg;
 using RLNET;
 using Roguelike.Actors;
 using Roguelike.Core;
@@ -8,7 +10,6 @@ using Roguelike.World;
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Roguelike
 {
@@ -19,15 +20,14 @@ namespace Roguelike
         public static PcgRandom Random { get; private set; }
         public static PcgRandom VisualRandom { get; private set; }
 
-        public static WorldHandler World { get; private set; }
-        public static Player Player { get; internal set; } // internal for deserialization
-
         public static StateHandler StateHandler { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
         public static OverlayHandler OverlayHandler { get; private set; }
 
+        public static WorldHandler World { get; private set; }
         public static MapHandler Map => World.Map;
+        public static Player Player => World.Player;
 
         public static RLRootConsole RootConsole { get; private set; }
         public static ConsoleInfo MapConsole { get; private set; }
@@ -76,21 +76,13 @@ namespace Roguelike
 
         public static void Run()
         {
-            RootConsole.Run();
+            RootConsole.Run(60);
         }
 
         public static void NewGame()
         {
             Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
             VisualRandom = new PcgRandom(Random.Next());
-
-            Player = new Player(new ActorParameters("Player")
-            {
-                Awareness = 10,
-                MaxHp = 100,
-                MaxMp = 50,
-                MaxSp = 50
-            });
 
             StateHandler.Reset();
             MessageHandler.Clear();
@@ -115,8 +107,8 @@ namespace Roguelike
             {
                 using (Stream saveFile = File.OpenRead(Constants.SAVE_FILE))
                 {
-                    BinaryFormatter deserializer = new BinaryFormatter();
-                    World = (WorldHandler)deserializer.Deserialize(saveFile);
+                    World = MessagePackSerializer.Deserialize<WorldHandler>(saveFile,
+                        StandardResolverAllowPrivate.Instance);
                 }
 
                 StateHandler.Reset();
@@ -135,8 +127,7 @@ namespace Roguelike
 
             using (Stream saveFile = File.OpenWrite(Constants.SAVE_FILE))
             {
-                BinaryFormatter serializer = new BinaryFormatter();
-                serializer.Serialize(saveFile, World);
+                MessagePackSerializer.Serialize(saveFile, World, StandardResolverAllowPrivate.Instance);
             }
         }
 
@@ -151,7 +142,7 @@ namespace Roguelike
         }
 
         internal static void ForceRender()
-        {
+        {                                                                                                                                                  
             _render = true;
         }
 

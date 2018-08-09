@@ -1,20 +1,27 @@
-﻿using RLNET;
+﻿using MessagePack;
+using MessagePack.Formatters;
+using RLNET;
 using Roguelike.Core;
-using System;
-using System.Runtime.Serialization;
 
 namespace Roguelike.Interfaces
 {
-    [Serializable]
-    public class Drawable : ISerializable
+    [MessagePackObject]
+    public class Drawable
     {
+        [MessagePackFormatter(typeof(TypelessFormatter))]
+        [Key(0)]
         public RLColor Color { get; internal set; }
+        [Key(1)]
         public char Symbol { get; internal set; }
 
+        [Key(3)]
         internal bool Activated { get; set; }
 
+        [Key(2)]
         private bool _remember;
+        [Key(4)]
         private int _rememberX;
+        [Key(5)]
         private int _rememberY;
 
         public Drawable(RLColor color, char symbol, bool remember)
@@ -23,21 +30,6 @@ namespace Roguelike.Interfaces
             Symbol = symbol;
             Activated = true;
             _remember = remember;
-        }
-
-        protected Drawable(SerializationInfo info, StreamingContext context)
-        {
-            float r = (float)info.GetValue($"{nameof(Color)}.r", typeof(float));
-            float g = (float)info.GetValue($"{nameof(Color)}.g", typeof(float));
-            float b = (float)info.GetValue($"{nameof(Color)}.b", typeof(float));
-            Color = new RLColor(r, g, b);
-
-            Symbol = info.GetChar(nameof(Symbol));
-            Activated = info.GetBoolean(nameof(Activated));
-
-            _remember = info.GetBoolean(nameof(_remember));
-            _rememberX = info.GetInt32(nameof(_rememberX));
-            _rememberY = info.GetInt32(nameof(_rememberY));
         }
 
         public virtual void Draw(RLConsole console, Tile tile)
@@ -81,20 +73,6 @@ namespace Roguelike.Interfaces
             {
                 console.Set(destX, destY, Colors.Floor, null, '.');
             }
-        }
-
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue($"{nameof(Color)}.r", Color.r);
-            info.AddValue($"{nameof(Color)}.g", Color.g);
-            info.AddValue($"{nameof(Color)}.b", Color.b);
-
-            info.AddValue(nameof(Symbol), Symbol);
-            info.AddValue(nameof(Activated), Activated);
-
-            info.AddValue(nameof(_remember), _remember);
-            info.AddValue(nameof(_rememberX), _rememberX);
-            info.AddValue(nameof(_rememberY), _rememberY);
         }
     }
 }

@@ -1,18 +1,17 @@
-﻿using System;
+﻿using MessagePack;
 
 namespace Roguelike.World
 {
-    [Serializable]
     public struct LevelId
     {
         public string Name { get; }
         public RegionType RegionType { get; }
         public int Depth { get; }
 
-        public LevelId(string name, RegionType type, int depth)
+        public LevelId(string name, RegionType regionType, int depth)
         {
             Name = name;
-            RegionType = type;
+            RegionType = regionType;
             Depth = depth;
         }
 
