@@ -17,7 +17,7 @@ namespace Roguelike.State
 
         private CharSelectState()
         {
-            _pixels = ImageConvert.Convert("circles.png", Game.Config.Screen.Width).ToList();
+            _pixels = ImageConvert.Convert("circles.png", Game.Config.ScreenWidth).ToList();
         }
 
         public ICommand HandleKeyInput(RLKeyPress keyPress)

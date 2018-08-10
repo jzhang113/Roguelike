@@ -1,17 +1,13 @@
 ﻿{
     "fontName": "ccc12x12.png",
     "fontSize": 12,
-    "screen": {
-        "height": 70,
-        "width": 80
-    },
     "map": {
-        "height": 100,
-        "width": 100
+        "height": 200,
+        "width": 200
     },
     "mapView": {
         "height": 60,
-        "width": 60
+        "width": 110
     },
     "messageMaxCount": 100,
     "messageView": {
@@ -19,7 +15,7 @@
         "width": 60
     },
     "statView": {
-        "height": 3,
+        "height": 5,
         "width": 60
     },
     "inventoryView": {

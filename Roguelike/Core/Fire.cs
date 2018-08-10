@@ -15,7 +15,7 @@ namespace Roguelike.Core
         public int X { get; set; }
         public int Y { get; set; }
 
-        public string Name => "fire";
+        public string Name => "Fire";
         public int Energy { get; set; }
         public int RefreshRate => Constants.DEFAULT_REFRESH_RATE;
 
@@ -23,6 +23,8 @@ namespace Roguelike.Core
         {
             ColorInterval foreground = new ColorInterval(Colors.Fire, Colors.FireAccent, 0.6);
             DrawingComponent = new AnimatedDrawable(foreground, null, '^');
+            X = x;
+            Y = y;
         }
 
         public ICommand Act()
@@ -42,7 +44,7 @@ namespace Roguelike.Core
 
             if (Game.Map.TryGetActor(X, Y, out _))
                 return new ActionCommand(this,
-                    new DamageAction(Constants.FIRE_DAMAGE, new TargetZone(TargetShape.Self)),
+                    new IgniteAction(new TargetZone(TargetShape.Self)),
                     Game.Map.Field[X, Y]);
 
             return new WaitCommand(this);

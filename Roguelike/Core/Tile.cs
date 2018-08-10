@@ -9,7 +9,6 @@ namespace Roguelike.Core
     {
         public int X { get; }
         public int Y { get; }
-        public Drawable DrawingComponent { get; private set; }
 
         public float Light
         {
@@ -46,6 +45,8 @@ namespace Roguelike.Core
         public bool IsWalkable => !IsWall && !IsOccupied;
         public bool IsLightable => !IsWall && !BlocksLight;
 
+        public Drawable DrawingComponent { get; private set; }
+
         private float _light;
         private TerrainType _type;
 
@@ -53,10 +54,9 @@ namespace Roguelike.Core
         {
             X = x;
             Y = y;
-            Fuel = 10;
-
             Type = type;
-            DrawingComponent = type.ToDrawable();
+
+            Fuel = 10;
         }
     }
 }

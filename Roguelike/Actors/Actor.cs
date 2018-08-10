@@ -46,7 +46,7 @@ namespace Roguelike.Actors
             Energy = 0;
             RefreshRate = Data.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
-            StatusHandler = new StatusHandler();
+            StatusHandler = new StatusHandler(this);
             StatusHandler.AddStatus(StatusType.Phasing, 10);
 
             DrawingComponent = new Drawable(color, symbol, false);

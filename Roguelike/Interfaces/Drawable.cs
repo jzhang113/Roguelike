@@ -79,7 +79,7 @@ namespace Roguelike.Interfaces
             }
             else
             {
-                console.Set(destX, destY, Colors.Floor, null, '.');
+                console.Set(destX, destY, Colors.FloorBackground, null, '.');
             }
         }
 

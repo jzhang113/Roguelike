@@ -105,6 +105,7 @@
   <ItemGroup>
     <Compile Include="Actions\EnchantAction.cs" />
     <Compile Include="Actions\HookAction.cs" />
+    <Compile Include="Actions\IgniteAction.cs" />
     <Compile Include="Actions\MoveAction.cs" />
     <Compile Include="Actors\ActorParameters.cs" />
     <Compile Include="Animations\ExplosionAnimation.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Statuses\StatusInfo.cs" />
     <Compile Include="Statuses\StatusType.cs" />
     <Compile Include="Statuses\StatusHandler.cs" />
+    <Compile Include="Systems\InfoHandler.cs" />
     <Compile Include="Utils\ColorInfo.cs" />
     <Compile Include="Utils\ImageConvert.cs" />
     <Compile Include="Utils\RandomExtensions.cs" />

@@ -34,9 +34,9 @@ namespace Roguelike
         public static ConsoleInfo InventoryConsole { get; private set; }
         public static ConsoleInfo FullConsole { get; private set; }
 
-        private static RLConsole _messageConsole;
-        private static RLConsole _statConsole;
-        private static RLConsole _viewConsole;
+        private static ConsoleInfo MessageConsole { get; set; }
+        private static ConsoleInfo StatConsole { get; set; }
+        private static ConsoleInfo ViewConsole { get; set; }
 
         private static bool _render = true;
 
@@ -49,20 +49,25 @@ namespace Roguelike
 
             string consoleTitle = "Roguelike";
 
-            RootConsole = new RLRootConsole(Config.FontName, Config.Screen.Width, Config.Screen.Height, Config.FontSize, Config.FontSize, 1, consoleTitle);
+            RootConsole = new RLRootConsole(Config.FontName, Config.ScreenWidth, Config.ScreenHeight, Config.FontSize, Config.FontSize, 1, consoleTitle);
             MapConsole = new ConsoleInfo(
                 new RLConsole(Config.MapView.Width, Config.MapView.Height),
                 0, Config.StatView.Height);
             InventoryConsole = new ConsoleInfo(
                 new RLConsole(Config.InventoryView.Width, Config.InventoryView.Height),
-                Config.Screen.Width - configs.InventoryView.Width, 0);
+                Config.ScreenWidth - configs.InventoryView.Width, 0);
             FullConsole = new ConsoleInfo(
-                new RLConsole(Config.Screen.Width, Config.Screen.Height),
+                new RLConsole(Config.ScreenWidth, Config.ScreenHeight),
                 0, 0);
-
-            _messageConsole = new RLConsole(Config.MessageView.Width, Config.MessageView.Height);
-            _statConsole = new RLConsole(Config.StatView.Width, Config.StatView.Height);
-            _viewConsole = new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height);
+            MessageConsole = new ConsoleInfo(
+                new RLConsole(Config.MessageView.Width, Config.MessageView.Height),
+                0, Config.StatView.Height + Config.MapView.Height);
+            StatConsole = new ConsoleInfo(
+                new RLConsole(Config.StatView.Width, Config.StatView.Height),
+                0, 0);
+            ViewConsole = new ConsoleInfo(
+                new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height),
+                Config.MapView.Width, 0);
 
             StateHandler = new StateHandler(RootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
@@ -167,41 +172,27 @@ namespace Roguelike
 
             if (MessageHandler.Redraw)
             {
-                _messageConsole.Clear(0, RLColor.Black, Colors.Text);
-                MessageHandler.Draw(_messageConsole);
-                RLConsole.Blit(_messageConsole, 0, 0, Config.MessageView.Width,
-                    Config.MessageView.Height, RootConsole, 0, Config.StatView.Height + Config.MapView.Height);
+                RLConsole console = MessageConsole.Console;
+                console.Clear(0, RLColor.Black, Colors.Text);
+                MessageHandler.Draw(console);
+                RLConsole.Blit(console, 0, 0, console.Width, console.Height, RootConsole,
+                    MessageConsole.X, MessageConsole.Y);
             }
 
-            //_statConsole.Clear(0, RLColor.Black, Colors.TextHeading);
-            //int stepSize = 5;
-            //int hpWidth = Player.Parameters.MaxHp / stepSize;
-            //int hpFilled = hpWidth * Player.Hp / Player.Parameters.MaxHp;
-            //string health = $"{Player.Hp}/{Player.Parameters.MaxHp}";
-            //_statConsole.Print((hpWidth - health.Length) / 2 + 2, 1, health, Colors.TextHeading);
-            //for (int i = 0; i <= hpFilled; i++)
-            //    _statConsole.SetBackColor(i + 1, 1, Swatch.DbBlood);
-            //for (int i = hpFilled + 1; i <= hpWidth; i++)
-            //    _statConsole.SetBackColor(i + 1, 1, Swatch.DbOldBlood);
+            if (Player != null)
+            {
+                RLConsole statConsole = StatConsole.Console;
+                statConsole.Clear(0, RLColor.Black, Colors.Text);
+                InfoHandler.Draw(statConsole);
+                RLConsole.Blit(statConsole, 0, 0, statConsole.Width, statConsole.Height, RootConsole,
+                    StatConsole.X, StatConsole.Y);
+            }
 
-            //int armorWidth = Player.Armor / stepSize;
-            //for (int i = 0; i <= armorWidth; i++)
-            //    _statConsole.SetBackColor(i + hpWidth + 3, 1, Swatch.DbMetal);
-
-            //int mpWidth = Player.Parameters.MaxMp / stepSize;
-            //int mpFilled = mpWidth * Player.Mp / Player.Parameters.MaxMp;
-            //string mana = $"{Player.Mp}/{Player.Parameters.MaxMp}";
-            //_statConsole.Print((mpWidth - mana.Length) / 2 + 2, 2, mana, Colors.TextHeading);
-            //for (int i = 0; i <= mpFilled; i++)
-            //    _statConsole.SetBackColor(i + 1, 2, Swatch.DbWater);
-            //for (int i = mpFilled + 1; i <= mpWidth; i++)
-            //    _statConsole.SetBackColor(i + 1, 2, Swatch.DbDeepWater);
-
-            //RLConsole.Blit(_statConsole, 0, 0, Config.StatView.Width, Config.StatView.Height, RootConsole, 0, 0);
-
-            _viewConsole.Clear(0, RLColor.Black, Colors.Text);
-            LookHandler.Draw(_viewConsole);
-            RLConsole.Blit(_viewConsole, 0, 0, Config.ViewWindow.Width, Config.ViewWindow.Height, RootConsole, Config.MapView.Width, 0);
+            RLConsole lookConsole = ViewConsole.Console;
+            lookConsole.Clear(0, RLColor.Black, Colors.Text);
+            LookHandler.Draw(lookConsole);
+            RLConsole.Blit(lookConsole, 0, 0, lookConsole.Width, lookConsole.Height, RootConsole,
+                ViewConsole.X, ViewConsole.Y);
 
             StateHandler.Draw();
             RootConsole.Draw();

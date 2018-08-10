@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Roguelike.Actors;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Statuses
@@ -7,10 +8,12 @@ namespace Roguelike.Statuses
     public class StatusHandler
     {
         private IDictionary<StatusType, StatusInfo> _statuses;
+        private Actor _source;
 
-        public StatusHandler()
+        public StatusHandler(Actor actor)
         {
             _statuses = new Dictionary<StatusType, StatusInfo>();
+            _source = actor;
         }
 
         public void AddStatus(StatusType type, int timeout)
@@ -52,7 +55,7 @@ namespace Roguelike.Statuses
                 switch (type)
                 {
                     case StatusType.Burning:
-                        Console.WriteLine("tick");
+                        _source.TakeDamage(10);
                         break;
                 }
 
