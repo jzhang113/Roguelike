@@ -1,22 +1,17 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Commands;
+using System;
 
 namespace Roguelike.Core
 {
+    [Serializable]
     public class Door : Actor
     {
         public bool IsOpen { get; set; }
 
-        public Door() : base(new ActorParameters("Door"), Colors.Door, '+')
-        {
-            IsOpen = false;
-        }
-
-        public Door(bool open) : base(new ActorParameters("Door"), Colors.Door, '+')
+        public Door(bool open = false) : base(new ActorParameters("Door"), Colors.Door, '+')
         {
             IsOpen = open;
-            if (open)
-                DrawingComponent.Symbol = '-';
         }
 
         public override ICommand GetAction()

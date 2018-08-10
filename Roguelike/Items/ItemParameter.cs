@@ -1,7 +1,9 @@
 ﻿using Roguelike.Data;
+using System;
 
 namespace Roguelike.Items
 {
+    [Serializable]
     public class ItemParameter
     {
         public string Name { get; }
@@ -11,10 +13,6 @@ namespace Roguelike.Items
         public int Damage { get; set; } = Constants.DEFAULT_DAMAGE;
         public double MeleeRange { get; set; } = Constants.DEFAULT_MELEE_RANGE;
         public double ThrowRange { get; set; } = Constants.DEFAULT_THROW_RANGE;
-
-        public ItemParameter()
-        {
-        }
 
         public ItemParameter(string name, MaterialType material)
         {

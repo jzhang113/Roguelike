@@ -1,40 +1,27 @@
-﻿using MessagePack;
-using Roguelike.Actions;
+﻿using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
-    [MessagePackObject]
+    [Serializable]
     public class Item
     {
-        [Key(0)]
         public int Enchantment { get; set; }
-        [Key(1)]
         public bool Burning { get; set; }
 
-        [Key(2)]
         public ItemParameter Parameters { get; }
-        [Key(3)]
         public Drawable DrawingComponent { get; }
         
-        [Key(4)]
         public int X { get; set; }
-        [Key(5)]
         public int Y { get; set; }
 
-        [Key(6)]
-        private readonly IList<IAction> _abilities;
-
-        [IgnoreMember]
         public string Name => Parameters.Name;
 
-        // Deserialization constructor
-        public Item()
-        {
-        }
+        private readonly IList<IAction> _abilities;
 
         public Item(ItemParameter parameters, RLNET.RLColor color, char symbol)
         {

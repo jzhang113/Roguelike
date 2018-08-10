@@ -1,13 +1,11 @@
 ﻿using Roguelike.Interfaces;
+using System;
 
 namespace Roguelike.Items
 {
+    [Serializable]
     public class Weapon : Item, IEquippable
     {
-        public Weapon()
-        {
-        }
-
         public Weapon(ItemParameter parameters, RLNET.RLColor color) : base(parameters, color, '(')
         {
         }

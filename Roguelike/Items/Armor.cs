@@ -1,15 +1,13 @@
 ﻿using Roguelike.Core;
 using Roguelike.Interfaces;
+using System;
 
 namespace Roguelike.Items
 {
+    [Serializable]
     public class Armor : Item, IEquippable
     {
         public ArmorType Type { get; }
-
-        public Armor()
-        {
-        }
 
         public Armor(ItemParameter parameters, RLNET.RLColor color, ArmorType type) : base(parameters, color, '[')
         {

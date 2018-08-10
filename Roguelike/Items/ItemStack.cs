@@ -1,34 +1,23 @@
-﻿using MessagePack;
-using Roguelike.Data;
+﻿using Roguelike.Data;
 using Roguelike.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Roguelike.Items
 {
-    [MessagePackObject]
+    [Serializable]
     class ItemStack : IEnumerable<ItemCount>
     {
-        [Key(0)]
         public string Name { get; }
-        [Key(1)]
         public int Count { get; private set; }
-        [Key(2)]
         internal bool Collapsed { get; set; }
-
-        [Key(3)]
-        private readonly IDictionary<Item, int> _itemStack;
-
-        [IgnoreMember]
         public int TypeCount => _itemStack.Count;
 
-        public bool IsEmpty() => _itemStack.Count == 0;
+        private readonly IDictionary<Item, int> _itemStack;
 
-        // Deserialization constructor
-        public ItemStack()
-        {
-        }
+        public bool IsEmpty() => _itemStack.Count == 0;
 
         public ItemStack(Item item, int count)
         {

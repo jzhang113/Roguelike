@@ -1,19 +1,16 @@
-﻿using MessagePack;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Roguelike.Core
 {
-    [MessagePackObject]
+    [Serializable]
     class Field : IEnumerable<Tile>
     {
-        [Key(0)]
-        private readonly int _width;
-        [Key(1)]
-        private readonly int _height;
-        [Key(2)]
         private readonly Tile[][] _field;
+        private readonly int _width;
+        private readonly int _height;
 
         public Field(int width, int height)
         {

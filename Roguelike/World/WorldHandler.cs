@@ -3,41 +3,23 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MessagePack;
-using Roguelike.Actors;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Roguelike.World
 {
-    [MessagePackObject]
+    [Serializable]
     class WorldHandler
     {
         // TODO: generate dynamic world names
         private const string _ROOT_NAME = "root";
+        private static int _counter;
 
-        [Key(0)]
         public MapHandler Map { get; private set; }
-        [Key(1)]
         public LevelId CurrentLevel { get; private set; }
-        [Key(2)]
-        public Player Player { get; private set; }
-
-        [Key(3)]
         private readonly Dictionary<LevelId, LevelData> _levels;
-
-        // Deserialization constructor
-        public WorldHandler()
-        {
-        }
 
         public WorldHandler(WorldParameter parameters)
         {
-            Player = new Player(new ActorParameters("Player")
-            {
-                Awareness = 10,
-                MaxHp = 100,
-                MaxMp = 50,
-                MaxSp = 50
-            });
             _levels = BuildWorld(parameters);
             CurrentLevel = new LevelId(_ROOT_NAME, RegionType.Root, 1);
         }
@@ -127,6 +109,7 @@ namespace Roguelike.World
             Dictionary<LevelId, LevelData> world)
         {
             int maxDepth = Game.Random.Next(region.MinLength, region.MaxLength);
+            string levelName = GenerateLevelName(region.Type);
 
             // attach new region to existing world
             LevelId parentId;
@@ -157,8 +140,6 @@ namespace Roguelike.World
                 parentLevel = keyValuePair.Value;
             }
 
-            int seed = Game.Random.Next();
-            string levelName = GenerateLevelName(region.Type,seed);
             LevelId firstId = new LevelId(levelName, region.Type, 1);
             parentLevel.Exits.Add(firstId);
 
@@ -171,15 +152,13 @@ namespace Roguelike.World
                     parentId,
                     new LevelId(levelName, region.Type, 2)
                 },
-                Seed = seed
+                Seed = Game.Random.Next()
             };
             world.Add(firstId, firstLevel);
 
             // create rest of connections in the region
             for (int depth = 2; depth <= maxDepth - 1; depth++)
             {
-                seed = Game.Random.Next();
-                levelName = GenerateLevelName(region.Type, seed);
                 LevelId id = new LevelId(levelName, region.Type, depth);
                 LevelData level = new LevelData
                 {
@@ -189,13 +168,11 @@ namespace Roguelike.World
                         new LevelId(levelName, region.Type, depth - 1),
                         new LevelId(levelName, region.Type, depth + 1)
                     },
-                    Seed = seed
+                    Seed = Game.Random.Next()
                 };
                 world.Add(id, level);
             }
 
-            seed = Game.Random.Next();
-            levelName = GenerateLevelName(region.Type, seed);
             LevelId lastId = new LevelId(levelName, region.Type, maxDepth);
             LevelData lastLevel = new LevelData
             {
@@ -204,12 +181,12 @@ namespace Roguelike.World
                 {
                     new LevelId(levelName, region.Type, maxDepth - 1)
                 },
-                Seed = seed
+                Seed = Game.Random.Next()
             };
             world.Add(lastId, lastLevel);
         }
 
-        private static string GenerateLevelName(RegionType region, int seed)
+        private static string GenerateLevelName(RegionType region)
         {
             switch (region)
             {
@@ -217,11 +194,11 @@ namespace Roguelike.World
                 case RegionType.Root:
                     return _ROOT_NAME;
                 case RegionType.Main:
-                    return "herp" + seed;
+                    return "herp" + _counter++;
                 case RegionType.Side:
-                    return "perp" + seed;
+                    return "perp" + _counter++;
                 case RegionType.Otherside:
-                    return "derp" + seed;
+                    return "derp" + _counter++;
                 default:
                     throw new ArgumentException($"undefined value of region");
             }
@@ -271,7 +248,8 @@ namespace Roguelike.World
         {
             using (Stream saveFile = File.OpenWrite($"{id}.dat"))
             {
-                MessagePackSerializer.Typeless.Serialize(saveFile, Map);
+                BinaryFormatter serializer = new BinaryFormatter();
+                serializer.Serialize(saveFile, Map);
             }
         }
 
@@ -279,7 +257,8 @@ namespace Roguelike.World
         {
             using (Stream saveFile = File.OpenRead($"{id}.dat"))
             {
-                return MessagePackSerializer.Typeless.Deserialize(saveFile) as MapHandler;
+                BinaryFormatter deserializer = new BinaryFormatter();
+                return (MapHandler)deserializer.Deserialize(saveFile);
             }
         }
         #endregion

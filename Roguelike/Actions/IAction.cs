@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Roguelike.Animations;
+﻿using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 
@@ -8,10 +7,6 @@ namespace Roguelike.Actions
     // Actions are similar to commands, but takes a target and will always trigger when called.
     // Actions may be chained into action sequences, which is considered as a single move and 
     // has a total time cost.
-    [Union(0, typeof(DamageAction))]
-    [Union(1, typeof(EnchantAction))]
-    [Union(2, typeof(HealAction))]
-    [Union(3, typeof(MoveAction))]
     public interface IAction
     {
         // Holds the area that an Action can target.
