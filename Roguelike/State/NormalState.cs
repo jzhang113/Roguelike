@@ -78,6 +78,38 @@ namespace Roguelike.State
                     else
                         Game.MessageHandler.AddMessage("Nothing to pick up here.");
                     return null;
+                case NormalInput.Throw:
+                    // TODO: Add ability to throw without wielding
+                    Weapon weapon = Game.Player.Equipment.PrimaryWeapon;
+                    if (weapon == null)
+                    {
+                        Game.MessageHandler.AddMessage("Nothing to throw.");
+                        return null;
+                    }
+
+                    IAction thrown = weapon.Throw();
+                    Game.StateHandler.PushState(new TargettingState(
+                        Game.Player,
+                        thrown.Area,
+                        returnTarget =>
+                        {
+                            Game.MessageHandler.AddMessage($"You throw a {weapon}.");
+
+                            // Switch to offhand weapon if possible.
+                            Game.Player.Equipment.PrimaryWeapon = Game.Player.Equipment.OffhandWeapon;
+
+                            // Drop the item on the map.
+                            // TODO: Add possibility of weapon stuck / breaking
+                            // TODO: Handle case of multiple thrown at once?
+                            Tile[] enumerable = returnTarget as Tile[] ?? returnTarget.ToArray();
+                            Tile tile = enumerable[0];
+                            weapon.X = tile.X;
+                            weapon.Y = tile.Y;
+                            Game.Map.AddItem(new ItemCount { Item = weapon, Count = 1 });
+
+                            return new ActionCommand(Game.Player, thrown, enumerable);
+                        }));
+                    return null;
                 case NormalInput.ChangeLevel:
                     // HACK: Ad-hoc input handling
                     if (Game.Map.TryChangeLocation(player, out World.LevelId destination))
@@ -122,13 +154,7 @@ namespace Roguelike.State
                 return null;
             }
 
-            if (keyPress.Key == RLKey.W)
-            {
-                Game.StateHandler.PushState(new AnimationState(new Animations.SpinAnimation(Game.Player.X, Game.Player.Y)));
-                return null;
-            }
-
-            if (keyPress.Key == RLKey.R)
+            if (keyPress.Key == RLKey.Z)
             {
                 Game.EventScheduler.Clear();
                 Game.NewGame();

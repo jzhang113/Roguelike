@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Roguelike.Core
 {
     [Serializable]
     class Field : IEnumerable<Tile>
     {
-        private readonly Tile[][] _field;
+        private readonly Tile[] _field;
         private readonly int _width;
         private readonly int _height;
 
@@ -17,13 +16,11 @@ namespace Roguelike.Core
             _width = width;
             _height = height;
 
-            _field = new Tile[width][];
-            for (int i = 0; i < width; i++)
+            _field = new Tile[width * height];
+            for (int y = 0; y < height; y++)
             {
-                _field[i] = new Tile[height];
-
-                for (int j = 0; j < height; j++)
-                    _field[i][j] = new Tile(i, j, Data.TerrainType.Wall);
+                for (int x = 0; x < width; x++)
+                    _field[y * height + x] = new Tile(x, y, Data.TerrainType.Wall);
             }
         }
 
@@ -39,10 +36,10 @@ namespace Roguelike.Core
 
                 if (j < 0)
                     tempY = 0;
-                else if (j >= _height)
+                else  if (j >= _height)
                     tempY = _height - 1;
 
-                return _field[tempX][tempY];
+                return _field[tempY * _height + tempX];
             }
         }
 
@@ -50,7 +47,8 @@ namespace Roguelike.Core
 
         public IEnumerator<Tile> GetEnumerator()
         {
-            return _field.SelectMany(row => row).GetEnumerator();
+            foreach (Tile tile in _field)
+                yield return tile;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

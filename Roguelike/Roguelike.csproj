@@ -120,7 +120,6 @@
     <Compile Include="Commands\EquipCommand.cs" />
     <Compile Include="Commands\WaitCommand.cs" />
     <Compile Include="Commands\PickupCommand.cs" />
-    <Compile Include="Commands\ThrowCommand.cs" />
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Core\ActorState.cs" />

@@ -31,6 +31,7 @@ namespace Roguelike.Input
         AutoExplore,
         ChangeLevel,
         Get,
+        Throw,
         Wait
     }
 

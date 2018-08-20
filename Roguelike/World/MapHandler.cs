@@ -756,21 +756,20 @@ namespace Roguelike.World
 
         private void UpdateAutoExploreMaps()
         {
+            Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    AutoexploreMap[x, y] = float.NaN;
-                }
-            }
-
-            Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
-            foreach (Tile tile in Field)
-            {
-                if (!tile.IsExplored)
-                {
-                    goals.Enqueue(new WeightedPoint(tile.X, tile.Y));
-                    AutoexploreMap[tile.X, tile.Y] = 0;
+                    if (Field[x, y].IsExplored)
+                    {
+                        AutoexploreMap[x, y] = float.NaN;
+                    }
+                    else
+                    {
+                        goals.Enqueue(new WeightedPoint(x, y));
+                        AutoexploreMap[x, y] = 0;
+                    }
                 }
             }
 
