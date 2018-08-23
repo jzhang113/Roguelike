@@ -660,7 +660,13 @@ namespace Roguelike.World
             {
                 for (int dy = 0; dy < Game.Config.MapView.Height; dy++)
                 {
-                    Tile tile = Field[Camera.X + dx, Camera.Y + dy];
+                    int newX = Camera.X + dx;
+                    int newY = Camera.Y + dy;
+
+                    if (newX >= Width || newY >= Height)
+                        continue;
+
+                    Tile tile = Field[newX, newY];
                     if (!tile.IsExplored)
                         continue;
 
