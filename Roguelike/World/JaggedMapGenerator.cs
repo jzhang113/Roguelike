@@ -13,7 +13,6 @@ namespace Roguelike.World
     {
         private const int _ROOM_SIZE = 5;
         private const int _ROOM_VARIANCE = 2;
-        private const int _ROOM_ATTEMPTS = 1000;
         private const double _FILL_PERCENT = 0.05;
         private const double _LOOP_CHANCE = 0.15;
 
@@ -35,12 +34,8 @@ namespace Roguelike.World
             // Set up the initial placement of the map. Include special features, if any.
             int counter = InitialPlacement(roomList, openPoints, ref occupied);
 
-            for (int i = 0; i < _ROOM_ATTEMPTS; i++)
+            while (openPoints.Count > 0)
             {
-                // Nowhere else to put rooms, so we are done.
-                if (openPoints.Count <= 0)
-                    break;
-
                 // Choose a random point to create a room around;
                 (int availX, int availY) = openPoints[Rand.Next(openPoints.Count)];
 
@@ -58,49 +53,40 @@ namespace Roguelike.World
             }
 
             // Use the largest areas as rooms and triangulate them to calculate hallways.
-            List<Vertex> roomCenters = roomList
+            RoomList = roomList
                 .OrderByDescending(r => r.Area)
                 .Take((int)(roomList.Count * _FILL_PERCENT))
-                .Select(r => new Vertex(r.Center.X, r.Center.Y))
                 .ToList();
 
             // If we don't get enough rooms, we can't (and don't need to) triangulate, so just
             // draw in what we have.
-            if (roomCenters.Count == 1)
+            if (RoomList.Count == 1)
             {
-                Vertex v0 = roomCenters[0];
-                CreateRoomWithoutBorder(roomList[occupied[(int)v0.X, (int)v0.Y]]);
+                CreateRoomWithoutBorder(RoomList[0]);
             }
-            else if (roomCenters.Count == 2)
+            else if (RoomList.Count == 2)
             {
-                Vertex v0 = roomCenters[0];
-                Vertex v1 = roomCenters[1];
-                IEnumerable<Tile> path = Map.GetStraightLinePath((int)v0.X, (int)v0.Y,
-                    (int)v1.X, (int)v1.Y);
-                ClearRoomsAlongPath(path, roomList, occupied);
+                // Add the only hallway to the hall list
+                Adjacency = new ICollection<int>[] { new[] { 1 }, new[] { 0 } };
+
+                ClearRoomsBetween(RoomList[0], RoomList[1], roomList, occupied);
             }
             else
             {
                 Polygon polygon = new Polygon();
-                foreach (Vertex vertex in roomCenters)
+                foreach (Room room in RoomList)
                 {
-                    polygon.Add(vertex);
+                    polygon.Add(new Vertex(room.Center.X, room.Center.Y));
                 }
                 IMesh delaunay = polygon.Triangulate();
 
-                IList<(int X, int Y)> vertices = new(int X, int Y)[delaunay.Vertices.Count];
-                foreach (Vertex vertex in delaunay.Vertices)
-                {
-                    vertices[vertex.ID] = ((int)vertex.X, (int)vertex.Y);
-                }
-
                 // Reduce the number of edges and clear out rooms along the remaining edges.
-                foreach (Edge edge in TrimEdges(delaunay.Edges, vertices))
+                var edges = TrimEdges(delaunay.Edges, RoomList).ToList();
+                Adjacency = BuildAdjacencyList(edges, RoomList.Count);
+
+                foreach (Edge edge in edges)
                 {
-                    (int x0, int y0) = vertices[edge.P0];
-                    (int x1, int y1) = vertices[edge.P1];
-                    IEnumerable<Tile> path = Map.GetStraightLinePath(x0, y0, x1, y1);
-                    ClearRoomsAlongPath(path, roomList, occupied);
+                    ClearRoomsBetween(RoomList[edge.P0], RoomList[edge.P1], roomList, occupied);
                 }
             }
 
@@ -143,8 +129,14 @@ namespace Roguelike.World
             }
         }
 
-        private void ClearRoomsAlongPath(IEnumerable<Tile> path, IList<Room> roomList, int[,] occupied)
+        private void ClearRoomsBetween(Room r1, Room r2, IList<Room> roomList, int[,] occupied)
         {
+            int x0 = Rand.Next(r1.Left + 1, r1.Right);
+            int y0 = Rand.Next(r1.Top + 1, r1.Bottom);
+            int x1 = Rand.Next(r2.Left + 1, r2.Right);
+            int y1 = Rand.Next(r2.Top + 1, r2.Bottom);
+            IEnumerable<Tile> path = Map.GetStraightLinePath(x0, y0, x1, y1);
+
             foreach (Tile tile in path)
             {
                 if (!tile.IsWall)
@@ -344,21 +336,21 @@ namespace Roguelike.World
 
         // Use Prim's algorithm to generate a MST of edges.
         private IEnumerable<Edge> TrimEdges(IEnumerable<Edge> edges,
-            IList<(int X, int Y)> vertices)
+            IList<Room> rooms)
         {
             List<Edge> allEdges = edges.ToList();
-            ICollection<int>[] adjacency = BuildAdjacencyList(allEdges, vertices.Count);
+            ICollection<int>[] adjacency = BuildAdjacencyList(allEdges, rooms.Count);
             // Comparator for MapVertex is defined to give negated
-            MaxHeap<MapVertex> pq = new MaxHeap<MapVertex>(vertices.Count);
+            MaxHeap<MapVertex> pq = new MaxHeap<MapVertex>(rooms.Count);
 
-            var (firstX, firstY) = vertices[0];
+            var (firstX, firstY) = rooms[0].Center;
             pq.Add(new MapVertex(0, firstX, firstY, 0));
 
-            bool[] inMst = new bool[vertices.Count];
-            double[] weight = new double[vertices.Count];
-            int[] parent = new int[vertices.Count];
+            bool[] inMst = new bool[rooms.Count];
+            double[] weight = new double[rooms.Count];
+            int[] parent = new int[rooms.Count];
 
-            for (int i = 0; i < vertices.Count; i++)
+            for (int i = 0; i < rooms.Count; i++)
             {
                 weight[i] = double.MaxValue;
                 parent[i] = -1;
@@ -374,7 +366,7 @@ namespace Roguelike.World
                     if (inMst[neighborID])
                         continue;
 
-                    var (neighborX, neighborY) = vertices[neighborID];
+                    var (neighborX, neighborY) = rooms[neighborID].Center;
                     double newWeight = Distance.EuclideanDistanceSquared(min.X, min.Y,
                         neighborX, neighborY);
 
@@ -388,7 +380,7 @@ namespace Roguelike.World
             }
 
             ICollection<Edge> graph = new HashSet<Edge>();
-            for (int i = 0; i < vertices.Count; i++)
+            for (int i = 0; i < rooms.Count; i++)
             {
                 if (parent[i] != -1)
                     graph.Add(new Edge(i, parent[i]));

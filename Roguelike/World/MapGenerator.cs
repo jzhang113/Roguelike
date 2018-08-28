@@ -11,12 +11,15 @@ namespace Roguelike.World
 {
     abstract class MapGenerator
     {
-        public int Width { get; }
-        public int Height { get; }
-        public IEnumerable<LevelId> Exits { get; }
-
+        protected int Width { get; }
+        protected int Height { get; }
         protected PcgRandom Rand { get; }
         protected MapHandler Map { get; }
+
+        protected IList<Room> RoomList { get; set; }
+        protected ICollection<int>[] Adjacency { get; set; }
+
+        private IEnumerable<LevelId> Exits { get; }
 
         protected MapGenerator(int width, int height, IEnumerable<LevelId> exits, PcgRandom random)
         {
@@ -164,7 +167,7 @@ namespace Roguelike.World
             }
         }
 
-        protected bool IsDoorLocation(int x, int y)
+        private bool IsDoorLocation(int x, int y)
         {
             bool current = Map.Field[x, y].IsWall;
             bool left = Map.Field[x - 1, y].IsWall;
@@ -185,7 +188,7 @@ namespace Roguelike.World
         }
 
         // HACK: ad-hoc placement code
-        protected void PlaceItems()
+        private void PlaceItems()
         {
             Weapon spear = new Weapon(
                 new ItemParameter("spear", MaterialType.Wood)
@@ -293,7 +296,7 @@ namespace Roguelike.World
         }
 
         // HACK: ad-hoc placement code
-        protected void PlaceActors()
+        private void PlaceActors()
         {
             do
             {
@@ -325,7 +328,7 @@ namespace Roguelike.World
             Map.SetFire(Game.Player.X + 3, Game.Player.Y + 3);
         }
 
-        protected void PlaceStairs()
+        private void PlaceStairs()
         {
             foreach (LevelId id in Exits)
             {
