@@ -158,6 +158,7 @@
     <Compile Include="Statuses\StatusInfo.cs" />
     <Compile Include="Statuses\StatusType.cs" />
     <Compile Include="Statuses\StatusHandler.cs" />
+    <Compile Include="Systems\MovesetHandler.cs" />
     <Compile Include="Systems\InfoHandler.cs" />
     <Compile Include="Utils\ColorInfo.cs" />
     <Compile Include="Utils\ImageConvert.cs" />

@@ -204,14 +204,19 @@ namespace Roguelike.World
             };
             Map.AddItem(new ItemCount { Item = spear, Count = 1 });
 
-            IAction heal = new HealAction(100, new TargetZone(TargetShape.Self));
+            spear.Moveset = new Systems.MovesetHandler(new Systems.ActionNode(
+                new Systems.ActionNode(
+                    new Systems.ActionNode(
+                        null,
+                        null,
+                        new MoveAction(new TargetZone(TargetShape.Range, 2))),
+                    null,
+                    new DamageAction(300, new TargetZone(TargetShape.Range, 1))),
+                null,
+                new DamageAction(100, new TargetZone(TargetShape.Directional, 2))));
 
-            //var lungeSkill = new List<IAction>()
-            //{
-            //    new MoveAction(new TargetZone(Enums.TargetShape.Directional)),
-            //    new DamageAction(100, new TargetZone(Enums.TargetShape.Directional))
-            //};
-            spear.AddAbility(new DamageAction(100, new TargetZone(TargetShape.Directional)));
+
+            IAction heal = new HealAction(100, new TargetZone(TargetShape.Self));
 
             Armor ha = new Armor(
                 new ItemParameter("heavy armor", MaterialType.Iron)
@@ -308,22 +313,22 @@ namespace Roguelike.World
             Map.AddActor(Game.Player);
             // Map.SetActorPosition(Player, playerX, playerY);
 
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    Skeleton s = new Skeleton(new ActorParameters($"Skeleton #{i}")
-            //    {
-            //        Awareness = 10,
-            //        MaxHp = 50,
-            //        MaxMp = 20,
-            //        MaxSp = 20
-            //    });
-            //    while (!Map.Field[s.X, s.Y].IsWalkable)
-            //    {
-            //        s.X = Rand.Next(1, Game.Config.Map.Width - 1);
-            //        s.Y = Rand.Next(1, Game.Config.Map.Height - 1);
-            //    }
-            //    Map.AddActor(s);
-            //}
+            for (int i = 0; i < 10; i++)
+            {
+                Actors.Skeleton s = new Actors.Skeleton(new Actors.ActorParameters($"Skeleton #{i}")
+                {
+                    Awareness = 10,
+                    MaxHp = 50,
+                    MaxMp = 20,
+                    MaxSp = 20
+                });
+                while (!Map.Field[s.X, s.Y].IsWalkable)
+                {
+                    s.X = Rand.Next(1, Game.Config.Map.Width - 1);
+                    s.Y = Rand.Next(1, Game.Config.Map.Height - 1);
+                }
+                Map.AddActor(s);
+            }
 
             Map.SetFire(Game.Player.X + 3, Game.Player.Y + 3);
         }

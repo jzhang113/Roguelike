@@ -29,12 +29,5 @@ namespace Roguelike.Actors
         }
 
         public override void TriggerDeath() => Game.GameOver();
-        public override IAction GetBasicAttack()
-        {
-            if (Equipment.IsDefaultWeapon())
-                return base.GetBasicAttack();
-            else
-                return Equipment.PrimaryWeapon.Attack();
-        }
     }
 }

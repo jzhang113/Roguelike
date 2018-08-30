@@ -2,6 +2,7 @@
 using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
+using Roguelike.Interfaces;
 using Roguelike.Statuses;
 using Roguelike.Systems;
 using System.Collections.Generic;
@@ -76,17 +77,17 @@ namespace Roguelike.Commands
                 $"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy",
                 MessageLevel.Verbose);
 
+            if (Source is IEquipped equipped)
+                equipped.Equipment.PrimaryWeapon?.AttackReset();
+
             if (Source is Player)
             {
                 // TODO: better handling of move over popups
-                if (Game.Map.TryGetStack(_newX, _newY, out InventoryHandler stack))
+                if (Game.Map.TryGetStack(_newX, _newY, out InventoryHandler stack) && !stack.IsEmpty())
                 {
-                    if (!stack.IsEmpty())
-                    {
-                        Game.MessageHandler.AddMessage(stack.Count == 1
-                            ? $"You see {stack.First()} here."
-                            : "You see several items here.");
-                    }
+                    Game.MessageHandler.AddMessage(stack.Count == 1
+                        ? $"You see {stack.First()} here."
+                        : "You see several items here.");
                 }
 
                 if (Game.Map.TryGetExit(_newX, _newY, out Exit exit))

@@ -11,7 +11,22 @@ namespace Roguelike.Systems
     {
         private readonly RLRootConsole _rootConsole;
         private readonly Stack<IState> _states;
-        private readonly IDictionary<Type, ConsoleInfo> _consoles;
+
+        private static readonly IDictionary<Type, ConsoleInfo> _consoles = new Dictionary<Type, ConsoleInfo>
+        {
+            [typeof(AnimationState)] = Game.MapConsole,
+            [typeof(ApplyState)] = Game.InventoryConsole,
+            [typeof(AutoexploreState)] = Game.MapConsole,
+            [typeof(CharSelectState)] = Game.FullConsole,
+            [typeof(DropState)] = Game.InventoryConsole,
+            [typeof(EquipState)] = Game.InventoryConsole,
+            [typeof(InventoryState)] = Game.InventoryConsole,
+            [typeof(MenuState)] = Game.FullConsole,
+            [typeof(NormalState)] = Game.MapConsole,
+            [typeof(TargettingState)] = Game.MapConsole,
+            [typeof(TextInputState)] = Game.MapConsole,
+            [typeof(UnequipState)] = Game.InventoryConsole
+        };
 
         public StateHandler(RLRootConsole console)
         {
@@ -25,22 +40,6 @@ namespace Roguelike.Systems
                 new MenuButton(5, 60, "  Exit  ", Game.Exit)
             });
             _states.Push(mainMenu);
-
-            _consoles = new Dictionary<Type, ConsoleInfo>
-            {
-                [typeof(AnimationState)] = Game.MapConsole,
-                [typeof(ApplyState)] = Game.InventoryConsole,
-                [typeof(AutoexploreState)] = Game.MapConsole,
-                [typeof(CharSelectState)] = Game.FullConsole,
-                [typeof(DropState)] = Game.InventoryConsole,
-                [typeof(EquipState)] = Game.InventoryConsole,
-                [typeof(InventoryState)] = Game.InventoryConsole,
-                [typeof(MenuState)] = Game.FullConsole,
-                [typeof(NormalState)] = Game.MapConsole,
-                [typeof(TargettingState)] = Game.MapConsole,
-                [typeof(TextInputState)] = Game.MapConsole,
-                [typeof(UnequipState)] = Game.InventoryConsole
-            };
         }
 
         public void Reset()

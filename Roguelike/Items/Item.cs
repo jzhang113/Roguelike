@@ -2,8 +2,8 @@
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Interfaces;
+using Roguelike.Systems;
 using System;
-using System.Collections.Generic;
 
 namespace Roguelike.Items
 {
@@ -15,20 +15,24 @@ namespace Roguelike.Items
 
         public ItemParameter Parameters { get; }
         public Drawable DrawingComponent { get; }
-        
+
         public int X { get; set; }
         public int Y { get; set; }
 
-        public string Name => Parameters.Name;
+        internal MovesetHandler Moveset { get; set; }
 
-        private readonly IList<IAction> _abilities;
+        public string Name => Parameters.Name;
 
         public Item(ItemParameter parameters, RLNET.RLColor color, char symbol)
         {
             Parameters = parameters;
             DrawingComponent = new Drawable(color, symbol, true);
 
-            _abilities = new List<IAction>();
+            Moveset = new MovesetHandler(new ActionNode(
+                null, null,
+                new DamageAction(
+                    Parameters.Damage,
+                    new TargetZone(TargetShape.Range, Parameters.MeleeRange))));
         }
 
         // copy constructor
@@ -39,20 +43,12 @@ namespace Roguelike.Items
             Parameters = other.Parameters;
             DrawingComponent = new Drawable(
                 other.DrawingComponent.Color, other.DrawingComponent.Symbol, true);
-            
-            _abilities = new List<IAction>(other._abilities);
         }
-        
+
         #region virtual methods
         public virtual void Consume(Actor actor)
         {
             Game.MessageHandler.AddMessage("That would be unhealthy.");
-        }
-
-        public virtual IAction Attack()
-        {
-            return new DamageAction(
-                Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.MeleeRange));
         }
 
         public virtual IAction Throw()
@@ -67,19 +63,11 @@ namespace Roguelike.Items
         }
         #endregion
 
-        public IAction GetAbility(int index)
-        {
-            if (index >= _abilities.Count)
-                return null;
-            else
-                return _abilities[index];
-        }
+        public IAction AttackLeft() => Moveset.ChooseLeft();
 
-        public void AddAbility(IAction skill)
-        {
-            // TODO: check that the skill doesn't already exist
-            _abilities.Add(skill);
-        }
+        public IAction AttackRight() => Moveset.ChooseRight();
+
+        public void AttackReset() => Moveset.Reset();
 
         public override string ToString()
         {
@@ -89,8 +77,8 @@ namespace Roguelike.Items
         // Helper method for merging hard stacks.
         internal bool SameAs(Item other)
         {
-            return Enchantment == other.Enchantment &&
-                   Parameters.Equals(other.Parameters);
+            return Enchantment == other.Enchantment
+                   && Parameters.Equals(other.Parameters);
         }
 
         // Helper method for merging soft stacks.

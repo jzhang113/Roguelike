@@ -21,31 +21,16 @@ namespace Roguelike.State
         {
         }
 
+        // ReSharper disable once CyclomaticComplexity
         public ICommand HandleKeyInput(RLKeyPress keyPress)
         {
             if (keyPress == null)
                 return null;
 
             Player player = Game.Player;
-            IAction ability = null;
+            Weapon weapon = player.Equipment.PrimaryWeapon;
 
-            if (keyPress.Shift)
-                ability = player.Equipment.PrimaryWeapon?.GetAbility(0);
-            else if (keyPress.Alt)
-                ability = player.Equipment.PrimaryWeapon?.GetAbility(1);
-            else if (keyPress.Control)
-                ability = player.Equipment.PrimaryWeapon?.GetAbility(2);
-
-            return ability != null
-                ? ResolveAttackInput(keyPress, player, ability)
-                : ResolveInput(keyPress, player);
-        }
-
-        // ReSharper disable once CyclomaticComplexity
-        private static ICommand ResolveInput(RLKeyPress keyPress, Actor player)
-        {
-            NormalInput input = InputMapping.GetNormalInput(keyPress);
-            switch (input)
+            switch (InputMapping.GetNormalInput(keyPress))
             {
                 //case NormalInput.None:
                 //    return null;
@@ -80,7 +65,6 @@ namespace Roguelike.State
                     return null;
                 case NormalInput.Throw:
                     // TODO: Add ability to throw without wielding
-                    Weapon weapon = Game.Player.Equipment.PrimaryWeapon;
                     if (weapon == null)
                     {
                         Game.MessageHandler.AddMessage("Nothing to throw.");
@@ -89,14 +73,14 @@ namespace Roguelike.State
 
                     IAction thrown = weapon.Throw();
                     Game.StateHandler.PushState(new TargettingState(
-                        Game.Player,
+                        player,
                         thrown.Area,
                         returnTarget =>
                         {
                             Game.MessageHandler.AddMessage($"You throw a {weapon}.");
 
                             // Switch to offhand weapon if possible.
-                            Game.Player.Equipment.PrimaryWeapon = Game.Player.Equipment.OffhandWeapon;
+                            player.Equipment.PrimaryWeapon = player.Equipment.OffhandWeapon;
 
                             // Drop the item on the map.
                             // TODO: Add possibility of weapon stuck / breaking
@@ -107,7 +91,7 @@ namespace Roguelike.State
                             weapon.Y = tile.Y;
                             Game.Map.AddItem(new ItemCount { Item = weapon, Count = 1 });
 
-                            return new ActionCommand(Game.Player, thrown, enumerable);
+                            return new ActionCommand(player, thrown, enumerable);
                         }));
                     return null;
                 case NormalInput.ChangeLevel:
@@ -148,51 +132,39 @@ namespace Roguelike.State
                 // the hook to escape will give enemies an "attack of opportunity".
                 IAction hookAction = new HookAction(10);
                 Game.StateHandler.PushState(new TargettingState(
-                    Game.Player,
+                    player,
                     hookAction.Area,
-                    returnTarget => new ActionCommand(Game.Player, hookAction, returnTarget)));
+                    returnTarget => new ActionCommand(player, hookAction, returnTarget)));
                 return null;
+            }
+
+            // TODO: Create a debug menu for test commands
+            if (keyPress.Key == RLKey.Grave)
+            {
+                Game.EventScheduler.Clear();
+                Game.NewGame();
+                return new WaitCommand(player);
             }
 
             if (keyPress.Key == RLKey.Z)
             {
-                Game.EventScheduler.Clear();
-                Game.NewGame();
-                return new WaitCommand(Game.Player);
+                IAction action = weapon?.AttackLeft() ?? player.GetBasicAttack();
+                Game.StateHandler.PushState(new TargettingState(
+                    player,
+                    action.Area,
+                    returnTarget => new ActionCommand(player, action, returnTarget)));
+            }
+
+            if (keyPress.Key == RLKey.X)
+            {
+                IAction action = weapon?.AttackRight() ?? player.GetBasicAttack();
+                Game.StateHandler.PushState(new TargettingState(
+                    player,
+                    action.Area,
+                    returnTarget => new ActionCommand(player, action, returnTarget)));
             }
 
             return null;
-        }
-
-        // ReSharper disable once CyclomaticComplexity
-        private static ICommand ResolveAttackInput(RLKeyPress keyPress, Actor player, IAction ability)
-        {
-            // TODO: merge with other resolve block?
-            NormalInput input = InputMapping.GetNormalInput(keyPress);
-            switch (input)
-            {
-                case NormalInput.AttackW:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.W.X, player.Y]);
-                case NormalInput.AttackN:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.S.Y]);
-                case NormalInput.AttackE:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X, player.Y + Direction.N.Y]);
-                case NormalInput.AttackS:
-                    return new ActionCommand(player, ability, Game.Map.Field[player.X + Direction.E.X, player.Y]);
-                case NormalInput.AttackNW:
-                    return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.NW.X, player.Y + Direction.NW.Y]);
-                case NormalInput.AttackNE:
-                    return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.NE.X, player.Y + Direction.NE.Y]);
-                case NormalInput.AttackSW:
-                    return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.SW.X, player.Y + Direction.SW.Y]);
-                case NormalInput.AttackSE:
-                    return new ActionCommand(player, ability,
-                        Game.Map.Field[player.X + Direction.SE.X, player.Y + Direction.SE.Y]);
-                default: return null;
-            }
         }
 
         public ICommand HandleMouseInput(RLMouse mouse)
@@ -215,12 +187,18 @@ namespace Roguelike.State
 
             if (Game.Map.Field[current.X, current.Y].IsVisible
                 && Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))
+            {
                 LookHandler.DisplayActor(displayActor);
+            }
             else if (Game.Map.TryGetItem(current.X, current.Y, out ItemCount displayItem)
                 && displayItem.Count > 0)
+            {
                 LookHandler.DisplayItem(displayItem);
+            }
             else
+            {
                 LookHandler.Clear();
+            }
 
             LookHandler.DisplayTerrain(Game.Map.Field[current.X, current.Y]);
 
@@ -235,11 +213,11 @@ namespace Roguelike.State
             Game.ForceRender();
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw(RLConsole console)
         {
-            mapConsole.Clear(0, RLColor.Black, Colors.Text);
-            Game.Map.Draw(mapConsole);
-            Game.OverlayHandler.Draw(mapConsole);
+            console.Clear(0, RLColor.Black, Colors.Text);
+            Game.Map.Draw(console);
+            Game.OverlayHandler.Draw(console);
         }
     }
 }

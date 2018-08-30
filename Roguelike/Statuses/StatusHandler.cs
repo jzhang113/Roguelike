@@ -7,8 +7,8 @@ namespace Roguelike.Statuses
     [Serializable]
     public class StatusHandler
     {
-        private IDictionary<StatusType, StatusInfo> _statuses;
-        private Actor _source;
+        private readonly IDictionary<StatusType, StatusInfo> _statuses;
+        private readonly Actor _source;
 
         public StatusHandler(Actor actor)
         {
