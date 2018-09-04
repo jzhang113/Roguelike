@@ -77,6 +77,8 @@ namespace Roguelike.Commands
                 $"{Source.Name} moved to {_newX}, {_newY} and is at {Source.Energy} energy",
                 MessageLevel.Verbose);
 
+            Source.Facing = Utils.Distance.GetNearestDirection(_newX, _newY, Source.X, Source.Y);
+
             if (Source is IEquipped equipped)
                 equipped.Equipment.PrimaryWeapon?.AttackReset();
 

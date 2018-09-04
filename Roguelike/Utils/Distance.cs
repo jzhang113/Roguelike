@@ -6,7 +6,7 @@ namespace Roguelike.Utils
     // Helper methods for calculating distances
     static class Distance
     {
-        public static (int X, int Y) GetNearestDirection(int x1, int y1, int x2, int y2)
+        public static Dir GetNearestDirection(int x1, int y1, int x2, int y2)
         {
             int dx = x1 - x2;
             int dy = y1 - y2;

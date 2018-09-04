@@ -1,18 +1,20 @@
-﻿namespace Roguelike.Core
-{
-    static class Direction
-    {
-        public static readonly (int X, int Y) N = (0, -1);
-        public static readonly (int X, int Y) E = (1, 0);
-        public static readonly (int X, int Y) S = (0, 1);
-        public static readonly (int X, int Y) W = (-1, 0);
-        public static readonly (int X, int Y) NE = (1, -1);
-        public static readonly (int X, int Y) SE = (1, 1);
-        public static readonly (int X, int Y) SW = (-1, 1);
-        public static readonly (int X, int Y) NW = (-1, -1);
-        public static readonly (int X, int Y) Center = (0, 0);
+﻿using System;
 
-        public static readonly (int X, int Y)[] DirectionList = {
+namespace Roguelike.Core
+{
+    internal static class Direction
+    {
+        public static readonly Dir N = new Dir(0, -1);
+        public static readonly Dir E = new Dir(1, 0);
+        public static readonly Dir S = new Dir(0, 1);
+        public static readonly Dir W = new Dir(-1, 0);
+        public static readonly Dir NE = new Dir(1, -1);
+        public static readonly Dir SE = new Dir(1, 1);
+        public static readonly Dir SW = new Dir(-1, 1);
+        public static readonly Dir NW = new Dir(-1, -1);
+        public static readonly Dir Center = new Dir(0, 0);
+
+        public static readonly Dir[] DirectionList = {
             N,
             E,
             S,
@@ -22,5 +24,96 @@
             SW,
             NW
         };
+
+        public static Dir Right(this Dir dir)
+        {
+            if (dir == N)
+                return NE;
+            else if (dir == NE)
+                return E;
+            else if (dir == E)
+                return SE;
+            else if (dir == SE)
+                return S;
+            else if (dir == S)
+                return SW;
+            else if (dir == SW)
+                return W;
+            else if (dir == W)
+                return NW;
+            else if (dir == NW)
+                return N;
+            else
+                return Center;
+        }
+
+        public static Dir Left(this Dir dir)
+        {
+            if (dir == N)
+                return NW;
+            else if (dir == NE)
+                return N;
+            else if (dir == E)
+                return NE;
+            else if (dir == SE)
+                return E;
+            else if (dir == S)
+                return SE;
+            else if (dir == SW)
+                return S;
+            else if (dir == W)
+                return SW;
+            else if (dir == NW)
+                return W;
+            else
+                return Center;
+        }
+    }
+
+    [Serializable]
+    public readonly struct Dir
+    {
+        public int X { get; }
+        public int Y { get; }
+
+        public Dir(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public void Deconstruct(out int x, out int y)
+        {
+            x = X;
+            y = Y;
+        }
+
+        public override string ToString() => $"({X}, {Y})";
+
+        #region equality
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Dir))
+            {
+                return false;
+            }
+
+            var dir = (Dir)obj;
+            return X == dir.X &&
+                   Y == dir.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1861411795;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator ==(Dir dir1, Dir dir2) => dir1.Equals(dir2);
+        public static bool operator !=(Dir dir1, Dir dir2) => !(dir1 == dir2);
+        #endregion
     }
 }

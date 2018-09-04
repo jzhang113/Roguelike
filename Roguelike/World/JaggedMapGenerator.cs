@@ -413,7 +413,7 @@ namespace Roguelike.World
             return adjacency;
         }
 
-        private struct MapVertex : IComparable<MapVertex>
+        private readonly struct MapVertex : IComparable<MapVertex>
         {
             public int ID { get; }
             public int X { get; }

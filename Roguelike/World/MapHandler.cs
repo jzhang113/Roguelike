@@ -481,71 +481,102 @@ namespace Roguelike.World
 
         // Octants are identified by the direction of the right edge. Returns a row starting from
         // the straight edge.
-        private IEnumerable<Tile> GetRowInOctant(int x, int y, int distance, (int X, int Y) dir)
+        private IEnumerable<Tile> GetRowInOctant(int x, int y, int distance, Dir dir)
         {
-            if (dir.X == 0 && dir.Y == 0)
+            if (dir == Direction.Center)
                 yield break;
 
             for (int i = 0; i <= distance; i++)
             {
-                if (dir.X == Direction.N.X && dir.Y == Direction.N.Y)
+                if (dir == Direction.N)
                     yield return Field[x - i, y - distance];
-                else if (dir.X == Direction.NW.X && dir.Y == Direction.NW.Y)
+                else if (dir == Direction.NW)
                     yield return Field[x - distance, y - i];
-                else if (dir.X == Direction.W.X && dir.Y == Direction.W.Y)
+                else if (dir == Direction.W)
                     yield return Field[x - distance, y + i];
-                else if (dir.X == Direction.SW.X && dir.Y == Direction.SW.Y)
+                else if (dir == Direction.SW)
                     yield return Field[x - i, y + distance];
-                else if (dir.X == Direction.S.X && dir.Y == Direction.S.Y)
+                else if (dir == Direction.S)
                     yield return Field[x + i, y + distance];
-                else if (dir.X == Direction.SE.X && dir.Y == Direction.SE.Y)
+                else if (dir == Direction.SE)
                     yield return Field[x + distance, y + i];
-                else if (dir.X == Direction.E.X && dir.Y == Direction.E.Y)
+                else if (dir == Direction.E)
                     yield return Field[x + distance, y - i];
-                else if (dir.X == Direction.NE.X && dir.Y == Direction.NE.Y)
+                else if (dir == Direction.NE)
                     yield return Field[x + i, y - distance];
             }
         }
         #endregion
 
         #region FOV Methods
-        public void ComputeFovInOctant(int x, int y, double lightDecay, (int X, int Y) dir,
+        public void ComputeDirectedFov(int x, int y, double minDecay, double maxDecay, Dir dir,
             bool setVisible)
         {
-            Queue<AngleRange> visibleRange = new Queue<AngleRange>();
-            visibleRange.Enqueue(new AngleRange(1, 0, 1, 1));
-
-            while (visibleRange.Count > 0)
+            Dir initial = dir;
+            int i = 0;
+            double midDecay = (minDecay + maxDecay) / 2;
+            double lowerDecay = (minDecay + midDecay) / 2;
+            double upperDecay = (midDecay + maxDecay) / 2;
+            double[] decay = new[]
             {
-                AngleRange range = visibleRange.Dequeue();
-                // If we don't care about setting visibility, we can stop once lightLevel reachese
-                // 0. Otherwise, we need to continue to check if los exists.
-                if (!setVisible && range.LightLevel < 0)
-                    continue;
+                minDecay,
+                lowerDecay,
+                midDecay,
+                upperDecay,
+                maxDecay,
+                upperDecay,
+                midDecay,
+                lowerDecay,
+                minDecay
+            };
 
-                // There is really no need to check past 100 or something.
-                // TODO: put safeguards for when map gen borks and excavates the edges of the map
-                if (range.Distance > 100)
-                    continue;
+            do
+            {
+                dir = dir.Right();
 
-                double delta = 0.5 / range.Distance;
-                IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
-                CheckFovInRange(range, row, delta, lightDecay, visibleRange, setVisible);
-            }
+                Queue<AngleRange> visibleRange = new Queue<AngleRange>();
+                visibleRange.Enqueue(new AngleRange(1, 0, 1, 1));
+
+                while (visibleRange.Count > 0)
+                {
+                    AngleRange range = visibleRange.Dequeue();
+                    // If we don't care about setting visibility, we can stop once lightLevel reaches
+                    // 0. Otherwise, we need to continue to check if los exists.
+                    if (!setVisible && range.LightLevel < Constants.MIN_VISIBLE_LIGHT_LEVEL)
+                        continue;
+
+                    // There is really no need to check past 100 or something.
+                    // TODO: put safeguards for when map gen borks and excavates the edges of the map
+                    if (range.Distance > 100)
+                        continue;
+
+                    double delta = 0.5 / range.Distance;
+                    IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
+                    double lowD = Math.Min(decay[i], decay[i + 1]);
+                    double highD = Math.Max(decay[i], decay[i + 1]);
+                    CheckFovInRange(range, row, delta, lowD, highD, visibleRange, setVisible);
+                }
+
+                i++;
+            } while (dir != initial);
         }
 
         // Sweep across a row and update the set of unblocked angles for the next row.
         private static void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
-            double lightDecay, Queue<AngleRange> queue, bool setVisible)
+            double minDecay, double maxDecay, Queue<AngleRange> queue, bool setVisible)
         {
             double currentAngle = 0;
             double newMinAngle = range.MinAngle;
             double newMaxAngle = range.MaxAngle;
             bool prevLit = false;
             bool first = true;
+            double lightDecay = minDecay;
+            double decayStep = (maxDecay - minDecay) * (2 * delta);
 
             foreach (Tile tile in row)
             {
+                lightDecay += decayStep;
+
                 if (currentAngle > range.MaxAngle && Math.Abs(currentAngle - range.MaxAngle) > 0.001)
                 {
                     // The line to the current tile falls outside the maximum angle. Partially
@@ -609,7 +640,7 @@ namespace Roguelike.World
                         if (prevLit && !tile.IsLightable)
                         {
                             int newDist = range.Distance + 1;
-                            double light = range.LightLevel - lightDecay;
+                            double light = range.LightLevel * (1 - lightDecay) * (1 - lightDecay);
                             queue.Enqueue(new AngleRange(newDist, newMinAngle, beginAngle, light));
 
                             // Update the minAngle to deal with single width walls in hallways.
@@ -631,12 +662,12 @@ namespace Roguelike.World
             if (prevLit)
             {
                 int newDist = range.Distance + 1;
-                double light = range.LightLevel - lightDecay;
+                double light = range.LightLevel * (1 - lightDecay) * (1 - lightDecay);
                 queue.Enqueue(new AngleRange(newDist, newMinAngle, newMaxAngle, light));
             }
         }
 
-        private struct AngleRange
+        private readonly struct AngleRange
         {
             internal int Distance { get; }
             internal double MinAngle { get; }
@@ -733,10 +764,7 @@ namespace Roguelike.World
                 Discovered.Add(origin);
             }
 
-            foreach (var dir in Direction.DirectionList)
-            {
-                ComputeFovInOctant(Game.Player.X, Game.Player.Y, 0.1, dir, true);
-            }
+            ComputeDirectedFov(Game.Player.X, Game.Player.Y, 0.05, 0.25, Game.Player.Facing, true);
         }
 
         private void UpdatePlayerMaps()

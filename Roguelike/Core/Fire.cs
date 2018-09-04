@@ -70,7 +70,7 @@ namespace Roguelike.Core
 
             foreach (var dir in Direction.DirectionList)
             {
-                map.ComputeFovInOctant(X, Y, 0.1, dir, false);
+                map.ComputeDirectedFov(X, Y, 0.1, 0.1, dir, false);
             }
         }
 

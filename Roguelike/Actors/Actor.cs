@@ -20,6 +20,7 @@ namespace Roguelike.Actors
         public int Armor { get; set; }
 
         public ActorState State { get; set; }
+        public Dir Facing { get; set; }
 
         public int Energy { get; set; }
         public int RefreshRate { get; set; }

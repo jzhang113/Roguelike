@@ -3,7 +3,7 @@
 namespace Roguelike.World
 {
     [Serializable]
-    public struct LevelId
+    public readonly struct LevelId
     {
         public string Name { get; }
         public RegionType RegionType { get; }

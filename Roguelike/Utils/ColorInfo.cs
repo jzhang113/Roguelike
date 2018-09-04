@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Utils
 {
-    struct ColorInfo
+    internal readonly struct ColorInfo
     {
         public int X { get; }
         public int Y { get; }

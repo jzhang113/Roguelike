@@ -2,7 +2,7 @@
 
 namespace Roguelike.Core
 {
-    public struct WeightedPoint
+    public readonly struct WeightedPoint
     {
         public int X { get; }
         public int Y { get; }

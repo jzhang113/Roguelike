@@ -7,51 +7,49 @@ using System.Runtime.Serialization;
 namespace Roguelike.Core
 {
     [Serializable]
-    struct ColorInterval : ISerializable
+    internal readonly struct ColorInterval : ISerializable
     {
-        public RLColor Primary => _primary;
-
-        private readonly RLColor _primary;
-        private readonly RLColor _secondary;
-        private readonly double _alpha;
+        public RLColor Primary { get; }
+        private RLColor Secondary { get; }
+        private double Alpha { get; }
 
         public ColorInterval(RLColor primary, RLColor secondary, double alpha)
         {
-            _primary = primary;
-            _secondary = secondary;
-            _alpha = alpha;
+            Primary = primary;
+            Secondary = secondary;
+            Alpha = alpha;
         }
 
         private ColorInterval(SerializationInfo info, StreamingContext context)
         {
-            float primaryR = (float)info.GetValue($"{nameof(_primary)}.r", typeof(float));
-            float primaryG = (float)info.GetValue($"{nameof(_primary)}.g", typeof(float));
-            float primaryB = (float)info.GetValue($"{nameof(_primary)}.b", typeof(float));
-            _primary = new RLColor(primaryR, primaryG, primaryB);
+            float primaryR = (float)info.GetValue($"{nameof(Primary)}.r", typeof(float));
+            float primaryG = (float)info.GetValue($"{nameof(Primary)}.g", typeof(float));
+            float primaryB = (float)info.GetValue($"{nameof(Primary)}.b", typeof(float));
+            Primary = new RLColor(primaryR, primaryG, primaryB);
 
-            float secondaryR = (float)info.GetValue($"{nameof(_secondary)}.r", typeof(float));
-            float secondaryG = (float)info.GetValue($"{nameof(_secondary)}.g", typeof(float));
-            float secondaryB = (float)info.GetValue($"{nameof(_secondary)}.b", typeof(float));
-            _secondary = new RLColor(secondaryR, secondaryG, secondaryB);
+            float secondaryR = (float)info.GetValue($"{nameof(Secondary)}.r", typeof(float));
+            float secondaryG = (float)info.GetValue($"{nameof(Secondary)}.g", typeof(float));
+            float secondaryB = (float)info.GetValue($"{nameof(Secondary)}.b", typeof(float));
+            Secondary = new RLColor(secondaryR, secondaryG, secondaryB);
 
-            _alpha = info.GetDouble(nameof(_alpha));
+            Alpha = info.GetDouble(nameof(Alpha));
         }
 
         [Pure]
         public RLColor GetColor(PcgRandom random) =>
-            RLColor.Blend(_primary, _secondary, (float)(random.NextDouble() * _alpha));
+            RLColor.Blend(Primary, Secondary, (float)(random.NextDouble() * Alpha));
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue($"{nameof(_primary)}.r", _primary.r);
-            info.AddValue($"{nameof(_primary)}.g", _primary.g);
-            info.AddValue($"{nameof(_primary)}.b", _primary.b);
+            info.AddValue($"{nameof(Primary)}.r", Primary.r);
+            info.AddValue($"{nameof(Primary)}.g", Primary.g);
+            info.AddValue($"{nameof(Primary)}.b", Primary.b);
 
-            info.AddValue($"{nameof(_secondary)}.r", _secondary.r);
-            info.AddValue($"{nameof(_secondary)}.g", _secondary.g);
-            info.AddValue($"{nameof(_secondary)}.b", _secondary.b);
+            info.AddValue($"{nameof(Secondary)}.r", Secondary.r);
+            info.AddValue($"{nameof(Secondary)}.g", Secondary.g);
+            info.AddValue($"{nameof(Secondary)}.b", Secondary.b);
 
-            info.AddValue(nameof(_alpha), _alpha);
+            info.AddValue(nameof(Alpha), Alpha);
         }
     }
 }
