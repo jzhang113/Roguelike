@@ -112,7 +112,10 @@ namespace Roguelike.Core
             return hashCode;
         }
 
-        public static bool operator ==(Dir dir1, Dir dir2) => dir1.Equals(dir2);
+        public static bool operator ==(Dir dir1, Dir dir2) =>
+            dir1.X == dir2.X &&
+            dir1.Y == dir2.Y;
+
         public static bool operator !=(Dir dir1, Dir dir2) => !(dir1 == dir2);
         #endregion
     }

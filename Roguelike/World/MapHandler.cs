@@ -38,6 +38,9 @@ namespace Roguelike.World
         private readonly KeyValueHelper<int, Exit> _tempExits;
         private readonly KeyValueHelper<int, Fire> _tempFires;
 
+        // keep queue to prevent unnecessary allocations
+        private readonly Queue<WeightedPoint> _goals = new Queue<WeightedPoint>();
+
         public MapHandler(int width, int height)
         {
             Width = width;
@@ -552,8 +555,9 @@ namespace Roguelike.World
 
                     double delta = 0.5 / range.Distance;
                     IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
-                    double lowD = Math.Min(decay[i], decay[i + 1]);
-                    double highD = Math.Max(decay[i], decay[i + 1]);
+                    double lowD = Math.Max(decay[i], decay[i + 1]);
+                    double highD = Math.Min(decay[i], decay[i + 1]);
+
                     CheckFovInRange(range, row, delta, lowD, highD, visibleRange, setVisible);
                 }
 
@@ -790,7 +794,7 @@ namespace Roguelike.World
 
         private void UpdateAutoExploreMaps()
         {
-            Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
+            _goals.Clear();
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < Height; y++)
@@ -801,13 +805,13 @@ namespace Roguelike.World
                     }
                     else
                     {
-                        goals.Enqueue(new WeightedPoint(x, y));
+                        _goals.Enqueue(new WeightedPoint(x, y));
                         AutoexploreMap[x, y] = 0;
                     }
                 }
             }
 
-            ProcessDijkstraMaps(goals, AutoexploreMap);
+            ProcessDijkstraMaps(_goals, AutoexploreMap);
         }
 
         private void ProcessDijkstraMaps(Queue<WeightedPoint> goals, float[,] mapWeights)
