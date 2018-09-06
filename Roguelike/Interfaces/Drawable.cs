@@ -54,7 +54,7 @@ namespace Roguelike.Interfaces
             {
                 color = RLColor.Blend(Color, Colors.Floor,
                     tile.IsVisible
-                        ? tile.Light
+                        ? Math.Min(tile.Light * 1.5f, 1)
                         : Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
             }
 

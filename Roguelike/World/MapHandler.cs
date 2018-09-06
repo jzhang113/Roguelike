@@ -589,6 +589,9 @@ namespace Roguelike.World
                     if (visiblePercent > 0)
                         tile.Light += (float)(visiblePercent * range.LightLevel);
 
+                    // TODO: los calculations, light calculations, and visibility calculations
+                    // probably should be handled separately? Right now, a torch behind the 
+                    // player lets the see behind them. Whoops.
                     if (setVisible)
                         tile.LosExists = true;
 
@@ -768,7 +771,10 @@ namespace Roguelike.World
                 Discovered.Add(origin);
             }
 
-            ComputeDirectedFov(Game.Player.X, Game.Player.Y, 0.05, 0.25, Game.Player.Facing, true);
+            if (Game.Player.Facing == Direction.Center)
+                ComputeDirectedFov(Game.Player.X, Game.Player.Y, 0.25, 0.25, Direction.N, true);
+            else
+                ComputeDirectedFov(Game.Player.X, Game.Player.Y, 0.05, 0.25, Game.Player.Facing, true);
         }
 
         private void UpdatePlayerMaps()

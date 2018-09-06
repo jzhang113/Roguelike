@@ -146,25 +146,38 @@ namespace Roguelike.State
                 return new WaitCommand(player);
             }
 
+            // TODO: Use weapon's attack sequence if equipped???
+            IAction action = player.GetBasicAttack();
             if (keyPress.Key == RLKey.Z)
+                action = weapon?.AttackLeft() ?? player.GetBasicAttack();
+            else if (keyPress.Key == RLKey.X)
+                action = weapon?.AttackRight() ?? player.GetBasicAttack();
+            else if (keyPress.Shift)
             {
-                IAction action = weapon?.AttackLeft() ?? player.GetBasicAttack();
+                // TODO: Change to an arbitrary facing
+                // TODO: Should attacks update facing?
+                player.Facing = player.Facing.Right();
+                Game.Map.Refresh();
+                return null;
+            }
+
+            if (keyPress.Shift)
+            {
                 Game.StateHandler.PushState(new TargettingState(
                     player,
                     action.Area,
-                    returnTarget => new ActionCommand(player, action, returnTarget)));
+                    target => new ActionCommand(player, action, target)));
+                return null;
             }
-
-            if (keyPress.Key == RLKey.X)
+            else
             {
-                IAction action = weapon?.AttackRight() ?? player.GetBasicAttack();
-                Game.StateHandler.PushState(new TargettingState(
+                (int dx, int dy) = player.Facing;
+                IEnumerable<Tile> target = action.Area.GetTilesInRange(
                     player,
-                    action.Area,
-                    returnTarget => new ActionCommand(player, action, returnTarget)));
+                    player.X + dx,
+                    player.Y + dy);
+                return new ActionCommand(player, action, target);
             }
-
-            return null;
         }
 
         public ICommand HandleMouseInput(RLMouse mouse)
