@@ -32,7 +32,8 @@ namespace Roguelike.Items
                 null, null,
                 new DamageAction(
                     Parameters.Damage,
-                    new TargetZone(TargetShape.Range, Parameters.MeleeRange))));
+                    new TargetZone(TargetShape.Range, Parameters.MeleeRange)),
+                "attack"));
         }
 
         // copy constructor

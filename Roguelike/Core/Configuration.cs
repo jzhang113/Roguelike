@@ -11,6 +11,7 @@
         public WindowConfig StatView { get; set; }
         public WindowConfig InventoryView { get; set; }
         public WindowConfig ViewWindow { get; set; }
+        public WindowConfig MoveView { get; set; }
 
         public int ScreenWidth => MapView.Width + ViewWindow.Width;
         public int ScreenHeight => StatView.Height + MapView.Height + MessageView.Height;

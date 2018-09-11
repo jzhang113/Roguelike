@@ -23,7 +23,11 @@
         "width": 30
     },
     "viewWindow": {
-        "height": 70,
+        "height": 40,
         "width": 20
+    },
+    "moveView": {
+        "height": 30,
+        "width":  20
     }
 }

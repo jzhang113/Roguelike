@@ -37,6 +37,7 @@ namespace Roguelike
         private static ConsoleInfo MessageConsole { get; set; }
         private static ConsoleInfo StatConsole { get; set; }
         private static ConsoleInfo ViewConsole { get; set; }
+        private static ConsoleInfo MoveConsole { get; set; }
 
         private static bool _render = true;
 
@@ -68,6 +69,9 @@ namespace Roguelike
             ViewConsole = new ConsoleInfo(
                 new RLConsole(Config.ViewWindow.Width, Config.ViewWindow.Height),
                 Config.MapView.Width, 0);
+            MoveConsole = new ConsoleInfo(
+                new RLConsole(Config.MoveView.Width, Config.MoveView.Height), // TODO: update config.json
+                Config.MapView.Width, Config.ViewWindow.Height);
 
             StateHandler = new StateHandler(RootConsole);
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
@@ -77,11 +81,6 @@ namespace Roguelike
             RootConsole.Update += RootConsoleUpdate;
             RootConsole.Render += RootConsoleRender;
             RootConsole.OnClosing += SaveGame;
-        }
-
-        public static void Run()
-        {
-            RootConsole.Run();
         }
 
         public static void NewGame()
@@ -145,25 +144,15 @@ namespace Roguelike
             }
         }
 
-        internal static void GameOver()
-        {
-            MessageHandler.AddMessage("Game Over.", MessageLevel.Minimal);
-        }
+        public static void Run() => RootConsole.Run();
 
-        internal static void Exit()
-        {
-            RootConsole.Close();
-        }
+        internal static void GameOver() => MessageHandler.AddMessage("Game Over.", MessageLevel.Minimal);
 
-        internal static void ForceRender()
-        {
-            _render = true;
-        }
+        internal static void Exit() => RootConsole.Close();
 
-        private static void RootConsoleUpdate(object sender, UpdateEventArgs e)
-        {
-            StateHandler.Update();
-        }
+        internal static void ForceRender() => _render = true;
+
+        private static void RootConsoleUpdate(object sender, UpdateEventArgs e) => StateHandler.Update();
 
         private static void RootConsoleRender(object sender, UpdateEventArgs e)
         {
@@ -186,6 +175,13 @@ namespace Roguelike
                 InfoHandler.Draw(statConsole);
                 RLConsole.Blit(statConsole, 0, 0, statConsole.Width, statConsole.Height, RootConsole,
                     StatConsole.X, StatConsole.Y);
+
+                Items.Weapon weapon = Player.Equipment.PrimaryWeapon;
+                RLConsole attackConsole = MoveConsole.Console;
+                attackConsole.Clear(0, RLColor.Black, Colors.Text);
+                weapon?.Moveset.Draw(attackConsole);
+                RLConsole.Blit(attackConsole, 0, 0, attackConsole.Width, attackConsole.Height, RootConsole,
+                    MoveConsole.X, MoveConsole.Y);
             }
 
             RLConsole lookConsole = ViewConsole.Console;

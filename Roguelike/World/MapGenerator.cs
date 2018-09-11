@@ -209,12 +209,18 @@ namespace Roguelike.World
                     new Systems.ActionNode(
                         null,
                         null,
-                        new MoveAction(new TargetZone(TargetShape.Range, 2))),
+                        new MoveAction(new TargetZone(TargetShape.Range, 2)),
+                        "Leap"),
                     null,
-                    new DamageAction(300, new TargetZone(TargetShape.Range, 1))),
-                null,
-                new DamageAction(100, new TargetZone(TargetShape.Directional, 2))));
-
+                    new DamageAction(300, new TargetZone(TargetShape.Range, 1)),
+                    "Slam"),
+                    new Systems.ActionNode(
+                        null,
+                        null,
+                        new DamageAction(100, new TargetZone(TargetShape.Self, radius: 2)),
+                        "Whirlwind"),
+                new DamageAction(100, new TargetZone(TargetShape.Directional, 2)),
+                "Strike"));
 
             IAction heal = new HealAction(100, new TargetZone(TargetShape.Self));
 
