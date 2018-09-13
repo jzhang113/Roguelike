@@ -11,8 +11,8 @@
 
         public const string SAVE_FILE = "save.dat";
 
-        public const double DEFAULT_MELEE_RANGE = 1.5;
-        public const double DEFAULT_THROW_RANGE = 1.5;
+        public const int DEFAULT_MELEE_RANGE = 1;
+        public const int DEFAULT_THROW_RANGE = 1;
         public const int DEFAULT_DAMAGE = 100;
 
         public const int FIRE_DAMAGE = 10;
@@ -21,5 +21,6 @@
         public const double HIGH_BURN_PERCENT = 0.8;
 
         public const float MIN_VISIBLE_LIGHT_LEVEL = 0.25f;
+        public const double LIGHT_DECAY = 0.1;
     }
 }

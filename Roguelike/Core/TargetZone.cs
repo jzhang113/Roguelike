@@ -16,23 +16,26 @@ namespace Roguelike.Core
     public class TargetZone
     {
         public TargetShape Shape { get; }
-        public double Range { get; }
+        public int Range { get; }
         public int Radius { get; }
         public bool Projectile { get; }
         public ICollection<Tile> Trail { get; }
 
-        public TargetZone(TargetShape shape, double range = 1.5, int radius = 0, bool projectile = true)
+        private ICollection<Tile> Targets { get; }
+
+        public TargetZone(TargetShape shape, int range = 1, int radius = 0, bool projectile = true)
         {
             Shape = shape;
             Range = range;
             Radius = radius;
             Projectile = projectile;
             Trail = new List<Tile>();
+            Targets = new List<Tile>();
         }
 
         public IEnumerable<Tile> GetTilesInRange(Actor current, int targetX, int targetY)
         {
-            ICollection<Tile> targets = new List<Tile>();
+            Targets.Clear();
 
             switch (Shape)
             {
@@ -40,9 +43,9 @@ namespace Roguelike.Core
                     foreach (Tile tile in Game.Map.GetTilesInRadius(current.X, current.Y, Radius))
                     {
                         if (InRange(current, tile.X, tile.Y))
-                            targets.Add(Game.Map.Field[tile.X, tile.Y]);
+                            Targets.Add(Game.Map.Field[tile.X, tile.Y]);
                     }
-                    return targets;
+                    return Targets;
                 case TargetShape.Range:
                     int collisionX = targetX;
                     int collisionY = targetY;
@@ -70,9 +73,9 @@ namespace Roguelike.Core
                     foreach (Tile tile in Game.Map.GetTilesInRadius(collisionX, collisionY, Radius))
                     {
                         // TODO: prevent large radius spells from hitting past walls.
-                        targets.Add(Game.Map.Field[tile.X, tile.Y]);
+                        Targets.Add(Game.Map.Field[tile.X, tile.Y]);
                     }
-                    return targets;
+                    return Targets;
                 case TargetShape.Ray:
                     IEnumerable<Tile> path = Game.Map.GetStraightLinePath(
                         current.X, current.Y, targetX, targetY);
@@ -85,14 +88,14 @@ namespace Roguelike.Core
                             if (!InRange(current, tile.X, tile.Y))
                                 break;
 
-                            targets.Add(tile);
+                            Targets.Add(tile);
 
                             // projectiles stop at the first blocked tile
                             if (!tile.IsWalkable)
                                 break;
                         }
 
-                        return targets;
+                        return Targets;
                     }
                     else
                     {
@@ -113,13 +116,13 @@ namespace Roguelike.Core
                             break;
 
                         Tile tile = Game.Map.Field[x, y];
-                        targets.Add(tile);
+                        Targets.Add(tile);
 
                         // projectiles stop at the first blocked tile
                         if (Projectile && !tile.IsWalkable)
                             break;
                     }
-                    return targets;
+                    return Targets;
                 default:
                     throw new ArgumentException("unknown skill shape");
             }
@@ -127,8 +130,9 @@ namespace Roguelike.Core
 
         private bool InRange(Actor actor, int x, int y)
         {
-            int distance = Utils.Distance.EuclideanDistanceSquared(actor.X, actor.Y, x, y);
-            return distance <= Range * Range;
+            // square ranges
+            int distance = Math.Max(Math.Abs(actor.X - x), Math.Abs(actor.Y - y));
+            return distance <= Range;
         }
     }
 }

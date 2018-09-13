@@ -445,13 +445,12 @@ namespace Roguelike.World
 
         public IEnumerable<Tile> GetTilesInRadius(int x, int y, int radius)
         {
-            // NOTE: lazy implementation - replace if needed
+            // square circles
             for (int i = x - radius; i <= x + radius; i++)
             {
                 for (int j = y - radius; j <= y + radius; j++)
                 {
-                    if (Distance.EuclideanDistanceSquared(i, j, x, y) <= radius * radius)
-                        yield return Field[i, j];
+                    yield return Field[i, j];
                 }
             }
         }
@@ -512,31 +511,10 @@ namespace Roguelike.World
         #endregion
 
         #region FOV Methods
-        public void ComputeDirectedFov(int x, int y, double minDecay, double maxDecay, Dir dir,
-            bool setVisible)
+        public void ComputeFov(int x, int y, double lightDecay, bool setVisible)
         {
-            Dir initial = dir;
-            int i = 0;
-            double midDecay = (minDecay + maxDecay) / 2;
-            double lowerDecay = (minDecay + midDecay) / 2;
-            double upperDecay = (midDecay + maxDecay) / 2;
-            double[] decay = new[]
+            foreach (Dir dir in Direction.DirectionList)
             {
-                minDecay,
-                lowerDecay,
-                midDecay,
-                upperDecay,
-                maxDecay,
-                upperDecay,
-                midDecay,
-                lowerDecay,
-                minDecay
-            };
-
-            do
-            {
-                dir = dir.Right();
-
                 Queue<AngleRange> visibleRange = new Queue<AngleRange>();
                 visibleRange.Enqueue(new AngleRange(1, 0, 1, 1));
 
@@ -555,32 +533,24 @@ namespace Roguelike.World
 
                     double delta = 0.5 / range.Distance;
                     IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
-                    double lowD = Math.Max(decay[i], decay[i + 1]);
-                    double highD = Math.Min(decay[i], decay[i + 1]);
 
-                    CheckFovInRange(range, row, delta, lowD, highD, visibleRange, setVisible);
+                    CheckFovInRange(range, row, delta, visibleRange, lightDecay, setVisible);
                 }
-
-                i++;
-            } while (dir != initial);
+            }
         }
 
         // Sweep across a row and update the set of unblocked angles for the next row.
         private static void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
-            double minDecay, double maxDecay, Queue<AngleRange> queue, bool setVisible)
+            Queue<AngleRange> queue, double lightDecay, bool setVisible)
         {
             double currentAngle = 0;
             double newMinAngle = range.MinAngle;
             double newMaxAngle = range.MaxAngle;
             bool prevLit = false;
             bool first = true;
-            double lightDecay = minDecay;
-            double decayStep = (maxDecay - minDecay) * (2 * delta);
 
             foreach (Tile tile in row)
             {
-                lightDecay += decayStep;
-
                 if (currentAngle > range.MaxAngle && Math.Abs(currentAngle - range.MaxAngle) > 0.001)
                 {
                     // The line to the current tile falls outside the maximum angle. Partially
@@ -588,10 +558,7 @@ namespace Roguelike.World
                     double visiblePercent = (range.MaxAngle - currentAngle) / (2 * delta) + 0.5;
                     if (visiblePercent > 0)
                         tile.Light += (float)(visiblePercent * range.LightLevel);
-
-                    // TODO: los calculations, light calculations, and visibility calculations
-                    // probably should be handled separately? Right now, a torch behind the 
-                    // player lets the see behind them. Whoops.
+                    
                     if (setVisible)
                         tile.LosExists = true;
 
@@ -770,11 +737,8 @@ namespace Roguelike.World
                 origin.IsExplored = true;
                 Discovered.Add(origin);
             }
-
-            if (Game.Player.Facing == Direction.Center)
-                ComputeDirectedFov(Game.Player.X, Game.Player.Y, 0.25, 0.25, Direction.N, true);
-            else
-                ComputeDirectedFov(Game.Player.X, Game.Player.Y, 0.05, 0.25, Game.Player.Facing, true);
+            
+            ComputeFov(Game.Player.X, Game.Player.Y, Constants.LIGHT_DECAY, true);
         }
 
         private void UpdatePlayerMaps()

@@ -67,11 +67,8 @@ namespace Roguelike.Core
                 stack.SetFire();
                 map.RemoveStackIfEmpty(X, Y);
             }
-
-            foreach (var dir in Direction.DirectionList)
-            {
-                map.ComputeDirectedFov(X, Y, 0.1, 0.1, dir, false);
-            }
+            
+            map.ComputeFov(X, Y, Constants.LIGHT_DECAY, false);
         }
 
         public int CompareTo(ISchedulable other)

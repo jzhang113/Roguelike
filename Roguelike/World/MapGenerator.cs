@@ -195,7 +195,6 @@ namespace Roguelike.World
                 {
                     AttackSpeed = 240,
                     Damage = 200,
-                    MeleeRange = 1.5f,
                     ThrowRange = 7
                 }, Swatch.DbBlood)
             {

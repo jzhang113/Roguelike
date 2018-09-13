@@ -45,9 +45,12 @@ namespace Roguelike.World
             return hashCode;
         }
 
-        public static bool operator ==(LevelId l1, LevelId l2) => l1.Equals(l2);
+        public static bool operator ==(LevelId l1, LevelId l2) =>
+            l1.Name == l2.Name &&
+            l1.RegionType == l2.RegionType &&
+            l1.Depth == l2.Depth;
 
-        public static bool operator !=(LevelId l1, LevelId l2) => !l1.Equals(l2);
+        public static bool operator !=(LevelId l1, LevelId l2) => !(l1 == l2);
         #endregion
     }
 }
