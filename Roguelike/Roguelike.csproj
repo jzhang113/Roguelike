@@ -122,6 +122,7 @@
     <Compile Include="Commands\PickupCommand.cs" />
     <Compile Include="Commands\UnequipCommand.cs" />
     <Compile Include="Actors\Actor.cs" />
+    <Compile Include="Core\ActorFlag.cs" />
     <Compile Include="Core\ActorState.cs" />
     <Compile Include="Core\Alignment.cs" />
     <Compile Include="Core\ArmorType.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Statuses\StatusInfo.cs" />
     <Compile Include="Statuses\StatusType.cs" />
     <Compile Include="Statuses\StatusHandler.cs" />
+    <Compile Include="Systems\ActorGenerator.cs" />
     <Compile Include="Systems\MovesetHandler.cs" />
     <Compile Include="Systems\InfoHandler.cs" />
     <Compile Include="Utils\ColorInfo.cs" />
@@ -194,7 +196,6 @@
     <Compile Include="Core\Direction.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Core\SimpleAI.cs" />
-    <Compile Include="Actors\Skeleton.cs" />
     <Compile Include="Data\Materials.cs" />
     <Compile Include="Systems\InventoryHandler.cs" />
     <Compile Include="Systems\LookHandler.cs" />

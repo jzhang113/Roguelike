@@ -84,6 +84,7 @@ namespace Roguelike.Actors
             return SimpleAI.GetAction(this);
         }
 
+        // TODO: basic attack depends on available body parts
         public virtual IAction GetBasicAttack()
         {
             return new DamageAction(5, new TargetZone(TargetShape.Directional));

@@ -318,21 +318,22 @@ namespace Roguelike.World
             Map.AddActor(Game.Player);
             // Map.SetActorPosition(Player, playerX, playerY);
 
+            Systems.ActorGenerator.ActorType actorType = Systems.ActorGenerator.Generate(10, Rand);
+
             for (int i = 0; i < 10; i++)
             {
-                Actors.Skeleton s = new Actors.Skeleton(new Actors.ActorParameters($"Skeleton #{i}")
+                Actors.Actor actor = Systems.ActorGenerator.Create(actorType);
+
+                actor.Parameters.Awareness = 10;
+                actor.Parameters.MaxHp = 50;
+                actor.Parameters.MaxMp = 30;
+
+                while (!Map.Field[actor.X, actor.Y].IsWalkable)
                 {
-                    Awareness = 10,
-                    MaxHp = 50,
-                    MaxMp = 20,
-                    MaxSp = 20
-                });
-                while (!Map.Field[s.X, s.Y].IsWalkable)
-                {
-                    s.X = Rand.Next(1, Game.Config.Map.Width - 1);
-                    s.Y = Rand.Next(1, Game.Config.Map.Height - 1);
+                    actor.X = Rand.Next(1, Game.Config.Map.Width - 1);
+                    actor.Y = Rand.Next(1, Game.Config.Map.Height - 1);
                 }
-                Map.AddActor(s);
+                Map.AddActor(actor);
             }
 
             Map.SetFire(Game.Player.X + 3, Game.Player.Y + 3);

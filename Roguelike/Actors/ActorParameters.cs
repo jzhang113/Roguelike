@@ -1,5 +1,7 @@
-﻿using Roguelike.Data;
+﻿using Roguelike.Core;
+using Roguelike.Data;
 using System;
+using System.Collections.Generic;
 
 namespace Roguelike.Actors
 {
@@ -7,6 +9,8 @@ namespace Roguelike.Actors
     public class ActorParameters
     {
         public string Type { get; }
+        public ICollection<ActorFlag> Flags { get; }
+
         public MaterialType Material { get; set; }
 
         public int Str { get; set; }
@@ -20,9 +24,10 @@ namespace Roguelike.Actors
         public int Awareness { get; set; }
         public int Speed { get; set; }
 
-        public ActorParameters(string name)
+        public ActorParameters(string name, params ActorFlag[] flags)
         {
             Type = name;
+            Flags = flags;
         }
     }
 }
