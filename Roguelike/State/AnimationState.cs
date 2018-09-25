@@ -1,10 +1,9 @@
-﻿using RLNET;
-using Roguelike.Animations;
+﻿using Roguelike.Animations;
 using Roguelike.Commands;
 
 namespace Roguelike.State
 {
-    class AnimationState : IState
+    internal class AnimationState : IState
     {
         private readonly IAnimation _animation;
 
@@ -13,14 +12,14 @@ namespace Roguelike.State
             _animation = animation;
         }
 
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
+        public ICommand HandleKeyInput(int key)
         {
-            return null;
+            throw new System.NotImplementedException();
         }
 
-        public ICommand HandleMouseInput(RLMouse mouse)
+        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            return null;
+            throw new System.NotImplementedException();
         }
 
         public void Update()
@@ -36,9 +35,9 @@ namespace Roguelike.State
             }
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
-            _animation.Draw(mapConsole);
+            _animation.Draw();
         }
     }
 }

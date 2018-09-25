@@ -1,10 +1,9 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Data;
 using Roguelike.Items;
 using Roguelike.Systems;
-using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -659,7 +658,7 @@ namespace Roguelike.World
         #endregion
 
         #region Drawing Methods
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
             for (int dx = 0; dx < Game.Config.MapView.Width; dx++)
             {
@@ -676,42 +675,55 @@ namespace Roguelike.World
                         continue;
 
                     if (tile.IsVisible)
-                        tile.DrawingComponent.Draw(mapConsole, tile);
+                    {
+                        tile.DrawingComponent.Draw(tile);
+                    }
                     else if (tile.IsWall)
-                        mapConsole.Set(dx, dy, Colors.WallBackground, null, '#');
+                    {
+                        Terminal.Color(Colors.WallBackground);
+                        Terminal.Put(dx, dy, '#');
+                    }
                     else
-                        mapConsole.Set(dx, dy, Colors.FloorBackground, null, '.');
+                    {
+                        Terminal.Color(Colors.FloorBackground);
+                        Terminal.Put(dx, dy, '.');
+                    }
                 }
             }
 
             foreach (Door door in Doors.Values)
             {
-                door.DrawingComponent.Draw(mapConsole, Field[door.X, door.Y]);
+                door.DrawingComponent.Draw(Field[door.X, door.Y]);
             }
 
             foreach (InventoryHandler stack in Items.Values)
             {
                 Item topItem = stack.First().Item;
-                topItem.DrawingComponent.Draw(mapConsole, Field[topItem.X, topItem.Y]);
+                topItem.DrawingComponent.Draw(Field[topItem.X, topItem.Y]);
             }
 
             foreach (Exit exit in Exits.Values)
             {
-                exit.DrawingComponent.Draw(mapConsole, Field[exit.X, exit.Y]);
+                exit.DrawingComponent.Draw(Field[exit.X, exit.Y]);
             }
 
             foreach (Fire fire in Fires.Values)
             {
-                fire.DrawingComponent.Draw(mapConsole, Field[fire.X, fire.Y]);
+                fire.DrawingComponent.Draw(Field[fire.X, fire.Y]);
             }
 
             foreach (Actor unit in Units.Values)
             {
                 if (!unit.IsDead)
-                    unit.DrawingComponent.Draw(mapConsole, Field[unit.X, unit.Y]);
+                {
+                    unit.DrawingComponent.Draw(Field[unit.X, unit.Y]);
+                }
                 else
+                {
                     // HACK: draw some corpses
-                    mapConsole.SetChar(unit.X - Camera.X, unit.Y - Camera.Y, '%');
+                    Terminal.Color(Swatch.DbOldBlood);
+                    Terminal.Put(unit.X - Camera.X, unit.Y - Camera.Y, '%');
+                }
             }
         }
         #endregion

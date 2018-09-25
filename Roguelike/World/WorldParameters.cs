@@ -10,13 +10,13 @@ namespace Roguelike.World
         Otherside
     }
 
-    struct WorldParameter
+    public struct WorldParameter
     {
         public ICollection<RegionData> Regions { get; set; }
         public int MinWorldSize { get; set; }
         public int MaxWorldSize { get; set; }
 
-        internal struct RegionData
+        public struct RegionData
         {
             public RegionType Type { get; set; }
             public int MinLength { get; set; }
@@ -26,19 +26,19 @@ namespace Roguelike.World
             public ConnectionConstraint Constraints { get; set; }
         }
 
-        internal struct ConnectionConstraint
+        public struct ConnectionConstraint
         {
             public ICollection<RequireId> Require { get; set; }
             public ICollection<RegionType> Avoid { get; set; }
         }
 
-        internal struct RegionConnection
+        public struct RegionConnection
         {
             public RegionData From { get; set; }
             public RegionData To { get; set; }
         }
 
-        internal struct RequireId
+        public struct RequireId
         {
             public RegionType RegionType { get; set; }
             public int MinDepth { get; set; }

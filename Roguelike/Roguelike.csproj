@@ -69,9 +69,6 @@
     <Reference Include="PcgRandom, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\PcgRandom.1.1.0\lib\net40\PcgRandom.dll</HintPath>
     </Reference>
-    <Reference Include="RLNET, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RLNET.1.0.6\lib\RLNET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
@@ -113,6 +110,7 @@
     <Compile Include="Animations\IAnimation.cs" />
     <Compile Include="Animations\SpinAnimation.cs" />
     <Compile Include="Animations\TrailAnimation.cs" />
+    <Compile Include="BearLibTerminal.cs" />
     <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\ApplyCommand.cs" />
     <Compile Include="Commands\ChangeLevelCommand.cs" />
@@ -124,10 +122,9 @@
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Core\ActorFlag.cs" />
     <Compile Include="Core\ActorState.cs" />
-    <Compile Include="Core\Alignment.cs" />
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\ColorInterval.cs" />
-    <Compile Include="Core\ConsoleInfo.cs" />
+    <Compile Include="Core\LayerInfo.cs" />
     <Compile Include="Core\Exit.cs" />
     <Compile Include="Core\Fire.cs" />
     <Compile Include="Core\Tile.cs" />
@@ -155,13 +152,13 @@
     <Compile Include="State\TargettingState.cs" />
     <Compile Include="State\TextInputState.cs" />
     <Compile Include="State\UnequipState.cs" />
-    <Compile Include="Input\MouseInput.cs" />
     <Compile Include="Statuses\StatusInfo.cs" />
     <Compile Include="Statuses\StatusType.cs" />
     <Compile Include="Statuses\StatusHandler.cs" />
     <Compile Include="Systems\ActorGenerator.cs" />
     <Compile Include="Systems\MovesetHandler.cs" />
     <Compile Include="Systems\InfoHandler.cs" />
+    <Compile Include="Utils\ColorExtensions.cs" />
     <Compile Include="Utils\ColorInfo.cs" />
     <Compile Include="Utils\ImageConvert.cs" />
     <Compile Include="Utils\RandomExtensions.cs" />
@@ -224,6 +221,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Content Include="BearLibTerminal.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="circles.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

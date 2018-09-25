@@ -1,13 +1,14 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Commands;
 using Roguelike.Utils;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Roguelike.State
 {
-    class CharSelectState : IState
+    internal sealed class CharSelectState : IState
     {
         private static readonly Lazy<CharSelectState> _instance =
             new Lazy<CharSelectState>(() => new CharSelectState());
@@ -20,12 +21,12 @@ namespace Roguelike.State
             _pixels = ImageConvert.Convert("circles.png", Game.Config.ScreenWidth).ToList();
         }
 
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
+        public ICommand HandleKeyInput(int key)
         {
             return null;
         }
 
-        public ICommand HandleMouseInput(RLMouse mouse)
+        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             return null;
         }
@@ -36,7 +37,7 @@ namespace Roguelike.State
             Game.ForceRender();
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
             foreach (ColorInfo info in _pixels)
             {
@@ -52,7 +53,9 @@ namespace Roguelike.State
                 else
                     character = 219; // full block 
 
-                console.Set(info.X, info.Y, new RLColor(info.R, info.G, info.B), RLColor.White, character);
+                Terminal.Color(Color.FromArgb(info.R, info.G, info.B));
+                Terminal.BkColor(Color.Wheat);
+                Terminal.Put(info.X, info.Y, character);
             }
         }
     }

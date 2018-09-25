@@ -1,5 +1,4 @@
 ﻿using Pcg;
-using RLNET;
 using Roguelike.Actions;
 using Roguelike.Core;
 using Roguelike.Data;
@@ -9,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.World
 {
-    abstract class MapGenerator
+    internal abstract class MapGenerator
     {
         protected int Width { get; }
         protected int Height { get; }
@@ -266,7 +265,7 @@ namespace Roguelike.World
                     new ItemParameter("scroll of enchantment", MaterialType.Paper),
                     new EnchantAction(
                         new TargetZone(TargetShape.Range, range: 10)),
-                    RLColor.LightGreen)
+                    System.Drawing.Color.LightGreen)
                 {
                     X = Game.Player.X - 1,
                     Y = Game.Player.Y

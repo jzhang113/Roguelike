@@ -1,18 +1,19 @@
-﻿using Roguelike.Core;
-using Roguelike.Interfaces;
-using System.Collections.Generic;
-using System;
-using Roguelike.Actions;
+﻿using Roguelike.Actions;
 using Roguelike.Actors;
+using Roguelike.Core;
+using Roguelike.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Roguelike.Items
 {
     [Serializable]
-    class Scroll : Item, IUsable
+    public class Scroll : Item, IUsable
     {
         public IAction ApplySkill { get; }
 
-        public Scroll(ItemParameter parameters, IAction action, RLNET.RLColor color) : base(parameters, color, '?')
+        public Scroll(ItemParameter parameters, IAction action, Color color) : base(parameters, color, '?')
         {
             ApplySkill = action;
         }

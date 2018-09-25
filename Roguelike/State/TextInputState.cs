@@ -1,4 +1,4 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Commands;
 using Roguelike.Utils;
 using System;
@@ -19,21 +19,19 @@ namespace Roguelike.State
             Game.OverlayHandler.DisplayText = "Drop how many?";
         }
 
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
+        public ICommand HandleKeyInput(int key)
         {
-            if (keyPress == null)
-                return null;
-
-            switch (keyPress.Key)
+            // TODO: replace with read_str
+            switch (key)
             {
-                case RLKey.BackSpace:
+                case Terminal.TK_BACKSPACE:
                     if (_inputBuffer.Length > 0) _inputBuffer.Length--;
                     break;
-                case RLKey.Enter:
-                case RLKey.KeypadEnter:
+                case Terminal.TK_ENTER:
+                case Terminal.TK_KP_ENTER:
                     return _createCommand(_inputBuffer.ToString());
                 default:
-                    _inputBuffer.Append(keyPress.Key.ToChar());
+                    _inputBuffer.Append(key.ToChar());
                     break;
             }
 
@@ -41,7 +39,7 @@ namespace Roguelike.State
             return null;
         }
 
-        public ICommand HandleMouseInput(RLMouse mouse)
+        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             return null;
         }
@@ -58,9 +56,9 @@ namespace Roguelike.State
             Game.StateHandler.PopState();
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
-            Game.OverlayHandler.Draw(mapConsole);
+            Game.OverlayHandler.Draw();
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Core;
 using System;
 
 namespace Roguelike.Animations
 {
-    class SpinAnimation : IAnimation
+    internal class SpinAnimation : IAnimation
     {
         public bool Done { get; private set; }
 
@@ -30,18 +30,19 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
+            Terminal.Color(Swatch.DbBrightWood);
             switch(_frame)
             {
-                case 1: mapConsole.Set(_x - 1, _y - 1, Swatch.DbBrightWood, null, '\\'); break;
-                case 2: mapConsole.Set(_x - 1, _y, Swatch.DbBrightWood, null, '-'); break;
-                case 3: mapConsole.Set(_x - 1, _y + 1, Swatch.DbBrightWood, null, '/'); break;
-                case 4: mapConsole.Set(_x, _y + 1, Swatch.DbBrightWood, null, '|'); break;
-                case 5: mapConsole.Set(_x + 1, _y + 1, Swatch.DbBrightWood, null, '\\'); break;
-                case 6: mapConsole.Set(_x + 1, _y, Swatch.DbBrightWood, null, '-'); break;
-                case 7: mapConsole.Set(_x + 1, _y - 1, Swatch.DbBrightWood, null, '/'); break;
-                case 8: mapConsole.Set(_x, _y - 1, Swatch.DbBrightWood, null, '|'); break;
+                case 1: Terminal.Put(_x - 1, _y - 1, '\\'); break;
+                case 2: Terminal.Put(_x - 1, _y, '-'); break;
+                case 3: Terminal.Put(_x - 1, _y + 1, '/'); break;
+                case 4: Terminal.Put(_x, _y + 1, '|'); break;
+                case 5: Terminal.Put(_x + 1, _y + 1, '\\'); break;
+                case 6: Terminal.Put(_x + 1, _y, '-'); break;
+                case 7: Terminal.Put(_x + 1, _y - 1, '/'); break;
+                case 8: Terminal.Put(_x, _y - 1, '|'); break;
             }
         }
 

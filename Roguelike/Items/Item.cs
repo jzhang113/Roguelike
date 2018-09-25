@@ -4,6 +4,7 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System;
+using System.Drawing;
 
 namespace Roguelike.Items
 {
@@ -23,7 +24,7 @@ namespace Roguelike.Items
 
         public string Name => Parameters.Name;
 
-        public Item(ItemParameter parameters, RLNET.RLColor color, char symbol)
+        public Item(ItemParameter parameters, Color color, char symbol)
         {
             Parameters = parameters;
             DrawingComponent = new Drawable(color, symbol, true);

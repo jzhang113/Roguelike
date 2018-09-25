@@ -1,20 +1,19 @@
-﻿using RLNET;
-using Roguelike.Commands;
+﻿using Roguelike.Commands;
 
 namespace Roguelike.State
 {
-    interface IState
+    public interface IState
     {
         // Handle keyboard inputs.
-        ICommand HandleKeyInput(RLKeyPress keyPress);
+        ICommand HandleKeyInput(int key);
 
         // Handle mouse inputs.
-        ICommand HandleMouseInput(RLMouse mouse);
+        ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick);
 
         // Update state information.
         void Update();
 
         // Draw to the screen.
-        void Draw(RLConsole console);
+        void Draw();
     }
 }

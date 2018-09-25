@@ -1,6 +1,7 @@
 ﻿using Roguelike.Core;
 using Roguelike.Interfaces;
 using System;
+using System.Drawing;
 
 namespace Roguelike.Items
 {
@@ -9,7 +10,7 @@ namespace Roguelike.Items
     {
         public ArmorType Type { get; }
 
-        public Armor(ItemParameter parameters, RLNET.RLColor color, ArmorType type) : base(parameters, color, '[')
+        public Armor(ItemParameter parameters, Color color, ArmorType type) : base(parameters, color, '[')
         {
             Type = type;
         }

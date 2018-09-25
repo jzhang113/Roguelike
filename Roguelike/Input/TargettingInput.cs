@@ -1,9 +1,9 @@
-﻿using RLNET;
+﻿using BearLib;
 using System;
 
 namespace Roguelike.Input
 {
-    public enum TargettingInput
+    internal enum TargettingInput
     {
         None,
         JumpE,
@@ -26,24 +26,18 @@ namespace Roguelike.Input
         Fire
     }
 
-    static partial class InputMapping
+    internal static partial class InputMapping
     {
-        public static TargettingInput GetTargettingInput(RLKeyPress keyPress)
+        public static TargettingInput GetTargettingInput(int key)
         {
-            if (keyPress == null)
-                return TargettingInput.None;
-
-            if (keyPress.Shift)
+            if (Terminal.Check(Terminal.TK_SHIFT))
             {
-                if (_keyMap.TargettingMap.Shift.TryGetValue(keyPress.Key, out string action)
-                    && Enum.TryParse(action, out TargettingInput input))
-                    return input;
+                if (_keyMap.TargettingMap.Shift.TryGetValue(key, out TargettingInput action))
+                    return action;
             }
-            else
+            else if (_keyMap.TargettingMap.None.TryGetValue(key, out TargettingInput action))
             {
-                if (_keyMap.TargettingMap.None.TryGetValue(keyPress.Key, out string action)
-                    && Enum.TryParse(action, out TargettingInput input))
-                    return input;
+                return action;
             }
 
             return TargettingInput.None;

@@ -1,11 +1,11 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Core;
 using System;
 using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
-    enum MessageLevel
+    public enum MessageLevel
     {
         Minimal,
         Normal,
@@ -14,7 +14,7 @@ namespace Roguelike.Systems
 
     // Accepts messages from various systems and displays it in the message console. Also keeps a 
     // rolling history of messages that can be displayed.
-    class MessageHandler
+    public class MessageHandler
     {
         public bool Redraw { get; private set; }
 
@@ -59,15 +59,16 @@ namespace Roguelike.Systems
             Redraw = true;
         }
 
-        public void Draw(RLConsole console)
+        public void Draw(LayerInfo layer)
         {
-            int viewSize = (console.Height - 1) / 2;
+            int viewSize = (layer.Height - 1) / 2;
             int maxCount = Math.Min(_messages.Count, viewSize);
-            int yPos = console.Height - 2;
+            int yPos = layer.Height - 2;
 
             for (int i = 0; i < maxCount; i++)
             {
-                console.Print(1, yPos, _messages[_messages.Count - i - 1], Colors.Text);
+                Terminal.Color(Colors.Text);
+                Terminal.Print(1, yPos, _messages[_messages.Count - i - 1]);
                 yPos -= 2;
             }
 

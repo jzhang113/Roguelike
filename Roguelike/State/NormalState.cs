@@ -1,4 +1,4 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Roguelike.State
 {
-    class NormalState : IState
+    internal sealed class NormalState : IState
     {
         private static readonly Lazy<NormalState> _instance = new Lazy<NormalState>(() => new NormalState());
         public static NormalState Instance => _instance.Value;
@@ -22,15 +22,12 @@ namespace Roguelike.State
         }
 
         // ReSharper disable once CyclomaticComplexity
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
+        public ICommand HandleKeyInput(int key)
         {
-            if (keyPress == null)
-                return null;
-
             Player player = Game.Player;
             Weapon weapon = player.Equipment.PrimaryWeapon;
 
-            switch (InputMapping.GetNormalInput(keyPress))
+            switch (InputMapping.GetNormalInput(key))
             {
                 //case NormalInput.None:
                 //    return null;
@@ -125,7 +122,7 @@ namespace Roguelike.State
             }
 
             // HACK: debugging commands
-            if (keyPress.Key == RLKey.Q)
+            if (key == Terminal.TK_Q)
             {
                 // NOTE: Movement occurs after the hook is used. This means that using the hook
                 // to pull enemies will often give the Player a first hit on enemies, but using
@@ -139,7 +136,7 @@ namespace Roguelike.State
             }
 
             // TODO: Create a debug menu for test commands
-            if (keyPress.Key == RLKey.Grave)
+            if (key == Terminal.TK_GRAVE)
             {
                 Game.EventScheduler.Clear();
                 Game.NewGame();
@@ -148,11 +145,15 @@ namespace Roguelike.State
 
             // TODO: Use weapon's attack sequence if equipped???
             IAction action = player.GetBasicAttack();
-            if (keyPress.Key == RLKey.Z)
+            if (key == Terminal.TK_Z)
+            {
                 action = weapon?.AttackLeft() ?? player.GetBasicAttack();
-            else if (keyPress.Key == RLKey.X)
+            }
+            else if (key == Terminal.TK_X)
+            {
                 action = weapon?.AttackRight() ?? player.GetBasicAttack();
-            else if (keyPress.Shift)
+            }
+            else if (Terminal.Check(Terminal.TK_SHIFT))
             {
                 // TODO: Change to an arbitrary facing
                 // TODO: Should attacks update facing?
@@ -161,7 +162,7 @@ namespace Roguelike.State
                 return null;
             }
 
-            if (keyPress.Shift)
+            if (Terminal.Check(Terminal.TK_SHIFT))
             {
                 Game.StateHandler.PushState(new TargettingState(
                     player,
@@ -180,16 +181,13 @@ namespace Roguelike.State
             }
         }
 
-        public ICommand HandleMouseInput(RLMouse mouse)
+        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            if (!MouseInput.GetHoverPosition(mouse, out (int X, int Y) mousePos))
-                return null;
-
-            Tile current = Game.Map.Field[mousePos.X, mousePos.Y];
+            Tile current = Game.Map.Field[x, y];
             if (!current.IsExplored || current.IsWall)
                 return null;
 
-            IEnumerable<WeightedPoint> path = Game.Map.GetPathToPlayer(mousePos.X, mousePos.Y).Reverse();
+            IEnumerable<WeightedPoint> path = Game.Map.GetPathToPlayer(x, y).Reverse();
             foreach (WeightedPoint p in path)
             {
                 if (Game.Map.Field[p.X, p.Y].IsExplored)
@@ -226,11 +224,10 @@ namespace Roguelike.State
             Game.ForceRender();
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
-            console.Clear(0, RLColor.Black, Colors.Text);
-            Game.Map.Draw(console);
-            Game.OverlayHandler.Draw(console);
+            Game.Map.Draw();
+            Game.OverlayHandler.Draw();
         }
     }
 }

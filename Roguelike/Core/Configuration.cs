@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Core
 {
-    struct Configuration
+    public struct Configuration
     {
         public string FontName { get; set; }
         public int FontSize { get; set; }
@@ -16,7 +16,7 @@
         public int ScreenWidth => MapView.Width + ViewWindow.Width;
         public int ScreenHeight => StatView.Height + MapView.Height + MessageView.Height;
 
-        internal struct WindowConfig
+        public struct WindowConfig
         {
             public int Width { get; set; }
             public int Height { get; set; }

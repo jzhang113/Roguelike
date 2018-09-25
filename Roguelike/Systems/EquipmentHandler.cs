@@ -1,8 +1,9 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Core;
 using Roguelike.Items;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Roguelike.Systems
 {
@@ -55,15 +56,16 @@ namespace Roguelike.Systems
             Armor[armor.Type] = null;
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
-            console.Print(1, console.Width / 2 - 8, "== Equipment ==", Colors.Text);
-            console.Print(1, 1, "Weapon - " + PrimaryWeapon.Name, Colors.Text);
-            console.Print(1, 2, "Offhand - " + (OffhandWeapon?.Name ?? "none"), Colors.Text);
-            console.Print(1, 3, "Armor - " + (Armor[ArmorType.Armor]?.Name ?? "none"), Colors.Text);
-            console.Print(1, 4, "Helmet - " + (Armor[ArmorType.Helmet]?.Name ?? "none"), Colors.Text);
-            console.Print(1, 5, "Gloves - " + (Armor[ArmorType.Gloves]?.Name ?? "none"), Colors.Text);
-            console.Print(1, 6, "Boots - " + (Armor[ArmorType.Boots]?.Name ?? "none"), Colors.Text);
+            Terminal.Color(Colors.Text);
+            Terminal.Print(1, 1, ContentAlignment.TopCenter, "== Equipment ==");
+            Terminal.Print(1, 1, "Weapon - " + PrimaryWeapon.Name);
+            Terminal.Print(1, 2, "Offhand - " + (OffhandWeapon?.Name ?? "none"));
+            Terminal.Print(1, 3, "Armor - " + (Armor[ArmorType.Armor]?.Name ?? "none"));
+            Terminal.Print(1, 4, "Helmet - " + (Armor[ArmorType.Helmet]?.Name ?? "none"));
+            Terminal.Print(1, 5, "Gloves - " + (Armor[ArmorType.Gloves]?.Name ?? "none"));
+            Terminal.Print(1, 6, "Boots - " + (Armor[ArmorType.Boots]?.Name ?? "none"));
         }
     }
 }

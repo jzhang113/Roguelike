@@ -1,9 +1,10 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Core;
 using Roguelike.Items;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Roguelike.Systems
@@ -170,16 +171,17 @@ namespace Roguelike.Systems
             }
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
-            console.Print(console.Width / 2 - 8, 1, "== Inventory ==", Colors.Text);
+            Terminal.Color(Colors.Text);
+            Terminal.Print(1, 1, ContentAlignment.MiddleCenter, "== Inventory ==");
 
             int line = 3;
             char letter = 'a';
 
             foreach (ItemStack itemStack in _inventory)
             {
-                console.Print(1, line, $"{letter}) {itemStack}", Colors.Text);
+                Terminal.Print(1, line, $"{letter}) {itemStack}");
                 line++;
                 letter++;
 
@@ -188,7 +190,7 @@ namespace Roguelike.Systems
 
                 foreach (ItemCount itemCount in itemStack)
                 {
-                    console.Print(3, line, $"- {itemCount}", Colors.Text);
+                    Terminal.Print(3, line, $"- {itemCount}");
                     line++;
                 }
             }

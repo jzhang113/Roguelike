@@ -5,9 +5,9 @@ using System.IO;
 
 namespace Roguelike
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Configuration configs = LoadData<Configuration>("config", Directory.GetCurrentDirectory());
             Game.Initialize(configs, OptionHandler.ParseOptions(args));

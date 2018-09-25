@@ -1,20 +1,20 @@
-﻿using RLNET;
+﻿using Roguelike.Core;
 using System;
-using Roguelike.Core;
+using System.Drawing;
 
 namespace Roguelike.Animations
 {
-    class ExplosionAnimation : IAnimation
+    internal class ExplosionAnimation : IAnimation
     {
         public bool Done { get; private set; }
 
         private readonly int _x;
         private readonly int _y;
         private readonly int _radius;
-        private readonly RLColor _color;
+        private readonly Color _color;
         private int _counter;
 
-        public ExplosionAnimation(int x, int y, int radius, RLColor color)
+        public ExplosionAnimation(int x, int y, int radius, Color color)
         {
             _x = x;
             _y = y;
@@ -34,14 +34,14 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
             Game.OverlayHandler.ClearForeground();
             foreach (Tile tile in Game.Map.GetTilesInRadius(_x, _y, _counter))
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, _color);
             }
-            Game.OverlayHandler.Draw(mapConsole);
+            Game.OverlayHandler.Draw();
         }
 
         public event EventHandler Complete;

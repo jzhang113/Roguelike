@@ -1,20 +1,20 @@
-﻿using RLNET;
-using Roguelike.Core;
+﻿using Roguelike.Core;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Roguelike.Animations
 {
-    class TrailAnimation : IAnimation
+    internal class TrailAnimation : IAnimation
     {
         public bool Done { get; private set; }
 
         private readonly IList<Tile> _path;
-        private readonly RLColor _color;
+        private readonly Color _color;
         private int _counter;
 
-        public TrailAnimation(IEnumerable<Tile> path, RLColor color)
+        public TrailAnimation(IEnumerable<Tile> path, Color color)
         {
             _path = path.ToList();
             _color = color;
@@ -34,7 +34,7 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
             if (_path.Count == 0)
                 return;
@@ -42,7 +42,7 @@ namespace Roguelike.Animations
             Game.OverlayHandler.ClearForeground();
             Tile tile = _path[_counter];
             Game.OverlayHandler.Set(tile.X, tile.Y, _color);
-            Game.OverlayHandler.Draw(mapConsole);
+            Game.OverlayHandler.Draw();
         }
 
         public event EventHandler Complete;

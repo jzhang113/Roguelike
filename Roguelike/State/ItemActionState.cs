@@ -1,19 +1,14 @@
-﻿using RLNET;
-using Roguelike.Commands;
-using Roguelike.Core;
+﻿using Roguelike.Commands;
 using Roguelike.Items;
 using Roguelike.Utils;
 
 namespace Roguelike.State
 {
-    abstract class ItemActionState : IState
+    internal abstract class ItemActionState : IState
     {
-        public virtual ICommand HandleKeyInput(RLKeyPress keyPress)
+        public virtual ICommand HandleKeyInput(int key)
         {
-            if (keyPress == null)
-                return null;
-
-            char keyChar = keyPress.Key.ToChar();
+            char keyChar = key.ToChar();
             if (!Game.Player.Inventory.TryGetKey(keyChar, out ItemCount itemCount))
             {
                 Game.MessageHandler.AddMessage("No such item.");
@@ -25,7 +20,7 @@ namespace Roguelike.State
             return ResolveInput(itemCount);
         }
 
-        public virtual ICommand HandleMouseInput(RLMouse mouse)
+        public virtual ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             // TODO do stuff and get the item selected
             return null;
@@ -49,10 +44,9 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
-        public virtual void Draw(RLConsole inventoryConsole)
+        public virtual void Draw()
         {
-            inventoryConsole.Clear(0, Colors.FloorBackground, Colors.Text);
-            Game.Player.Inventory.Draw(inventoryConsole);
+            Game.Player.Inventory.Draw();
         }
     }
 }

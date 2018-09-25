@@ -1,12 +1,11 @@
-﻿using RLNET;
-using Roguelike.Commands;
+﻿using Roguelike.Commands;
 using Roguelike.Items;
 using Roguelike.Utils;
 using System;
 
 namespace Roguelike.State
 {
-    class InventoryState : ItemActionState
+    internal sealed class InventoryState : ItemActionState
     {
         private static readonly Lazy<InventoryState> _instance = new Lazy<InventoryState>(() => new InventoryState());
         public static InventoryState Instance => _instance.Value;
@@ -15,12 +14,9 @@ namespace Roguelike.State
         {
         }
 
-        public override ICommand HandleKeyInput(RLKeyPress keyPress)
+        public override ICommand HandleKeyInput(int key)
         {
-            if (keyPress == null)
-                return null;
-
-            char keyChar = keyPress.Key.ToChar();
+            char keyChar = key.ToChar();
             bool opened = Game.Player.Inventory.OpenStack(keyChar);
             if (opened)
             {

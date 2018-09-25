@@ -8,7 +8,7 @@ namespace Roguelike.Systems
     // Effectively the main game loop. Actions are processed until one becomes null, which should
     // only occur with the Player. While the Player is in the heap as a sentinel, the actual input
     // handling is managed by the States.
-    class EventScheduler
+    public class EventScheduler
     {
         private readonly ICollection<ISchedulable> _entities;
         private readonly MaxHeap<ISchedulable> _eventSet;
@@ -62,19 +62,18 @@ namespace Roguelike.Systems
                 ISchedulable current = _eventSet.Peek();
                 ICommand action = current.Act();
                 if (!Execute(current, action))
+                {
                     return false;
+                }
+                else if (_clearing)
+                {
+                    _eventSet.Clear();
+                    _clearing = false;
+                    return false;
+                }
                 else
                 {
-                    if (_clearing)
-                    {
-                        _eventSet.Clear();
-                        _clearing = false;
-                        return false;
-                    }
-                    else
-                    {
-                        _eventSet.PopMax();
-                    }
+                    _eventSet.PopMax();
                 }
             }
 
@@ -114,7 +113,7 @@ namespace Roguelike.Systems
                 }
                 else
                 {
-                    System.Diagnostics.Debug.Assert(false, "monster made invalid move");
+                    System.Diagnostics.Debug.Fail("monster made invalid move");
                     current.Energy = 0;
                 }
             }

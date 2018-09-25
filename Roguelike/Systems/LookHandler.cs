@@ -1,11 +1,11 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Items;
 
 namespace Roguelike.Systems
 {
-    static class LookHandler
+    internal static class LookHandler
     {
         private static Actor _displayActor;
         private static Item _displayItem;
@@ -40,28 +40,30 @@ namespace Roguelike.Systems
             _showTile = tile != null;
         }
 
-        public static void Draw(RLConsole console)
+        public static void Draw()
         {
+            Terminal.Color(Colors.Text);
+
             if (_showItemInfo)
-                console.Print(1, 1, _displayItem.Name, Colors.Text);
+                Terminal.Print(1, 1, _displayItem.Name);
 
             if (_showActorInfo)
             {
-                console.Print(1, 1, _displayActor.Name, Colors.Text);
-                console.Print(1, 2, "HP: " + _displayActor.Hp + " / " + _displayActor.Parameters.MaxHp, Colors.Text);
-                console.Print(1, 3, "MP: " + _displayActor.Mp + " / " + _displayActor.Parameters.MaxMp, Colors.Text);
-                console.Print(1, 4, "SP: " + _displayActor.Sp + " / " + _displayActor.Parameters.MaxSp, Colors.Text);
-                console.Print(1, 5, "Energy: " + _displayActor.Energy, Colors.Text);
-                console.Print(1, 6, "State: " + _displayActor.State, Colors.Text);
+                Terminal.Print(1, 1, _displayActor.Name);
+                Terminal.Print(1, 2, $"HP: {_displayActor.Hp} / {_displayActor.Parameters.MaxHp}");
+                Terminal.Print(1, 3, $"MP: {_displayActor.Mp} / {_displayActor.Parameters.MaxMp}");
+                Terminal.Print(1, 4, $"SP: {_displayActor.Sp} / {_displayActor.Parameters.MaxSp}");
+                Terminal.Print(1, 5, $"Energy: {_displayActor.Energy}");
+                Terminal.Print(1, 6, $"State: {_displayActor.State}");
             }
 
             if (_showTile)
             {
-                // console.Print(1, 8, "Move cost: " + _displayTile.MoveCost.ToString(), Colors.TextHeading);
-                console.Print(1, 9, "Occupied: " + _displayTile.IsOccupied, Colors.Text);
-                console.Print(1, 9, "Walkable: " + _displayTile.IsWalkable, Colors.Text);
-                console.Print(1, 10, "Wall: " + _displayTile.IsWall, Colors.Text);
-                console.Print(1, 11, $"Position: ({_displayTile.X}, {_displayTile.Y})", Colors.Text);
+                // console.Print(1, 8, $"Move cost: {_displayTile.MoveCost.ToString()}");
+                Terminal.Print(1, 9, $"Occupied: {_displayTile.IsOccupied}");
+                Terminal.Print(1, 9, $"Walkable: {_displayTile.IsWalkable}");
+                Terminal.Print(1, 10, $"Wall: {_displayTile.IsWall}");
+                Terminal.Print(1, 11, $"Position: ({_displayTile.X}, {_displayTile.Y})");
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Actions;
 using Roguelike.Core;
 using System;
@@ -40,13 +40,13 @@ namespace Roguelike.Systems
             Current = Root;
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
             _printLine = 0;
-            RecursivePrint(console, Root, 0);
+            RecursivePrint(Root, 0);
         }
 
-        private void RecursivePrint(RLConsole console, ActionNode action, int depth)
+        private void RecursivePrint(ActionNode action, int depth)
         {
             if (action == null)
                 return;
@@ -60,12 +60,11 @@ namespace Roguelike.Systems
             else
                 line = depth > 0 ? "+-" : "  ";
 
-            console.Print(
-                2 * depth - 2, _printLine++, line + action.Name,
-                action == Current ? Swatch.DbBlood : Colors.Text);
+            Terminal.Color(action == Current ? Swatch.DbBlood : Colors.Text);
+            Terminal.Print(2 * depth - 2, _printLine++, line + action.Name);
 
-            RecursivePrint(console, action.Left, depth + 1);
-            RecursivePrint(console, action.Right, depth + 1);
+            RecursivePrint(action.Left, depth + 1);
+            RecursivePrint(action.Right, depth + 1);
         }
     }
 

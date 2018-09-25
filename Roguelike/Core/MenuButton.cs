@@ -1,9 +1,10 @@
-﻿using RLNET;
+﻿using BearLib;
 using System;
+using System.Drawing;
 
 namespace Roguelike.Core
 {
-    class MenuButton
+    internal class MenuButton
     {
         public int X { get; }
         public int Y { get; }
@@ -13,18 +14,18 @@ namespace Roguelike.Core
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public RLColor BackgroundColor { get; set; }
-        public RLColor BorderColor { get; set; }
-        public RLColor HoverColor { get; set; }
-        public RLColor TextColor { get; set; }
+        public Color BackgroundColor { get; set; }
+        public Color BorderColor { get; set; }
+        public Color HoverColor { get; set; }
+        public Color TextColor { get; set; }
 
         internal bool Hover { get; set; }
 
-        private bool _border;
-        private Alignment _align;
+        private readonly bool _border;
+        private readonly ContentAlignment _align;
 
         public MenuButton(int x, int y, string text, Action callback,
-            bool border = false, Alignment alignment = Alignment.Center)
+            bool border = false, ContentAlignment alignment = ContentAlignment.MiddleCenter)
         {
             X = x;
             Y = y;
@@ -44,65 +45,56 @@ namespace Roguelike.Core
             _align = alignment;
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
-            RLColor backColor = Hover ? HoverColor : BackgroundColor;
+            Color backColor = Hover ? HoverColor : BackgroundColor;
 
             if (_border)
             {
+                Terminal.BkColor(backColor);
                 for (int dx = 1; dx < Width - 1; dx++)
                 {
                     for (int dy = 1; dy < Height - 1; dy++)
                     {
-                        console.SetBackColor(X + dx, Y + dy, backColor);
+                        Terminal.Put(X + dx, Y + dy, Terminal.Pick(X + dx, Y + dy));
                     }
                 }
 
+                Terminal.Color(BorderColor);
                 // top and bottom border
                 for (int dx = 1; dx < Width - 1; dx++)
                 {
-                    console.Set(X + dx, Y, BorderColor, backColor, 196);
-                    console.Set(X + dx, Y + Height - 1, BorderColor, backColor, 196);
+                    Terminal.Put(X + dx, Y, 196);
+                    Terminal.Put(X + dx, Y + Height - 1, 196);
                 }
 
                 // left and right border
                 for (int dy = 1; dy < Height - 1; dy++)
                 {
-                    console.Set(X, Y + dy, BorderColor, backColor, 179);
-                    console.Set(X + Width - 1, Y + dy, BorderColor, backColor, 179);
+                    Terminal.Put(X, Y + dy, 179);
+                    Terminal.Put(X + Width - 1, Y + dy, 179);
                 }
 
                 // corners
-                console.Set(X, Y, BorderColor, backColor, 218);
-                console.Set(X + Width - 1, Y, BorderColor, backColor, 191);
-                console.Set(X, Y + Height - 1, BorderColor, backColor, 192);
-                console.Set(X + Width - 1, Y + Height - 1, BorderColor, backColor , 217);
+                Terminal.Put(X, Y, 218);
+                Terminal.Put(X + Width - 1, Y, 191);
+                Terminal.Put(X, Y + Height - 1, 192);
+                Terminal.Put(X + Width - 1, Y + Height - 1, 217);
             }
             else
             {
-                for (int dx = 0; dx < Width - 0; dx++)
+                Terminal.BkColor(backColor);
+                for (int dx = 0; dx < Width; dx++)
                 {
-                    for (int dy = 0; dy < Height - 0; dy++)
+                    for (int dy = 0; dy < Height; dy++)
                     {
-                        console.SetBackColor(X + dx, Y + dy, backColor);
+                        Terminal.Put(X + dx, Y + dy, Terminal.Pick(X + dx, Y + dy));
                     }
                 }
             }
 
-            switch (_align)
-            {
-                case Alignment.Center:
-                    console.Print(X + (Width - Text.Length) / 2, Y + Height / 2, Text, TextColor);
-                    break;
-                case Alignment.Left:
-                    console.Print(X + 1, Y + Height / 2, Text, TextColor);
-                    break;
-                case Alignment.Right:
-                    console.Print(X + Width - Text.Length - 1, Y + Height / 2, Text, TextColor);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(_align));
-            }
+            Terminal.Color(TextColor);
+            Terminal.Print(X + 1, Y + Height / 2, _align, Text);
         }
     }
 }

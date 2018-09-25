@@ -2,7 +2,7 @@
 
 namespace Roguelike.Core
 {
-    class Options
+    public class Options
     {
         // How much text to show.
         internal MessageLevel Verbosity { get; set; }

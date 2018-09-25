@@ -1,5 +1,4 @@
-﻿using RLNET;
-using Roguelike.Actors;
+﻿using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Input;
@@ -9,7 +8,7 @@ using System.Linq;
 
 namespace Roguelike.State
 {
-    class TargettingState : IState
+    internal class TargettingState : IState
     {
         private readonly Actor _source;
         private readonly TargetZone _targetZone;
@@ -90,10 +89,9 @@ namespace Roguelike.State
         }
 
         // ReSharper disable once CyclomaticComplexity
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
+        public ICommand HandleKeyInput(int key)
         {
-            TargettingInput input = InputMapping.GetTargettingInput(keyPress);
-            switch (input)
+            switch (InputMapping.GetTargettingInput(key))
             {
                 case TargettingInput.None:
                     return null;
@@ -165,7 +163,7 @@ namespace Roguelike.State
             }
 
             IEnumerable<Tile> targets = DrawTargettedTiles();
-            return input == TargettingInput.Fire ? _callback(targets) : null;
+            return InputMapping.GetTargettingInput(key) == TargettingInput.Fire ? _callback(targets) : null;
         }
 
         private void MoveTarget(Dir direction)
@@ -192,24 +190,21 @@ namespace Roguelike.State
             }
         }
 
-        public ICommand HandleMouseInput(RLMouse mouse)
+        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            if (!MouseInput.GetHoverPosition(mouse, out (int X, int Y) hover))
-                return null;
-
             // Handle clicks before checking for movement.
-            if (mouse.GetLeftClick())
+            if (leftClick)
             {
                 IEnumerable<Tile> targets = DrawTargettedTiles();
                 return _callback(targets);
             }
 
             // If the mouse didn't get moved, don't do anything.
-            if (hover.X == _prevMouseX && hover.Y == _prevMouseY)
+            if (x == _prevMouseX && y == _prevMouseY)
                 return null;
 
-            _prevMouseX = hover.X;
-            _prevMouseY = hover.Y;
+            _prevMouseX = x;
+            _prevMouseY = y;
 
             // Adjust the targetting position so it remains in the targetting range.
             _targetX = _source.X;
@@ -265,9 +260,9 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
-            Game.OverlayHandler.Draw(mapConsole);
+            Game.OverlayHandler.Draw();
         }
     }
 }

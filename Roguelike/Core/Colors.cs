@@ -1,39 +1,39 @@
-﻿using RLNET;
+﻿using System.Drawing;
 
 namespace Roguelike.Core
 {
-    static class Colors
+    internal static class Colors
     {
-        public static RLColor FloorBackground = Swatch.SecondaryDarkest;
-        public static RLColor Floor = Swatch.Secondary;
+        public static Color FloorBackground =   Swatch.SecondaryDarkest;
+        public static Color Floor =             Swatch.Secondary;
 
-        public static RLColor WallBackground = Swatch.AlternateDarkest;
-        public static RLColor Wall = Swatch.Alternate;
+        public static Color WallBackground =    Swatch.AlternateDarkest;
+        public static Color Wall =              Swatch.Alternate;
 
         // Units
-        public static RLColor Player = Swatch.DbLight;
+        public static Color Player =            Swatch.DbLight;
 
         // UI
-        public static RLColor Path = Swatch.Alternate;
-        public static RLColor Target = Swatch.PrimaryDarker;
-        public static RLColor TargetBackground = Swatch.Secondary;
-        public static RLColor Cursor = Swatch.PrimaryDarkest;
+        public static Color Path =              Swatch.Alternate;
+        public static Color Target =            Swatch.PrimaryDarker;
+        public static Color TargetBackground =  Swatch.Secondary;
+        public static Color Cursor =            Swatch.PrimaryDarkest;
 
-        public static RLColor Text = Swatch.DbLight;
-        public static RLColor ButtonBackground = Swatch.Primary;
-        public static RLColor ButtonBorder = Swatch.Secondary;
-        public static RLColor ButtonHover = Swatch.Alternate;
+        public static Color Text =              Swatch.DbLight;
+        public static Color ButtonBackground =  Swatch.Primary;
+        public static Color ButtonBorder =      Swatch.Secondary;
+        public static Color ButtonHover =       Swatch.Alternate;
 
         // Terrain
-        public static RLColor Grass = Swatch.DbGrass;
-        public static RLColor Stone = Swatch.DbStone;
-        public static RLColor Water = Swatch.DbWater;
+        public static Color Grass =             Swatch.DbGrass;
+        public static Color Stone =             Swatch.DbStone;
+        public static Color Water =             Swatch.DbWater;
 
         // Map features
-        public static RLColor Door = Swatch.DbBrightWood;
-        public static RLColor Exit = Swatch.Alternate;
-        public static RLColor Hook = Swatch.DbLight;
-        public static RLColor Fire = new RLColor(255, 185, 0);
-        public static RLColor FireAccent = Swatch.DbBlood;
+        public static Color Door =              Swatch.DbBrightWood;
+        public static Color Exit =              Swatch.Alternate;
+        public static Color Hook =              Swatch.DbLight;
+        public static Color Fire =              Color.FromArgb(255, 185, 0);
+        public static Color FireAccent =        Swatch.DbBlood;
     }
 }

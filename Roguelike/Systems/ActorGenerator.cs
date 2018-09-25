@@ -1,9 +1,8 @@
-﻿using RLNET;
+﻿using Pcg;
 using Roguelike.Actors;
 using Roguelike.Core;
-using System;
 using System.Collections.Generic;
-using Pcg;
+using System.Drawing;
 using System.Linq;
 
 namespace Roguelike.Systems
@@ -88,7 +87,7 @@ namespace Roguelike.Systems
                     return new ActorType(flags, "horse", 'h', Swatch.DbSky);
             }
 
-            return new ActorType(flags, "chimera", 'c', RLColor.White);
+            return new ActorType(flags, "chimera", 'c', Color.White);
         }
 
         public readonly struct ActorPart
@@ -109,9 +108,9 @@ namespace Roguelike.Systems
         {
             public ActorParameters Parameters { get; }
             public char Symbol { get; }
-            public RLColor Color { get; }
+            public Color Color { get; }
 
-            public ActorType(ICollection<ActorFlag> flags, string name, char symbol, RLColor color)
+            public ActorType(ICollection<ActorFlag> flags, string name, char symbol, Color color)
             {
                 Parameters = new ActorParameters(name, flags.ToArray());
                 Symbol = symbol;

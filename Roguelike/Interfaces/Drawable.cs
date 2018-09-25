@@ -1,14 +1,15 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Core;
+using Roguelike.Utils;
 using System;
-using System.Runtime.Serialization;
+using System.Drawing;
 
 namespace Roguelike.Interfaces
 {
     [Serializable]
-    public class Drawable : ISerializable
+    public class Drawable
     {
-        public RLColor Color { get; internal set; }
+        public Color Color { get; internal set; }
         public char Symbol { get; internal set; }
 
         internal bool Activated { get; set; }
@@ -17,7 +18,7 @@ namespace Roguelike.Interfaces
         private int _rememberX;
         private int _rememberY;
 
-        public Drawable(RLColor color, char symbol, bool remember)
+        public Drawable(Color color, char symbol, bool remember)
         {
             Color = color;
             Symbol = symbol;
@@ -25,22 +26,7 @@ namespace Roguelike.Interfaces
             _remember = remember;
         }
 
-        protected Drawable(SerializationInfo info, StreamingContext context)
-        {
-            float r = (float)info.GetValue($"{nameof(Color)}.r", typeof(float));
-            float g = (float)info.GetValue($"{nameof(Color)}.g", typeof(float));
-            float b = (float)info.GetValue($"{nameof(Color)}.b", typeof(float));
-            Color = new RLColor(r, g, b);
-
-            Symbol = info.GetChar(nameof(Symbol));
-            Activated = info.GetBoolean(nameof(Activated));
-
-            _remember = info.GetBoolean(nameof(_remember));
-            _rememberX = info.GetInt32(nameof(_rememberX));
-            _rememberY = info.GetInt32(nameof(_rememberY));
-        }
-
-        public virtual void Draw(RLConsole console, Tile tile)
+        public virtual void Draw(Tile tile)
         {
             if (!tile.IsExplored)
                 return;
@@ -49,52 +35,43 @@ namespace Roguelike.Interfaces
                 return;
 
             // Don't blend wall colors
-            RLColor color = Color;
+            Color color = Color;
             if (!tile.IsWall)
             {
-                color = RLColor.Blend(Color, Colors.Floor,
+                color = Color.Blend(Colors.Floor,
                     tile.IsVisible
                         ? Math.Min(tile.Light * 1.5f, 1)
                         : Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
             }
 
-            DrawTile(console, color, null, tile.IsVisible, tile.X, tile.Y);
+            DrawTile(color, null, tile.IsVisible, tile.X, tile.Y);
         }
 
-        protected void DrawTile(RLConsole console, RLColor foreground, RLColor? background, bool visible, int x, int y)
+        protected void DrawTile(Color foreground, Color? background, bool visible, int x, int y)
         {
             int destX = x - Camera.X;
             int destY = y - Camera.Y;
 
+            Terminal.Color(foreground);
+
+            // TODO: can only set backgrounds on 0th layer
+            if (background.HasValue)
+                Terminal.BkColor(background.Value);
+
             if (visible)
             {
-                console.Set(destX, destY, foreground, background, Symbol);
+                Terminal.Put(destX, destY, Symbol);
                 _rememberX = x;
                 _rememberY = y;
             }
             else if (_remember)
             {
-                console.Set(_rememberX - Camera.X, _rememberY - Camera.Y,
-                    foreground, background, Symbol);
+                Terminal.Put(_rememberX - Camera.X, _rememberY - Camera.Y, Symbol);
             }
             else
             {
-                console.Set(destX, destY, Colors.FloorBackground, null, '.');
+                Terminal.Put(destX, destY, '.');
             }
-        }
-
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue($"{nameof(Color)}.r", Color.r);
-            info.AddValue($"{nameof(Color)}.g", Color.g);
-            info.AddValue($"{nameof(Color)}.b", Color.b);
-
-            info.AddValue(nameof(Symbol), Symbol);
-            info.AddValue(nameof(Activated), Activated);
-
-            info.AddValue(nameof(_remember), _remember);
-            info.AddValue(nameof(_rememberX), _rememberX);
-            info.AddValue(nameof(_rememberY), _rememberY);
         }
     }
 }

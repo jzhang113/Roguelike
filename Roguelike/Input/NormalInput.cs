@@ -1,9 +1,8 @@
-﻿using RLNET;
-using System;
+﻿using BearLib;
 
 namespace Roguelike.Input
 {
-    public enum NormalInput
+    internal enum NormalInput
     {
         None,
         AttackE,
@@ -35,24 +34,18 @@ namespace Roguelike.Input
         Wait
     }
 
-    static partial class InputMapping
+    internal static partial class InputMapping
     {
-        public static NormalInput GetNormalInput(RLKeyPress keyPress)
+        public static NormalInput GetNormalInput(int key)
         {
-            if (keyPress == null)
-                return NormalInput.None;
-
-            if (keyPress.Shift)
+            if (Terminal.Check(Terminal.TK_SHIFT))
             {
-                if (_keyMap.NormalMap.Shift.TryGetValue(keyPress.Key, out string action)
-                    && Enum.TryParse(action, out NormalInput input))
-                    return input;
+                if (_keyMap.NormalMap.Shift.TryGetValue(key, out NormalInput action))
+                    return action;
             }
-            else
+            else if (_keyMap.NormalMap.None.TryGetValue(key, out NormalInput action))
             {
-                if (_keyMap.NormalMap.None.TryGetValue(keyPress.Key, out string action)
-                    && Enum.TryParse(action, out NormalInput input))
-                    return input;
+                return action;
             }
 
             return NormalInput.None;

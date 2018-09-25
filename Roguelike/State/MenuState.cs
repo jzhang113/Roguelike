@@ -1,11 +1,10 @@
-﻿using RLNET;
-using Roguelike.Commands;
+﻿using Roguelike.Commands;
 using Roguelike.Core;
 using System.Collections.Generic;
 
 namespace Roguelike.State
 {
-    class MenuState : IState
+    internal class MenuState : IState
     {
         private IEnumerable<MenuButton> _buttons;
 
@@ -14,19 +13,19 @@ namespace Roguelike.State
             _buttons = buttons;
         }
 
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
+        public ICommand HandleKeyInput(int key)
         {
             return null;
         }
 
-        public ICommand HandleMouseInput(RLMouse mouse)
+        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             foreach (MenuButton button in _buttons)
             {
-                button.Hover = mouse.X >= button.X && mouse.X < button.X + button.Width
-                    && mouse.Y >= button.Y && mouse.Y < button.Y + button.Height;
+                button.Hover = x >= button.X && x < button.X + button.Width
+                    && y >= button.Y && y < button.Y + button.Height;
 
-                if (button.Hover && mouse.GetLeftClick())
+                if (button.Hover && leftClick)
                     button.Callback();
             }
 
@@ -39,11 +38,11 @@ namespace Roguelike.State
             Game.ForceRender();
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
             foreach (MenuButton button in _buttons)
             {
-                button.Draw(console);
+                button.Draw();
             }
         }
     }

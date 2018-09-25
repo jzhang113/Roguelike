@@ -1,15 +1,15 @@
-﻿using System;
-using RLNET;
+﻿using BearLib;
 using Roguelike.Core;
+using System.Drawing;
 
 namespace Roguelike.Systems
 {
-    class OverlayHandler
+    public class OverlayHandler
     {
         public string DisplayText { private get; set; }
 
-        private RLColor[,] Background { get; }
-        private RLColor[,] Foreground { get; }
+        private Color[,] Background { get; }
+        private Color[,] Foreground { get; }
         private bool[,] SetBackground { get; }
         private bool[,] SetForeground { get; }
 
@@ -18,20 +18,22 @@ namespace Roguelike.Systems
             int viewWidth = width + 1;
             int viewHeight = height + 1;
 
-            Background = new RLColor[viewWidth, viewHeight];
-            Foreground = new RLColor[viewWidth, viewHeight];
+            Background = new Color[viewWidth, viewHeight];
+            Foreground = new Color[viewWidth, viewHeight];
             SetBackground = new bool[viewWidth, viewHeight];
             SetForeground = new bool[viewWidth, viewHeight];
         }
 
-        public void Set(int x, int y, RLColor color, bool background = false)
+        public void Set(int x, int y, Color color, bool background = false)
         {
             int xPos = x - Camera.X;
             int yPos = y - Camera.Y;
 
             if (xPos > Game.Config.MapView.Width || yPos > Game.Config.MapView.Height
                 || xPos < 0 || yPos < 0)
+            {
                 return;
+            }
 
             if (background)
             {
@@ -45,26 +47,25 @@ namespace Roguelike.Systems
             }
         }
 
-        public void Draw(RLConsole console)
+        public void Draw()
         {
-            console.Print(1, 1, DisplayText, Colors.Text);
+            Terminal.Color(Colors.Text);
+            Terminal.Print(1, 1, DisplayText);
 
             for (int i = 0; i <= Game.Config.MapView.Width; i++)
             {
                 for (int j = 0; j <= Game.Config.MapView.Height; j++)
                 {
+                    // TODO: can only set backgrounds on 0th layer
                     if (SetBackground[i, j])
-                        console.SetBackColor(i, j, Background[i, j]);
+                        Terminal.BkColor(Background[i, j]);
 
                     if (SetForeground[i, j])
-                        console.SetBackColor(i, j, Foreground[i, j]);
+                        Terminal.Color(Foreground[i, j]);
+
+                    Terminal.Put(i, j, Terminal.Pick(i, j));
                 }
             }
-        }
-
-        internal void Set(int x, int y, object targetBackground, bool v)
-        {
-            throw new NotImplementedException();
         }
 
         public void ClearBackground()

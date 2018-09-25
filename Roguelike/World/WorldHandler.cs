@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace Roguelike.World
 {
     [Serializable]
-    class WorldHandler
+    public class WorldHandler
     {
         // TODO: generate dynamic world names
         private const string _ROOT_NAME = "root";

@@ -8,7 +8,7 @@ using System;
 namespace Roguelike.Actors
 {
     [Serializable]
-    class Player : Actor, IEquipped
+    public class Player : Actor, IEquipped
     {
         public EquipmentHandler Equipment { get; }
 

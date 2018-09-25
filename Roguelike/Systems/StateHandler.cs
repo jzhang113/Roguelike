@@ -1,4 +1,4 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.State;
@@ -7,30 +7,28 @@ using System.Collections.Generic;
 
 namespace Roguelike.Systems
 {
-    class StateHandler
+    public class StateHandler
     {
-        private readonly RLRootConsole _rootConsole;
         private readonly Stack<IState> _states;
 
-        private static readonly IDictionary<Type, ConsoleInfo> _consoles = new Dictionary<Type, ConsoleInfo>
+        private static readonly IDictionary<Type, LayerInfo> _consoles = new Dictionary<Type, LayerInfo>
         {
-            [typeof(AnimationState)] = Game.MapConsole,
-            [typeof(ApplyState)] = Game.InventoryConsole,
-            [typeof(AutoexploreState)] = Game.MapConsole,
+            [typeof(AnimationState)] = Game.MapLayer,
+            [typeof(ApplyState)] = Game.InventoryLayer,
+            [typeof(AutoexploreState)] = Game.MapLayer,
             [typeof(CharSelectState)] = Game.FullConsole,
-            [typeof(DropState)] = Game.InventoryConsole,
-            [typeof(EquipState)] = Game.InventoryConsole,
-            [typeof(InventoryState)] = Game.InventoryConsole,
+            [typeof(DropState)] = Game.InventoryLayer,
+            [typeof(EquipState)] = Game.InventoryLayer,
+            [typeof(InventoryState)] = Game.InventoryLayer,
             [typeof(MenuState)] = Game.FullConsole,
-            [typeof(NormalState)] = Game.MapConsole,
-            [typeof(TargettingState)] = Game.MapConsole,
-            [typeof(TextInputState)] = Game.MapConsole,
-            [typeof(UnequipState)] = Game.InventoryConsole
+            [typeof(NormalState)] = Game.MapLayer,
+            [typeof(TargettingState)] = Game.MapLayer,
+            [typeof(TextInputState)] = Game.MapLayer,
+            [typeof(UnequipState)] = Game.InventoryLayer
         };
 
-        public StateHandler(RLRootConsole console)
+        public StateHandler()
         {
-            _rootConsole = console;
             _states = new Stack<IState>();
 
             MenuState mainMenu = new MenuState(new[]
@@ -50,13 +48,22 @@ namespace Roguelike.Systems
 
         public ICommand HandleInput()
         {
+            // TODO: non-blocking input?
             IState currentState = _states.Peek();
-            ICommand command = currentState.HandleMouseInput(_rootConsole.Mouse);
-            if (command != null)
-                return command;
+            int key = Terminal.Read();
 
-            RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
-            if (keyPress?.Key == RLKey.Escape)
+            bool left = key == Terminal.TK_MOUSE_LEFT;
+            bool right = key == Terminal.TK_MOUSE_RIGHT;
+
+            if (key == Terminal.TK_MOUSE_MOVE || left || right)
+            {
+                int x = Terminal.State(Terminal.TK_MOUSE_X);
+                int y = Terminal.State(Terminal.TK_MOUSE_Y);
+
+                return currentState.HandleMouseInput(x, y, left, right);
+            }
+
+            if (key == Terminal.TK_ESCAPE)
             {
                 PopState();
                 if (_states.Count == 0)
@@ -66,7 +73,7 @@ namespace Roguelike.Systems
                 return null;
             }
 
-            return currentState.HandleKeyInput(keyPress);
+            return currentState.HandleKeyInput(key);
         }
 
         public void PopState()
@@ -84,7 +91,7 @@ namespace Roguelike.Systems
         public void Update()
         {
             if (_states.Count == 0)
-                return;
+                Game.Exit();
 
             _states.Peek().Update();
         }
@@ -95,11 +102,9 @@ namespace Roguelike.Systems
                 return;
 
             IState current = _states.Peek();
-            ConsoleInfo info = _consoles[current.GetType()];
-            RLConsole console = info.Console;
-
-            current.Draw(console);
-            RLConsole.Blit(console, 0, 0, console.Width, console.Height, _rootConsole, info.X, info.Y);
+            LayerInfo info = _consoles[current.GetType()];
+            Terminal.Layer(info.Z);
+            current.Draw();
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Roguelike.Actors
 
         public bool IsDead => Hp < 0;
 
-        public Actor(ActorParameters parameters, RLNET.RLColor color, char symbol)
+        public Actor(ActorParameters parameters, System.Drawing.Color color, char symbol)
         {
             Parameters = parameters;
             Hp = Parameters.MaxHp;

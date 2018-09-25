@@ -1,19 +1,18 @@
-﻿using RLNET;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Roguelike.Input
 {
-    struct KeyMap
+    internal struct KeyMap
     {
-        public StateMap NormalMap { get; set; }
-        public StateMap TargettingMap { get; set; }
+        public StateMap<NormalInput> NormalMap { get; set; }
+        public StateMap<TargettingInput> TargettingMap { get; set; }
 
-        internal struct StateMap
+        internal struct StateMap<T>
         {
-            public IDictionary<RLKey, string> Shift { get; set; }
-            public IDictionary<RLKey, string> Ctrl { get; set; }
-            public IDictionary<RLKey, string> Alt { get; set; }
-            public IDictionary<RLKey, string> None { get; set; }
+            public IDictionary<int, T> Shift { get; set; }
+            public IDictionary<int, T> Ctrl { get; set; }
+            public IDictionary<int, T> Alt { get; set; }
+            public IDictionary<int, T> None { get; set; }
         }
     }
 }

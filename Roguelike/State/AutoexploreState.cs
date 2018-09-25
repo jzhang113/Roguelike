@@ -1,13 +1,12 @@
-﻿using System;
-using System.Linq;
-using RLNET;
-using Roguelike.Actors;
+﻿using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
+using System;
+using System.Linq;
 
 namespace Roguelike.State
 {
-    class AutoexploreState : IState
+    internal sealed class AutoexploreState : IState
     {
         private static readonly Lazy<AutoexploreState> _instance = new Lazy<AutoexploreState>(() => new AutoexploreState());
         public static AutoexploreState Instance => _instance.Value;
@@ -16,7 +15,7 @@ namespace Roguelike.State
         {
         }
 
-        public ICommand HandleKeyInput(RLKeyPress keyPress)
+        public ICommand HandleKeyInput(int key)
         {
             foreach (Tile tile in Game.Map.Discovered)
             {
@@ -60,7 +59,7 @@ namespace Roguelike.State
             }
         }
 
-        public ICommand HandleMouseInput(RLMouse mouse)
+        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             return null;
         }
@@ -76,10 +75,9 @@ namespace Roguelike.State
             Game.ForceRender();
         }
 
-        public void Draw(RLConsole mapConsole)
+        public void Draw()
         {
-            mapConsole.Clear(0, RLColor.Black, Colors.Text);
-            Game.Map.Draw(mapConsole);
+            Game.Map.Draw();
         }
     }
 }

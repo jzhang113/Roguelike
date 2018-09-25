@@ -1,55 +1,68 @@
-﻿using RLNET;
+﻿using BearLib;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Statuses;
 
 namespace Roguelike.Systems
 {
-    static class InfoHandler
+    internal static class InfoHandler
     {
-        public static void Draw(RLConsole console)
+        public static void Draw()
         {
             Actor player = Game.Player;
 
-            int stepSize = 5;
+            const int stepSize = 5;
             int hpWidth = player.Parameters.MaxHp / stepSize;
             int hpFilled = hpWidth * player.Hp / player.Parameters.MaxHp;
             string health = $"{player.Hp}/{player.Parameters.MaxHp}";
-            console.Print((hpWidth - health.Length) / 2 + 2, 1, health, Colors.Text);
+            Terminal.Print((hpWidth - health.Length) / 2 + 2, 1, health, Colors.Text);
+
+            Terminal.Color(Swatch.DbBlood);
             for (int i = 0; i <= hpFilled; i++)
-                console.SetBackColor(i + 1, 1, Swatch.DbBlood);
+                Terminal.Put(i + 1, 1, Terminal.Pick(i + 1, 1));
+
+            Terminal.Color(Swatch.DbOldBlood);
             for (int i = hpFilled + 1; i <= hpWidth; i++)
-                console.SetBackColor(i + 1, 1, Swatch.DbOldBlood);
+                Terminal.Put(i + 1, 1, Terminal.Pick(i + 1, 1));
 
             int armorWidth = player.Armor / stepSize;
+            Terminal.Color(Swatch.DbMetal);
             for (int i = 0; i <= armorWidth; i++)
-                console.SetBackColor(i + hpWidth + 3, 1, Swatch.DbMetal);
+                Terminal.Put(i + hpWidth + 3, 1, Terminal.Pick(i + hpWidth + 3, 1));
 
             int mpWidth = player.Parameters.MaxMp / stepSize;
             int mpFilled = mpWidth * player.Mp / player.Parameters.MaxMp;
             string mana = $"{player.Mp}/{player.Parameters.MaxMp}";
-            console.Print((mpWidth - mana.Length) / 2 + 2, 2, mana, Colors.Text);
+            Terminal.Color(Colors.Text);
+            Terminal.Print((mpWidth - mana.Length) / 2 + 2, 2, mana);
+
+            Terminal.Color(Swatch.DbWater);
             for (int i = 0; i <= mpFilled; i++)
-                console.SetBackColor(i + 1, 2, Swatch.DbWater);
+                Terminal.Put(i + 1, 2, Terminal.Pick(i + 1, 2));
+
+            Terminal.Color(Swatch.DbDeepWater);
             for (int i = mpFilled + 1; i <= mpWidth; i++)
-                console.SetBackColor(i + 1, 2, Swatch.DbDeepWater);
+                Terminal.Put(i + 1, 2, Terminal.Pick(i + 1, 2));
 
             int pos = 1;
             if (player.StatusHandler.TryGetStatus(StatusType.Phasing, out _))
             {
-                console.Print(pos, 4, "Phasing", Swatch.DbMetal);
+                Terminal.Color(Swatch.DbMetal);
+                Terminal.Print(pos, 4, "Phasing");
                 pos += 8;
             }
 
             if (player.StatusHandler.TryGetStatus(StatusType.Burning, out _))
             {
-                console.Print(pos, 4, "Burning", Colors.Fire);
+                Terminal.Color(Colors.Fire);
+                Terminal.Print(pos, 4, "Burning");
                 pos += 8;
             }
 
             if (player.StatusHandler.TryGetStatus(StatusType.Frozen, out _))
             {
-                console.Print(pos, 4, "Frozen", Colors.Water);
+                Terminal.Color(Colors.Water);
+                Terminal.Print(pos, 4, "Frozen");
                 pos += 7;
             }
         }
