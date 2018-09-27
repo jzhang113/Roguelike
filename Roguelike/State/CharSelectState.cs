@@ -34,7 +34,6 @@ namespace Roguelike.State
         public void Update()
         {
             Game.StateHandler.HandleInput();
-            Game.ForceRender();
         }
 
         public void Draw()

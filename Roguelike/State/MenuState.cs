@@ -6,7 +6,7 @@ namespace Roguelike.State
 {
     internal class MenuState : IState
     {
-        private IEnumerable<MenuButton> _buttons;
+        private readonly IEnumerable<MenuButton> _buttons;
 
         public MenuState(IEnumerable<MenuButton> buttons)
         {
@@ -22,9 +22,7 @@ namespace Roguelike.State
         {
             foreach (MenuButton button in _buttons)
             {
-                button.Hover = x >= button.X && x < button.X + button.Width
-                    && y >= button.Y && y < button.Y + button.Height;
-
+                button.Hover = button.Position.Contains(x, y);
                 if (button.Hover && leftClick)
                     button.Callback();
             }
@@ -35,7 +33,6 @@ namespace Roguelike.State
         public void Update()
         {
             Game.StateHandler.HandleInput();
-            Game.ForceRender();
         }
 
         public void Draw()

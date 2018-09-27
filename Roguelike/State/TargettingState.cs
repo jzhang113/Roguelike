@@ -84,8 +84,6 @@ namespace Roguelike.State
             // Initialize the saved mouse position as well.
             _prevMouseX = _targetX;
             _prevMouseY = _targetY;
-
-            Game.ForceRender();
         }
 
         // ReSharper disable once CyclomaticComplexity
@@ -247,7 +245,6 @@ namespace Roguelike.State
 
         public void Update()
         {
-            Game.ForceRender();
             ICommand command = Game.StateHandler.HandleInput();
             if (command == null)
                 return;
@@ -262,7 +259,8 @@ namespace Roguelike.State
 
         public void Draw()
         {
-            Game.OverlayHandler.Draw();
+            Game.OverlayHandler.Draw(Game.MapLayer);
+            Game.World.Map.Draw(Game.MapLayer);
         }
     }
 }

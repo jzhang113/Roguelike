@@ -30,7 +30,6 @@ namespace Roguelike.State
 
         public virtual void Update()
         {
-            Game.ForceRender();
             ICommand command = Game.StateHandler.HandleInput();
             if (command == null)
                 return;
@@ -46,7 +45,7 @@ namespace Roguelike.State
 
         public virtual void Draw()
         {
-            Game.Player.Inventory.Draw();
+            Game.Player.Inventory.Draw(Game.InventoryLayer);
         }
     }
 }

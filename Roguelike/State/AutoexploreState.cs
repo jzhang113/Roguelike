@@ -72,12 +72,11 @@ namespace Roguelike.State
 
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
-            Game.ForceRender();
         }
 
         public void Draw()
         {
-            Game.Map.Draw();
+            Game.Map.Draw(Game.MapLayer);
         }
     }
 }

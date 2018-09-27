@@ -6,6 +6,7 @@ using Roguelike.Data;
 using Roguelike.Systems;
 using Roguelike.World;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -29,6 +30,7 @@ namespace Roguelike
 
         public static MapHandler Map => World.Map;
         
+        internal static LayerInfo HighlightLayer { get; set; }
         internal static LayerInfo MapLayer { get; set; }
         internal static LayerInfo InventoryLayer { get; set; }
         internal static LayerInfo FullConsole { get; set; }
@@ -59,25 +61,29 @@ namespace Roguelike
 
             Terminal.Set(
                 $"window: size={Config.ScreenWidth}x{Config.ScreenHeight}," +
-                $"cellsize=auto, title='{consoleTitle}'; font: default;" +
-                $"input.filter = [keyboard, mouse]");
+                $"cellsize=auto, title='{consoleTitle}';" +
+                $"font: ccc12x12.png, size = 12x12;" +
+                $"input: filter = [keyboard, mouse]");
 
+            HighlightLayer = new LayerInfo(2,
+                0, Config.StatView.Height,
+                Config.MapView.Width, configs.MapView.Height);
             MapLayer = new LayerInfo(1,
                 0, Config.StatView.Height,
                 Config.MapView.Width, Config.MapView.Height);
-            InventoryLayer = new LayerInfo(2,
+            InventoryLayer = new LayerInfo(3,
                 Config.ScreenWidth - configs.InventoryView.Width, 0,
                 Config.InventoryView.Width, Config.InventoryView.Height);
-            MessageLayer = new LayerInfo(3,
+            MessageLayer = new LayerInfo(4,
                 0, Config.StatView.Height + Config.MapView.Height,
                 Config.MessageView.Width, Config.MessageView.Height);
-            StatLayer = new LayerInfo(4,
+            StatLayer = new LayerInfo(5,
                 0, 0,
                 Config.StatView.Width, Config.StatView.Height);
-            LookLayer = new LayerInfo(5,
+            LookLayer = new LayerInfo(6,
                 Config.MapView.Width, 0,
                 Config.ViewWindow.Width, Config.ViewWindow.Height);
-            MoveLayer = new LayerInfo(6,
+            MoveLayer = new LayerInfo(7,
                 Config.MapView.Width, Config.ViewWindow.Height,
                 Config.MoveView.Width, Config.MoveView.Height);
 
@@ -116,7 +122,7 @@ namespace Roguelike
             World = new WorldHandler(worldParameter);
             World.Initialize();
 
-            ForceRender();
+            Render();
         }
 
         public static void LoadGame()
@@ -163,7 +169,7 @@ namespace Roguelike
                 if (_exiting)
                     break;
 
-                ForceRender();
+                Render();
             }
 
             SaveGame();
@@ -174,7 +180,7 @@ namespace Roguelike
 
         internal static void GameOver() => MessageHandler.AddMessage("Game Over.", MessageLevel.Minimal);
 
-        internal static void ForceRender()
+        internal static void Render()
         {
             Terminal.Clear();
 
@@ -187,15 +193,15 @@ namespace Roguelike
             if (Player != null)
             {
                 Terminal.Layer(StatLayer.Z);
-                InfoHandler.Draw();
+                InfoHandler.Draw(StatLayer);
 
                 Items.Weapon weapon = Player.Equipment.PrimaryWeapon;
                 Terminal.Layer(MoveLayer.Z);
-                weapon?.Moveset.Draw();
+                weapon?.Moveset.Draw(MoveLayer);
             }
 
             Terminal.Layer(LookLayer.Z);
-            LookHandler.Draw();
+            LookHandler.Draw(LookLayer);
 
             StateHandler.Draw();
             Terminal.Refresh();

@@ -30,19 +30,19 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             Terminal.Color(Swatch.DbBrightWood);
             switch(_frame)
             {
-                case 1: Terminal.Put(_x - 1, _y - 1, '\\'); break;
-                case 2: Terminal.Put(_x - 1, _y, '-'); break;
-                case 3: Terminal.Put(_x - 1, _y + 1, '/'); break;
-                case 4: Terminal.Put(_x, _y + 1, '|'); break;
-                case 5: Terminal.Put(_x + 1, _y + 1, '\\'); break;
-                case 6: Terminal.Put(_x + 1, _y, '-'); break;
-                case 7: Terminal.Put(_x + 1, _y - 1, '/'); break;
-                case 8: Terminal.Put(_x, _y - 1, '|'); break;
+                case 1: layer.Put(_x - 1, _y - 1, '\\'); break;
+                case 2: layer.Put(_x - 1, _y, '-'); break;
+                case 3: layer.Put(_x - 1, _y + 1, '/'); break;
+                case 4: layer.Put(_x, _y + 1, '|'); break;
+                case 5: layer.Put(_x + 1, _y + 1, '\\'); break;
+                case 6: layer.Put(_x + 1, _y, '-'); break;
+                case 7: layer.Put(_x + 1, _y - 1, '/'); break;
+                case 8: layer.Put(_x, _y - 1, '|'); break;
             }
         }
 

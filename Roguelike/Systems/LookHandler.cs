@@ -40,30 +40,30 @@ namespace Roguelike.Systems
             _showTile = tile != null;
         }
 
-        public static void Draw()
+        public static void Draw(LayerInfo layer)
         {
             Terminal.Color(Colors.Text);
 
             if (_showItemInfo)
-                Terminal.Print(1, 1, _displayItem.Name);
+                layer.Print(1, _displayItem.Name);
 
             if (_showActorInfo)
             {
-                Terminal.Print(1, 1, _displayActor.Name);
-                Terminal.Print(1, 2, $"HP: {_displayActor.Hp} / {_displayActor.Parameters.MaxHp}");
-                Terminal.Print(1, 3, $"MP: {_displayActor.Mp} / {_displayActor.Parameters.MaxMp}");
-                Terminal.Print(1, 4, $"SP: {_displayActor.Sp} / {_displayActor.Parameters.MaxSp}");
-                Terminal.Print(1, 5, $"Energy: {_displayActor.Energy}");
-                Terminal.Print(1, 6, $"State: {_displayActor.State}");
+                layer.Print(1, _displayActor.Name);
+                layer.Print(2, $"HP: {_displayActor.Hp} / {_displayActor.Parameters.MaxHp}");
+                layer.Print(3, $"MP: {_displayActor.Mp} / {_displayActor.Parameters.MaxMp}");
+                layer.Print(4, $"SP: {_displayActor.Sp} / {_displayActor.Parameters.MaxSp}");
+                layer.Print(5, $"Energy: {_displayActor.Energy}");
+                layer.Print(6, $"State: {_displayActor.State}");
             }
 
             if (_showTile)
             {
                 // console.Print(1, 8, $"Move cost: {_displayTile.MoveCost.ToString()}");
-                Terminal.Print(1, 9, $"Occupied: {_displayTile.IsOccupied}");
-                Terminal.Print(1, 9, $"Walkable: {_displayTile.IsWalkable}");
-                Terminal.Print(1, 10, $"Wall: {_displayTile.IsWall}");
-                Terminal.Print(1, 11, $"Position: ({_displayTile.X}, {_displayTile.Y})");
+                layer.Print(8, $"Occupied: {_displayTile.IsOccupied}");
+                layer.Print(9, $"Walkable: {_displayTile.IsWalkable}");
+                layer.Print(10, $"Wall: {_displayTile.IsWall}");
+                layer.Print(11, $"Position: ({_displayTile.X}, {_displayTile.Y})");
             }
         }
     }

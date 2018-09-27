@@ -50,8 +50,11 @@ namespace Roguelike.Systems
         {
             // TODO: non-blocking input?
             IState currentState = _states.Peek();
-            int key = Terminal.Read();
 
+            if (!Terminal.HasInput())
+                return null;
+
+            int key = Terminal.Read();
             bool left = key == Terminal.TK_MOUSE_LEFT;
             bool right = key == Terminal.TK_MOUSE_RIGHT;
 
@@ -69,7 +72,6 @@ namespace Roguelike.Systems
                 if (_states.Count == 0)
                     Game.Exit();
 
-                Game.ForceRender();
                 return null;
             }
 
@@ -92,8 +94,8 @@ namespace Roguelike.Systems
         {
             if (_states.Count == 0)
                 Game.Exit();
-
-            _states.Peek().Update();
+            else
+                _states.Peek().Update();
         }
 
         public void Draw()

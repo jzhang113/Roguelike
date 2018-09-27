@@ -28,7 +28,7 @@ namespace Roguelike.Interfaces
             }
         }
 
-        public override void Draw(Tile tile)
+        public override void Draw(LayerInfo layer, Tile tile)
         {
             if (!tile.IsExplored)
                 return;
@@ -46,7 +46,7 @@ namespace Roguelike.Interfaces
                 backColor = _background.GetColor(Game.VisualRandom).Blend(Colors.Floor, tile.Light);
             }
 
-            DrawTile(foreColor, backColor, tile.IsVisible, tile.X, tile.Y);
+            DrawTile(layer, foreColor, backColor, tile.IsVisible, tile.X, tile.Y);
         }
     }
 }

@@ -34,14 +34,14 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             Game.OverlayHandler.ClearForeground();
             foreach (Tile tile in Game.Map.GetTilesInRadius(_x, _y, _counter))
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, _color);
             }
-            Game.OverlayHandler.Draw();
+            Game.OverlayHandler.Draw(layer);
         }
 
         public event EventHandler Complete;

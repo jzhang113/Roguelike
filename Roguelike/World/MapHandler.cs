@@ -658,7 +658,7 @@ namespace Roguelike.World
         #endregion
 
         #region Drawing Methods
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             for (int dx = 0; dx < Game.Config.MapView.Width; dx++)
             {
@@ -676,53 +676,53 @@ namespace Roguelike.World
 
                     if (tile.IsVisible)
                     {
-                        tile.DrawingComponent.Draw(tile);
+                        tile.DrawingComponent.Draw(layer, tile);
                     }
                     else if (tile.IsWall)
                     {
                         Terminal.Color(Colors.WallBackground);
-                        Terminal.Put(dx, dy, '#');
+                        layer.Put(dx, dy, '#');
                     }
                     else
                     {
                         Terminal.Color(Colors.FloorBackground);
-                        Terminal.Put(dx, dy, '.');
+                        layer.Put(dx, dy, '.');
                     }
                 }
             }
 
             foreach (Door door in Doors.Values)
             {
-                door.DrawingComponent.Draw(Field[door.X, door.Y]);
+                door.DrawingComponent.Draw(layer, Field[door.X, door.Y]);
             }
 
             foreach (InventoryHandler stack in Items.Values)
             {
                 Item topItem = stack.First().Item;
-                topItem.DrawingComponent.Draw(Field[topItem.X, topItem.Y]);
+                topItem.DrawingComponent.Draw(layer, Field[topItem.X, topItem.Y]);
             }
 
             foreach (Exit exit in Exits.Values)
             {
-                exit.DrawingComponent.Draw(Field[exit.X, exit.Y]);
+                exit.DrawingComponent.Draw(layer, Field[exit.X, exit.Y]);
             }
 
             foreach (Fire fire in Fires.Values)
             {
-                fire.DrawingComponent.Draw(Field[fire.X, fire.Y]);
+                fire.DrawingComponent.Draw(layer, Field[fire.X, fire.Y]);
             }
 
             foreach (Actor unit in Units.Values)
             {
                 if (!unit.IsDead)
                 {
-                    unit.DrawingComponent.Draw(Field[unit.X, unit.Y]);
+                    unit.DrawingComponent.Draw(layer, Field[unit.X, unit.Y]);
                 }
                 else
                 {
                     // HACK: draw some corpses
                     Terminal.Color(Swatch.DbOldBlood);
-                    Terminal.Put(unit.X - Camera.X, unit.Y - Camera.Y, '%');
+                    layer.Put(unit.X - Camera.X, unit.Y - Camera.Y, '%');
                 }
             }
         }

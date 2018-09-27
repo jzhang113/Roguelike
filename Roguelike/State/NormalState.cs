@@ -218,16 +218,16 @@ namespace Roguelike.State
 
         public void Update()
         {
-            Game.OverlayHandler.ClearForeground();
+            // Game.OverlayHandler.ClearForeground();
             Game.Player.NextCommand = Game.StateHandler.HandleInput();
             Game.EventScheduler.Run();
-            Game.ForceRender();
         }
 
         public void Draw()
         {
-            Game.Map.Draw();
-            Game.OverlayHandler.Draw();
+            Game.OverlayHandler.Draw(Game.HighlightLayer);
+
+            Game.Map.Draw(Game.MapLayer);
         }
     }
 }

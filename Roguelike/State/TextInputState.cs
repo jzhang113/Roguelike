@@ -46,7 +46,6 @@ namespace Roguelike.State
 
         public void Update()
         {
-            Game.ForceRender();
             ICommand command = Game.StateHandler.HandleInput();
             if (command == null)
                 return;
@@ -58,7 +57,7 @@ namespace Roguelike.State
 
         public void Draw()
         {
-            Game.OverlayHandler.Draw();
+            Game.OverlayHandler.Draw(Game.MapLayer);
         }
     }
 }

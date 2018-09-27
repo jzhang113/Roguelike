@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Roguelike.Core;
+using System;
 
 namespace Roguelike.Animations
 {
@@ -7,7 +8,7 @@ namespace Roguelike.Animations
         bool Done { get; }
 
         void Update();
-        void Draw();
+        void Draw(LayerInfo layer);
 
         event EventHandler Complete;
     }

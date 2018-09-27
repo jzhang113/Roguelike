@@ -40,13 +40,13 @@ namespace Roguelike.Systems
             Current = Root;
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             _printLine = 0;
-            RecursivePrint(Root, 0);
+            RecursivePrint(layer, Root, 0);
         }
 
-        private void RecursivePrint(ActionNode action, int depth)
+        private void RecursivePrint(LayerInfo layer, ActionNode action, int depth)
         {
             if (action == null)
                 return;
@@ -61,10 +61,10 @@ namespace Roguelike.Systems
                 line = depth > 0 ? "+-" : "  ";
 
             Terminal.Color(action == Current ? Swatch.DbBlood : Colors.Text);
-            Terminal.Print(2 * depth - 2, _printLine++, line + action.Name);
+            layer.Print(2 * depth - 2, _printLine++, line + action.Name);
 
-            RecursivePrint(action.Left, depth + 1);
-            RecursivePrint(action.Right, depth + 1);
+            RecursivePrint(layer, action.Left, depth + 1);
+            RecursivePrint(layer, action.Right, depth + 1);
         }
     }
 

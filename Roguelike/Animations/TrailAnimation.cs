@@ -34,7 +34,7 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             if (_path.Count == 0)
                 return;
@@ -42,7 +42,7 @@ namespace Roguelike.Animations
             Game.OverlayHandler.ClearForeground();
             Tile tile = _path[_counter];
             Game.OverlayHandler.Set(tile.X, tile.Y, _color);
-            Game.OverlayHandler.Draw();
+            Game.OverlayHandler.Draw(layer);
         }
 
         public event EventHandler Complete;

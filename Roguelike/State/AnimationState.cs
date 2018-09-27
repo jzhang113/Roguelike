@@ -25,19 +25,14 @@ namespace Roguelike.State
         public void Update()
         {
             if (!_animation.Done)
-            {
                 _animation.Update();
-                Game.ForceRender();
-            }
             else
-            {
                 Game.StateHandler.PopState();
-            }
         }
 
         public void Draw()
         {
-            _animation.Draw();
+            _animation.Draw(Game.MapLayer);
         }
     }
 }

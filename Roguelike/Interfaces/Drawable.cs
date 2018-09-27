@@ -26,7 +26,7 @@ namespace Roguelike.Interfaces
             _remember = remember;
         }
 
-        public virtual void Draw(Tile tile)
+        public virtual void Draw(LayerInfo layer, Tile tile)
         {
             if (!tile.IsExplored)
                 return;
@@ -44,10 +44,11 @@ namespace Roguelike.Interfaces
                         : Data.Constants.MIN_VISIBLE_LIGHT_LEVEL);
             }
 
-            DrawTile(color, null, tile.IsVisible, tile.X, tile.Y);
+            DrawTile(layer, color, null, tile.IsVisible, tile.X, tile.Y);
         }
 
-        protected void DrawTile(Color foreground, Color? background, bool visible, int x, int y)
+        protected void DrawTile(LayerInfo layer, Color foreground, Color? background,
+            bool visible, int x, int y)
         {
             int destX = x - Camera.X;
             int destY = y - Camera.Y;
@@ -60,17 +61,18 @@ namespace Roguelike.Interfaces
 
             if (visible)
             {
-                Terminal.Put(destX, destY, Symbol);
+                layer.Put(destX, destY, Symbol);
                 _rememberX = x;
                 _rememberY = y;
             }
             else if (_remember)
             {
-                Terminal.Put(_rememberX - Camera.X, _rememberY - Camera.Y, Symbol);
+                layer.Put(_rememberX - Camera.X, _rememberY - Camera.Y, Symbol);
             }
             else
             {
-                Terminal.Put(destX, destY, '.');
+                Terminal.Color(Colors.FloorBackground);
+                layer.Put(destX, destY, '.');
             }
         }
     }

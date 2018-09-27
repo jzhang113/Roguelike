@@ -6,13 +6,9 @@ namespace Roguelike.Core
 {
     internal class MenuButton
     {
-        public int X { get; }
-        public int Y { get; }
+        public Rectangle Position { get; }
         public string Text { get; }
         public Action Callback { get; }
-
-        public int Width { get; set; }
-        public int Height { get; set; }
 
         public Color BackgroundColor { get; set; }
         public Color BorderColor { get; set; }
@@ -27,13 +23,9 @@ namespace Roguelike.Core
         public MenuButton(int x, int y, string text, Action callback,
             bool border = false, ContentAlignment alignment = ContentAlignment.MiddleCenter)
         {
-            X = x;
-            Y = y;
+            Position = new Rectangle(x, y, text.Length + 4, 5);
             Text = text;
             Callback = callback;
-
-            Width = text.Length + 4;
-            Height = 5;
 
             BackgroundColor = Colors.ButtonBackground;
             BorderColor = Colors.ButtonBorder;
@@ -47,54 +39,54 @@ namespace Roguelike.Core
 
         public void Draw()
         {
-            Color backColor = Hover ? HoverColor : BackgroundColor;
+            Terminal.Composition(true);
+            Terminal.Color(Hover ? HoverColor : BackgroundColor);
 
             if (_border)
             {
-                Terminal.BkColor(backColor);
-                for (int dx = 1; dx < Width - 1; dx++)
+                for (int x = Position.Left + 1; x < Position.Right - 1; x++)
                 {
-                    for (int dy = 1; dy < Height - 1; dy++)
+                    for (int y = Position.Top + 1; y < Position.Bottom - 1; y++)
                     {
-                        Terminal.Put(X + dx, Y + dy, Terminal.Pick(X + dx, Y + dy));
+                        Terminal.Put(x, y, '█'); // 219
                     }
                 }
 
                 Terminal.Color(BorderColor);
                 // top and bottom border
-                for (int dx = 1; dx < Width - 1; dx++)
+                for (int x = Position.Left + 1; x < Position.Right - 1; x++)
                 {
-                    Terminal.Put(X + dx, Y, 196);
-                    Terminal.Put(X + dx, Y + Height - 1, 196);
+                    Terminal.Put(x, Position.Top, '─'); // 196
+                    Terminal.Put(x, Position.Bottom - 1, '─');
                 }
 
                 // left and right border
-                for (int dy = 1; dy < Height - 1; dy++)
+                for (int y = Position.Top + 1; y < Position.Bottom - 1; y++)
                 {
-                    Terminal.Put(X, Y + dy, 179);
-                    Terminal.Put(X + Width - 1, Y + dy, 179);
+                    Terminal.Put(Position.Left, y, '│'); // 179
+                    Terminal.Put(Position.Right - 1, y, '│');
                 }
 
                 // corners
-                Terminal.Put(X, Y, 218);
-                Terminal.Put(X + Width - 1, Y, 191);
-                Terminal.Put(X, Y + Height - 1, 192);
-                Terminal.Put(X + Width - 1, Y + Height - 1, 217);
+                Terminal.Put(Position.Left, Position.Top, '┌'); // 218
+                Terminal.Put(Position.Right - 1, Position.Top, '┐'); // 191
+                Terminal.Put(Position.Left, Position.Bottom - 1, '└'); // 192
+                Terminal.Put(Position.Right - 1, Position.Bottom - 1, '┘'); // 217
             }
             else
             {
-                Terminal.BkColor(backColor);
-                for (int dx = 0; dx < Width; dx++)
+                for (int x = Position.Left; x < Position.Right; x++)
                 {
-                    for (int dy = 0; dy < Height; dy++)
+                    for (int y = Position.Top; y < Position.Bottom; y++)
                     {
-                        Terminal.Put(X + dx, Y + dy, Terminal.Pick(X + dx, Y + dy));
+                        Terminal.Put(x, y, '█');
                     }
                 }
             }
 
             Terminal.Color(TextColor);
-            Terminal.Print(X + 1, Y + Height / 2, _align, Text);
+            Terminal.Print(Position, _align, Text);
+            Terminal.Composition(false);
         }
     }
 }

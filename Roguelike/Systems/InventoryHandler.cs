@@ -171,17 +171,17 @@ namespace Roguelike.Systems
             }
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             Terminal.Color(Colors.Text);
-            Terminal.Print(1, 1, ContentAlignment.MiddleCenter, "== Inventory ==");
+            layer.Print(1, "== Inventory ==", ContentAlignment.MiddleCenter);
 
             int line = 3;
             char letter = 'a';
 
             foreach (ItemStack itemStack in _inventory)
             {
-                Terminal.Print(1, line, $"{letter}) {itemStack}");
+                layer.Print(line, $"{letter}) {itemStack}");
                 line++;
                 letter++;
 
@@ -190,7 +190,7 @@ namespace Roguelike.Systems
 
                 foreach (ItemCount itemCount in itemStack)
                 {
-                    Terminal.Print(3, line, $"- {itemCount}");
+                    layer.Print(line, $"  - {itemCount}");
                     line++;
                 }
             }

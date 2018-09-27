@@ -66,7 +66,7 @@ namespace Roguelike.Animations
             }
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             if (!_hit)
             {
@@ -76,7 +76,7 @@ namespace Roguelike.Animations
                     Tile tile = _path[i];
 
                     Terminal.Color(Colors.Hook);
-                    Terminal.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                    layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                 }
             }
             else
@@ -89,13 +89,13 @@ namespace Roguelike.Animations
                         Tile tile = _path[i];
 
                         Terminal.Color(Colors.Hook);
-                        Terminal.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                        layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                     }
 
                     if (_target != null && _counter > 0)
                     {
                         _prevPos = _path[_counter - 1];
-                        _target.DrawingComponent.Draw(_prevPos);
+                        _target.DrawingComponent.Draw(layer, _prevPos);
                     }
                 }
                 else
@@ -106,13 +106,13 @@ namespace Roguelike.Animations
                         Tile tile = _path[i];
 
                         Terminal.Color(Colors.Hook);
-                        Terminal.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                        layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                     }
 
                     if (_counter > 1)
                     {
                         _prevPos = _path[_path.Count - _counter + 1];
-                        _source.DrawingComponent.Draw(_prevPos);
+                        _source.DrawingComponent.Draw(layer, _prevPos);
                     }
                 }
             }

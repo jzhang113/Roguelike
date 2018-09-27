@@ -47,23 +47,27 @@ namespace Roguelike.Systems
             }
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             Terminal.Color(Colors.Text);
-            Terminal.Print(1, 1, DisplayText);
+            Terminal.Composition(true);
+            layer.Print(1, DisplayText);
 
             for (int i = 0; i <= Game.Config.MapView.Width; i++)
             {
                 for (int j = 0; j <= Game.Config.MapView.Height; j++)
                 {
-                    // TODO: can only set backgrounds on 0th layer
                     if (SetBackground[i, j])
-                        Terminal.BkColor(Background[i, j]);
+                    {
+                        Terminal.Color(Background[i, j]);
+                        layer.Put(i, j, '█');
+                    }
 
                     if (SetForeground[i, j])
+                    {
                         Terminal.Color(Foreground[i, j]);
-
-                    Terminal.Put(i, j, Terminal.Pick(i, j));
+                        layer.Put(i, j, '█');
+                    }
                 }
             }
         }

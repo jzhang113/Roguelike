@@ -16,8 +16,6 @@ namespace Roguelike.Systems
     // rolling history of messages that can be displayed.
     public class MessageHandler
     {
-        public bool Redraw { get; private set; }
-
         private readonly int _maxSize;
         private readonly IList<string> _messages;
 
@@ -38,9 +36,6 @@ namespace Roguelike.Systems
 
             if (_messages.Count > _maxSize)
                 _messages.RemoveAt(0);
-
-            Redraw = true;
-            Game.ForceRender();
         }
 
         // Modify the last message by adding additional text.
@@ -48,31 +43,24 @@ namespace Roguelike.Systems
         {
             int prev = _messages.Count - 1;
             _messages[prev] += " " + text;
-
-            Redraw = true;
-            Game.ForceRender();
         }
 
         public void Clear()
         {
             _messages.Clear();
-            Redraw = true;
         }
 
         public void Draw(LayerInfo layer)
         {
-            int viewSize = (layer.Height - 1) / 2;
-            int maxCount = Math.Min(_messages.Count, viewSize);
-            int yPos = layer.Height - 2;
+            int maxCount = Math.Min(_messages.Count, layer.Height - 1);
+            int yPos = layer.Height - 1;
 
             for (int i = 0; i < maxCount; i++)
             {
                 Terminal.Color(Colors.Text);
-                Terminal.Print(1, yPos, _messages[_messages.Count - i - 1]);
-                yPos -= 2;
+                layer.Print(yPos, _messages[_messages.Count - i - 1]);
+                yPos--;
             }
-
-            Redraw = false;
         }
     }
 }
