@@ -755,8 +755,8 @@ namespace Roguelike.World
 
         private void UpdatePlayerMaps()
         {
-            Queue<WeightedPoint> goals = new Queue<WeightedPoint>();
-            goals.Enqueue(new WeightedPoint(Game.Player.X, Game.Player.Y));
+            _goals.Clear();
+            _goals.Enqueue(new WeightedPoint(Game.Player.X, Game.Player.Y));
 
             for (int x = 0; x < Width; x++)
             {
@@ -766,12 +766,9 @@ namespace Roguelike.World
                 }
             }
 
-            foreach (WeightedPoint p in goals)
-            {
-                PlayerMap[p.X, p.Y] = 0;
-            }
+            PlayerMap[Game.Player.X, Game.Player.Y] = 0;
 
-            ProcessDijkstraMaps(goals, PlayerMap);
+            ProcessDijkstraMaps(_goals, PlayerMap);
         }
 
         private void UpdateAutoExploreMaps()

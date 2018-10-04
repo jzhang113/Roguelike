@@ -55,6 +55,12 @@ namespace Roguelike.Systems
                 return null;
 
             int key = Terminal.Read();
+            if (key == Terminal.TK_CLOSE)
+            {
+                Game.Exit();
+                return null;
+            }
+
             bool left = key == Terminal.TK_MOUSE_LEFT;
             bool right = key == Terminal.TK_MOUSE_RIGHT;
 

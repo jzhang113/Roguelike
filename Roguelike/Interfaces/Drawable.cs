@@ -53,20 +53,24 @@ namespace Roguelike.Interfaces
             int destX = x - Camera.X;
             int destY = y - Camera.Y;
 
-            Terminal.Color(foreground);
+            Terminal.Composition(true);
 
-            // TODO: can only set backgrounds on 0th layer
             if (background.HasValue)
-                Terminal.BkColor(background.Value);
+            {
+                Terminal.Color(background.Value);
+                Terminal.Put(destX, destY, '█');
+            }
 
             if (visible)
             {
+                Terminal.Color(foreground);
                 layer.Put(destX, destY, Symbol);
                 _rememberX = x;
                 _rememberY = y;
             }
             else if (_remember)
             {
+                Terminal.Color(foreground);
                 layer.Put(_rememberX - Camera.X, _rememberY - Camera.Y, Symbol);
             }
             else
@@ -74,6 +78,8 @@ namespace Roguelike.Interfaces
                 Terminal.Color(Colors.FloorBackground);
                 layer.Put(destX, destY, '.');
             }
+
+            Terminal.Composition(false);
         }
     }
 }

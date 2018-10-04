@@ -2,7 +2,6 @@
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Statuses;
-using System.Drawing;
 
 namespace Roguelike.Systems
 {
@@ -11,43 +10,50 @@ namespace Roguelike.Systems
         public static void Draw(LayerInfo layer)
         {
             Actor player = Game.Player;
-
             const int stepSize = 5;
+            Terminal.Composition(true);
+
+            // HP bar
             int hpWidth = player.Parameters.MaxHp / stepSize;
             int hpFilled = hpWidth * player.Hp / player.Parameters.MaxHp;
             string health = $"{player.Hp}/{player.Parameters.MaxHp}";
 
-            Terminal.Color(Colors.Text);
-            layer.Print(1, health);
-
             Terminal.Color(Swatch.DbBlood);
             for (int i = 0; i <= hpFilled; i++)
-                layer.Put(i + 1, 1, Terminal.Pick(i + 1, 1));
+                layer.Put(i + 1, 1, '█');
 
             Terminal.Color(Swatch.DbOldBlood);
             for (int i = hpFilled + 1; i <= hpWidth; i++)
-                layer.Put(i + 1, 1, Terminal.Pick(i + 1, 1));
+                layer.Put(i + 1, 1, '█');
 
+            Terminal.Color(Colors.Text);
+            layer.Print(1, 1, health);
+
+            // Armor
             int armorWidth = player.Armor / stepSize;
             Terminal.Color(Swatch.DbMetal);
             for (int i = 0; i <= armorWidth; i++)
-                layer.Put(i + hpWidth + 3, 1, Terminal.Pick(i + hpWidth + 3, 1));
+                layer.Put(i + hpWidth + 3, 1, '█');
 
+            // MP bar
             int mpWidth = player.Parameters.MaxMp / stepSize;
             int mpFilled = mpWidth * player.Mp / player.Parameters.MaxMp;
             string mana = $"{player.Mp}/{player.Parameters.MaxMp}";
 
-            Terminal.Color(Colors.Text);
-            layer.Print(2, mana);
-
             Terminal.Color(Swatch.DbWater);
             for (int i = 0; i <= mpFilled; i++)
-                layer.Put(i + 1, 2, Terminal.Pick(i + 1, 2));
+                layer.Put(i + 1, 2, '█');
 
             Terminal.Color(Swatch.DbDeepWater);
             for (int i = mpFilled + 1; i <= mpWidth; i++)
-                layer.Put(i + 1, 2, Terminal.Pick(i + 1, 2));
+                layer.Put(i + 1, 2, '█');
 
+            Terminal.Color(Colors.Text);
+            layer.Print(1, 2, mana);
+
+            Terminal.Composition(false);
+
+            // Statuses
             int pos = 1;
             if (player.StatusHandler.TryGetStatus(StatusType.Phasing, out _))
             {

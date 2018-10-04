@@ -1,4 +1,5 @@
 ﻿{
+    "gameName": "Steel Carnation",
     "fontName": "ccc12x12.png",
     "fontSize": 12,
     "map": {
@@ -28,6 +29,6 @@
     },
     "moveView": {
         "height": 30,
-        "width":  20
+        "width": 20
     }
 }

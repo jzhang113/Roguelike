@@ -6,7 +6,6 @@ using Roguelike.Data;
 using Roguelike.Systems;
 using Roguelike.World;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -29,7 +28,7 @@ namespace Roguelike
         public static OverlayHandler OverlayHandler { get; private set; }
 
         public static MapHandler Map => World.Map;
-        
+
         internal static LayerInfo HighlightLayer { get; set; }
         internal static LayerInfo MapLayer { get; set; }
         internal static LayerInfo InventoryLayer { get; set; }
@@ -50,18 +49,16 @@ namespace Roguelike
             Option = options;
             Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
             VisualRandom = new PcgRandom(Random.Next());
-
-            const string consoleTitle = "Roguelike";
-
+            
             if (!Terminal.Open())
             {
-                Console.WriteLine("Failed to initialize terminal");
+                System.Diagnostics.Debug.WriteLine("Failed to initialize terminal");
                 return;
             }
 
             Terminal.Set(
                 $"window: size={Config.ScreenWidth}x{Config.ScreenHeight}," +
-                $"cellsize=auto, title='{consoleTitle}';" +
+                $"cellsize=auto, title='{Config.GameName}';" +
                 $"font: ccc12x12.png, size = 12x12;" +
                 $"input: filter = [keyboard, mouse]");
 
@@ -95,8 +92,8 @@ namespace Roguelike
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(16);
             OverlayHandler = new OverlayHandler(Config.MapView.Width, Config.MapView.Height);
-            
-            // TODO: save on closing
+
+            Render();
         }
 
         public static void NewGame()
@@ -121,8 +118,6 @@ namespace Roguelike
             WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
             World = new WorldHandler(worldParameter);
             World.Initialize();
-
-            Render();
         }
 
         public static void LoadGame()
@@ -162,21 +157,20 @@ namespace Roguelike
 
         public static void Run()
         {
-            while (true)
+            while (!_exiting)
             {
                 StateHandler.Update();
-
-                if (_exiting)
-                    break;
-
                 Render();
             }
 
-            SaveGame();
             Terminal.Close();
         }
 
-        internal static void Exit() => _exiting = true;
+        internal static void Exit()
+        {
+            SaveGame();
+            _exiting = true;
+        }
 
         internal static void GameOver() => MessageHandler.AddMessage("Game Over.", MessageLevel.Minimal);
 
@@ -184,11 +178,8 @@ namespace Roguelike
         {
             Terminal.Clear();
 
-            // if (MessageHandler.Redraw)
-            {
-                Terminal.Layer(MessageLayer.Z);
-                MessageHandler.Draw(MessageLayer);
-            }
+            Terminal.Layer(MessageLayer.Z);
+            MessageHandler.Draw(MessageLayer);
 
             if (Player != null)
             {
