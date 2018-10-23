@@ -56,42 +56,46 @@ namespace Roguelike
                 return;
             }
 
+            // main UI elements
+            MapLayer = new LayerInfo("Map", 1,
+                Constants.SIDEBAR_WIDTH, Constants.STATUS_HEIGHT,
+                Constants.MAPVIEW_WIDTH, Constants.MAPVIEW_HEIGHT);
+            MessageLayer = new LayerInfo("Message", 1,
+                Constants.SIDEBAR_WIDTH, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT,
+                Constants.MAPVIEW_WIDTH, Constants.MESSAGE_HEIGHT);
+            StatLayer = new LayerInfo("Stats", 1,
+                Constants.SIDEBAR_WIDTH, 0,
+                Constants.MAPVIEW_WIDTH, Constants.STATUS_HEIGHT);
+            LookLayer = new LayerInfo("Look", 1,
+                0, 0,
+                Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
+            InventoryLayer = new LayerInfo("Inventory", 1,
+                Constants.SIDEBAR_WIDTH + Constants.MAPVIEW_WIDTH, 0,
+                Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
+
+            // overlay over map
+            HighlightLayer = new LayerInfo("Highlight", 2,
+                MapLayer.X, MapLayer.Y,
+                MapLayer.Width, MapLayer.Height);
+
+            // alternate tab for inventory
+            MoveLayer = new LayerInfo("Moves", 2,
+                InventoryLayer.X, InventoryLayer.Y,
+                InventoryLayer.Width, InventoryLayer.Height);
+
+            FullConsole = new LayerInfo("Full", 10, 0, 0,
+                Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+
             Terminal.Set(
-                $"window: size={Config.ScreenWidth}x{Config.ScreenHeight}," +
+                $"window: size={Constants.SCREEN_WIDTH}x{Constants.SCREEN_HEIGHT}," +
                 $"cellsize=auto, title='{Config.GameName}';" +
                 $"font: ccc12x12.png, size = 12x12;" +
                 $"input: filter = [keyboard, mouse]");
 
-            HighlightLayer = new LayerInfo(2,
-                0, Config.StatView.Height,
-                Config.MapView.Width, configs.MapView.Height);
-            MapLayer = new LayerInfo(1,
-                0, Config.StatView.Height,
-                Config.MapView.Width, Config.MapView.Height);
-            InventoryLayer = new LayerInfo(3,
-                Config.ScreenWidth - configs.InventoryView.Width, 0,
-                Config.InventoryView.Width, Config.InventoryView.Height);
-            MessageLayer = new LayerInfo(4,
-                0, Config.StatView.Height + Config.MapView.Height,
-                Config.MessageView.Width, Config.MessageView.Height);
-            StatLayer = new LayerInfo(5,
-                0, 0,
-                Config.StatView.Width, Config.StatView.Height);
-            LookLayer = new LayerInfo(6,
-                Config.MapView.Width, 0,
-                Config.ViewWindow.Width, Config.ViewWindow.Height);
-            MoveLayer = new LayerInfo(7,
-                Config.MapView.Width, Config.ViewWindow.Height,
-                Config.MoveView.Width, Config.MoveView.Height);
-
-            FullConsole = new LayerInfo(10,
-                0, 0,
-                Config.ScreenWidth, Config.ScreenHeight);
-
             StateHandler = new StateHandler();
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(16);
-            OverlayHandler = new OverlayHandler(Config.MapView.Width, Config.MapView.Height);
+            OverlayHandler = new OverlayHandler(HighlightLayer.Width, HighlightLayer.Height);
 
             Render();
         }
@@ -178,21 +182,17 @@ namespace Roguelike
         {
             Terminal.Clear();
 
-            Terminal.Layer(MessageLayer.Z);
-            MessageHandler.Draw(MessageLayer);
-
+            Terminal.Layer(1);
             if (Player != null)
             {
-                Terminal.Layer(StatLayer.Z);
+                MessageHandler.Draw(MessageLayer);
                 InfoHandler.Draw(StatLayer);
+                LookHandler.Draw(LookLayer);
 
+                Player.Inventory.Draw(InventoryLayer);
                 Items.Weapon weapon = Player.Equipment.PrimaryWeapon;
-                Terminal.Layer(MoveLayer.Z);
                 weapon?.Moveset.Draw(MoveLayer);
             }
-
-            Terminal.Layer(LookLayer.Z);
-            LookHandler.Draw(LookLayer);
 
             StateHandler.Draw();
             Terminal.Refresh();

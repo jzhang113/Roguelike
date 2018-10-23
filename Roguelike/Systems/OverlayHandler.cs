@@ -13,15 +13,18 @@ namespace Roguelike.Systems
         private bool[,] SetBackground { get; }
         private bool[,] SetForeground { get; }
 
+        private int _viewWidth;
+        private int _viewHeight;
+
         public OverlayHandler(int width, int height)
         {
-            int viewWidth = width + 1;
-            int viewHeight = height + 1;
+            _viewWidth = width + 1;
+            _viewHeight = height + 1;
 
-            Background = new Color[viewWidth, viewHeight];
-            Foreground = new Color[viewWidth, viewHeight];
-            SetBackground = new bool[viewWidth, viewHeight];
-            SetForeground = new bool[viewWidth, viewHeight];
+            Foreground = new Color[_viewWidth, _viewHeight];
+            Background = new Color[_viewWidth, _viewHeight];
+            SetBackground = new bool[_viewWidth, _viewHeight];
+            SetForeground = new bool[_viewWidth, _viewHeight];
         }
 
         public void Set(int x, int y, Color color, bool background = false)
@@ -29,7 +32,7 @@ namespace Roguelike.Systems
             int xPos = x - Camera.X;
             int yPos = y - Camera.Y;
 
-            if (xPos > Game.Config.MapView.Width || yPos > Game.Config.MapView.Height
+            if (xPos >= _viewWidth || yPos >= _viewHeight
                 || xPos < 0 || yPos < 0)
             {
                 return;
@@ -53,9 +56,9 @@ namespace Roguelike.Systems
             Terminal.Composition(true);
             layer.Print(1, DisplayText);
 
-            for (int i = 0; i <= Game.Config.MapView.Width; i++)
+            for (int i = 0; i <= layer.Width; i++)
             {
-                for (int j = 0; j <= Game.Config.MapView.Height; j++)
+                for (int j = 0; j <= layer.Height; j++)
                 {
                     if (SetBackground[i, j])
                     {
@@ -74,9 +77,9 @@ namespace Roguelike.Systems
 
         public void ClearBackground()
         {
-            for (int i = 0; i <= Game.Config.MapView.Width; i++)
+            for (int i = 0; i < _viewWidth; i++)
             {
-                for (int j = 0; j <= Game.Config.MapView.Height; j++)
+                for (int j = 0; j < _viewHeight; j++)
                 {
                     SetBackground[i, j] = false;
                 }
@@ -85,9 +88,9 @@ namespace Roguelike.Systems
 
         public void ClearForeground()
         {
-            for (int i = 0; i <= Game.Config.MapView.Width; i++)
+            for (int i = 0; i < _viewWidth; i++)
             {
-                for (int j = 0; j <= Game.Config.MapView.Height; j++)
+                for (int j = 0; j < _viewHeight; j++)
                 {
                     SetForeground[i, j] = false;
                 }

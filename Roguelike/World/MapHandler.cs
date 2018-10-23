@@ -660,9 +660,19 @@ namespace Roguelike.World
         #region Drawing Methods
         public void Draw(LayerInfo layer)
         {
-            for (int dx = 0; dx < Game.Config.MapView.Width; dx++)
+            // draw borders
+            Terminal.Color(Colors.BorderColor);
+            for (int y = 0; y < layer.Height; y++)
             {
-                for (int dy = 0; dy < Game.Config.MapView.Height; dy++)
+                layer.Put(0, y, '║'); // 186
+                layer.Put(layer.Width - 1, y, '║'); // 186
+            }
+
+            // draw everything else
+            Terminal.Color(Colors.Text);
+            for (int dx = 0; dx < layer.Width; dx++)
+            {
+                for (int dy = 0; dy < layer.Height; dy++)
                 {
                     int newX = Camera.X + dx;
                     int newY = Camera.Y + dy;

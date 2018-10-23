@@ -4,7 +4,6 @@ using Roguelike.Items;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace Roguelike.Systems
@@ -173,9 +172,26 @@ namespace Roguelike.Systems
 
         public void Draw(LayerInfo layer)
         {
-            Terminal.Color(Colors.Text);
-            layer.Print(1, "== Inventory ==", ContentAlignment.MiddleCenter);
+            // draw borders
+            Terminal.Color(Colors.BorderColor);
+            layer.Put(layer.Width - 1, 0, '╗'); // 187
+            layer.Put(layer.Width - 1, layer.Height - 1, '╝'); // 188
 
+            for (int x = 0; x < layer.Width - 1; x++)
+            {
+                layer.Put(x, 0, '═'); // 205
+                layer.Put(x, layer.Height - 1, '═');
+            }
+
+            for (int y = 1; y < layer.Height - 1; y++)
+            {
+                layer.Put(layer.Width - 1, y, '║'); // 186
+            }
+
+            Terminal.Color(Colors.Text);
+            layer.Print(0, "[[INVENTORY]]", System.Drawing.ContentAlignment.TopCenter);
+
+            // draw items
             int line = 3;
             char letter = 'a';
 

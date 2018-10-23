@@ -52,12 +52,34 @@ namespace Roguelike.Systems
 
         public void Draw(LayerInfo layer)
         {
+            // draw borders
+            Terminal.Color(Colors.BorderColor);
+            layer.Put(0, 0, '╟'); // 199
+            layer.Put(layer.Width - 1, 0, '╢'); // 182
+            layer.Put(0, layer.Height - 1, '╩'); // 202
+            layer.Put(layer.Width - 1, layer.Height - 1, '╩'); // 202
+
+            for (int x = 1; x < layer.Width - 1; x++)
+            {
+                layer.Put(x, 0, '─'); // 196
+                layer.Put(x, layer.Height - 1, '═'); // 205
+            }
+
+            for (int y = 1; y < layer.Height - 1; y++)
+            {
+                layer.Put(0, y, '║'); // 186
+                layer.Put(layer.Width - 1, y, '║');
+            }
+
+            Terminal.Color(Colors.Text);
+            layer.Print(0, "[[SYSTEM LOG]]", System.Drawing.ContentAlignment.TopCenter);
+
+            // draw messages
             int maxCount = Math.Min(_messages.Count, layer.Height - 1);
             int yPos = layer.Height - 1;
 
             for (int i = 0; i < maxCount; i++)
             {
-                Terminal.Color(Colors.Text);
                 layer.Print(yPos, _messages[_messages.Count - i - 1]);
                 yPos--;
             }

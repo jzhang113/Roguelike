@@ -1,6 +1,6 @@
 ﻿namespace Roguelike.Data
 {
-    static class Constants
+    internal static class Constants
     {
         public const int DEFAULT_REFRESH_RATE = 120;
         public const int MIN_TURN_ENERGY = 0;
@@ -22,5 +22,17 @@
 
         public const float MIN_VISIBLE_LIGHT_LEVEL = 0.25f;
         public const double LIGHT_DECAY = 0.1;
+
+        // UI constants
+        public const int MAP_WIDTH = 100;
+        public const int MAP_HEIGHT = 100;
+        public const int MAPVIEW_WIDTH = 90;
+        public const int MAPVIEW_HEIGHT = 60;
+        public const int SIDEBAR_WIDTH = 30;
+        public const int STATUS_HEIGHT = 5;
+        public const int MESSAGE_HEIGHT = 10;
+
+        public const int SCREEN_WIDTH = MAPVIEW_WIDTH + 2 * SIDEBAR_WIDTH;
+        public const int SCREEN_HEIGHT = STATUS_HEIGHT + MAPVIEW_HEIGHT + MESSAGE_HEIGHT;
     }
 }

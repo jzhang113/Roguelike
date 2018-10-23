@@ -230,7 +230,7 @@ namespace Roguelike.World
 
             sw.Start();
             MapGenerator mapGenerator = new JaggedMapGenerator(
-                Game.Config.Map.Width, Game.Config.Map.Height,
+                Data.Constants.MAP_WIDTH, Data.Constants.MAP_HEIGHT,
                 level.Exits, new PcgRandom(level.Seed));
             MapHandler map = mapGenerator.Generate();
             sw.Stop();

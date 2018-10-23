@@ -2,33 +2,5 @@
     "gameName": "Steel Carnation",
     "fontName": "ccc12x12.png",
     "fontSize": 12,
-    "map": {
-        "height": 100,
-        "width": 100
-    },
-    "mapView": {
-        "height": 60,
-        "width": 110
-    },
-    "messageMaxCount": 100,
-    "messageView": {
-        "height": 5,
-        "width": 60
-    },
-    "statView": {
-        "height": 5,
-        "width": 60
-    },
-    "inventoryView": {
-        "height": 70,
-        "width": 30
-    },
-    "viewWindow": {
-        "height": 40,
-        "width": 20
-    },
-    "moveView": {
-        "height": 30,
-        "width": 20
-    }
+    "messageMaxCount": 100
 }

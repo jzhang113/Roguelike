@@ -2,23 +2,23 @@
 
 namespace Roguelike.Core
 {
-    static class Camera
+    internal static class Camera
     {
         public static int X { get; private set; }
         public static int Y { get; private set; }
 
         internal static void UpdateCamera()
         {
-            int screenWidth = Game.Config.MapView.Width;
-            int screenHeight = Game.Config.MapView.Height;
+            int screenWidth = Data.Constants.MAPVIEW_WIDTH;
+            int screenHeight = Data.Constants.MAPVIEW_HEIGHT;
 
             // set left and top limits for the camera
             int startX = Math.Max(Game.Player.X - screenWidth / 2, 0);
             int startY = Math.Max(Game.Player.Y - screenHeight / 2, 0);
 
             // set right and bottom limits for the camera
-            int xDiff = Game.Config.Map.Width - screenWidth;
-            int yDiff = Game.Config.Map.Height - screenHeight;
+            int xDiff = Data.Constants.MAP_WIDTH - screenWidth;
+            int yDiff = Data.Constants.MAP_HEIGHT - screenHeight;
             X = xDiff < 0 ? 0 : Math.Min(xDiff, startX);
             Y = yDiff < 0 ? 0 : Math.Min(yDiff, startY);
         }

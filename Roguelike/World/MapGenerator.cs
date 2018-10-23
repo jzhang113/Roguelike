@@ -309,8 +309,8 @@ namespace Roguelike.World
         {
             do
             {
-                Game.Player.X = Rand.Next(1, Game.Config.Map.Width - 1);
-                Game.Player.Y = Rand.Next(1, Game.Config.Map.Height - 1);
+                Game.Player.X = Rand.Next(1, Width - 1);
+                Game.Player.Y = Rand.Next(1, Height - 1);
             }
             while (!Map.Field[Game.Player.X, Game.Player.Y].IsWalkable);
 
@@ -329,8 +329,8 @@ namespace Roguelike.World
 
                 while (!Map.Field[actor.X, actor.Y].IsWalkable)
                 {
-                    actor.X = Rand.Next(1, Game.Config.Map.Width - 1);
-                    actor.Y = Rand.Next(1, Game.Config.Map.Height - 1);
+                    actor.X = Rand.Next(1, Width - 1);
+                    actor.Y = Rand.Next(1, Height - 1);
                 }
                 Map.AddActor(actor);
             }
@@ -350,8 +350,8 @@ namespace Roguelike.World
                 Exit exit = new Exit(id, symbol);
                 while (!Map.Field[exit.X, exit.Y].IsWalkable && !Map.TryGetExit(exit.X, exit.Y, out _))
                 {
-                    exit.X = Rand.Next(1, Game.Config.Map.Width - 1);
-                    exit.Y = Rand.Next(1, Game.Config.Map.Height - 1);
+                    exit.X = Rand.Next(1, Width - 1);
+                    exit.Y = Rand.Next(1, Height - 1);
                 }
 
                 Map.AddExit(exit);

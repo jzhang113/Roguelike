@@ -42,8 +42,26 @@ namespace Roguelike.Systems
 
         public static void Draw(LayerInfo layer)
         {
-            Terminal.Color(Colors.Text);
+            // draw borders
+            Terminal.Color(Colors.BorderColor);
+            layer.Put(0, 0, '╔'); // 201
+            layer.Put(0, layer.Height - 1, '╚'); // 200
 
+            for (int x = 1; x < layer.Width; x++)
+            {
+                layer.Put(x, 0, '═'); // 205
+                layer.Put(x, layer.Height - 1, '═');
+            }
+
+            for (int y = 1; y < layer.Height - 1; y++)
+            {
+                layer.Put(0, y, '║'); // 186
+            }
+
+            Terminal.Color(Colors.Text);
+            layer.Print(0, "[[SCAN]]", System.Drawing.ContentAlignment.TopCenter);
+
+            // draw info
             if (_showItemInfo)
                 layer.Print(1, _displayItem.Name);
 
