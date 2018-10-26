@@ -74,9 +74,9 @@ namespace Roguelike.State
             Game.EventScheduler.Run();
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
-            Game.Map.Draw(Game.MapLayer);
+            Game.Map.Draw(layer);
         }
     }
 }

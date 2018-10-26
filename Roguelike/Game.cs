@@ -3,9 +3,11 @@ using Pcg;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Data;
+using Roguelike.State;
 using Roguelike.Systems;
 using Roguelike.World;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -14,13 +16,13 @@ namespace Roguelike
     public static class Game
     {
         public static Configuration Config { get; private set; }
-
         public static Options Option { get; private set; }
+
         public static PcgRandom Random { get; private set; }
         public static PcgRandom VisualRandom { get; private set; }
 
         public static WorldHandler World { get; private set; }
-        public static Player Player { get; internal set; } // internal for deserialization
+        public static Player Player { get; internal set; }
 
         public static StateHandler StateHandler { get; private set; }
         public static MessageHandler MessageHandler { get; private set; }
@@ -29,22 +31,21 @@ namespace Roguelike
 
         public static MapHandler Map => World.Map;
 
-        internal static LayerInfo HighlightLayer { get; set; }
-        internal static LayerInfo MapLayer { get; set; }
-        internal static LayerInfo InventoryLayer { get; set; }
-        internal static LayerInfo FullConsole { get; set; }
+        public static bool ShowEquip { get; set; }
 
-        private static LayerInfo MessageLayer { get; set; }
-        private static LayerInfo StatLayer { get; set; }
-        private static LayerInfo LookLayer { get; set; }
-        private static LayerInfo MoveLayer { get; set; }
+        private static LayerInfo _highlightLayer;
+        private static LayerInfo _mapLayer;
+        private static LayerInfo _inventoryLayer;
+        private static LayerInfo _fullConsole;
+        private static LayerInfo _messageLayer;
+        private static LayerInfo _statLayer;
+        private static LayerInfo _lookLayer;
+        private static LayerInfo _moveLayer;
 
         private static bool _exiting;
 
         public static void Initialize(Configuration configs, Options options)
         {
-            _exiting = false;
-
             Config = configs;
             Option = options;
             Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
@@ -57,45 +58,63 @@ namespace Roguelike
             }
 
             // main UI elements
-            MapLayer = new LayerInfo("Map", 1,
+            _mapLayer = new LayerInfo("Map", 1,
                 Constants.SIDEBAR_WIDTH, Constants.STATUS_HEIGHT,
                 Constants.MAPVIEW_WIDTH, Constants.MAPVIEW_HEIGHT);
-            MessageLayer = new LayerInfo("Message", 1,
+            _messageLayer = new LayerInfo("Message", 1,
                 Constants.SIDEBAR_WIDTH, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT,
                 Constants.MAPVIEW_WIDTH, Constants.MESSAGE_HEIGHT);
-            StatLayer = new LayerInfo("Stats", 1,
+            _statLayer = new LayerInfo("Stats", 1,
                 Constants.SIDEBAR_WIDTH, 0,
                 Constants.MAPVIEW_WIDTH, Constants.STATUS_HEIGHT);
-            LookLayer = new LayerInfo("Look", 1,
+            _lookLayer = new LayerInfo("Look", 1,
                 0, 0,
                 Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
-            InventoryLayer = new LayerInfo("Inventory", 1,
+            _inventoryLayer = new LayerInfo("Inventory", 1,
                 Constants.SIDEBAR_WIDTH + Constants.MAPVIEW_WIDTH, 0,
                 Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
 
             // overlay over map
-            HighlightLayer = new LayerInfo("Highlight", 2,
-                MapLayer.X, MapLayer.Y,
-                MapLayer.Width, MapLayer.Height);
+            _highlightLayer = new LayerInfo("Highlight", 2,
+                _mapLayer.X, _mapLayer.Y,
+                _mapLayer.Width, _mapLayer.Height);
 
             // alternate tab for inventory
-            MoveLayer = new LayerInfo("Moves", 2,
-                InventoryLayer.X, InventoryLayer.Y,
-                InventoryLayer.Width, InventoryLayer.Height);
+            _moveLayer = new LayerInfo("Moves", 2,
+                _inventoryLayer.X, _inventoryLayer.Y,
+                _inventoryLayer.Width, _inventoryLayer.Height);
 
-            FullConsole = new LayerInfo("Full", 10, 0, 0,
+            _fullConsole = new LayerInfo("Full", 10, 0, 0,
                 Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+            
+            Terminal.Set($"window: size={Constants.SCREEN_WIDTH}x{Constants.SCREEN_HEIGHT}," +
+                $"cellsize=auto, title='{Config.GameName}';");
+            Terminal.Set("font: ccc12x12.png, size = 12x12;");
+            Terminal.Set("big font: ccc12x12.png, size = 12x12, resize = 24x24, spacing = 2x2;");
+            Terminal.Set("0xE000: extra.png, size = 12x12, transparent = white;");
+            Terminal.Set("input: filter = [keyboard, mouse]");
 
-            Terminal.Set(
-                $"window: size={Constants.SCREEN_WIDTH}x{Constants.SCREEN_HEIGHT}," +
-                $"cellsize=auto, title='{Config.GameName}';" +
-                $"font: ccc12x12.png, size = 12x12;" +
-                $"input: filter = [keyboard, mouse]");
+            StateHandler = new StateHandler(new Dictionary<Type, LayerInfo>
+            {
+                [typeof(AnimationState)] =      _mapLayer,
+                [typeof(ApplyState)] =          _inventoryLayer,
+                [typeof(AutoexploreState)] =    _mapLayer,
+                [typeof(DropState)] =           _inventoryLayer,
+                [typeof(EquipState)] =          _inventoryLayer,
+                [typeof(InventoryState)] =      _inventoryLayer,
+                [typeof(MenuState)] =           _fullConsole,
+                [typeof(NormalState)] =         _mapLayer,
+                [typeof(TargettingState)] =     _mapLayer,
+                [typeof(TextInputState)] =      _mapLayer,
+                [typeof(UnequipState)] =        _inventoryLayer
+            });
 
-            StateHandler = new StateHandler();
             MessageHandler = new MessageHandler(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(16);
-            OverlayHandler = new OverlayHandler(HighlightLayer.Width, HighlightLayer.Height);
+            OverlayHandler = new OverlayHandler(_highlightLayer.Width, _highlightLayer.Height);
+
+            _exiting = false;
+            ShowEquip = false;
 
             Render();
         }
@@ -181,17 +200,15 @@ namespace Roguelike
         internal static void Render()
         {
             Terminal.Clear();
-
             Terminal.Layer(1);
+
             if (Player != null)
             {
-                MessageHandler.Draw(MessageLayer);
-                InfoHandler.Draw(StatLayer);
-                LookHandler.Draw(LookLayer);
-
-                Player.Inventory.Draw(InventoryLayer);
-                Items.Weapon weapon = Player.Equipment.PrimaryWeapon;
-                weapon?.Moveset.Draw(MoveLayer);
+                Map.Draw(_mapLayer);
+                MessageHandler.Draw(_messageLayer);
+                InfoHandler.Draw(_statLayer);
+                LookHandler.Draw(_lookLayer);
+                Player.Inventory.Draw(_inventoryLayer);
             }
 
             StateHandler.Draw();

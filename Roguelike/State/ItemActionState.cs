@@ -1,4 +1,5 @@
 ﻿using Roguelike.Commands;
+using Roguelike.Core;
 using Roguelike.Items;
 using Roguelike.Utils;
 
@@ -43,9 +44,11 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
-        public virtual void Draw()
+        public virtual void Draw(LayerInfo layer)
         {
-            Game.Player.Inventory.Draw(Game.InventoryLayer);
+            Game.ShowEquip = false;
+            BearLib.Terminal.Color(Swatch.DbSun);
+            layer.Print(0, "INVENTORY", System.Drawing.ContentAlignment.TopCenter);
         }
     }
 }

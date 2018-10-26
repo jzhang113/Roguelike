@@ -1,5 +1,6 @@
 ﻿using BearLib;
 using Roguelike.Commands;
+using Roguelike.Core;
 using Roguelike.Utils;
 using System;
 using System.Text;
@@ -55,9 +56,9 @@ namespace Roguelike.State
             Game.StateHandler.PopState();
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
-            Game.OverlayHandler.Draw(Game.MapLayer);
+            Game.OverlayHandler.Draw(layer);
         }
     }
 }

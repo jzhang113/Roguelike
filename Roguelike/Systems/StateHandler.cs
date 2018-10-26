@@ -10,26 +10,12 @@ namespace Roguelike.Systems
     public class StateHandler
     {
         private readonly Stack<IState> _states;
+        private readonly IDictionary<Type, LayerInfo> _consoles;
 
-        private static readonly IDictionary<Type, LayerInfo> _consoles = new Dictionary<Type, LayerInfo>
-        {
-            [typeof(AnimationState)] = Game.MapLayer,
-            [typeof(ApplyState)] = Game.InventoryLayer,
-            [typeof(AutoexploreState)] = Game.MapLayer,
-            [typeof(CharSelectState)] = Game.FullConsole,
-            [typeof(DropState)] = Game.InventoryLayer,
-            [typeof(EquipState)] = Game.InventoryLayer,
-            [typeof(InventoryState)] = Game.InventoryLayer,
-            [typeof(MenuState)] = Game.FullConsole,
-            [typeof(NormalState)] = Game.MapLayer,
-            [typeof(TargettingState)] = Game.MapLayer,
-            [typeof(TextInputState)] = Game.MapLayer,
-            [typeof(UnequipState)] = Game.InventoryLayer
-        };
-
-        public StateHandler()
+        public StateHandler(IDictionary<Type, LayerInfo> consoleMapping)
         {
             _states = new Stack<IState>();
+            _consoles = consoleMapping;
 
             MenuState mainMenu = new MenuState(new[]
             {
@@ -112,7 +98,7 @@ namespace Roguelike.Systems
             IState current = _states.Peek();
             LayerInfo info = _consoles[current.GetType()];
             Terminal.Layer(info.Z);
-            current.Draw();
+            current.Draw(info);
         }
     }
 }

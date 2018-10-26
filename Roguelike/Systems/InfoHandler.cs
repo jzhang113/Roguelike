@@ -27,11 +27,12 @@ namespace Roguelike.Systems
 
             Actor player = Game.Player;
             const int stepSize = 5;
-            Terminal.Composition(true);
 
+            Terminal.Color(Colors.Text);
             string name = player.Name.ToUpper();
-            layer.Print(1, $"\\ {name} /", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(1, $"[font=big]{name}", System.Drawing.ContentAlignment.TopCenter);
 
+            Terminal.Composition(true);
             // HP bar
             int hpWidth = player.Parameters.MaxHp / stepSize;
             int hpFilled = hpWidth * player.Hp / player.Parameters.MaxHp;
@@ -77,21 +78,21 @@ namespace Roguelike.Systems
             if (player.StatusHandler.TryGetStatus(StatusType.Phasing, out _))
             {
                 Terminal.Color(Swatch.DbMetal);
-                layer.Print(pos, 4, "Phasing");
+                layer.Print(pos, 2, "Phasing");
                 pos += 8;
             }
 
             if (player.StatusHandler.TryGetStatus(StatusType.Burning, out _))
             {
                 Terminal.Color(Colors.Fire);
-                layer.Print(pos, 4, "Burning");
+                layer.Print(pos, 2, "Burning");
                 pos += 8;
             }
 
             if (player.StatusHandler.TryGetStatus(StatusType.Frozen, out _))
             {
                 Terminal.Color(Colors.Water);
-                layer.Print(pos, 4, "Frozen");
+                layer.Print(pos, 2, "Frozen");
                 pos += 7;
             }
         }

@@ -29,7 +29,7 @@
         public const int MAPVIEW_WIDTH = 90;
         public const int MAPVIEW_HEIGHT = 60;
         public const int SIDEBAR_WIDTH = 30;
-        public const int STATUS_HEIGHT = 5;
+        public const int STATUS_HEIGHT = 3;
         public const int MESSAGE_HEIGHT = 10;
 
         public const int SCREEN_WIDTH = MAPVIEW_WIDTH + 2 * SIDEBAR_WIDTH;

@@ -257,10 +257,10 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
-            Game.OverlayHandler.Draw(Game.MapLayer);
-            Game.World.Map.Draw(Game.MapLayer);
+            Game.OverlayHandler.Draw(layer);
+            Game.World.Map.Draw(layer);
         }
     }
 }

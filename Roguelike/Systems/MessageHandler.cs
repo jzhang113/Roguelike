@@ -75,8 +75,8 @@ namespace Roguelike.Systems
             layer.Print(0, "[[SYSTEM LOG]]", System.Drawing.ContentAlignment.TopCenter);
 
             // draw messages
-            int maxCount = Math.Min(_messages.Count, layer.Height - 1);
-            int yPos = layer.Height - 1;
+            int maxCount = Math.Min(_messages.Count, layer.Height - 2);
+            int yPos = layer.Height - 2;
 
             for (int i = 0; i < maxCount; i++)
             {

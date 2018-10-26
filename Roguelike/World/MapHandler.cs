@@ -670,7 +670,7 @@ namespace Roguelike.World
 
             // draw everything else
             Terminal.Color(Colors.Text);
-            for (int dx = 0; dx < layer.Width; dx++)
+            for (int dx = 1; dx < layer.Width - 1; dx++)
             {
                 for (int dy = 0; dy < layer.Height; dy++)
                 {

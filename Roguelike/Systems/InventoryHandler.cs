@@ -190,6 +190,7 @@ namespace Roguelike.Systems
 
             Terminal.Color(Colors.Text);
             layer.Print(0, "[[INVENTORY]]", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(0, "[[EQUIPMENT]]", System.Drawing.ContentAlignment.TopRight);
 
             // draw items
             int line = 3;

@@ -1,5 +1,6 @@
 ﻿using Roguelike.Animations;
 using Roguelike.Commands;
+using Roguelike.Core;
 
 namespace Roguelike.State
 {
@@ -30,9 +31,9 @@ namespace Roguelike.State
                 Game.StateHandler.PopState();
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
-            _animation.Draw(Game.MapLayer);
+            _animation.Draw(layer);
         }
     }
 }

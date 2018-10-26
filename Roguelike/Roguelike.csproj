@@ -141,7 +141,6 @@
     <Compile Include="State\AnimationState.cs" />
     <Compile Include="State\ApplyState.cs" />
     <Compile Include="State\AutoexploreState.cs" />
-    <Compile Include="State\CharSelectState.cs" />
     <Compile Include="State\DropState.cs" />
     <Compile Include="State\EquipState.cs" />
     <Compile Include="State\InventoryState.cs" />
@@ -220,6 +219,9 @@
     <Compile Include="World\WorldParameters.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="extra.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="App.config" />
     <Content Include="BearLibTerminal.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

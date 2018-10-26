@@ -1,4 +1,5 @@
 ﻿using Roguelike.Commands;
+using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using System;
@@ -29,6 +30,13 @@ namespace Roguelike.State
 
             Game.MessageHandler.AddMessage($"Cannot unequip {itemCount.Item}.");
             return null;
+        }
+
+        public override void Draw(LayerInfo layer)
+        {
+            Game.ShowEquip = true;
+            BearLib.Terminal.Color(Swatch.DbSun);
+            layer.Print(0, "EQUIPMENT", System.Drawing.ContentAlignment.TopCenter);
         }
     }
 }

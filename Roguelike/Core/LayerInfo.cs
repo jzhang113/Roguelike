@@ -30,6 +30,12 @@ namespace Roguelike.Core
                 System.Diagnostics.Debug.WriteLine($"Warning: {x} {y} out of bounds on layer {Name}");
         }
 
+        public void Print(Rectangle layout, string text, ContentAlignment alignment)
+        {
+            layout.Offset(X, Y);
+            Terminal.Print(layout, alignment, text);
+        }
+
         public void Print(int y, string text, ContentAlignment alignment = ContentAlignment.TopLeft)
         {
             if (y < Height)

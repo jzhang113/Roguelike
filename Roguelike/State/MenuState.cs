@@ -35,11 +35,11 @@ namespace Roguelike.State
             Game.StateHandler.HandleInput();
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             foreach (MenuButton button in _buttons)
             {
-                button.Draw();
+                button.Draw(layer);
             }
         }
     }

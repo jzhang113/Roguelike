@@ -1,4 +1,5 @@
 ﻿using Roguelike.Commands;
+using Roguelike.Core;
 
 namespace Roguelike.State
 {
@@ -14,6 +15,6 @@ namespace Roguelike.State
         void Update();
 
         // Draw to the screen.
-        void Draw();
+        void Draw(LayerInfo layer);
     }
 }

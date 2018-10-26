@@ -37,7 +37,7 @@ namespace Roguelike.Core
             _align = alignment;
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
             Terminal.Composition(true);
             Terminal.Color(Hover ? HoverColor : BackgroundColor);
@@ -48,7 +48,7 @@ namespace Roguelike.Core
                 {
                     for (int y = Position.Top + 1; y < Position.Bottom - 1; y++)
                     {
-                        Terminal.Put(x, y, '█'); // 219
+                        layer.Put(x, y, '█'); // 219
                     }
                 }
 
@@ -56,22 +56,22 @@ namespace Roguelike.Core
                 // top and bottom border
                 for (int x = Position.Left + 1; x < Position.Right - 1; x++)
                 {
-                    Terminal.Put(x, Position.Top, '─'); // 196
-                    Terminal.Put(x, Position.Bottom - 1, '─');
+                    layer.Put(x, Position.Top, '─'); // 196
+                    layer.Put(x, Position.Bottom - 1, '─');
                 }
 
                 // left and right border
                 for (int y = Position.Top + 1; y < Position.Bottom - 1; y++)
                 {
-                    Terminal.Put(Position.Left, y, '│'); // 179
-                    Terminal.Put(Position.Right - 1, y, '│');
+                    layer.Put(Position.Left, y, '│'); // 179
+                    layer.Put(Position.Right - 1, y, '│');
                 }
 
                 // corners
-                Terminal.Put(Position.Left, Position.Top, '┌'); // 218
-                Terminal.Put(Position.Right - 1, Position.Top, '┐'); // 191
-                Terminal.Put(Position.Left, Position.Bottom - 1, '└'); // 192
-                Terminal.Put(Position.Right - 1, Position.Bottom - 1, '┘'); // 217
+                layer.Put(Position.Left, Position.Top, '┌'); // 218
+                layer.Put(Position.Right - 1, Position.Top, '┐'); // 191
+                layer.Put(Position.Left, Position.Bottom - 1, '└'); // 192
+                layer.Put(Position.Right - 1, Position.Bottom - 1, '┘'); // 217
             }
             else
             {
@@ -79,13 +79,13 @@ namespace Roguelike.Core
                 {
                     for (int y = Position.Top; y < Position.Bottom; y++)
                     {
-                        Terminal.Put(x, y, '█');
+                        layer.Put(x, y, '█');
                     }
                 }
             }
 
             Terminal.Color(TextColor);
-            Terminal.Print(Position, _align, Text);
+            layer.Print(Position, Text, _align);
             Terminal.Composition(false);
         }
     }

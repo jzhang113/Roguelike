@@ -99,7 +99,9 @@ namespace Roguelike.Commands
             }
 
             Game.Map.SetActorPosition(Source, _newX, _newY);
-            Game.Map.Refresh();
+
+            if (Source is Player)
+                Game.Map.Refresh();
         }
     }
 }
