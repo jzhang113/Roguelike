@@ -4,6 +4,7 @@ using Roguelike.Items;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Roguelike.Systems
@@ -188,13 +189,12 @@ namespace Roguelike.Systems
                 layer.Put(layer.Width - 1, y, '║'); // 186
             }
 
-            Terminal.Color(Colors.Text);
-            layer.Print(0, "[[INVENTORY]]", System.Drawing.ContentAlignment.TopCenter);
-            layer.Print(0, "[[EQUIPMENT]]", System.Drawing.ContentAlignment.TopRight);
+            layer.Print(0, "[color=white][[INVENTORY]][/color]EQUIPMENT]]");
 
             // draw items
-            int line = 3;
+            int line = 2;
             char letter = 'a';
+            Terminal.Color(Colors.Text);
 
             foreach (ItemStack itemStack in _inventory)
             {
@@ -210,6 +210,50 @@ namespace Roguelike.Systems
                     layer.Print(line, $"  - {itemCount}");
                     line++;
                 }
+            }
+        }
+
+        // redraw selected items
+        internal void DrawSelected(LayerInfo layer, Func<Item, bool> selected)
+        {
+            int line = 2;
+            char letter = 'a';
+            Terminal.Color(Colors.HighlightColor);
+
+            foreach (ItemStack itemStack in _inventory)
+            {
+                if (itemStack.Collapsed)
+                {
+                    foreach (ItemCount itemCount in itemStack)
+                    {
+                        if (selected(itemCount.Item))
+                        {
+                            layer.Print(line, $"{letter}) {itemStack}");
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    int nameLine = line;
+
+                    foreach (ItemCount itemCount in itemStack)
+                    {
+                        if (selected(itemCount.Item))
+                        {
+                            layer.Print(line, $"  - {itemCount}");
+                            line++;
+                        }
+                    }
+
+                    if (line != nameLine)
+                    {
+                        layer.Print(nameLine, $"{letter}) {itemStack}");
+                    }
+                }
+
+                line++;
+                letter++;
             }
         }
 

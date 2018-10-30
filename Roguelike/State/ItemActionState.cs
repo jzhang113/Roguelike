@@ -1,4 +1,5 @@
-﻿using Roguelike.Commands;
+﻿using BearLib;
+using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Items;
 using Roguelike.Utils;
@@ -46,9 +47,27 @@ namespace Roguelike.State
 
         public virtual void Draw(LayerInfo layer)
         {
+            // highlight draw borders
+            Terminal.Color(Colors.HighlightColor);
+            layer.Put(layer.Width - 1, 0, '╗'); // 187
+            layer.Put(layer.Width - 1, layer.Height - 1, '╝'); // 188
+            layer.Put(-1, 0, '╔'); // 188
+            layer.Put(-1, layer.Height - 1, '╚'); // 188
+
+            for (int x = 0; x < layer.Width - 1; x++)
+            {
+                layer.Put(x, 0, '═'); // 205
+                layer.Put(x, layer.Height - 1, '═');
+            }
+
+            for (int y = 1; y < layer.Height - 1; y++)
+            {
+                layer.Put(-1, y, '║');
+                layer.Put(layer.Width - 1, y, '║'); // 186
+            }
+
             Game.ShowEquip = false;
-            BearLib.Terminal.Color(Swatch.DbSun);
-            layer.Print(0, "INVENTORY", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(0, "[color=white][[INVENTORY]][/color][color=grass]EQUIPMENT]]");
         }
     }
 }

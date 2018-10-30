@@ -28,5 +28,7 @@ namespace Roguelike.State
             }));
             return null;
         }
+
+        // TODO: if we have cursed items, highlight non-cursed items as droppable
     }
 }

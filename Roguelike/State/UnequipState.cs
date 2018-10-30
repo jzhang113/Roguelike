@@ -34,9 +34,9 @@ namespace Roguelike.State
 
         public override void Draw(LayerInfo layer)
         {
+            base.Draw(layer);
             Game.ShowEquip = true;
-            BearLib.Terminal.Color(Swatch.DbSun);
-            layer.Print(0, "EQUIPMENT", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(0, "[color=grass][[INVENTORY[/color][color=white][[EQUIPMENT]]");
         }
     }
 }

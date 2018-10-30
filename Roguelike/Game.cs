@@ -91,7 +91,7 @@ namespace Roguelike
                 $"cellsize=auto, title='{Config.GameName}';");
             Terminal.Set("font: ccc12x12.png, size = 12x12;");
             Terminal.Set("big font: ccc12x12.png, size = 12x12, resize = 24x24, spacing = 2x2;");
-            Terminal.Set("0xE000: extra.png, size = 12x12, transparent = white;");
+            Terminal.Set("palette.grass: #6daa2c");
             Terminal.Set("input: filter = [keyboard, mouse]");
 
             StateHandler = new StateHandler(new Dictionary<Type, LayerInfo>
@@ -208,7 +208,11 @@ namespace Roguelike
                 MessageHandler.Draw(_messageLayer);
                 InfoHandler.Draw(_statLayer);
                 LookHandler.Draw(_lookLayer);
-                Player.Inventory.Draw(_inventoryLayer);
+
+                if (ShowEquip)
+                    Player.Equipment.Draw(_inventoryLayer);
+                else
+                    Player.Inventory.Draw(_inventoryLayer);
             }
 
             StateHandler.Draw();

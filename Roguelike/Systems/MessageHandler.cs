@@ -80,7 +80,7 @@ namespace Roguelike.Systems
 
             for (int i = 0; i < maxCount; i++)
             {
-                layer.Print(yPos, _messages[_messages.Count - i - 1]);
+                layer.Print(1, yPos, _messages[_messages.Count - i - 1]);
                 yPos--;
             }
         }

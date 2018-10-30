@@ -25,6 +25,7 @@ namespace Roguelike.Core
         public static Color ButtonHover =       Swatch.Alternate;
 
         public static Color BorderColor =       Swatch.DbGrass;
+        public static Color HighlightColor =    Swatch.DbSun;
 
         // Terrain
         public static Color Grass =             Swatch.DbGrass;

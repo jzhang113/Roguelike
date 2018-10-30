@@ -56,16 +56,35 @@ namespace Roguelike.Systems
             Armor[armor.Type] = null;
         }
 
-        public void Draw()
+        public void Draw(LayerInfo layer)
         {
+            // draw borders
+            Terminal.Color(Colors.BorderColor);
+            layer.Put(layer.Width - 1, 0, '╗'); // 187
+            layer.Put(layer.Width - 1, layer.Height - 1, '╝'); // 188
+
+            for (int x = 0; x < layer.Width - 1; x++)
+            {
+                layer.Put(x, 0, '═'); // 205
+                layer.Put(x, layer.Height - 1, '═');
+            }
+
+            for (int y = 1; y < layer.Height - 1; y++)
+            {
+                layer.Put(layer.Width - 1, y, '║'); // 186
+            }
+
+            layer.Print(0, "[[INVENTORY[color=white][[EQUIPMENT]]");
+
             Terminal.Color(Colors.Text);
-            Terminal.Print(1, 1, ContentAlignment.TopCenter, "== Equipment ==");
-            Terminal.Print(1, 1, "Weapon - " + PrimaryWeapon.Name);
-            Terminal.Print(1, 2, "Offhand - " + (OffhandWeapon?.Name ?? "none"));
-            Terminal.Print(1, 3, "Armor - " + (Armor[ArmorType.Armor]?.Name ?? "none"));
-            Terminal.Print(1, 4, "Helmet - " + (Armor[ArmorType.Helmet]?.Name ?? "none"));
-            Terminal.Print(1, 5, "Gloves - " + (Armor[ArmorType.Gloves]?.Name ?? "none"));
-            Terminal.Print(1, 6, "Boots - " + (Armor[ArmorType.Boots]?.Name ?? "none"));
+            layer.Print(2, "a) Primary:    " + (PrimaryWeapon?.Name ?? "none"));
+            layer.Print(3, "b) Offhand:    " + (OffhandWeapon?.Name ?? "none"));
+            layer.Print(4, "c) Armor:      " + (Armor[ArmorType.Armor]?.Name ?? "none"));
+            layer.Print(5, "d) Helmet:     " + (Armor[ArmorType.Helmet]?.Name ?? "none"));
+            layer.Print(6, "e) Gloves:     " + (Armor[ArmorType.Gloves]?.Name ?? "none"));
+            layer.Print(7, "f) Boots:      " + (Armor[ArmorType.Boots]?.Name ?? "none"));
+            layer.Print(8, "g) Left ring:  " + (Armor[ArmorType.RingLeft]?.Name ?? "none"));
+            layer.Print(9, "h) Right ring: " + (Armor[ArmorType.RingRight]?.Name ?? "none"));
         }
     }
 }

@@ -31,5 +31,12 @@ namespace Roguelike.State
             Game.MessageHandler.AddMessage($"Cannot equip {itemCount.Item}.");
             return null;
         }
+
+        public override void Draw(LayerInfo layer)
+        {
+            base.Draw(layer);
+            // highlight equippable items
+            Game.Player.Inventory.DrawSelected(layer, x => x is IEquippable);
+        }
     }
 }
