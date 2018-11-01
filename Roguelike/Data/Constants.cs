@@ -32,7 +32,7 @@
         public const int STATUS_HEIGHT = 3;
         public const int MESSAGE_HEIGHT = 10;
 
-        public const int SCREEN_WIDTH = MAPVIEW_WIDTH + 2 * SIDEBAR_WIDTH;
-        public const int SCREEN_HEIGHT = STATUS_HEIGHT + MAPVIEW_HEIGHT + MESSAGE_HEIGHT;
+        public const int SCREEN_WIDTH = MAPVIEW_WIDTH + 2 * SIDEBAR_WIDTH + 2;
+        public const int SCREEN_HEIGHT = STATUS_HEIGHT + MAPVIEW_HEIGHT + MESSAGE_HEIGHT + 1;
     }
 }

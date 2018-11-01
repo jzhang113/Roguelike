@@ -4,7 +4,6 @@ using Roguelike.Items;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace Roguelike.Systems
@@ -173,26 +172,21 @@ namespace Roguelike.Systems
 
         public void Draw(LayerInfo layer)
         {
+            Game.ShowEquip = false;
             // draw borders
             Terminal.Color(Colors.BorderColor);
-            layer.Put(layer.Width - 1, 0, '╗'); // 187
-            layer.Put(layer.Width - 1, layer.Height - 1, '╝'); // 188
-
-            for (int x = 0; x < layer.Width - 1; x++)
+            layer.DrawBorders(new BorderInfo
             {
-                layer.Put(x, 0, '═'); // 205
-                layer.Put(x, layer.Height - 1, '═');
-            }
-
-            for (int y = 1; y < layer.Height - 1; y++)
-            {
-                layer.Put(layer.Width - 1, y, '║'); // 186
-            }
-
-            layer.Print(0, "[color=white][[INVENTORY]][/color]EQUIPMENT]]");
+                TopRightChar = '╗', // 187
+                BottomRightChar = '╝', // 188
+                TopChar = '═', // 205
+                BottomChar = '═',
+                RightChar = '║' // 186
+            });
+            layer.Print(-1, "[color=white][[INVENTORY]][/color]EQUIPMENT]]");
 
             // draw items
-            int line = 2;
+            int line = 1;
             char letter = 'a';
             Terminal.Color(Colors.Text);
 
@@ -216,7 +210,7 @@ namespace Roguelike.Systems
         // redraw selected items
         internal void DrawSelected(LayerInfo layer, Func<Item, bool> selected)
         {
-            int line = 2;
+            int line = 1;
             char letter = 'a';
             Terminal.Color(Colors.HighlightColor);
 

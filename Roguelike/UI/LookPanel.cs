@@ -3,9 +3,9 @@ using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Items;
 
-namespace Roguelike.Systems
+namespace Roguelike.UI
 {
-    internal static class LookHandler
+    internal static class LookPanel
     {
         private static Actor _displayActor;
         private static Item _displayItem;
@@ -42,26 +42,21 @@ namespace Roguelike.Systems
 
         public static void Draw(LayerInfo layer)
         {
+            Game.ShowInfo = false;
             // draw borders
             Terminal.Color(Colors.BorderColor);
-            layer.Put(0, 0, '╔'); // 201
-            layer.Put(0, layer.Height - 1, '╚'); // 200
-
-            for (int x = 1; x < layer.Width; x++)
+            layer.DrawBorders(new BorderInfo
             {
-                layer.Put(x, 0, '═'); // 205
-                layer.Put(x, layer.Height - 1, '═');
-            }
-
-            for (int y = 1; y < layer.Height - 1; y++)
-            {
-                layer.Put(0, y, '║'); // 186
-            }
-
-            Terminal.Color(Colors.Text);
-            layer.Print(0, "[[SCAN]]", System.Drawing.ContentAlignment.TopCenter);
+                TopLeftChar = '╔', // 201
+                BottomLeftChar = '╚', // 200
+                TopChar = '═', // 205
+                BottomChar = '═',
+                LeftChar = '║' // 186
+            });
+            layer.Print(-1, "[color=white][[SCAN]][/color]DATA]]", System.Drawing.ContentAlignment.TopRight);
 
             // draw info
+            Terminal.Color(Colors.Text);
             if (_showItemInfo)
                 layer.Print(1, _displayItem.Name);
 

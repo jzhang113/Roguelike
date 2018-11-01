@@ -6,6 +6,7 @@ using Roguelike.Core;
 using Roguelike.Input;
 using Roguelike.Items;
 using Roguelike.Systems;
+using Roguelike.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -199,19 +200,19 @@ namespace Roguelike.State
             if (Game.Map.Field[current.X, current.Y].IsVisible
                 && Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))
             {
-                LookHandler.DisplayActor(displayActor);
+                LookPanel.DisplayActor(displayActor);
             }
             else if (Game.Map.TryGetItem(current.X, current.Y, out ItemCount displayItem)
                 && displayItem.Count > 0)
             {
-                LookHandler.DisplayItem(displayItem);
+                LookPanel.DisplayItem(displayItem);
             }
             else
             {
-                LookHandler.Clear();
+                LookPanel.Clear();
             }
 
-            LookHandler.DisplayTerrain(Game.Map.Field[current.X, current.Y]);
+            LookPanel.DisplayTerrain(Game.Map.Field[current.X, current.Y]);
 
             return null;
         }

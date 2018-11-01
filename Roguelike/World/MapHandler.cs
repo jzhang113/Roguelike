@@ -662,15 +662,15 @@ namespace Roguelike.World
         {
             // draw borders
             Terminal.Color(Colors.BorderColor);
-            for (int y = 0; y < layer.Height; y++)
+            layer.DrawBorders(new BorderInfo
             {
-                layer.Put(0, y, '║'); // 186
-                layer.Put(layer.Width - 1, y, '║'); // 186
-            }
+                LeftChar = '│', // 179
+                RightChar = '│'
+            });
 
             // draw everything else
             Terminal.Color(Colors.Text);
-            for (int dx = 1; dx < layer.Width - 1; dx++)
+            for (int dx = 0; dx < layer.Width; dx++)
             {
                 for (int dy = 0; dy < layer.Height; dy++)
                 {

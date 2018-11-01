@@ -35,8 +35,7 @@ namespace Roguelike.State
         public override void Draw(LayerInfo layer)
         {
             base.Draw(layer);
-            Game.ShowEquip = true;
-            layer.Print(0, "[color=grass][[INVENTORY[/color][color=white][[EQUIPMENT]]");
+            layer.Print(-1, "[color=grass][[INVENTORY[/color][color=white][[EQUIPMENT]]");
         }
     }
 }

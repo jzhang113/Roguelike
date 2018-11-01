@@ -3,34 +3,30 @@ using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Statuses;
 
-namespace Roguelike.Systems
+namespace Roguelike.UI
 {
-    internal static class InfoHandler
+    internal static class StatPanel
     {
         public static void Draw(LayerInfo layer)
         {
             // draw borders
             Terminal.Color(Colors.BorderColor);
-            layer.Put(0, 0, '╦'); // 203
-            layer.Put(layer.Width - 1, 0, '╦');
-
-            for (int x = 1; x < layer.Width - 1; x++)
+            layer.DrawBorders(new BorderInfo
             {
-                layer.Put(x, 0, '═'); // 205
-            }
-
-            for (int y = 1; y < layer.Height; y++)
-            {
-                layer.Put(0, y, '║'); // 186
-                layer.Put(layer.Width - 1, y, '║'); // 186
-            }
+                TopLeftChar = '╤', // 209
+                TopRightChar = '╤',
+                TopChar = '═', // 205
+                LeftChar = '│', // 179
+                RightChar = '│'
+            });
 
             Actor player = Game.Player;
             const int stepSize = 5;
+            const int yPos = 0;
 
             Terminal.Color(Colors.Text);
             string name = player.Name.ToUpper();
-            layer.Print(1, $"[font=big]{name}", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(yPos, $"[font=big]{name}", System.Drawing.ContentAlignment.TopCenter);
 
             Terminal.Composition(true);
             // HP bar
@@ -40,20 +36,20 @@ namespace Roguelike.Systems
 
             Terminal.Color(Swatch.DbBlood);
             for (int i = 0; i <= hpFilled; i++)
-                layer.Put(i + 1, 1, '█');
+                layer.Put(i, yPos, '█');
 
             Terminal.Color(Swatch.DbOldBlood);
             for (int i = hpFilled + 1; i <= hpWidth; i++)
-                layer.Put(i + 1, 1, '█');
+                layer.Put(i, yPos, '█');
 
             Terminal.Color(Colors.Text);
-            layer.Print(1, health);
+            layer.Print(yPos, health);
 
             // Armor
             int armorWidth = player.Armor / stepSize;
             Terminal.Color(Swatch.DbMetal);
             for (int i = 0; i <= armorWidth; i++)
-                layer.Put(i + hpWidth + 3, 1, '█');
+                layer.Put(i + hpWidth + 2, yPos, '█');
 
             // MP bar
             int mpWidth = player.Parameters.MaxMp / stepSize;
@@ -62,38 +58,38 @@ namespace Roguelike.Systems
 
             Terminal.Color(Swatch.DbWater);
             for (int i = 0; i <= mpFilled; i++)
-                layer.Put(layer.Width - i - 2, 1, '█');
+                layer.Put(layer.Width - i - 1, yPos, '█');
 
             Terminal.Color(Swatch.DbDeepWater);
             for (int i = mpFilled + 1; i <= mpWidth; i++)
-                layer.Put(layer.Width - i - 2, 1, '█');
+                layer.Put(layer.Width - i - 1, yPos, '█');
 
             Terminal.Color(Colors.Text);
-            layer.Print(1, mana, System.Drawing.ContentAlignment.TopRight);
+            layer.Print(yPos, mana, System.Drawing.ContentAlignment.TopRight);
 
             Terminal.Composition(false);
 
             // Statuses
-            int pos = 1;
+            int xPos = 0;
             if (player.StatusHandler.TryGetStatus(StatusType.Phasing, out _))
             {
                 Terminal.Color(Swatch.DbMetal);
-                layer.Print(pos, 2, "Phasing");
-                pos += 8;
+                layer.Print(xPos, yPos + 1, "Phasing");
+                xPos += 8;
             }
 
             if (player.StatusHandler.TryGetStatus(StatusType.Burning, out _))
             {
                 Terminal.Color(Colors.Fire);
-                layer.Print(pos, 2, "Burning");
-                pos += 8;
+                layer.Print(xPos, yPos + 1, "Burning");
+                xPos += 8;
             }
 
             if (player.StatusHandler.TryGetStatus(StatusType.Frozen, out _))
             {
                 Terminal.Color(Colors.Water);
-                layer.Print(pos, 2, "Frozen");
-                pos += 7;
+                layer.Print(xPos, yPos + 1, "Frozen");
+                xPos += 7;
             }
         }
     }

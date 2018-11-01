@@ -28,3 +28,21 @@ Good games can be made on the basis of 1,2,3,4, degenerate 5. I think Angband ha
 Nethack has 1,2,3,4,5,6,7 at least, and may have 8,9,10,11: I'd have to source-dive to know for sure.
 
 The design problems of 8,9,10 are simplified dramatically if you start with an "actor" type that can be either a monster or an item. I recommend this.
+
+
+Tangldeep:
+reduce time learning UI & actions
+define mechanics, skills, items in-game
+reduce impact of RNG
+dynamic battlefield (movement necessary / encouraged)
+reduce deaths from attrition
+more viable builds
+
+Other:
+all items can be useful
+items can be applied outside of their intended uses
+
+Ideas:
+difficulty modifiers
+balance is semi-important
+allowing grinding can help smooth out difficulty curves

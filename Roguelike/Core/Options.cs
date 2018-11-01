@@ -1,6 +1,4 @@
-﻿using Roguelike.Systems;
-
-namespace Roguelike.Core
+﻿namespace Roguelike.Core
 {
     public class Options
     {

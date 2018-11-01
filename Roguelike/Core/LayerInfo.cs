@@ -52,6 +52,33 @@ namespace Roguelike.Core
                 System.Diagnostics.Debug.WriteLine($"Warning: line {y} out of bounds on layer {Name}");
         }
 
+        public void DrawBorders(BorderInfo border)
+        {
+            if (border.TopLeftChar != default)
+                Terminal.Put(X - 1, Y - 1, border.TopLeftChar);
+
+            if (border.TopRightChar != default)
+                Terminal.Put(X + Width, Y - 1, border.TopRightChar);
+
+            if (border.BottomLeftChar != default)
+                Terminal.Put(X - 1, Y + Height, border.BottomLeftChar);
+
+            if (border.BottomRightChar != default)
+                Terminal.Put(X + Width, Y + Height, border.BottomRightChar);
+
+            if (border.TopChar != default)
+                for (int dx = 0; dx < Width; dx++) Terminal.Put(X + dx, Y - 1, border.TopChar);
+
+            if (border.BottomChar != default)
+                for (int dx = 0; dx < Width; dx++) Terminal.Put(X + dx, Y + Height, border.BottomChar);
+
+            if (border.LeftChar != default)
+                for (int dy = 0; dy < Height; dy++) Terminal.Put(X - 1, Y + dy, border.LeftChar);
+
+            if (border.RightChar != default)
+                for (int dy = 0; dy < Height; dy++) Terminal.Put(X + Width, Y + dy, border.RightChar);
+        }
+
         public void Clear() => Terminal.ClearArea(X, Y, Width, Height);
     }
 }

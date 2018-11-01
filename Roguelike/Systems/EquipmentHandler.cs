@@ -58,23 +58,18 @@ namespace Roguelike.Systems
 
         public void Draw(LayerInfo layer)
         {
+            Game.ShowEquip = true;
             // draw borders
             Terminal.Color(Colors.BorderColor);
-            layer.Put(layer.Width - 1, 0, '╗'); // 187
-            layer.Put(layer.Width - 1, layer.Height - 1, '╝'); // 188
-
-            for (int x = 0; x < layer.Width - 1; x++)
+            layer.DrawBorders(new BorderInfo
             {
-                layer.Put(x, 0, '═'); // 205
-                layer.Put(x, layer.Height - 1, '═');
-            }
-
-            for (int y = 1; y < layer.Height - 1; y++)
-            {
-                layer.Put(layer.Width - 1, y, '║'); // 186
-            }
-
-            layer.Print(0, "[[INVENTORY[color=white][[EQUIPMENT]]");
+                TopRightChar = '╗', // 187
+                BottomRightChar = '╝', // 188
+                TopChar = '═', // 205
+                BottomChar = '═',
+                RightChar = '║' // 186
+            });
+            layer.Print(-1, "[[INVENTORY[color=white][[EQUIPMENT]]");
 
             Terminal.Color(Colors.Text);
             layer.Print(2, "a) Primary:    " + (PrimaryWeapon?.Name ?? "none"));

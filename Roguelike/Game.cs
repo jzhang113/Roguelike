@@ -5,6 +5,7 @@ using Roguelike.Core;
 using Roguelike.Data;
 using Roguelike.State;
 using Roguelike.Systems;
+using Roguelike.UI;
 using Roguelike.World;
 using System;
 using System.Collections.Generic;
@@ -25,13 +26,14 @@ namespace Roguelike
         public static Player Player { get; internal set; }
 
         public static StateHandler StateHandler { get; private set; }
-        public static MessageHandler MessageHandler { get; private set; }
+        public static MessagePanel MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
         public static OverlayHandler OverlayHandler { get; private set; }
 
         public static MapHandler Map => World.Map;
 
         public static bool ShowEquip { get; set; }
+        public static bool ShowInfo { get; set; }
 
         private static LayerInfo _highlightLayer;
         private static LayerInfo _mapLayer;
@@ -59,19 +61,19 @@ namespace Roguelike
 
             // main UI elements
             _mapLayer = new LayerInfo("Map", 1,
-                Constants.SIDEBAR_WIDTH, Constants.STATUS_HEIGHT,
+                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + 1,
                 Constants.MAPVIEW_WIDTH, Constants.MAPVIEW_HEIGHT);
             _messageLayer = new LayerInfo("Message", 1,
-                Constants.SIDEBAR_WIDTH, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT,
+                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT + 2,
                 Constants.MAPVIEW_WIDTH, Constants.MESSAGE_HEIGHT);
             _statLayer = new LayerInfo("Stats", 1,
-                Constants.SIDEBAR_WIDTH, 0,
+                Constants.SIDEBAR_WIDTH + 2, 1,
                 Constants.MAPVIEW_WIDTH, Constants.STATUS_HEIGHT);
             _lookLayer = new LayerInfo("Look", 1,
-                0, 0,
+                1, 1,
                 Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
             _inventoryLayer = new LayerInfo("Inventory", 1,
-                Constants.SIDEBAR_WIDTH + Constants.MAPVIEW_WIDTH, 0,
+                Constants.SIDEBAR_WIDTH + Constants.MAPVIEW_WIDTH + 3, 1,
                 Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
 
             // overlay over map
@@ -85,9 +87,9 @@ namespace Roguelike
                 _inventoryLayer.Width, _inventoryLayer.Height);
 
             _fullConsole = new LayerInfo("Full", 10, 0, 0,
-                Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+                Constants.SCREEN_WIDTH + 2, Constants.SCREEN_HEIGHT + 2);
             
-            Terminal.Set($"window: size={Constants.SCREEN_WIDTH}x{Constants.SCREEN_HEIGHT}," +
+            Terminal.Set($"window: size={Constants.SCREEN_WIDTH + 2}x{Constants.SCREEN_HEIGHT + 2}," +
                 $"cellsize=auto, title='{Config.GameName}';");
             Terminal.Set("font: ccc12x12.png, size = 12x12;");
             Terminal.Set("big font: ccc12x12.png, size = 12x12, resize = 24x24, spacing = 2x2;");
@@ -109,7 +111,7 @@ namespace Roguelike
                 [typeof(UnequipState)] =        _inventoryLayer
             });
 
-            MessageHandler = new MessageHandler(Config.MessageMaxCount);
+            MessageHandler = new MessagePanel(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(16);
             OverlayHandler = new OverlayHandler(_highlightLayer.Width, _highlightLayer.Height);
 
@@ -206,8 +208,12 @@ namespace Roguelike
             {
                 Map.Draw(_mapLayer);
                 MessageHandler.Draw(_messageLayer);
-                InfoHandler.Draw(_statLayer);
-                LookHandler.Draw(_lookLayer);
+                StatPanel.Draw(_statLayer);
+
+                if (ShowInfo)
+                    InfoPanel.Draw(_lookLayer);
+                else
+                    LookPanel.Draw(_lookLayer);
 
                 if (ShowEquip)
                     Player.Equipment.Draw(_inventoryLayer);

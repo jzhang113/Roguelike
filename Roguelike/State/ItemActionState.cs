@@ -49,25 +49,18 @@ namespace Roguelike.State
         {
             // highlight draw borders
             Terminal.Color(Colors.HighlightColor);
-            layer.Put(layer.Width - 1, 0, '╗'); // 187
-            layer.Put(layer.Width - 1, layer.Height - 1, '╝'); // 188
-            layer.Put(-1, 0, '╔'); // 188
-            layer.Put(-1, layer.Height - 1, '╚'); // 188
-
-            for (int x = 0; x < layer.Width - 1; x++)
+            layer.DrawBorders(new BorderInfo
             {
-                layer.Put(x, 0, '═'); // 205
-                layer.Put(x, layer.Height - 1, '═');
-            }
-
-            for (int y = 1; y < layer.Height - 1; y++)
-            {
-                layer.Put(-1, y, '║');
-                layer.Put(layer.Width - 1, y, '║'); // 186
-            }
-
-            Game.ShowEquip = false;
-            layer.Print(0, "[color=white][[INVENTORY]][/color][color=grass]EQUIPMENT]]");
+                TopLeftChar = '╔', // 201
+                TopRightChar = '╗', // 187
+                BottomLeftChar = '╚', // 200
+                BottomRightChar = '╝', // 188
+                TopChar = '═', // 205
+                BottomChar = '═',
+                LeftChar = '║', // 186
+                RightChar = '║'
+            });
+            layer.Print(-1, "[color=white][[INVENTORY]][/color][color=grass]EQUIPMENT]]");
         }
     }
 }

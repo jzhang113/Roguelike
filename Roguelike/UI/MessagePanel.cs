@@ -3,23 +3,16 @@ using Roguelike.Core;
 using System;
 using System.Collections.Generic;
 
-namespace Roguelike.Systems
+namespace Roguelike.UI
 {
-    public enum MessageLevel
-    {
-        Minimal,
-        Normal,
-        Verbose
-    }
-
     // Accepts messages from various systems and displays it in the message console. Also keeps a 
     // rolling history of messages that can be displayed.
-    public class MessageHandler
+    public class MessagePanel
     {
         private readonly int _maxSize;
         private readonly IList<string> _messages;
 
-        public MessageHandler(int maxSize)
+        public MessagePanel(int maxSize)
         {
             _maxSize = maxSize;
             _messages = new List<string>();
@@ -54,33 +47,28 @@ namespace Roguelike.Systems
         {
             // draw borders
             Terminal.Color(Colors.BorderColor);
-            layer.Put(0, 0, '╟'); // 199
-            layer.Put(layer.Width - 1, 0, '╢'); // 182
-            layer.Put(0, layer.Height - 1, '╩'); // 202
-            layer.Put(layer.Width - 1, layer.Height - 1, '╩'); // 202
-
-            for (int x = 1; x < layer.Width - 1; x++)
+            layer.DrawBorders(new BorderInfo
             {
-                layer.Put(x, 0, '─'); // 196
-                layer.Put(x, layer.Height - 1, '═'); // 205
-            }
-
-            for (int y = 1; y < layer.Height - 1; y++)
-            {
-                layer.Put(0, y, '║'); // 186
-                layer.Put(layer.Width - 1, y, '║');
-            }
+                TopLeftChar = '├', // 195
+                TopRightChar = '┤', // 180
+                BottomLeftChar = '╧', // 207
+                BottomRightChar = '╧',
+                TopChar = '─', // 196
+                BottomChar = '═', // 205
+                LeftChar = '│', // 179
+                RightChar = '│'
+            });
 
             Terminal.Color(Colors.Text);
-            layer.Print(0, "[[SYSTEM LOG]]", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(-1, "[[SYSTEM LOG]]", System.Drawing.ContentAlignment.TopCenter);
 
             // draw messages
-            int maxCount = Math.Min(_messages.Count, layer.Height - 2);
-            int yPos = layer.Height - 2;
+            int maxCount = Math.Min(_messages.Count, layer.Height - 1);
+            int yPos = layer.Height - 1;
 
             for (int i = 0; i < maxCount; i++)
             {
-                layer.Print(1, yPos, _messages[_messages.Count - i - 1]);
+                layer.Print(yPos, _messages[_messages.Count - i - 1]);
                 yPos--;
             }
         }
