@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.World
 {
-    internal abstract class MapGenerator
+    public abstract class MapGenerator
     {
         protected int Width { get; }
         protected int Height { get; }
