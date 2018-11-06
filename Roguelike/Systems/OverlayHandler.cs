@@ -54,7 +54,6 @@ namespace Roguelike.Systems
         {
             Terminal.Color(Colors.Text);
             Terminal.Composition(true);
-            layer.Print(1, DisplayText);
 
             for (int i = 0; i <= layer.Width; i++)
             {
@@ -73,6 +72,8 @@ namespace Roguelike.Systems
                     }
                 }
             }
+
+            Terminal.Composition(false);
         }
 
         public void ClearBackground()

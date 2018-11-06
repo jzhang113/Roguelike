@@ -11,7 +11,7 @@ namespace Roguelike.World
 {
     class JaggedMapGenerator : MapGenerator
     {
-        private const int _ROOM_SIZE = 5;
+        private const int _ROOM_SIZE = 3;
         private const int _ROOM_VARIANCE = 2;
         private const double _FILL_PERCENT = 0.05;
         private const double _LOOP_CHANCE = 0.15;
@@ -90,7 +90,11 @@ namespace Roguelike.World
                 }
             }
 
+            AsciiPrint();
+
             PostProcess();
+
+            AsciiPrint();
         }
 
         // Set up any special features on the level. After setup is complete, return the value the
@@ -154,11 +158,15 @@ namespace Roguelike.World
         }
 
         // Clean up the map by removing stray walls.
+        // TODO: fill in 1-tile holes without cutting the map
+        // TODO: identify and mark islands
+        // TODO: identify and mark peninsulas
         private void PostProcess()
         {
             // Sweep from top to bottom.
             for (int x = 1; x < Width - 1; x++)
             {
+                // Keep a running count of consecutive walls
                 // Start the wall count at an arbitrarily high number so walls near edges don't get
                 // removed unnecessarily.
                 int wallCount = 10;
@@ -171,14 +179,7 @@ namespace Roguelike.World
                     else
                     {
                         if (wallCount == 1)
-                        {
                             Map.Field[x, y - 1].Type = Data.TerrainType.Stone;
-                        }
-                        else if (wallCount == 2)
-                        {
-                            Map.Field[x, y - 1].Type = Data.TerrainType.Stone;
-                            Map.Field[x, y - 2].Type = Data.TerrainType.Stone;
-                        }
 
                         wallCount = 0;
                     }
@@ -198,14 +199,7 @@ namespace Roguelike.World
                     else
                     {
                         if (wallCount == 1)
-                        {
                             Map.Field[x - 1, y].Type = Data.TerrainType.Stone;
-                        }
-                        else if (wallCount == 2)
-                        {
-                            Map.Field[x - 1, y].Type = Data.TerrainType.Stone;
-                            Map.Field[x - 2, y].Type = Data.TerrainType.Stone;
-                        }
 
                         wallCount = 0;
                     }
@@ -411,6 +405,18 @@ namespace Roguelike.World
             }
 
             return adjacency;
+        }
+
+        private void AsciiPrint()
+        {
+            for (int i = 0; i < Map.Width; i++)
+            {
+                for (int j = 0; j < Map.Height; j++)
+                {
+                    Console.Write(Map.Field[i, j].IsWall ? '#' : '.');
+                }
+                Console.WriteLine();
+            }
         }
 
         private readonly struct MapVertex : IComparable<MapVertex>

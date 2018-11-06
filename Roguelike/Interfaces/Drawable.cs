@@ -58,7 +58,7 @@ namespace Roguelike.Interfaces
             if (background.HasValue)
             {
                 Terminal.Color(background.Value);
-                Terminal.Put(destX, destY, '█');
+                layer.Put(destX, destY, '█');
             }
 
             if (visible)
