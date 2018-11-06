@@ -105,6 +105,7 @@
     <Compile Include="Actions\IgniteAction.cs" />
     <Compile Include="Actions\MoveAction.cs" />
     <Compile Include="Actors\ActorParameters.cs" />
+    <Compile Include="Actors\Titan.cs" />
     <Compile Include="Animations\ExplosionAnimation.cs" />
     <Compile Include="Animations\HookAnimation.cs" />
     <Compile Include="Animations\IAnimation.cs" />

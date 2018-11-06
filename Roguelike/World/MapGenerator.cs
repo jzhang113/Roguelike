@@ -313,27 +313,18 @@ namespace Roguelike.World
                 Game.Player.Y = Rand.Next(1, Height - 1);
             }
             while (!Map.Field[Game.Player.X, Game.Player.Y].IsWalkable);
-
             Map.AddActor(Game.Player);
-            // Map.SetActorPosition(Player, playerX, playerY);
 
-            Systems.ActorGenerator.ActorType actorType = Systems.ActorGenerator.Generate(10, Rand);
-
-            for (int i = 0; i < 10; i++)
+            Actors.Titan titan = new Actors.Titan(new Actors.ActorParameters("Bob")
             {
-                Actors.Actor actor = Systems.ActorGenerator.Create(actorType);
-
-                actor.Parameters.Awareness = 10;
-                actor.Parameters.MaxHp = 50;
-                actor.Parameters.MaxMp = 30;
-
-                while (!Map.Field[actor.X, actor.Y].IsWalkable)
-                {
-                    actor.X = Rand.Next(1, Width - 1);
-                    actor.Y = Rand.Next(1, Height - 1);
-                }
-                Map.AddActor(actor);
-            }
+                Awareness = 10,
+                MaxHp = 250
+            })
+            {
+                X = Game.Player.X - 4,
+                Y = Game.Player.Y - 4
+            };
+            Map.AddActor(titan);
 
             Map.SetFire(Game.Player.X + 3, Game.Player.Y + 3);
         }

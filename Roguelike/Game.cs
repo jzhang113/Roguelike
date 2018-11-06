@@ -32,8 +32,8 @@ namespace Roguelike
 
         public static MapHandler Map => World.Map;
 
-        public static bool ShowEquip { get; set; }
-        public static bool ShowInfo { get; set; }
+        internal static bool ShowEquip { get; set; }
+        internal static bool ShowInfo { get; set; }
 
         private static LayerInfo _highlightLayer;
         private static LayerInfo _mapLayer;
