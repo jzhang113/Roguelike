@@ -6,7 +6,7 @@ using System;
 
 namespace Roguelike.State
 {
-    class UnequipState : ItemActionState
+    internal sealed class UnequipState : ItemActionState
     {
         private static readonly Lazy<UnequipState> _instance = new Lazy<UnequipState>(() => new UnequipState());
         public static UnequipState Instance => _instance.Value;

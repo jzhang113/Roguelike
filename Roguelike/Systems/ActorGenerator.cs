@@ -12,7 +12,7 @@ namespace Roguelike.Systems
     internal static class ActorGenerator
     {
         private static IList<ActorPart> PartList { get; }
-        
+
         // TODO: generator should be non-static and initialized with the world layout. Then create
         // can be called for each level (or region?) to create specific creatures
         static ActorGenerator()

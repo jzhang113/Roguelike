@@ -4,7 +4,7 @@ using System;
 namespace Roguelike.Utils
 {
     // Helper methods for calculating distances
-    static class Distance
+    public static class Distance
     {
         public static Dir GetNearestDirection(int x1, int y1, int x2, int y2)
         {

@@ -13,13 +13,13 @@ namespace Roguelike.Data
         Water
     }
 
-    struct TerrainProperty
+    internal struct TerrainProperty
     {
         public double MoveCost { get; set; }
         public Flammability Flammability { get; set; }
     }
 
-    static class TerrainExtensions
+    internal static class TerrainExtensions
     {
         private static readonly IDictionary<TerrainType, TerrainProperty> _terrainList;
         private static readonly IDictionary<TerrainType, Drawable> _drawableList;

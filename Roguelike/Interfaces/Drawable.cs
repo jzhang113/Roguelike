@@ -14,7 +14,7 @@ namespace Roguelike.Interfaces
 
         internal bool Activated { get; set; }
 
-        private bool _remember;
+        private readonly bool _remember;
         private int _rememberX;
         private int _rememberY;
 

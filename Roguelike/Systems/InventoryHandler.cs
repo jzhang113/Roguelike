@@ -25,35 +25,35 @@ namespace Roguelike.Systems
         }
 
         // Increments the item stack if it already exists or adds the item to inventory.
-        public void Add(ItemCount itemCount)
+        public void Add(ItemCount item)
         {
-            if (itemCount?.Item == null)
+            if (item?.Item == null)
                 return;
 
             bool found = false;
             foreach (ItemStack itemStack in _inventory)
             {
-                if (itemStack.Contains(itemCount.Item, out _))
+                if (itemStack.Contains(item.Item, out _))
                 {
                     found = true;
-                    itemStack.Add(itemCount.Item, itemCount.Count);
+                    itemStack.Add(item.Item, item.Count);
                     break;
                 }
             }
 
             if (!found)
-                _inventory.Add(new ItemStack(itemCount.Item, itemCount.Count));
+                _inventory.Add(new ItemStack(item.Item, item.Count));
         }
 
         // Deregister an Item from the Inventory.
-        public bool Remove(ItemCount itemCount)
+        public bool Remove(ItemCount item)
         {
-            if (itemCount?.Item == null)
+            if (item?.Item == null)
                 return false;
 
             foreach (ItemStack itemStack in _inventory)
             {
-                if (itemStack.Contains(itemCount.Item, out Item key))
+                if (itemStack.Contains(item.Item, out Item key))
                 {
                     itemStack.Remove(key);
 
@@ -88,8 +88,7 @@ namespace Roguelike.Systems
             Game.MessageHandler.AddMessage(
                 $"{itemCount.Item.Name} not found, can't split it",
                 MessageLevel.Verbose);
-            System.Diagnostics.Debug.Assert(
-                false,
+            System.Diagnostics.Debug.Fail(
                 $"Cannot split non-existant item, {itemCount.Item.Name}, from inventory");
             return null;
         }
@@ -99,17 +98,17 @@ namespace Roguelike.Systems
             _inventory.Clear();
         }
 
-        public bool Contains(ItemCount itemCount)
+        public bool Contains(ItemCount item)
         {
-            if (itemCount?.Item == null)
+            if (item?.Item == null)
                 return false;
 
-            return _inventory.Any(itemStack => itemStack.Contains(itemCount.Item, out _));
+            return _inventory.Any(itemStack => itemStack.Contains(item.Item, out _));
         }
 
         public void CopyTo(ItemCount[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            _inventory.SelectMany(itemStack => itemStack).ToList().CopyTo(array, arrayIndex);
         }
 
         public bool HasKey(char key)

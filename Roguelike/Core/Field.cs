@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Roguelike.Core
 {
     [Serializable]
-    class Field : IEnumerable<Tile>
+    internal class Field : IEnumerable<Tile>
     {
         private readonly Tile[] _field;
         private readonly int _width;

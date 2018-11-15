@@ -4,7 +4,7 @@ using System;
 
 namespace Roguelike.State
 {
-    class DropState : ItemActionState
+    internal sealed class DropState : ItemActionState
     {
         private static readonly Lazy<DropState> _instance = new Lazy<DropState>(() => new DropState());
         public static DropState Instance => _instance.Value;

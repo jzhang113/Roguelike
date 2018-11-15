@@ -29,7 +29,7 @@ namespace Roguelike.Items
             equipped.Equipment.Equip(this);
             Game.MessageHandler.AddMessage($"You wield a {Name}.");
         }
-        
+
         public void Unequip(IEquipped equipped)
         {
             System.Diagnostics.Debug.Assert(equipped != null);

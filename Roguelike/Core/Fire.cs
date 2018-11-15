@@ -43,9 +43,11 @@ namespace Roguelike.Core
             ProcessFire(Game.Map);
 
             if (Game.Map.TryGetActor(X, Y, out _))
+            {
                 return new ActionCommand(this,
-                    new IgniteAction(new TargetZone(TargetShape.Self)),
-                    Game.Map.Field[X, Y]);
+                   new IgniteAction(new TargetZone(TargetShape.Self)),
+                   Game.Map.Field[X, Y]);
+            }
 
             return new WaitCommand(this);
         }
@@ -67,7 +69,7 @@ namespace Roguelike.Core
                 stack.SetFire();
                 map.RemoveStackIfEmpty(X, Y);
             }
-            
+
             map.ComputeFov(X, Y, Constants.LIGHT_DECAY, false);
         }
 

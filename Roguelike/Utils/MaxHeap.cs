@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.Utils
 {
-    class MaxHeap<T> : ICollection<T> where T : IComparable<T>
+    public class MaxHeap<T> : ICollection<T> where T : IComparable<T>
     {
         private T[] _heap;
 
@@ -16,7 +16,7 @@ namespace Roguelike.Utils
             _heap = new T[size];
             Count = 0;
         }
-        
+
         public T Peek()
         {
             if (Count > 0)
@@ -64,28 +64,7 @@ namespace Roguelike.Utils
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
-            if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException(
-                    nameof(arrayIndex),
-                    "arrayIndex is less than 0.");
-            if (array.Rank > 1)
-                throw new ArgumentException("array is multidimensional.");
-            if (Count == 0)
-                return;
-            if (arrayIndex >= array.Length)
-                throw new ArgumentException(
-                    "arrayIndex is equal to or greater than the length of the array.");
-            if (Count > array.Length - arrayIndex)
-                throw new ArgumentException(
-                    "The number of elements in the source ICollection is greater than the" +
-                    " available space from arrayIndex to the end of the destination array.");
-
-            for (int i = 0; i < Count; i++)
-            {
-                array[arrayIndex + i] = _heap[i];
-            }
+            _heap.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(T item)

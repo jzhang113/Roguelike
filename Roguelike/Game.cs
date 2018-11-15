@@ -34,15 +34,16 @@ namespace Roguelike
 
         internal static bool ShowEquip { get; set; }
         internal static bool ShowInfo { get; set; }
+        internal static bool ShowQte { get; set; }
 
         private static LayerInfo _highlightLayer;
         private static LayerInfo _mapLayer;
-        private static LayerInfo _inventoryLayer;
+        private static LayerInfo _rightLayer;
         private static LayerInfo _fullConsole;
         private static LayerInfo _messageLayer;
         private static LayerInfo _statLayer;
-        private static LayerInfo _lookLayer;
-        private static LayerInfo _moveLayer;
+        private static LayerInfo _leftLayer;
+        private static LayerInfo _qteLayer;
 
         private static bool _exiting;
 
@@ -52,7 +53,7 @@ namespace Roguelike
             Option = options;
             Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
             VisualRandom = new PcgRandom(Random.Next());
-            
+
             if (!Terminal.Open())
             {
                 System.Diagnostics.Debug.WriteLine("Failed to initialize terminal");
@@ -60,19 +61,26 @@ namespace Roguelike
             }
 
             // main UI elements
-            _mapLayer = new LayerInfo("Map", 1,
-                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + 1,
-                Constants.MAPVIEW_WIDTH, Constants.MAPVIEW_HEIGHT);
-            _messageLayer = new LayerInfo("Message", 1,
-                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT + 2,
-                Constants.MAPVIEW_WIDTH, Constants.MESSAGE_HEIGHT);
             _statLayer = new LayerInfo("Stats", 1,
                 Constants.SIDEBAR_WIDTH + 2, 1,
                 Constants.MAPVIEW_WIDTH, Constants.STATUS_HEIGHT);
-            _lookLayer = new LayerInfo("Look", 1,
+            _mapLayer = new LayerInfo("Map", 1,
+                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + 1,
+                Constants.MAPVIEW_WIDTH, Constants.MAPVIEW_HEIGHT);
+            _qteLayer = new LayerInfo("QTE", 2,
+                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT - Constants.QTE_HEIGHT + 1,
+                Constants.MAPVIEW_WIDTH, Constants.QTE_HEIGHT);
+            _messageLayer = new LayerInfo("Message", 1,
+                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT + 2,
+                Constants.MAPVIEW_WIDTH, Constants.MESSAGE_HEIGHT);
+
+            // left panel for look and info
+            _leftLayer = new LayerInfo("Look", 1,
                 1, 1,
                 Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
-            _inventoryLayer = new LayerInfo("Inventory", 1,
+
+            // right panel for inventory and equipment
+            _rightLayer = new LayerInfo("Inventory", 1,
                 Constants.SIDEBAR_WIDTH + Constants.MAPVIEW_WIDTH + 3, 1,
                 Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
 
@@ -81,14 +89,9 @@ namespace Roguelike
                 _mapLayer.X, _mapLayer.Y,
                 _mapLayer.Width, _mapLayer.Height);
 
-            // alternate tab for inventory
-            _moveLayer = new LayerInfo("Moves", 2,
-                _inventoryLayer.X, _inventoryLayer.Y,
-                _inventoryLayer.Width, _inventoryLayer.Height);
-
             _fullConsole = new LayerInfo("Full", 10, 0, 0,
                 Constants.SCREEN_WIDTH + 2, Constants.SCREEN_HEIGHT + 2);
-            
+
             Terminal.Set($"window: size={Constants.SCREEN_WIDTH + 2}x{Constants.SCREEN_HEIGHT + 2}," +
                 $"cellsize=auto, title='{Config.GameName}';");
             Terminal.Set("font: ccc12x12.png, size = 12x12;");
@@ -99,16 +102,17 @@ namespace Roguelike
             StateHandler = new StateHandler(new Dictionary<Type, LayerInfo>
             {
                 [typeof(AnimationState)] =      _mapLayer,
-                [typeof(ApplyState)] =          _inventoryLayer,
+                [typeof(ApplyState)] =          _rightLayer,
                 [typeof(AutoexploreState)] =    _mapLayer,
-                [typeof(DropState)] =           _inventoryLayer,
-                [typeof(EquipState)] =          _inventoryLayer,
-                [typeof(InventoryState)] =      _inventoryLayer,
+                [typeof(DropState)] =           _rightLayer,
+                [typeof(EquipState)] =          _rightLayer,
+                [typeof(InventoryState)] =      _rightLayer,
                 [typeof(MenuState)] =           _fullConsole,
                 [typeof(NormalState)] =         _mapLayer,
+                [typeof(QteState)] =            _qteLayer,
                 [typeof(TargettingState)] =     _mapLayer,
                 [typeof(TextInputState)] =      _mapLayer,
-                [typeof(UnequipState)] =        _inventoryLayer
+                [typeof(UnequipState)] =        _rightLayer
             });
 
             MessageHandler = new MessagePanel(Config.MessageMaxCount);
@@ -209,16 +213,17 @@ namespace Roguelike
                 Map.Draw(_mapLayer);
                 MessageHandler.Draw(_messageLayer);
                 StatPanel.Draw(_statLayer);
+                _qteLayer.Clear();
 
                 if (ShowInfo)
-                    InfoPanel.Draw(_lookLayer);
+                    InfoPanel.Draw(_leftLayer);
                 else
-                    LookPanel.Draw(_lookLayer);
+                    LookPanel.Draw(_leftLayer);
 
                 if (ShowEquip)
-                    Player.Equipment.Draw(_inventoryLayer);
+                    Player.Equipment.Draw(_rightLayer);
                 else
-                    Player.Inventory.Draw(_inventoryLayer);
+                    Player.Inventory.Draw(_rightLayer);
             }
 
             StateHandler.Draw();

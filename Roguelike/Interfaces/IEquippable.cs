@@ -1,7 +1,7 @@
 ﻿namespace Roguelike.Interfaces
 {
     // Represents items that can be equipped.
-    interface IEquippable
+    public interface IEquippable
     {
         // Unequip existing items and equip this item.
         void Equip(IEquipped equipped);

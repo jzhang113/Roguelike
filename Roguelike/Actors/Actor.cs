@@ -98,6 +98,7 @@ namespace Roguelike.Actors
             Hp -= damage;
             return damage;
         }
+
         public int TakeHealing(int power)
         {
             int restore = Parameters.MaxHp - Hp;

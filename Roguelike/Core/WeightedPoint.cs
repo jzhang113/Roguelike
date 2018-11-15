@@ -42,8 +42,7 @@ namespace Roguelike.Core
             hashCode = hashCode * -1521134295 + base.GetHashCode();
             hashCode = hashCode * -1521134295 + X.GetHashCode();
             hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            hashCode = hashCode * -1521134295 + Weight.GetHashCode();
-            return hashCode;
+            return hashCode * -1521134295 + Weight.GetHashCode();
         }
 
         public static bool operator ==(WeightedPoint w1, WeightedPoint w2) =>

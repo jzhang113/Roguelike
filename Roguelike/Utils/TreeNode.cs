@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Roguelike.Utils
 {
     // Generic tree implementation
-    class TreeNode<T>
+    public class TreeNode<T>
     {
         public T Value { get; }
         public TreeNode<T> Parent { get; }

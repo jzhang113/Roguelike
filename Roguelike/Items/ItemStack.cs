@@ -8,7 +8,7 @@ using System.Linq;
 namespace Roguelike.Items
 {
     [Serializable]
-    class ItemStack : IEnumerable<ItemCount>
+    internal class ItemStack : IEnumerable<ItemCount>
     {
         public string Name { get; }
         public int Count { get; private set; }

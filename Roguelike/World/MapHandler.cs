@@ -247,8 +247,7 @@ namespace Roguelike.World
             int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
             {
-                System.Diagnostics.Debug.Assert(
-                    false, $"Could not split {itemCount.Item.Name} on the map.");
+                System.Diagnostics.Debug.Fail($"Could not split {itemCount.Item.Name} on the map.");
                 return null;
             }
 
@@ -429,12 +428,12 @@ namespace Roguelike.World
                 int e2 = 2 * err;
                 if (e2 > -dy)
                 {
-                    err = err - dy;
+                    err -= dy;
                     sourceX += sx;
                 }
                 if (e2 < dx)
                 {
-                    err = err + dx;
+                    err += dx;
                     sourceY += sy;
                 }
 
@@ -557,7 +556,7 @@ namespace Roguelike.World
                     double visiblePercent = (range.MaxAngle - currentAngle) / (2 * delta) + 0.5;
                     if (visiblePercent > 0)
                         tile.Light += (float)(visiblePercent * range.LightLevel);
-                    
+
                     if (setVisible)
                         tile.LosExists = true;
 
@@ -759,7 +758,7 @@ namespace Roguelike.World
                 origin.IsExplored = true;
                 Discovered.Add(origin);
             }
-            
+
             ComputeFov(Game.Player.X, Game.Player.Y, Constants.LIGHT_DECAY, true);
         }
 

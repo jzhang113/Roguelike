@@ -6,7 +6,7 @@ using Roguelike.Actors;
 namespace Roguelike.Interfaces
 {
     // Represents items that can be applied.
-    interface IUsable
+    public interface IUsable
     {
         // Action to perform.
         IAction ApplySkill { get; }

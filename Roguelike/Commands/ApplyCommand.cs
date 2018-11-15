@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Roguelike.Commands
 {
-    class ApplyCommand : ICommand
+    internal class ApplyCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost => Data.Constants.FULL_TURN;

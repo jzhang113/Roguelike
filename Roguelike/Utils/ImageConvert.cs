@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Roguelike.Utils
 {
-    class ImageConvert
+    internal static class ImageConvert
     {
         public static IEnumerable<ColorInfo> Convert(string filename, int maxWidth)
         {

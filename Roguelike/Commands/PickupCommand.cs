@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Roguelike.Commands
 {
-    class PickupCommand : ICommand
+    internal class PickupCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost => Data.Constants.HALF_TURN;

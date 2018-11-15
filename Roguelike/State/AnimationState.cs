@@ -6,6 +6,8 @@ namespace Roguelike.State
 {
     internal class AnimationState : IState
     {
+        public bool Nonblocking => true;
+
         private readonly IAnimation _animation;
 
         public AnimationState(IAnimation animation)
@@ -15,15 +17,15 @@ namespace Roguelike.State
 
         public ICommand HandleKeyInput(int key)
         {
-            throw new System.NotImplementedException();
+            return null;
         }
 
         public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            throw new System.NotImplementedException();
+            return null;
         }
 
-        public void Update()
+        public void Update(ICommand command)
         {
             if (!_animation.Done)
                 _animation.Update();

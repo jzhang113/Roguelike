@@ -5,7 +5,7 @@ namespace Roguelike.Core
 {
     // Provides the default behavior for Actors.
     // ReSharper disable once InconsistentNaming
-    static class SimpleAI
+    internal static class SimpleAI
     {
         // Monsters will wander randomly if awake and chase the Player if s/he is in their perception
         // range. If their health falls below a certain threshold, they will attempt to flee.
@@ -66,7 +66,7 @@ namespace Roguelike.Core
                     }
                 default:
                     // We should not be here
-                    System.Diagnostics.Debug.Assert(false);
+                    System.Diagnostics.Debug.Fail($"{monster.Name} in unknown state: {monster.State}");
                     return new WaitCommand(monster);
             }
         }

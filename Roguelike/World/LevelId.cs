@@ -41,8 +41,7 @@ namespace Roguelike.World
             hashCode = hashCode * -1521134295 + base.GetHashCode();
             hashCode = hashCode * -1521134295 + Name.GetHashCode();
             hashCode = hashCode * -1521134295 + RegionType.GetHashCode();
-            hashCode = hashCode * -1521134295 + Depth.GetHashCode();
-            return hashCode;
+            return hashCode * -1521134295 + Depth.GetHashCode();
         }
 
         public static bool operator ==(LevelId l1, LevelId l2) =>

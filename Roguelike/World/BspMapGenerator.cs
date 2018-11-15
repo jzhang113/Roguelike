@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Roguelike.World
 {
-    class BspMapGenerator : MapGenerator
+    internal class BspMapGenerator : MapGenerator
     {
         private const int _MIN_ROOM_SIZE = 4;
         private const int _MAX_ROOM_SIZE = 15;

@@ -10,7 +10,7 @@ namespace Roguelike.Data
         High
     }
 
-    static class FlammabilityExtensions
+    internal static class FlammabilityExtensions
     {
         public static double ToIgniteChance(this Flammability flammability)
         {

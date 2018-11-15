@@ -2,7 +2,7 @@
 
 namespace Roguelike.Utils
 {
-    static class StringExtensions
+    internal static class StringExtensions
     {
         public static string Pluralize(this string name)
         {

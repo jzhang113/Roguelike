@@ -7,8 +7,10 @@ using System.Text;
 
 namespace Roguelike.State
 {
-    class TextInputState : IState
+    internal class TextInputState : IState
     {
+        public bool Nonblocking => false;
+
         private readonly StringBuilder _inputBuffer;
         private readonly Func<string, ICommand> _createCommand;
 
@@ -45,12 +47,8 @@ namespace Roguelike.State
             return null;
         }
 
-        public void Update()
+        public void Update(ICommand command)
         {
-            ICommand command = Game.StateHandler.HandleInput();
-            if (command == null)
-                return;
-
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
             Game.StateHandler.PopState();

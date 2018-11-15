@@ -8,6 +8,8 @@ namespace Roguelike.State
 {
     internal abstract class ItemActionState : IState
     {
+        public bool Nonblocking => false;
+
         public virtual ICommand HandleKeyInput(int key)
         {
             char keyChar = key.ToChar();
@@ -30,12 +32,8 @@ namespace Roguelike.State
 
         protected abstract ICommand ResolveInput(ItemCount itemCount);
 
-        public virtual void Update()
+        public virtual void Update(ICommand command)
         {
-            ICommand command = Game.StateHandler.HandleInput();
-            if (command == null)
-                return;
-
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
             Game.StateHandler.PopState();

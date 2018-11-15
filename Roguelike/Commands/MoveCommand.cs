@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Roguelike.Commands
 {
-    class MoveCommand : ICommand
+    internal class MoveCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost => Data.Constants.FULL_TURN;

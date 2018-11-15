@@ -12,7 +12,7 @@ namespace Roguelike.Systems
         private ActionNode Current { get; set; }
 
         private static int _printLine; // helper variable for RecursivePrint
-        
+
         public MovesetHandler(ActionNode starter)
         {
             Root = starter;

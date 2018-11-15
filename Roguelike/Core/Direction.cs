@@ -108,8 +108,7 @@ namespace Roguelike.Core
             var hashCode = 1861411795;
             hashCode = hashCode * -1521134295 + base.GetHashCode();
             hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            return hashCode;
+            return hashCode * -1521134295 + Y.GetHashCode();
         }
 
         public static bool operator ==(Dir dir1, Dir dir2) =>

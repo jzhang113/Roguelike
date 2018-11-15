@@ -5,7 +5,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Commands
 {
-    class UnequipCommand : ICommand
+    internal class UnequipCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost => Data.Constants.FULL_TURN;

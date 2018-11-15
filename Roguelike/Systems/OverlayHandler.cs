@@ -13,8 +13,8 @@ namespace Roguelike.Systems
         private bool[,] SetBackground { get; }
         private bool[,] SetForeground { get; }
 
-        private int _viewWidth;
-        private int _viewHeight;
+        private readonly int _viewWidth;
+        private readonly int _viewHeight;
 
         public OverlayHandler(int width, int height)
         {

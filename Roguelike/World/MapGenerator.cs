@@ -288,7 +288,6 @@ namespace Roguelike.World
                 Count = 1
             });
 
-
             Item planks = new Item(
                     new ItemParameter("plank", MaterialType.Wood), Swatch.DbWood, '\\')
             {

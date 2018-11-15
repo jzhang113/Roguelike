@@ -5,7 +5,7 @@ using Roguelike.Interfaces;
 
 namespace Roguelike.Actions
 {
-    class IgniteAction : IAction
+    internal class IgniteAction : IAction
     {
         public TargetZone Area { get; }
         public int Speed => Data.Constants.FULL_TURN;

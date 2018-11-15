@@ -10,6 +10,8 @@ namespace Roguelike.State
 {
     internal class TargettingState : IState
     {
+        public bool Nonblocking => false;
+
         private readonly Actor _source;
         private readonly TargetZone _targetZone;
         private readonly Func<IEnumerable<Tile>, ICommand> _callback;
@@ -146,7 +148,7 @@ namespace Roguelike.State
                     MoveTarget(Direction.E);
                     break;
                 case TargettingInput.NextActor:
-                    if (_targettableActors.Any())
+                    if (_targettableActors.Count > 0)
                     {
                         Actor nextActor = _targettableActors[++_index % _targettableActors.Count];
                         _targetX = nextActor.X;
@@ -238,17 +240,13 @@ namespace Roguelike.State
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, Colors.Target);
             }
-            
+
             Game.OverlayHandler.Set(_targetX, _targetY, Colors.Cursor);
             return targets;
         }
 
-        public void Update()
+        public void Update(ICommand command)
         {
-            ICommand command = Game.StateHandler.HandleInput();
-            if (command == null)
-                return;
-
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
             Game.StateHandler.PopState();

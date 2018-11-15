@@ -156,11 +156,15 @@ namespace Roguelike.World
                 // Zero corresponds to an unfilled tile, so we need to reduce the ID by 1.
                 int roomID = occupied[tile.X, tile.Y] - 1;
                 if (roomID >= 0)
+                {
                     CreateRoomWithoutBorder(roomList[roomID]);
+                }
                 else
+                {
                     // Map may not be fully tiled, so clear out any untouched squares to avoid
                     // disconnected regions.
                     tile.Type = Data.TerrainType.Stone;
+                }
             }
         }
 

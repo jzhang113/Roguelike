@@ -123,13 +123,12 @@ namespace Roguelike.World
                 parentId = keyValuePair.Key;
                 parentLevel = keyValuePair.Value;
             }
-
             else if (region.Constraints.Avoid != null)
             {
                 var remaining = world
                     .Where(kvp => !region.Constraints.Avoid.Contains(kvp.Key.RegionType))
                     .ToList();
-                var keyValuePair = remaining.ElementAt(Game.Random.Next(remaining.Count));
+                var keyValuePair = remaining[Game.Random.Next(remaining.Count)];
                 parentId = keyValuePair.Key;
                 parentLevel = keyValuePair.Value;
             }
@@ -212,7 +211,9 @@ namespace Roguelike.World
             {
                 if (kvp.Key.RegionType == partialId.RegionType
                     && kvp.Key.Depth >= partialId.MinDepth)
+                {
                     return kvp;
+                }
             }
 
             // TODO: handle parent region not added yet

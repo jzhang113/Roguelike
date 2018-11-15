@@ -32,13 +32,16 @@ namespace Roguelike.Systems
             _states.Push(NormalState.Instance);
         }
 
-        public ICommand HandleInput()
+        private ICommand HandleInput()
         {
-            // TODO: non-blocking input?
             IState currentState = _states.Peek();
 
             if (!Terminal.HasInput())
-                return null;
+            {
+                return currentState.Nonblocking
+                   ? currentState.HandleKeyInput(Terminal.TK_INPUT_NONE)
+                   : null;
+            }
 
             int key = Terminal.Read();
             if (key == Terminal.TK_CLOSE)
@@ -85,9 +88,17 @@ namespace Roguelike.Systems
         public void Update()
         {
             if (_states.Count == 0)
+            {
                 Game.Exit();
+            }
             else
-                _states.Peek().Update();
+            {
+                IState currentState = _states.Peek();
+                ICommand command = HandleInput();
+
+                if (command != null || currentState.Nonblocking)
+                    currentState.Update(command);
+            }
         }
 
         public void Draw()

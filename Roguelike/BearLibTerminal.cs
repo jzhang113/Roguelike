@@ -170,15 +170,15 @@ namespace BearLib
         // Input result codes for terminal_read function.
         TK_INPUT_NONE       =    0,
         TK_INPUT_CANCELLED  =   -1;
-        
+
         private static string Format(string text, object[] args)
         {
-        	if (args != null && args.Length > 0)
+        	if (args?.Length > 0)
         		return string.Format(text, args);
         	else
         		return text;
         }
-        
+
         private static int LibraryAlignmentFromContentAlignment(ContentAlignment alignment)
         {
             switch (alignment)
@@ -233,17 +233,15 @@ namespace BearLib
                         PixelFormat.Format32bppArgb
                     );
                     bitmaps[bitmap] = data;
-                    args[i] = string.Format("0x{0:X}", (System.UInt64)data.Scan0.ToInt64());
+                    args[i] = string.Format("0x{0:X}", (ulong)data.Scan0.ToInt64());
                 }
-                else if (args[i] is Size)
+                else if (args[i] is Size size)
                 {
-                    Size size = (Size)args[i];
                     args[i] = string.Format("{0}x{1}", size.Width, size.Height);
                 }
-                else if (args[i] is bool)
+                else if (args[i] is bool value)
                 {
-                    bool value = (bool)args[i];
-                    args[i] = value? "true": "false";
+                    args[i] = value ? "true" : "false";
                 }
             }
             bool result = Set(string.Format(options, args));
@@ -332,7 +330,7 @@ namespace BearLib
         }
 
         [DllImport("BearLibTerminal.dll", EntryPoint = "terminal_put_ext", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void PutExtImpl(int x, int y, int dx, int dy, int code, [MarshalAs(UnmanagedType.LPArray)]System.Int32[] corners);
+        private static extern void PutExtImpl(int x, int y, int dx, int dy, int code, [MarshalAs(UnmanagedType.LPArray)]int[] corners);
 
         public static void PutExt(int x, int y, int dx, int dy, int code)
         {
@@ -346,17 +344,17 @@ namespace BearLib
 
         public static void PutExt(int x, int y, int dx, int dy, char code)
         {
-            PutExtImpl(x, y, dx, dy, (int)code, null);
+            PutExtImpl(x, y, dx, dy, code, null);
         }
 
         public static void PutExt(Point location, Point offset, char code)
         {
-            PutExtImpl(location.X, location.Y, offset.X, offset.Y, (int)code, null);
+            PutExtImpl(location.X, location.Y, offset.X, offset.Y, code, null);
         }
 
         public static void PutExt(int x, int y, int dx, int dy, int code, Color[] corners)
         {
-            System.Int32[] values = new System.Int32[4];
+            int[] values = new int[4];
             for (int i=0; i<4; i++) values[i] = corners[i].ToArgb();
             PutExtImpl(x, y, dx, dy, code, values);
         }
@@ -432,53 +430,49 @@ namespace BearLib
 
         [DllImport("BearLibTerminal.dll", CharSet = CharSet.Unicode, EntryPoint = "terminal_print_ext16", CallingConvention = CallingConvention.Cdecl)]
         private static extern void PrintImpl(int x, int y, int w, int h, int align, string text, out int out_w, out int out_h);
-        
+
         public static Size Print(Rectangle layout, ContentAlignment alignment, string text, params object[] args)
         {
-        	int width, height;
-        	PrintImpl(layout.X, layout.Y, layout.Width, layout.Height, LibraryAlignmentFromContentAlignment(alignment), Format(text, args), out width, out height);
-        	return new Size(width, height);
+            PrintImpl(layout.X, layout.Y, layout.Width, layout.Height, LibraryAlignmentFromContentAlignment(alignment), Format(text, args), out int width, out int height);
+            return new Size(width, height);
         }
-        
+
         public static Size Print(Rectangle layout, string text, params object[] args)
         {
         	return Print(layout, ContentAlignment.TopLeft, text, args);
         }
-        
+
         public static Size Print(Point location, ContentAlignment alignment, string text, params object[] args)
         {
         	return Print(location.X, location.Y, alignment, text, args);
         }
-        
+
         public static Size Print(Point location, string text, params object[] args)
         {
         	return Print(location.X, location.Y, text, args);
         }
-        
+
         public static Size Print(int x, int y, ContentAlignment alignment, string text, params object[] args)
         {
-        	int width, height;
-        	PrintImpl(x, y, 0, 0, LibraryAlignmentFromContentAlignment(alignment), Format(text, args), out width, out height);
-        	return new Size(width, height);
+            PrintImpl(x, y, 0, 0, LibraryAlignmentFromContentAlignment(alignment), Format(text, args), out int width, out int height);
+            return new Size(width, height);
         }
-        
+
         public static Size Print(int x, int y, string text, params object[] args)
         {
-        	int width, height;
-        	PrintImpl(x, y, 0, 0, 0, Format(text, args), out width, out height);
-        	return new Size(width, height);
-        }  
+            PrintImpl(x, y, 0, 0, 0, Format(text, args), out int width, out int height);
+            return new Size(width, height);
+        }
 
         [DllImport("BearLibTerminal.dll", CharSet = CharSet.Unicode, EntryPoint = "terminal_measure_ext16", CallingConvention = CallingConvention.Cdecl)]
         private static extern void MeasureImpl(int width, int height, string text, out int out_w, out int out_h);
-        
+
         public static Size Measure(Size bbox, string text, params object[] args)
         {
-        	int width, height;
-        	MeasureImpl(bbox.Width, bbox.Height, Format(text, args), out width, out height);
-        	return new Size(width, height);
+            MeasureImpl(bbox.Width, bbox.Height, Format(text, args), out int width, out int height);
+            return new Size(width, height);
         }
-        
+
         public static Size Measure(string text, params object[] args)
         {
         	return Measure(new Size(), text, args);
@@ -544,7 +538,7 @@ namespace BearLib
             return s == "true";
         }
 
-        public static T Get<T>(string name, T default_value = default(T))
+        public static T Get<T>(string name, T default_value = default)
         {
             string result_str = Get(name);
             if (result_str.Length == 0)
@@ -556,7 +550,6 @@ namespace BearLib
                 try
                 {
                     Type type = typeof(T);
-                    
                     if (type == typeof(Size))
                     {
                         return (T)ParseSize(result_str);

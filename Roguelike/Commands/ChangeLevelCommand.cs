@@ -4,7 +4,7 @@ using Roguelike.World;
 
 namespace Roguelike.Commands
 {
-    class ChangeLevelCommand : ICommand
+    internal class ChangeLevelCommand : ICommand
     {
         public int EnergyCost => 0;
         public IAnimation Animation => null;

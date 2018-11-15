@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Roguelike.Actions
 {
-    class HookAction : IAction
+    internal class HookAction : IAction
     {
         public TargetZone Area { get; }
         public int Speed => Data.Constants.FULL_TURN;
@@ -53,7 +53,7 @@ namespace Roguelike.Actions
                     Animation = new HookAnimation(sourceActor, collisionPath, true, actor);
                     Animation.Complete += (sender, args) =>
                     {
-                        Tile depositTile = collisionPath.First();
+                        Tile depositTile = collisionPath[0];
                         Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
                         Game.Map.Refresh();
                     };

@@ -37,6 +37,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
+    <CodeAnalysisRuleSet>Roguelike.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,6 +47,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>Roguelike.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Extensions.FileProviders.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -151,6 +153,7 @@
     <Compile Include="Core\MenuButton.cs" />
     <Compile Include="State\MenuState.cs" />
     <Compile Include="State\NormalState.cs" />
+    <Compile Include="State\QteState.cs" />
     <Compile Include="State\TargettingState.cs" />
     <Compile Include="State\TextInputState.cs" />
     <Compile Include="State\UnequipState.cs" />
@@ -160,6 +163,7 @@
     <Compile Include="Systems\ActorGenerator.cs" />
     <Compile Include="Systems\MovesetHandler.cs" />
     <Compile Include="UI\InfoPanel.cs" />
+    <Compile Include="UI\QtePanel.cs" />
     <Compile Include="UI\StatPanel.cs" />
     <Compile Include="Utils\ColorExtensions.cs" />
     <Compile Include="Utils\ColorInfo.cs" />
@@ -255,6 +259,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Roguelike.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ccc12x12.png">

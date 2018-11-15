@@ -3,7 +3,7 @@ using System;
 
 namespace Roguelike.Utils
 {
-    static class RandomExtensions
+    public static class RandomExtensions
     {
         public static double NextNormal(this PcgRandom rand, double mean, double variance)
         {

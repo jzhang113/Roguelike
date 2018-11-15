@@ -5,7 +5,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Commands
 {
-    class WaitCommand : ICommand
+    internal class WaitCommand : ICommand
     {
         public ISchedulable Source { get; }
         public int EnergyCost { get; }

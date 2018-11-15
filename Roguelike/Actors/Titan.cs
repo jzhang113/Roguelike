@@ -13,7 +13,7 @@ namespace Roguelike.Actors
     {
         public EquipmentHandler Equipment { get; }
 
-        private IList<IAction> _attacks;
+        private readonly IList<IAction> _attacks;
         private int _current;
 
         public Titan(ActorParameters parameters) : base(parameters, Swatch.DbBlood, 'T')

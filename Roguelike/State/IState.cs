@@ -5,6 +5,8 @@ namespace Roguelike.State
 {
     public interface IState
     {
+        bool Nonblocking { get; }
+
         // Handle keyboard inputs.
         ICommand HandleKeyInput(int key);
 
@@ -12,7 +14,7 @@ namespace Roguelike.State
         ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick);
 
         // Update state information.
-        void Update();
+        void Update(ICommand command);
 
         // Draw to the screen.
         void Draw(LayerInfo layer);

@@ -5,7 +5,7 @@ using System;
 namespace Roguelike.Core
 {
     [Serializable]
-    class SaveObject
+    internal class SaveObject
     {
         public IState GameState { get; set; }
 

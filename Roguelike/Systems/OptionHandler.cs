@@ -3,7 +3,7 @@ using System;
 
 namespace Roguelike.Systems
 {
-    static class OptionHandler
+    internal static class OptionHandler
     {
         // Parse command line arguments
         public static Options ParseOptions(string[] args)

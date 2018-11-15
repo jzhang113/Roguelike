@@ -5,7 +5,7 @@ using Roguelike.Systems;
 
 namespace Roguelike.Commands
 {
-    class DropCommand : ICommand
+    internal class DropCommand : ICommand
     {
         public Actor Source { get; }
         public int EnergyCost => 0;

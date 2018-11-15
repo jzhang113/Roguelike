@@ -2,7 +2,7 @@
 {
     public enum ActorState
     {
-        Sleep, 
+        Sleep,
         Wander,
         Chase,
         Flee,

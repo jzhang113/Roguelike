@@ -6,6 +6,8 @@ namespace Roguelike.State
 {
     internal class MenuState : IState
     {
+        public bool Nonblocking => false;
+
         private readonly IEnumerable<MenuButton> _buttons;
 
         public MenuState(IEnumerable<MenuButton> buttons)
@@ -30,9 +32,9 @@ namespace Roguelike.State
             return null;
         }
 
-        public void Update()
+        public void Update(ICommand command)
         {
-            Game.StateHandler.HandleInput();
+            // TODO: do menu things
         }
 
         public void Draw(LayerInfo layer)

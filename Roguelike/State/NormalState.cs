@@ -18,6 +18,8 @@ namespace Roguelike.State
         private static readonly Lazy<NormalState> _instance = new Lazy<NormalState>(() => new NormalState());
         public static NormalState Instance => _instance.Value;
 
+        public bool Nonblocking => false;
+
         private NormalState()
         {
         }
@@ -217,10 +219,10 @@ namespace Roguelike.State
             return null;
         }
 
-        public void Update()
+        public void Update(ICommand command)
         {
             // Game.OverlayHandler.ClearForeground();
-            Game.Player.NextCommand = Game.StateHandler.HandleInput();
+            Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
         }
 

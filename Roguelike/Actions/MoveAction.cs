@@ -7,7 +7,7 @@ using System;
 namespace Roguelike.Actions
 {
     [Serializable]
-    class MoveAction : IAction
+    internal class MoveAction : IAction
     {
         public TargetZone Area { get; }
         public int Speed => Data.Constants.FULL_TURN;

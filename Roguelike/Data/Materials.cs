@@ -14,14 +14,14 @@ namespace Roguelike.Data
         Flesh
     }
 
-    struct MaterialProperty
+    internal struct MaterialProperty
     {
         // Density measured in kg/m^3
         public int Density { get; set; }
         public Flammability Flammability { get; set; }
     }
 
-    static class MaterialExtensions
+    internal static class MaterialExtensions
     {
         private static readonly IDictionary<MaterialType, MaterialProperty> _materialList;
 

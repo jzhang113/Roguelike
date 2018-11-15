@@ -11,9 +11,9 @@ namespace Roguelike.State
         private static readonly Lazy<AutoexploreState> _instance = new Lazy<AutoexploreState>(() => new AutoexploreState());
         public static AutoexploreState Instance => _instance.Value;
 
-        private AutoexploreState()
-        {
-        }
+        public bool Nonblocking => true;
+
+        private AutoexploreState() { }
 
         public ICommand HandleKeyInput(int key)
         {
@@ -35,8 +35,10 @@ namespace Roguelike.State
             }
 
             Actor actor = null;
-            if (Game.Map.Field.Where(tile => tile.IsVisible)
-                .Any(tile => Game.Map.TryGetActor(tile.X, tile.Y, out actor) && !(actor is Player)))
+            if (Game.Map.Field.Any(tile =>
+                    tile.IsVisible &&
+                    Game.Map.TryGetActor(tile.X, tile.Y, out actor) &&
+                    !(actor is Player)))
             {
                 Game.MessageHandler.AddMessage($"You see a {actor.Name}");
                 Game.StateHandler.PopState();
@@ -64,12 +66,8 @@ namespace Roguelike.State
             return null;
         }
 
-        public void Update()
+        public void Update(ICommand command)
         {
-            ICommand command = Game.StateHandler.HandleInput();
-            if (command == null)
-                return;
-
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
         }
