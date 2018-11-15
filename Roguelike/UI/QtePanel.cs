@@ -46,10 +46,13 @@ namespace Roguelike.UI
             }
 
             // draw moving bar
+            int pos = (int)current;
+            int offset = (int)((current - pos) * Terminal.State(Terminal.TK_CELL_WIDTH));
+
             Terminal.Color(Swatch.DbBlood);
-            Terminal.Composition(true);
-            layer.Put((int)current, height, '▓'); // 178
-            Terminal.Composition(false);
+            Terminal.Layer(layer.Z + 1);
+            Terminal.PutExt(layer.X + xOffset + pos, layer.Y + height, offset, 0, '█'); // 178
+            Terminal.Layer(layer.Z);
         }
     }
 }

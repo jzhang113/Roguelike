@@ -9,7 +9,7 @@ namespace Roguelike.State
 {
     internal class QteState : IState
     {
-        private const int _WIDTH = Constants.MAPVIEW_WIDTH - 2;
+        private const int _WIDTH = 32;
         private const int _PADDING = 2;
 
         public bool Nonblocking => true;
@@ -41,7 +41,7 @@ namespace Roguelike.State
         {
             // TODO: need a new system to deal with out of turn actions
             if (command == null && _current < _WIDTH)
-                _current += 0.8f;
+                _current += 0.4f;
             else
                 Game.StateHandler.PopState();
         }

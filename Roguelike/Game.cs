@@ -67,7 +67,7 @@ namespace Roguelike
             _mapLayer = new LayerInfo("Map", 1,
                 Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + 1,
                 Constants.MAPVIEW_WIDTH, Constants.MAPVIEW_HEIGHT);
-            _qteLayer = new LayerInfo("QTE", 2,
+            _qteLayer = new LayerInfo("QTE", 3,
                 Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT - Constants.QTE_HEIGHT + 1,
                 Constants.MAPVIEW_WIDTH, Constants.QTE_HEIGHT);
             _messageLayer = new LayerInfo("Message", 1,
@@ -85,11 +85,11 @@ namespace Roguelike
                 Constants.SIDEBAR_WIDTH, Constants.SCREEN_HEIGHT);
 
             // overlay over map
-            _highlightLayer = new LayerInfo("Highlight", 2,
+            _highlightLayer = new LayerInfo("Highlight", 3,
                 _mapLayer.X, _mapLayer.Y,
                 _mapLayer.Width, _mapLayer.Height);
 
-            _fullConsole = new LayerInfo("Full", 10, 0, 0,
+            _fullConsole = new LayerInfo("Full", 11, 0, 0,
                 Constants.SCREEN_WIDTH + 2, Constants.SCREEN_HEIGHT + 2);
 
             Terminal.Set($"window: size={Constants.SCREEN_WIDTH + 2}x{Constants.SCREEN_HEIGHT + 2}," +
