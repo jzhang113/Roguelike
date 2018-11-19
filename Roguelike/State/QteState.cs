@@ -1,10 +1,9 @@
 ﻿using BearLib;
+using Roguelike.Animations;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.UI;
 using System;
-using System.Drawing;
-using Roguelike.Utils;
 
 namespace Roguelike.State
 {
@@ -17,11 +16,8 @@ namespace Roguelike.State
 
         private readonly QtePanel _panel;
         private float _current;
-        private int _left;
-        private int _right;
-
-        private int _ticks;
-        private bool _done;
+        private readonly int _left;
+        private readonly int _right;
 
         public QteState()
         {
@@ -31,9 +27,6 @@ namespace Roguelike.State
             _right = mid + 2;
             _panel = new QtePanel(_WIDTH, 1, _left, _right);
             _current = 0;
-
-            _ticks = 20;
-            _done = false;
         }
 
         public ICommand HandleKeyInput(int key)
@@ -41,7 +34,6 @@ namespace Roguelike.State
             // TODO: proper command returned should by fixed by reaction system
             if (key != Terminal.TK_INPUT_NONE)
             {
-                _done = true;
                 return new WaitCommand(Game.Player);
             }
             else
@@ -62,35 +54,23 @@ namespace Roguelike.State
         public void Update(ICommand command)
         {
             // TODO: need a new system to deal with out of turn actions
-            if (command == null && _current < _WIDTH && !_done)
+            if (command == null && _current < _WIDTH)
             {
                 // TODO: customize speed
                 _current += 0.3f;
             }
             else
             {
-                if (_ticks <= 0)
-                    Game.StateHandler.PopState();
-                else
-                    _ticks--;
+                Game.StateHandler.PopState();
+
+                var color = _current > _left && _current < _right ? Swatch.DbGrass : Swatch.DbBlood;
+                Game.StateHandler.PushState(new AnimationState(new QteFlash(_panel, color)));
             }
         }
 
         public void Draw(LayerInfo layer)
         {
-            if (!_done)
-                _panel.Draw(layer, _current);
-            else
-            {
-                if (_current > _left && _current < _right)
-                {
-                    _panel.Draw(layer, Colors.Grass.Blend(Color.Black, _ticks / (double)20));
-                }
-                else
-                {
-                    _panel.Draw(layer, Swatch.DbBlood.Blend(Color.Black, _ticks / (double)20));
-                }
-            }
+            _panel.Draw(layer, _current);
         }
     }
 }
