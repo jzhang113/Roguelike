@@ -115,7 +115,6 @@
     <Compile Include="Animations\ExplosionAnimation.cs" />
     <Compile Include="Animations\HookAnimation.cs" />
     <Compile Include="Animations\IAnimation.cs" />
-    <Compile Include="Animations\QteFlash.cs" />
     <Compile Include="Animations\SpinAnimation.cs" />
     <Compile Include="Animations\TrailAnimation.cs" />
     <Compile Include="BearLibTerminal.cs" />
@@ -158,7 +157,6 @@
     <Compile Include="Core\MenuButton.cs" />
     <Compile Include="State\MenuState.cs" />
     <Compile Include="State\NormalState.cs" />
-    <Compile Include="State\QteState.cs" />
     <Compile Include="State\TargettingState.cs" />
     <Compile Include="State\TextInputState.cs" />
     <Compile Include="State\UnequipState.cs" />
@@ -168,7 +166,6 @@
     <Compile Include="Systems\ActorGenerator.cs" />
     <Compile Include="Systems\MovesetHandler.cs" />
     <Compile Include="UI\InfoPanel.cs" />
-    <Compile Include="UI\QtePanel.cs" />
     <Compile Include="UI\StatPanel.cs" />
     <Compile Include="Utils\ColorExtensions.cs" />
     <Compile Include="Utils\ColorInfo.cs" />

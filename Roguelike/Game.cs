@@ -43,7 +43,6 @@ namespace Roguelike
         private static LayerInfo _messageLayer;
         private static LayerInfo _statLayer;
         private static LayerInfo _leftLayer;
-        private static LayerInfo _qteLayer;
 
         private static bool _exiting;
 
@@ -67,9 +66,6 @@ namespace Roguelike
             _mapLayer = new LayerInfo("Map", 1,
                 Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + 1,
                 Constants.MAPVIEW_WIDTH, Constants.MAPVIEW_HEIGHT);
-            _qteLayer = new LayerInfo("QTE", 3,
-                Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT - Constants.QTE_HEIGHT + 1,
-                Constants.MAPVIEW_WIDTH, Constants.QTE_HEIGHT);
             _messageLayer = new LayerInfo("Message", 1,
                 Constants.SIDEBAR_WIDTH + 2, Constants.STATUS_HEIGHT + Constants.MAPVIEW_HEIGHT + 2,
                 Constants.MAPVIEW_WIDTH, Constants.MESSAGE_HEIGHT);
@@ -109,7 +105,6 @@ namespace Roguelike
                 [typeof(InventoryState)] =      _rightLayer,
                 [typeof(MenuState)] =           _fullConsole,
                 [typeof(NormalState)] =         _mapLayer,
-                [typeof(QteState)] =            _qteLayer,
                 [typeof(TargettingState)] =     _mapLayer,
                 [typeof(TextInputState)] =      _mapLayer,
                 [typeof(UnequipState)] =        _rightLayer
@@ -213,7 +208,6 @@ namespace Roguelike
                 Map.Draw(_mapLayer);
                 MessageHandler.Draw(_messageLayer);
                 StatPanel.Draw(_statLayer);
-                _qteLayer.Clear();
 
                 if (ShowInfo)
                     InfoPanel.Draw(_leftLayer);

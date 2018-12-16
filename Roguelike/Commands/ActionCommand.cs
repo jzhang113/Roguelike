@@ -44,7 +44,6 @@ namespace Roguelike.Commands
                 if (Game.Map.TryGetActor(tile.X, tile.Y, out Actors.Actor actor) && actor == Game.Player)
                 {
                     // TODO: implement a general reaction system
-                    Game.StateHandler.PushState(new State.QteState());
                 }
 
                 _action.Activate(Source, tile);
