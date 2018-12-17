@@ -9,7 +9,7 @@ using TriangleNet.Meshing;
 
 namespace Roguelike.World
 {
-    internal enum EndRooms
+    internal enum EndType
     {
         None,
         Few,
@@ -27,6 +27,8 @@ namespace Roguelike.World
         private const double _FILL_PERCENT = 0.05;
         private const double _LOOP_CHANCE = 0.15;
 
+        private const EndType _END_TYPE = EndType.None;
+
         public JaggedMapGenerator(int width, int height, IEnumerable<LevelId> exits, PcgRandom random)
             : base(width, height, exits, random)
         {
@@ -36,19 +38,22 @@ namespace Roguelike.World
         {
             // Maintain a list of points bordering the current list of rooms so we can attach
             // more rooms. Also track of the facing of the wall the point comes from.
-            IList<(int x, int y)> openPoints = new List<(int x, int y)>();
+            IList<int> openPoints = new List<int>();
 
             // Also keep track of the rooms and where they are.
-            IList<Room> roomList = new List<Room>();
+            IList<Room> initialRooms = new List<Room>();
             int[,] occupied = new int[Width, Height];
 
             // Set up the initial placement of the map. Include special features, if any.
-            int counter = InitialPlacement(roomList, openPoints, ref occupied);
+            int counter = InitialPlacement(null, initialRooms, openPoints, ref occupied);
+            IList<Room> allRooms = new List<Room>(initialRooms);
 
             while (openPoints.Count > 0)
             {
                 // Choose a random point to create a room around;
-                (int availX, int availY) = openPoints[Rand.Next(openPoints.Count)];
+                int index = openPoints[Rand.Next(openPoints.Count)];
+                int availX = index % Width;
+                int availY = index / Width;
 
                 // Fit a room around the point as best as possible. AdjustRoom should avoid most
                 // collisions between rooms.
@@ -58,16 +63,23 @@ namespace Roguelike.World
 
                 // Update the room list, the open point list, and the location grid.
                 RemoveOpenPoints(room, openPoints);
-                if (TrackRoom(room, roomList, counter + 1, ref occupied))
+                if (TrackRoom(room, allRooms, counter + 1, ref occupied))
                     counter++;
                 AddOpenPoints(room, openPoints, occupied);
             }
 
             // Use the largest areas as rooms and triangulate them to calculate hallways.
-            RoomList = roomList
+            RoomList = allRooms
                 .OrderByDescending(r => r.Area)
-                .Take((int)(roomList.Count * _FILL_PERCENT))
+                .Take((int)(allRooms.Count * _FILL_PERCENT))
                 .ToList();
+
+            // Ensure that prefab elements are included
+            foreach (Room initial in initialRooms)
+            {
+                if (!RoomList.Contains(initial))
+                    RoomList.Add(initial);
+            }
 
             // If we don't get enough rooms, we can't (and don't need to) triangulate, so just
             // draw in what we have.
@@ -79,8 +91,7 @@ namespace Roguelike.World
             {
                 // Add the only hallway to the hall list
                 Adjacency = new ICollection<int>[] { new[] { 1 }, new[] { 0 } };
-
-                ClearRoomsBetween(RoomList[0], RoomList[1], roomList, occupied);
+                ClearRoomsBetween(RoomList[0], RoomList[1], allRooms, occupied);
             }
             else
             {
@@ -96,12 +107,12 @@ namespace Roguelike.World
                 List<Edge> edges = TrimEdges(adj, RoomList).ToList();
 
                 // Restore some edges, so exploring is a bit more interesting
-                RestoreEdges(edges, delaunay.Edges.ToList(), adj, EndRooms.None);
+                RestoreEdges(edges, delaunay.Edges.ToList(), adj, _END_TYPE);
                 Adjacency = BuildAdjacencyList(edges, RoomList.Count);
 
                 foreach (Edge edge in edges)
                 {
-                    ClearRoomsBetween(RoomList[edge.P0], RoomList[edge.P1], roomList, occupied);
+                    ClearRoomsBetween(RoomList[edge.P0], RoomList[edge.P1], allRooms, occupied);
                 }
             }
 
@@ -111,37 +122,85 @@ namespace Roguelike.World
 
         // Set up any special features on the level. After setup is complete, return the value the
         // room ID counter should start at.
-        private int InitialPlacement(ICollection<Room> roomList,
-            ICollection<(int x, int y)> openPoints, ref int[,] occupied)
+        private int InitialPlacement(string filename, ICollection<Room> roomList,
+            ICollection<int> openPoints, ref int[,] occupied)
         {
-            // TODO: load starting layouts from json / xp
-            Room first = new Room(
-                Rand.Next(Width - _ROOM_SIZE), Rand.Next(Height - _ROOM_SIZE),
-                (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE),
-                (int)Rand.NextNormal(_ROOM_SIZE, _ROOM_VARIANCE));
-
-            // Ensure that the first room is on the map.
-            if (first.Right >= Width)
-                first.X -= first.Right - Width + 1;
-
-            if (first.Bottom >= Height)
-                first.Y -= first.Bottom - Height + 1;
-
-            if (first.Left < 0)
-                first.X = 0;
-
-            if (first.Top < 0)
-                first.Y = 0;
-
-            if (TrackRoom(first, roomList, 1, ref occupied))
+            if (filename == null)
             {
+                // Default initialization, first room is like all other rooms
+                Room first = new Room(
+                    Rand.Next(Width - _ROOM_SIZE), Rand.Next(Height - _ROOM_SIZE),
+                    (int)Rand.NextGamma(_ALPHA, _BETA),
+                    (int)Rand.NextGamma(_ALPHA, _BETA));
+
+                // Ensure that the first room is on the map.
+                if (first.Right >= Width)
+                    first.X -= first.Right - Width + 1;
+
+                if (first.Bottom >= Height)
+                    first.Y -= first.Bottom - Height + 1;
+
+                if (first.Left < 0)
+                    first.X = 0;
+
+                if (first.Top < 0)
+                    first.Y = 0;
+
+                // Can't do anything if the first room doesn't get placed
+                System.Diagnostics.Debug.Assert(TrackRoom(first, roomList, 1, ref occupied));
                 AddOpenPoints(first, openPoints, occupied);
                 return 1;
             }
             else
             {
-                return 0;
+                // Load initialization from an external map
+                char[,] init = RexLoader.Load(filename);
+                bool[,] seen = new bool[init.GetLength(0), init.GetLength(1)];
+                int counter = 0;
+
+                for (int x = 0; x < init.GetLength(0); x++)
+                {
+                    for (int y = 0; y < init.GetLength(1); y++)
+                    {
+                        if (seen[x, y])
+                            continue;
+
+                        if (init[x, y] == '#')
+                        {
+                            seen[x, y] = true;
+                            continue;
+                        }
+
+                        FloodFill(x, y, init, ref seen, ++counter, ref occupied, openPoints);
+                        // TODO: do we need to fit the room to the actual area?
+                        roomList.Add(new Room(x, y, 1, 1));
+                    }
+                }
+
+                return counter;
             }
+        }
+
+        private void FloodFill(int x, int y, char[,] map, ref bool[,] seen, int counter,
+            ref int[,] occupied, ICollection<int> openPoints)
+        {
+            if (!PointOnMap(x, y) || seen[x, y])
+                return;
+
+            if (map[x, y] == '#')
+            {
+                openPoints.Add(ToIndex(x, y));
+                return;
+            }
+
+            seen[x, y] = true;
+            occupied[x, y] = counter;
+            Map.Field[x, y].Type = Data.TerrainType.Stone;
+
+            FloodFill(x + 1, y, map, ref seen, counter, ref occupied, openPoints);
+            FloodFill(x - 1, y, map, ref seen, counter, ref occupied, openPoints);
+            FloodFill(x, y + 1, map, ref seen, counter, ref occupied, openPoints);
+            FloodFill(x, y - 1, map, ref seen, counter, ref occupied, openPoints);
         }
 
         private void ClearRoomsBetween(Room r1, Room r2, IList<Room> roomList, int[,] occupied)
@@ -298,7 +357,7 @@ namespace Roguelike.World
         }
 
         private void AddOpenPoints(Room room,
-            ICollection<(int x, int y)> openPoints, int[,] occupied)
+            ICollection<int> openPoints, int[,] occupied)
         {
             for (int x = room.Left; x <= room.Right; x++)
             {
@@ -306,10 +365,10 @@ namespace Roguelike.World
                 int yBottom = room.Bottom + 1;
 
                 if (PointOnMap(x, yTop) && occupied[x, yTop] == 0)
-                    openPoints.Add((x, yTop));
+                    openPoints.Add(ToIndex(x, yTop));
 
                 if (PointOnMap(x, yBottom) && occupied[x, yBottom] == 0)
-                    openPoints.Add((x, yBottom));
+                    openPoints.Add(ToIndex(x, yBottom));
             }
 
             for (int y = room.Top; y <= room.Bottom; y++)
@@ -318,27 +377,27 @@ namespace Roguelike.World
                 int xRight = room.Right + 1;
 
                 if (PointOnMap(xLeft, y) && occupied[xLeft, y] == 0)
-                    openPoints.Add((xLeft, y));
+                    openPoints.Add(ToIndex(xLeft, y));
 
                 if (PointOnMap(xRight, y) && occupied[xRight, y] == 0)
-                    openPoints.Add((xRight, y));
+                    openPoints.Add(ToIndex(xRight, y));
             }
         }
 
-        private static void RemoveOpenPoints(Room room,
-            ICollection<(int x, int y)> openPoints)
+        private void RemoveOpenPoints(Room room,
+            ICollection<int> openPoints)
         {
             // Only need to check the edges since the adjust step already fits the rectangles.
             for (int x = room.Left; x <= room.Right; x++)
             {
-                openPoints.Remove((x, room.Top));
-                openPoints.Remove((x, room.Bottom));
+                openPoints.Remove(ToIndex(x, room.Top));
+                openPoints.Remove(ToIndex(x, room.Bottom));
             }
 
             for (int y = room.Top; y <= room.Bottom; y++)
             {
-                openPoints.Remove((room.Left, y));
-                openPoints.Remove((room.Right, y));
+                openPoints.Remove(ToIndex(room.Left, y));
+                openPoints.Remove(ToIndex(room.Right, y));
             }
         }
 
@@ -396,7 +455,7 @@ namespace Roguelike.World
 
         // Add back some edges so that there loops, preferring rooms at the end of hallways
         private void RestoreEdges(ICollection<Edge> minimal, IList<Edge> full, ICollection<int>[] adjacency,
-            EndRooms endRooms)
+            EndType endRooms)
         {
             ICollection<int>[] minAdj = BuildAdjacencyList(minimal, RoomList.Count);
             ICollection<int> endSet = new List<int>();
@@ -409,7 +468,7 @@ namespace Roguelike.World
                 if (minAdj[i].Count != 1)
                     continue;
 
-                if (endRooms == EndRooms.None)
+                if (endRooms == EndType.None)
                 {
                     // if we don't want end rooms, try to add a loop to everything
                     endSet.Add(i);
@@ -420,7 +479,7 @@ namespace Roguelike.World
                     if (minAdj[adjNode].Count <= 2)
                     {
                         // alternatively, if we want more end rooms, add a loop before the last room
-                        if (endRooms == EndRooms.Many)
+                        if (endRooms == EndType.Many)
                             endSet.Add(adjNode);
                         else
                             endSet.Add(i);
@@ -513,6 +572,11 @@ namespace Roguelike.World
                 }
             }
 #endif
+        }
+
+        private int ToIndex(int x, int y)
+        {
+            return x + Width * y;
         }
 
         private readonly struct MapVertex : IComparable<MapVertex>

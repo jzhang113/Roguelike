@@ -171,6 +171,7 @@
     <Compile Include="Utils\ColorInfo.cs" />
     <Compile Include="Utils\ImageConvert.cs" />
     <Compile Include="Utils\RandomExtensions.cs" />
+    <Compile Include="Utils\RexLoader.cs" />
     <Compile Include="Utils\RLKeyExtensions.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="Systems\OverlayHandler.cs" />

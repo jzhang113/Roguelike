@@ -31,21 +31,7 @@ namespace Roguelike.World
 
         public MapHandler Generate()
         {
-            int retry = 2;
-            while (true)
-            {
-                try
-                {
-                    CreateMap();
-                    break;
-                }
-                catch (Exception)
-                {
-                    // Delaunay triangulation fails sometimes, so retry.
-                    if (--retry < 0)
-                        throw;
-                }
-            }
+            CreateMap();
 
             PlaceActors();
             PlaceItems();
