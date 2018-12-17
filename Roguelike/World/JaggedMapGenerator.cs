@@ -11,13 +11,11 @@ namespace Roguelike.World
 {
     internal class JaggedMapGenerator : MapGenerator
     {
-        private const int _ROOM_SIZE = 3;
+        private const int _ROOM_SIZE = 4;
         private const int _ROOM_VARIANCE = 2;
 
-        private const double _WIDTH_SIZE_MULT = 1;
-        private const double _WIDTH_VAR_MULT = 1;
-        private const double _HEIGHT_SIZE_MULT = 1;
-        private const double _HEIGHT_VAR_MULT = 1;
+        private const double _BETA = _ROOM_SIZE / _ROOM_VARIANCE;
+        private const double _ALPHA = _ROOM_SIZE * _BETA;
 
         private const double _FILL_PERCENT = 0.05;
         private const double _LOOP_CHANCE = 0.15;
@@ -47,12 +45,8 @@ namespace Roguelike.World
 
                 // Fit a room around the point as best as possible. AdjustRoom should avoid most
                 // collisions between rooms.
-                int width = (int)Rand.NextNormal(
-                    _WIDTH_SIZE_MULT * _ROOM_SIZE,
-                    _WIDTH_VAR_MULT * _ROOM_VARIANCE);
-                int height = (int)Rand.NextNormal(
-                    _HEIGHT_SIZE_MULT * _ROOM_SIZE,
-                    _HEIGHT_VAR_MULT * _ROOM_VARIANCE);
+                int width = (int)Rand.NextGamma(_ALPHA, _BETA);
+                int height = (int)Rand.NextGamma(_ALPHA, _BETA);
                 Room room = AdjustRoom(availX, availY, width, height, occupied);
 
                 // Update the room list, the open point list, and the location grid.

@@ -42,5 +42,37 @@ namespace Roguelike.Utils
                     return normal;
             }
         }
+
+        public static double NextGamma(this PcgRandom rand, double a, double b)
+        {
+            // Marsaliga and Tsang - assumes a > 0
+            if (a < 1)
+            {
+                return rand.NextGamma(1.0 + a, b) * Math.Pow(rand.NextDouble(), 1.0 / a);
+            }
+
+            double d = a - 1.0 / 3.0;
+            double c = 1.0 / Math.Sqrt(9.0 * d);
+            double z, u, v;
+
+            do
+            {
+                do
+                {
+                    z = rand.NextNormal(0, 1.0);
+                    v = 1.0 + c * z;
+                }
+                while (v <= 0);
+
+                v = v * v * v;
+                u = rand.NextDouble();
+
+                if (u < 1 - 0.0331 * z * z * z * z)
+                    break;
+            }
+            while (Math.Log(u) >= 0.5 * z * z + d * (1 - v + Math.Log(v)));
+
+            return d * v / b;
+        }
     }
 }
