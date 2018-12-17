@@ -9,6 +9,13 @@ using TriangleNet.Meshing;
 
 namespace Roguelike.World
 {
+    internal enum EndRooms
+    {
+        None,
+        Few,
+        Many
+    }
+
     internal class JaggedMapGenerator : MapGenerator
     {
         private const int _ROOM_SIZE = 4;
@@ -85,7 +92,11 @@ namespace Roguelike.World
                 IMesh delaunay = polygon.Triangulate();
 
                 // Reduce the number of edges and clear out rooms along the remaining edges.
-                var edges = TrimEdges(delaunay.Edges, RoomList).ToList();
+                ICollection<int>[] adj = BuildAdjacencyList(delaunay.Edges, RoomList.Count);
+                List<Edge> edges = TrimEdges(adj, RoomList).ToList();
+
+                // Restore some edges, so exploring is a bit more interesting
+                RestoreEdges(edges, delaunay.Edges.ToList(), adj, EndRooms.None);
                 Adjacency = BuildAdjacencyList(edges, RoomList.Count);
 
                 foreach (Edge edge in edges)
@@ -95,14 +106,13 @@ namespace Roguelike.World
             }
 
             PostProcess();
-            AsciiPrint();
+            AsciiDump("map.txt");
         }
 
         // Set up any special features on the level. After setup is complete, return the value the
         // room ID counter should start at.
         private int InitialPlacement(ICollection<Room> roomList,
-            ICollection<(int x, int y)> openPoints,
-            ref int[,] occupied)
+            ICollection<(int x, int y)> openPoints, ref int[,] occupied)
         {
             // TODO: load starting layouts from json / xp
             Room first = new Room(
@@ -165,7 +175,6 @@ namespace Roguelike.World
         // Clean up the map by removing stray walls.
         // TODO: fill in 1-tile holes without cutting the map
         // TODO: identify and mark islands
-        // TODO: identify and mark peninsulas
         private void PostProcess()
         {
             // Sweep from top to bottom.
@@ -334,12 +343,9 @@ namespace Roguelike.World
         }
 
         // Use Prim's algorithm to generate a MST of edges.
-        private IEnumerable<Edge> TrimEdges(IEnumerable<Edge> edges,
-            IList<Room> rooms)
+        private IEnumerable<Edge> TrimEdges(ICollection<int>[] adjacency, IList<Room> rooms)
         {
-            List<Edge> allEdges = edges.ToList();
-            ICollection<int>[] adjacency = BuildAdjacencyList(allEdges, rooms.Count);
-            // Comparator for MapVertex is defined to give negated
+            // Comparator for MapVertex is defined to give negated, so this is actually a minheap
             MaxHeap<MapVertex> pq = new MaxHeap<MapVertex>(rooms.Count);
 
             var (firstX, firstY) = rooms[0].Center;
@@ -385,14 +391,87 @@ namespace Roguelike.World
                     graph.Add(new Edge(i, parent[i]));
             }
 
-            // Add back some edges so that there are some loops.
-            // TODO: smarter checking to add edges between the farthest rooms.
-            for (int i = 0; i < allEdges.Count * _LOOP_CHANCE; i++)
+            return graph;
+        }
+
+        // Add back some edges so that there loops, preferring rooms at the end of hallways
+        private void RestoreEdges(ICollection<Edge> minimal, IList<Edge> full, ICollection<int>[] adjacency,
+            EndRooms endRooms)
+        {
+            ICollection<int>[] minAdj = BuildAdjacencyList(minimal, RoomList.Count);
+            ICollection<int> endSet = new List<int>();
+            int maxAdd = (int)(full.Count * _LOOP_CHANCE);
+            int added = 0;
+
+            // identify end rooms (only one connection)
+            for (int i = 0; i < minAdj.Length; i++)
             {
-                graph.Add(allEdges[Rand.Next(allEdges.Count)]);
+                if (minAdj[i].Count != 1)
+                    continue;
+
+                if (endRooms == EndRooms.None)
+                {
+                    // if we don't want end rooms, try to add a loop to everything
+                    endSet.Add(i);
+                }
+                else
+                {
+                    int adjNode = minAdj[i].First();
+                    if (minAdj[adjNode].Count <= 2)
+                    {
+                        // alternatively, if we want more end rooms, add a loop before the last room
+                        if (endRooms == EndRooms.Many)
+                            endSet.Add(adjNode);
+                        else
+                            endSet.Add(i);
+                    }
+                }
+            }
+            
+            foreach (int index in endSet)
+            {
+                int adjNode = minAdj[index].First();
+                (int currX, int currY) = RoomList[index].Center;
+                (int adjX, int adjY) =  RoomList[adjNode].Center;
+                double angle = Math.Atan2(currY - adjY, currX - adjX);
+
+                foreach (int elem in adjacency[index])
+                {
+                    (int nextX, int nextY) = RoomList[elem].Center;
+                    double newAngle = Math.Atan2(currY - nextY, currX - nextX);
+
+                    // get the minimum angle between the existing and new hallways
+                    double diff = Math.Abs(newAngle - angle);
+                    if (diff > Math.PI)
+                        diff = 2 * Math.PI - diff;
+
+                    // add the new hallway if the angle is >= 60 degrees
+                    if (diff >= Math.PI / 3)
+                    {
+                        minimal.Add(new Edge(index, elem));
+#if DEBUG
+                        Map.Field[RoomList[index].Center.X, RoomList[index].Center.Y].Debug = 48 + added;
+                        Map.Field[RoomList[elem].Center.X, RoomList[elem].Center.Y].Debug = 48 + added;
+#endif
+                        added++;
+                        break;
+                    }
+                }
+
+                if (added >= maxAdd)
+                    break;
             }
 
-            return graph;
+            // randomly add the rest of the edges
+            for ( ; added < maxAdd; added++)
+            {
+                Edge edge = full[Rand.Next(full.Count)];
+                minimal.Add(edge);
+#if DEBUG
+                Map.Field[RoomList[edge.P0].Center.X, RoomList[edge.P0].Center.Y].Debug = 48 + added;
+                Map.Field[RoomList[edge.P1].Center.X, RoomList[edge.P1].Center.Y].Debug = 48 + added;
+#endif
+            }
         }
 
         private static ICollection<int>[] BuildAdjacencyList(IEnumerable<Edge> edges, int size)
@@ -412,16 +491,28 @@ namespace Roguelike.World
             return adjacency;
         }
 
-        private void AsciiPrint()
+        // dumps map to file for debugging, does nothing in release
+        private void AsciiDump(string filename)
         {
-            for (int i = 0; i < Map.Width; i++)
-            {
-                for (int j = 0; j < Map.Height; j++)
+#if DEBUG
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(filename)) {
+                for (int i = 0; i < Map.Width; i++)
                 {
-                    Console.Write(Map.Field[i, j].IsWall ? '#' : '.');
+                    for (int j = 0; j < Map.Height; j++)
+                    {
+                        if (Map.Field[i, j].Debug >= 48)
+                        {
+                            sw.Write((char)Map.Field[i, j].Debug);
+                        }
+                        else
+                        {
+                            sw.Write(Map.Field[i, j].IsWall ? '#' : '.');
+                        }
+                    }
+                    sw.WriteLine();
                 }
-                Console.WriteLine();
             }
+#endif
         }
 
         private readonly struct MapVertex : IComparable<MapVertex>

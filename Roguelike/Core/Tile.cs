@@ -39,6 +39,9 @@ namespace Roguelike.Core
         public bool IsExplored { get; internal set; }
         public bool BlocksLight { get; internal set; }
         public bool LosExists { get; internal set; }
+#if DEBUG
+        public int Debug { get; set; }
+#endif
 
         public bool IsVisible => LosExists && Light > Constants.MIN_VISIBLE_LIGHT_LEVEL;
         public bool IsWall => Type == TerrainType.Wall;
