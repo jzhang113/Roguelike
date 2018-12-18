@@ -24,24 +24,7 @@ namespace Roguelike.Core
             }
         }
 
-        public Tile this[int i, int j]
-        {
-            get
-            {
-                int tempX = i, tempY = j;
-                if (i < 0)
-                    tempX = 0;
-                else if (i >= _width)
-                    tempX = _width - 1;
-
-                if (j < 0)
-                    tempY = 0;
-                else  if (j >= _height)
-                    tempY = _height - 1;
-
-                return _field[tempY * _height + tempX];
-            }
-        }
+        public Tile this[int i, int j] => _field[i + _width * j];
 
         public bool IsValid(int i, int j) => i >= 0 && i < _width && j >= 0 && j < _height;
 

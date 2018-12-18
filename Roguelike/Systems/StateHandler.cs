@@ -1,6 +1,7 @@
 ﻿using BearLib;
 using Roguelike.Commands;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.State;
 using System;
 using System.Collections.Generic;
@@ -19,9 +20,9 @@ namespace Roguelike.Systems
 
             MenuState mainMenu = new MenuState(new[]
             {
-                new MenuButton(5, 50, "Continue", Game.LoadGame),
-                new MenuButton(5, 55, "New Game", Game.NewGame),
-                new MenuButton(5, 60, "  Exit  ", Game.Exit)
+                new MenuButton(5, Constants.SCREEN_HEIGHT - 20, "Continue", Game.LoadGame),
+                new MenuButton(5, Constants.SCREEN_HEIGHT - 15, "New Game", Game.NewGame),
+                new MenuButton(5, Constants.SCREEN_HEIGHT - 10, "  Exit  ", Game.Exit)
             });
             _states.Push(mainMenu);
         }

@@ -488,22 +488,54 @@ namespace Roguelike.World
 
             for (int i = 0; i <= distance; i++)
             {
+                int dx = 0;
+                int dy = 0;
+
                 if (dir == Direction.N)
-                    yield return Field[x - i, y - distance];
+                {
+                    dx = -i;
+                    dy = -distance;
+                }
                 else if (dir == Direction.NW)
-                    yield return Field[x - distance, y - i];
+                {
+                    dx = -distance;
+                    dy = -i;
+                }
                 else if (dir == Direction.W)
-                    yield return Field[x - distance, y + i];
+                {
+                    dx = -distance;
+                    dy = i;
+                }
                 else if (dir == Direction.SW)
-                    yield return Field[x - i, y + distance];
+                {
+                    dx = -i;
+                    dy = distance;
+                }
                 else if (dir == Direction.S)
-                    yield return Field[x + i, y + distance];
+                {
+                    dx = i;
+                    dy = distance;
+                }
                 else if (dir == Direction.SE)
-                    yield return Field[x + distance, y + i];
+                {
+                    dx = distance;
+                    dy = i;
+                }
                 else if (dir == Direction.E)
-                    yield return Field[x + distance, y - i];
+                {
+                    dx = distance;
+                    dy = -i;
+                }
                 else if (dir == Direction.NE)
-                    yield return Field[x + i, y - distance];
+                {
+                    dx = i;
+                    dy = -distance;
+                }
+
+                if (!Field.IsValid(x + dx, y + dy))
+                    yield break;
+                else
+                    yield return Field[x + dx, y + dy];
             }
         }
         #endregion
@@ -813,9 +845,13 @@ namespace Roguelike.World
                     int newX = p.X + dx;
                     int newY = p.Y + dy;
                     float newWeight = p.Weight + 1;
+
+                    if (!Field.IsValid(newX, newY))
+                        continue;
+
                     Tile tile = Field[newX, newY];
 
-                    if (Field.IsValid(newX, newY) && !tile.IsWall && tile.IsExplored &&
+                    if (!tile.IsWall && tile.IsExplored &&
                         (double.IsNaN(mapWeights[newX, newY]) || newWeight < mapWeights[newX, newY]))
                     {
                         mapWeights[newX, newY] = newWeight;

@@ -45,7 +45,7 @@ namespace Roguelike.World
             int[,] occupied = new int[Width, Height];
 
             // Set up the initial placement of the map. Include special features, if any.
-            int counter = InitialPlacement(null, initialRooms, openPoints, ref occupied);
+            int counter = InitialPlacement("map.xp", initialRooms, openPoints, ref occupied);
             IList<Room> allRooms = new List<Room>(initialRooms);
 
             while (openPoints.Count > 0)
@@ -555,17 +555,17 @@ namespace Roguelike.World
         {
 #if DEBUG
             using (System.IO.StreamWriter sw = new System.IO.StreamWriter(filename)) {
-                for (int i = 0; i < Map.Width; i++)
+                for (int i = 0; i < Map.Height; i++)
                 {
-                    for (int j = 0; j < Map.Height; j++)
+                    for (int j = 0; j < Map.Width; j++)
                     {
-                        if (Map.Field[i, j].Debug >= 48)
+                        if (Map.Field[j, i].Debug >= 48)
                         {
-                            sw.Write((char)Map.Field[i, j].Debug);
+                            sw.Write((char)Map.Field[j, i].Debug);
                         }
                         else
                         {
-                            sw.Write(Map.Field[i, j].IsWall ? '#' : '.');
+                            sw.Write(Map.Field[j, i].IsWall ? '#' : '.');
                         }
                     }
                     sw.WriteLine();

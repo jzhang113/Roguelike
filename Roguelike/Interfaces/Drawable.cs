@@ -53,6 +53,10 @@ namespace Roguelike.Interfaces
             int destX = x - Camera.X;
             int destY = y - Camera.Y;
 
+            // don't draw out of bounds
+            if (destX < 0 || destY < 0 || destX > layer.Width || destY > layer.Height)
+                return;
+
             Terminal.Composition(true);
 
             if (background.HasValue)
