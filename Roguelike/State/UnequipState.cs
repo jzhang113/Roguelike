@@ -1,5 +1,6 @@
 ﻿using Roguelike.Commands;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using System;
@@ -35,7 +36,8 @@ namespace Roguelike.State
         public override void Draw(LayerInfo layer)
         {
             base.Draw(layer);
-            layer.Print(-1, "[color=grass][[INVENTORY[/color][color=white][[EQUIPMENT]]");
+            layer.Print(-1, $"{Constants.HEADER_LEFT}[color=grass]INVENTORY[/color]" +
+                $"[color=white]{Constants.HEADER_SEP}EQUIPMENT[/color]{Constants.HEADER_RIGHT}");
         }
     }
 }

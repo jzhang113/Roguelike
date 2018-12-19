@@ -1,5 +1,6 @@
 ﻿using BearLib;
 using Roguelike.Core;
+using Roguelike.Data;
 using System;
 using System.Collections.Generic;
 
@@ -59,9 +60,10 @@ namespace Roguelike.UI
                 RightChar = '│'
             });
 
-            Terminal.Color(Colors.Text);
-            layer.Print(-1, "[[SYSTEM LOG]]", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(-1, $"{Constants.HEADER_LEFT}[color=white]SYSTEM LOG[/color]{Constants.HEADER_RIGHT}",
+                System.Drawing.ContentAlignment.TopCenter);
 
+            Terminal.Color(Colors.Text);
             // draw messages
             int maxCount = Math.Min(_messages.Count, layer.Height - 1);
             int yPos = layer.Height - 1;

@@ -34,5 +34,9 @@
 
         public const int SCREEN_WIDTH = MAPVIEW_WIDTH + 2 * SIDEBAR_WIDTH + 2;
         public const int SCREEN_HEIGHT = STATUS_HEIGHT + MAPVIEW_HEIGHT + MESSAGE_HEIGHT + 1;
+
+        public const char HEADER_LEFT = '╡';  // 181
+        public const char HEADER_RIGHT = '╞'; // 198
+        public const char HEADER_SEP = '│';   // 179
     }
 }

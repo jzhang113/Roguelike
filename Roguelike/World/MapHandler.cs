@@ -448,7 +448,8 @@ namespace Roguelike.World
             {
                 for (int j = y - radius; j <= y + radius; j++)
                 {
-                    yield return Field[i, j];
+                    if (Field.IsValid(i, j))
+                        yield return Field[i, j];
                 }
             }
         }
@@ -468,14 +469,20 @@ namespace Roguelike.World
         {
             for (int i = x + 1; i < x + width; i++)
             {
-                yield return Field[i, y];
-                yield return Field[i, y + height];
+                if (Field.IsValid(i, y))
+                    yield return Field[i, y];
+
+                if (Field.IsValid(i, y + height))
+                    yield return Field[i, y + height];
             }
 
             for (int j = y; j <= y + height; j++)
             {
-                yield return Field[x, j];
-                yield return Field[x + width, j];
+                if (Field.IsValid(x, j))
+                    yield return Field[x, j];
+
+                if (Field.IsValid(x + width, j))
+                    yield return Field[x + width, j];
             }
         }
 
@@ -532,10 +539,10 @@ namespace Roguelike.World
                     dy = -distance;
                 }
 
-                if (!Field.IsValid(x + dx, y + dy))
-                    yield break;
-                else
+                if (Field.IsValid(x + dx, y + dy))
                     yield return Field[x + dx, y + dy];
+                else
+                    yield break;
             }
         }
         #endregion

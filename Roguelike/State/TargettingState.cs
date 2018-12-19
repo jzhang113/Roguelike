@@ -199,12 +199,15 @@ namespace Roguelike.State
                 return _callback(targets);
             }
 
+            int adjustedX = x + Camera.X - Data.Constants.SIDEBAR_WIDTH - 2;
+            int adjustedY = y + Camera.Y - Data.Constants.STATUS_HEIGHT - 1;
+
             // If the mouse didn't get moved, don't do anything.
-            if (x == _prevMouseX && y == _prevMouseY)
+            if (adjustedX == _prevMouseX && adjustedY == _prevMouseY)
                 return null;
 
-            _prevMouseX = x;
-            _prevMouseY = y;
+            _prevMouseX = adjustedX;
+            _prevMouseY = adjustedY;
 
             // Adjust the targetting position so it remains in the targetting range.
             _targetX = _source.X;

@@ -1,5 +1,6 @@
 ﻿using BearLib;
 using Roguelike.Core;
+using Roguelike.Data;
 
 namespace Roguelike.UI
 {
@@ -18,7 +19,9 @@ namespace Roguelike.UI
                 BottomChar = '═',
                 LeftChar = '║' // 186
             });
-            layer.Print(-1, "[[SCAN[color=white][[DATA]]", System.Drawing.ContentAlignment.TopRight);
+            layer.Print(-1, $"{Constants.HEADER_LEFT}SCAN" +
+                $"[color=white]{Constants.HEADER_SEP}DATA{Constants.HEADER_RIGHT}",
+                System.Drawing.ContentAlignment.TopRight);
 
             // draw info
             Terminal.Color(Colors.Text);

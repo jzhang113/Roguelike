@@ -1,5 +1,6 @@
 ﻿using BearLib;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.Items;
 using System;
 using System.Collections;
@@ -182,7 +183,8 @@ namespace Roguelike.Systems
                 BottomChar = '═',
                 RightChar = '║' // 186
             });
-            layer.Print(-1, "[color=white][[INVENTORY]][/color]EQUIPMENT]]");
+            layer.Print(-1, $"{Constants.HEADER_LEFT}[color=white]INVENTORY{Constants.HEADER_SEP}" +
+                $"[/color]EQUIPMENT{Constants.HEADER_RIGHT}");
 
             // draw items
             int line = 1;

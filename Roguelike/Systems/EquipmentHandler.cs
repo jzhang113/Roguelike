@@ -1,9 +1,9 @@
 ﻿using BearLib;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.Items;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace Roguelike.Systems
 {
@@ -69,7 +69,8 @@ namespace Roguelike.Systems
                 BottomChar = '═',
                 RightChar = '║' // 186
             });
-            layer.Print(-1, "[[INVENTORY[color=white][[EQUIPMENT]]");
+            layer.Print(-1, $"{Constants.HEADER_LEFT}INVENTORY" +
+                $"[color=white]{Constants.HEADER_SEP}EQUIPMENT{Constants.HEADER_RIGHT}");
 
             Terminal.Color(Colors.Text);
             layer.Print(2, "a) Primary:    " + (PrimaryWeapon?.Name ?? "none"));

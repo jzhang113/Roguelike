@@ -1,6 +1,7 @@
 ﻿using BearLib;
 using Roguelike.Actors;
 using Roguelike.Core;
+using Roguelike.Data;
 using Roguelike.Statuses;
 
 namespace Roguelike.UI
@@ -24,10 +25,11 @@ namespace Roguelike.UI
             const int stepSize = 5;
             const int yPos = 0;
 
-            Terminal.Color(Colors.Text);
             string name = player.Name.ToUpper();
-            layer.Print(yPos, $"[font=big]{name}", System.Drawing.ContentAlignment.TopCenter);
+            layer.Print(-1, $"{Constants.HEADER_LEFT}[color=white]{name}[/color]{Constants.HEADER_RIGHT}",
+                System.Drawing.ContentAlignment.TopCenter);
 
+            Terminal.Color(Colors.Text);
             Terminal.Composition(true);
             // HP bar
             int hpWidth = player.Parameters.MaxHp / stepSize;

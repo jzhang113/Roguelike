@@ -1,4 +1,5 @@
 ﻿using Roguelike.Commands;
+using Roguelike.Core;
 using Roguelike.Items;
 using System;
 
@@ -29,6 +30,12 @@ namespace Roguelike.State
             return null;
         }
 
-        // TODO: if we have cursed items, highlight non-cursed items as droppable
+        public override void Draw(LayerInfo layer)
+        {
+            base.Draw(layer);
+
+            // TODO: if we have cursed items, highlight non-cursed items as droppable
+            Game.Player.Inventory.DrawSelected(layer, _ => true);
+        }
     }
 }
