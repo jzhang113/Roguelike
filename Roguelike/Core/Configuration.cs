@@ -4,8 +4,7 @@
     {
         public string GameName { get; set; }
         public string FontName { get; set; }
-        public int FontSize { get; set; }
-        //public WindowConfig Map { get; set; }
+        public string FontSize { get; set; }
         public int MessageMaxCount { get; set; }
     }
 }

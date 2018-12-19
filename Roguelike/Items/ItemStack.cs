@@ -8,22 +8,22 @@ using System.Linq;
 namespace Roguelike.Items
 {
     [Serializable]
-    internal class ItemStack : IEnumerable<ItemCount>
+    public class ItemStack : IEnumerable<ItemCount>
     {
         public string Name { get; }
         public int Count { get; private set; }
-        internal bool Collapsed { get; set; }
         public int TypeCount => _itemStack.Count;
 
         private readonly IDictionary<Item, int> _itemStack;
 
         public bool IsEmpty() => _itemStack.Count == 0;
 
+        public bool HasIndex(int index) => index >= 0 && index < TypeCount;
+
         public ItemStack(Item item, int count)
         {
             Name = item.Name;
             Count = count;
-            Collapsed = true;
 
             _itemStack = new Dictionary<Item, int>
             {

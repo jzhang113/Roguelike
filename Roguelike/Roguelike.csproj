@@ -157,6 +157,7 @@
     <Compile Include="Core\MenuButton.cs" />
     <Compile Include="State\MenuState.cs" />
     <Compile Include="State\NormalState.cs" />
+    <Compile Include="State\SubinvState.cs" />
     <Compile Include="State\TargettingState.cs" />
     <Compile Include="State\TextInputState.cs" />
     <Compile Include="State\UnequipState.cs" />

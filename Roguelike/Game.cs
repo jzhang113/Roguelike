@@ -90,24 +90,24 @@ namespace Roguelike
 
             Terminal.Set($"window: size={Constants.SCREEN_WIDTH + 2}x{Constants.SCREEN_HEIGHT + 2}," +
                 $"cellsize=auto, title='{Config.GameName}';");
-            Terminal.Set("font: ccc12x12.png, size = 12x12;");
-            Terminal.Set("big font: ccc12x12.png, size = 12x12, resize = 24x24, spacing = 2x2;");
+            Terminal.Set($"font: {Config.FontName}, size = {Config.FontSize};");
             Terminal.Set("palette.grass: #6daa2c");
             Terminal.Set("input: filter = [keyboard, mouse]");
 
             StateHandler = new StateHandler(new Dictionary<Type, LayerInfo>
             {
-                [typeof(AnimationState)] =      _mapLayer,
-                [typeof(ApplyState)] =          _rightLayer,
-                [typeof(AutoexploreState)] =    _mapLayer,
-                [typeof(DropState)] =           _rightLayer,
-                [typeof(EquipState)] =          _rightLayer,
-                [typeof(InventoryState)] =      _rightLayer,
-                [typeof(MenuState)] =           _fullConsole,
-                [typeof(NormalState)] =         _mapLayer,
-                [typeof(TargettingState)] =     _mapLayer,
-                [typeof(TextInputState)] =      _mapLayer,
-                [typeof(UnequipState)] =        _rightLayer
+                [typeof(AnimationState)]   = _mapLayer,
+                [typeof(ApplyState)]       = _rightLayer,
+                [typeof(AutoexploreState)] = _mapLayer,
+                [typeof(DropState)]        = _rightLayer,
+                [typeof(EquipState)]       = _rightLayer,
+                [typeof(InventoryState)]   = _rightLayer,
+                [typeof(SubinvState)]      = _rightLayer,
+                [typeof(MenuState)]        = _fullConsole,
+                [typeof(NormalState)]      = _mapLayer,
+                [typeof(TargettingState)]  = _mapLayer,
+                [typeof(TextInputState)]   = _mapLayer,
+                [typeof(UnequipState)]     = _rightLayer
             });
 
             MessageHandler = new MessagePanel(Config.MessageMaxCount);

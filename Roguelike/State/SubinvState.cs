@@ -7,53 +7,60 @@ using System;
 
 namespace Roguelike.State
 {
-    internal sealed class InventoryState : ItemActionState
+    internal class SubinvState : ItemActionState
     {
-        private static readonly Lazy<InventoryState> _instance = new Lazy<InventoryState>(() => new InventoryState());
-        public static InventoryState Instance => _instance.Value;
+        private char _subKey;
+        private int _currKey;
+        private ItemStack _subinv;
 
-        private char _currKey;
-
-        private InventoryState()
+        internal SubinvState(char curr)
         {
-            _currKey = 'a';
+            _subKey = curr;
+            _currKey = 0;
+            Game.Player.Inventory.TryGetKey(curr, out _subinv);
         }
 
         public override ICommand HandleKeyInput(int key)
         {
-            var inv = Game.Player.Inventory;
-
-            // TODO: what if inv is empty?
             if (key == Terminal.TK_DOWN)
             {
-                if (_currKey < inv.LastKey)
+                if (_currKey < _subinv.TypeCount - 1)
                     _currKey++;
             }
             else if (key == Terminal.TK_UP)
             {
-                if (_currKey > 'a')
+                if (_currKey > 0)
                     _currKey--;
             }
             else if (key == Terminal.TK_ENTER || key == Terminal.TK_SPACE)
             {
-                System.Diagnostics.Debug.Assert(inv.HasKey(_currKey));
-                if (Game.Player.Inventory.IsStacked(_currKey))
-                {
-                    Game.StateHandler.PushState(new SubinvState(_currKey));
-                }
-                else
-                {
-                    // TODO: open use item menu
-                }
+                System.Diagnostics.Debug.Assert(_subinv.HasIndex(_currKey));
+                // TODO: getting item from dict based on index is inefficient
+                // TODO: open use item menu
             }
             else
             {
                 char charKey = key.ToChar();
-                if (inv.HasKey(charKey))
+                if (_subinv.HasIndex(charKey))
                     _currKey = charKey;
             }
 
             return null;
+        }
+
+        public override ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        {
+            return base.HandleMouseInput(x, y, leftClick, rightClick);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public override void Update(ICommand command)
+        {
+            base.Update(command);
         }
 
         protected override ICommand ResolveInput(ItemCount itemCount)
@@ -65,7 +72,9 @@ namespace Roguelike.State
         {
             base.Draw(layer);
 
-            int row = 1 + _currKey - 'a';
+            Game.Player.Inventory.DrawItemStack(layer, _subKey);
+
+            int row = 2 + _subKey - 'a' + _currKey;
             Terminal.Color(Colors.DimText);
             Terminal.Layer(layer.Z - 1);
 

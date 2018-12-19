@@ -20,6 +20,7 @@ namespace Roguelike.Core
         public static Color Cursor =            Swatch.PrimaryDarkest;
 
         public static Color Text =              Swatch.DbLight;
+        public static Color DimText =           Swatch.SecondaryDarkest;
         public static Color ButtonBackground =  Swatch.Primary;
         public static Color ButtonBorder =      Swatch.Secondary;
         public static Color ButtonHover =       Swatch.Alternate;

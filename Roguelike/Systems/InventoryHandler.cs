@@ -16,6 +16,9 @@ namespace Roguelike.Systems
         private readonly IList<ItemStack> _inventory;
 
         public int Count => _inventory.Count;
+
+        public char LastKey => (char)('a' + _inventory.Count - 1);
+
         public bool IsReadOnly => false;
 
         public bool IsEmpty() => _inventory.Count == 0;
@@ -112,17 +115,11 @@ namespace Roguelike.Systems
             _inventory.SelectMany(itemStack => itemStack).ToList().CopyTo(array, arrayIndex);
         }
 
-        public bool HasKey(char key)
-        {
-            if (key < 'a' || key > 'z')
-                return false;
-
-            return key - 'a' < _inventory.Count;
-        }
+        public bool HasKey(char key) => key >= 'a' && key <= LastKey;
 
         // Attempts to returns the item at position key. Does not remove the item from inventory.
         // Returns false if the item does not exist.
-        public bool TryGetKey(char key, out ItemCount item)
+        public bool TryGetKey(char key, out ItemStack item)
         {
             if (!HasKey(key))
             {
@@ -130,34 +127,16 @@ namespace Roguelike.Systems
                 return false;
             }
 
-            item = _inventory[key - 'a'].First();
+            item = _inventory[key - 'a'];
             return true;
         }
 
-        public bool OpenStack(char key)
+        public bool IsStacked(char key)
         {
-            if (!HasKey(key))
-                return false;
+            System.Diagnostics.Debug.Assert(HasKey(key));
 
             ItemStack itemStack = _inventory[key - 'a'];
-            if (itemStack.TypeCount == 1)
-                return false;
-
-            itemStack.Collapsed = false;
-            return true;
-        }
-
-        public bool CollapseStack(char key)
-        {
-            if (!HasKey(key))
-                return false;
-
-            ItemStack itemStack = _inventory[key - 'a'];
-            if (itemStack.TypeCount == 1)
-                return false;
-
-            itemStack.Collapsed = true;
-            return true;
+            return itemStack.TypeCount > 1;
         }
 
         public void SetFire()
@@ -193,18 +172,9 @@ namespace Roguelike.Systems
 
             foreach (ItemStack itemStack in _inventory)
             {
-                layer.Print(line, $"{letter}) {itemStack}");
+                layer.Print(line, $"{letter} - {itemStack}");
                 line++;
                 letter++;
-
-                if (itemStack.Collapsed)
-                    continue;
-
-                foreach (ItemCount itemCount in itemStack)
-                {
-                    layer.Print(line, $"  - {itemCount}");
-                    line++;
-                }
             }
         }
 
@@ -217,37 +187,48 @@ namespace Roguelike.Systems
 
             foreach (ItemStack itemStack in _inventory)
             {
-                if (itemStack.Collapsed)
+                foreach (ItemCount itemCount in itemStack)
                 {
-                    foreach (ItemCount itemCount in itemStack)
+                    if (selected(itemCount.Item))
                     {
-                        if (selected(itemCount.Item))
-                        {
-                            layer.Print(line, $"{letter}) {itemStack}");
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    int nameLine = line;
-
-                    foreach (ItemCount itemCount in itemStack)
-                    {
-                        if (selected(itemCount.Item))
-                        {
-                            layer.Print(line, $"  - {itemCount}");
-                            line++;
-                        }
-                    }
-
-                    if (line != nameLine)
-                    {
-                        layer.Print(nameLine, $"{letter}) {itemStack}");
+                        layer.Print(line, $"{letter} - {itemStack}");
+                        break;
                     }
                 }
 
                 line++;
+                letter++;
+            }
+        }
+
+        // redraw inventory with opened item stack
+        internal void DrawItemStack(LayerInfo layer, char key)
+        {
+            System.Diagnostics.Debug.Assert(IsStacked(key));
+
+            int line = 1;
+            char letter = 'a';
+            char subletter = 'a';
+            Terminal.Color(Colors.WallBackground);
+            layer.Clear();
+
+            foreach (ItemStack itemStack in _inventory)
+            {
+                layer.Print(line++, $"{letter} - {itemStack}");
+
+                if (letter == key)
+                {
+                    Terminal.Color(Colors.HighlightColor);
+
+                    foreach (ItemCount itemCount in _inventory[key - 'a'])
+                    {
+                        layer.Print(line++, $"  {subletter} - {itemCount}");
+                        subletter++;
+                    }
+
+                    Terminal.Color(Colors.WallBackground);
+                }
+
                 letter++;
             }
         }
