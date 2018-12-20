@@ -46,7 +46,7 @@ namespace Roguelike.Core
 
         public void Print(int x, int y, string text)
         {
-            if (x + text.Length < Width && y < Height)
+            if (y < Height)
                 Terminal.Print(X + x, Y + y, text);
             else
                 System.Diagnostics.Debug.WriteLine($"Warning: line {y} out of bounds on layer {Name}");

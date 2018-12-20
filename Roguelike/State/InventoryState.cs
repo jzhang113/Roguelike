@@ -43,7 +43,7 @@ namespace Roguelike.State
                 }
                 else
                 {
-                    // TODO: open use item menu
+                    Game.StateHandler.PushState(new ItemMenuState(_currKey));
                 }
             }
             else

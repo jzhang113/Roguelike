@@ -103,6 +103,7 @@ namespace Roguelike
                 [typeof(EquipState)]       = _rightLayer,
                 [typeof(InventoryState)]   = _rightLayer,
                 [typeof(SubinvState)]      = _rightLayer,
+                [typeof(ItemMenuState)]    = _rightLayer,
                 [typeof(MenuState)]        = _fullConsole,
                 [typeof(NormalState)]      = _mapLayer,
                 [typeof(TargettingState)]  = _mapLayer,

@@ -9,11 +9,11 @@ namespace Roguelike.State
 {
     internal class SubinvState : ItemActionState
     {
-        private char _subKey;
+        private readonly char _subKey;
+        private readonly ItemStack _subinv;
         private int _currKey;
-        private ItemStack _subinv;
 
-        internal SubinvState(char curr)
+        public SubinvState(char curr)
         {
             _subKey = curr;
             _currKey = 0;
@@ -51,16 +51,6 @@ namespace Roguelike.State
         public override ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             return base.HandleMouseInput(x, y, leftClick, rightClick);
-        }
-
-        public override string ToString()
-        {
-            return base.ToString();
-        }
-
-        public override void Update(ICommand command)
-        {
-            base.Update(command);
         }
 
         protected override ICommand ResolveInput(ItemCount itemCount)

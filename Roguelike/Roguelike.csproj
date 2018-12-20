@@ -153,6 +153,7 @@
     <Compile Include="State\DropState.cs" />
     <Compile Include="State\EquipState.cs" />
     <Compile Include="State\InventoryState.cs" />
+    <Compile Include="State\ItemMenuState.cs" />
     <Compile Include="State\ItemActionState.cs" />
     <Compile Include="Core\MenuButton.cs" />
     <Compile Include="State\MenuState.cs" />

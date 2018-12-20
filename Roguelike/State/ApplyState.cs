@@ -18,19 +18,19 @@ namespace Roguelike.State
 
         protected override ICommand ResolveInput(ItemCount itemCount)
         {
-            if (itemCount.Item is IUsable usableItem)
+            if (!(itemCount.Item is IUsable usableItem))
             {
-                IAction action = usableItem.ApplySkill;
-                TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
-                {
-                    Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
-                    return new ApplyCommand(Game.Player, usableItem, returnTarget);
-                });
-                Game.StateHandler.PushState(state);
+                Game.MessageHandler.AddMessage($"Cannot apply {itemCount.Item}.");
                 return null;
             }
 
-            Game.MessageHandler.AddMessage($"Cannot apply {itemCount.Item}.");
+            IAction action = usableItem.ApplySkill;
+            TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
+            {
+                Game.Player.Inventory.Split(new ItemCount { Item = itemCount.Item, Count = 1 });
+                return new ApplyCommand(Game.Player, usableItem, returnTarget);
+            });
+            Game.StateHandler.PushState(state);
             return null;
         }
 

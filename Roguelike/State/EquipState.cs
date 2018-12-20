@@ -17,19 +17,19 @@ namespace Roguelike.State
 
         protected override ICommand ResolveInput(ItemCount itemCount)
         {
-            if (itemCount.Item is IEquippable)
+            if (!(itemCount.Item is IEquippable))
             {
-                ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount
-                {
-                    Item = itemCount.Item,
-                    Count = 1
-                });
-                IEquippable equipable = splitCount.Item as IEquippable;
-                return new EquipCommand(Game.Player, equipable);
+                Game.MessageHandler.AddMessage($"Cannot equip {itemCount.Item}.");
+                return null;
             }
 
-            Game.MessageHandler.AddMessage($"Cannot equip {itemCount.Item}.");
-            return null;
+            ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount
+            {
+                Item = itemCount.Item,
+                Count = 1
+            });
+            IEquippable equipable = splitCount.Item as IEquippable;
+            return new EquipCommand(Game.Player, equipable);
         }
 
         public override void Draw(LayerInfo layer)
