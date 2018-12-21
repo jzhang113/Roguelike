@@ -58,8 +58,12 @@ namespace Roguelike.Systems
             {
                 int x = Terminal.State(Terminal.TK_MOUSE_X);
                 int y = Terminal.State(Terminal.TK_MOUSE_Y);
+                LayerInfo layer = _consoles[currentState.GetType()];
 
-                return currentState.HandleMouseInput(x, y, left, right);
+                if (layer.PointInside(x, y))
+                    return currentState.HandleMouseInput(x - layer.X, y - layer.Y, left, right);
+                else
+                    return null;
             }
 
             if (key == Terminal.TK_ESCAPE)

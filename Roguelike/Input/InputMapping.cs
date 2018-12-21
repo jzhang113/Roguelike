@@ -123,6 +123,20 @@ namespace Roguelike.Input
                         [Terminal.TK_KP_3] =        TargettingInput.JumpSE,
                         [Terminal.TK_N] =           TargettingInput.JumpSE
                     }
+                },
+                InventoryMap = new KeyMap.StateMap<InventoryInput>()
+                {
+                    None = new Dictionary<int, InventoryInput>()
+                    {
+                        [Terminal.TK_SPACE]     = InventoryInput.Open,
+                        [Terminal.TK_ENTER]     = InventoryInput.Open,
+                        [Terminal.TK_KP_ENTER]  = InventoryInput.Open,
+                        [Terminal.TK_RIGHT]     = InventoryInput.Open,
+                        [Terminal.TK_UP]        = InventoryInput.MoveUp,
+                        [Terminal.TK_KP_8]      = InventoryInput.MoveUp,
+                        [Terminal.TK_DOWN]      = InventoryInput.MoveDown,
+                        [Terminal.TK_KP_2]      = InventoryInput.MoveDown
+                    }
                 }
             };
         }

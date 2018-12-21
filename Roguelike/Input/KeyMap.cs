@@ -6,6 +6,7 @@ namespace Roguelike.Input
     {
         public StateMap<NormalInput> NormalMap { get; set; }
         public StateMap<TargettingInput> TargettingMap { get; set; }
+        public StateMap<InventoryInput> InventoryMap { get; set; }
 
         internal struct StateMap<T>
         {

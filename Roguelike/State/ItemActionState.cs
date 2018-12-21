@@ -2,6 +2,7 @@
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Data;
+using Roguelike.Input;
 using Roguelike.Items;
 using Roguelike.Utils;
 
@@ -11,25 +12,71 @@ namespace Roguelike.State
     {
         public bool Nonblocking => false;
 
+        protected virtual char CurrKey { get; set; }
+
+        protected virtual int Line => 1 + CurrKey - 'a';
+
+        protected ItemActionState()
+        {
+            CurrKey = 'a';
+        }
+
         public virtual ICommand HandleKeyInput(int key)
         {
-            char keyChar = key.ToChar();
-            Item item = Game.Player.Inventory.GetItem(keyChar);
-
-            // TODO: what about stacks
-            if (item == null)
+            switch (InputMapping.GetInventoryInput(key))
             {
-                Game.MessageHandler.AddMessage("No such item.");
-                return null;
+                case InventoryInput.MoveDown:
+                    if (CurrKey < Game.Player.Inventory.LastKey)
+                        CurrKey++;
+                    return null;
+                case InventoryInput.MoveUp:
+                    if (CurrKey > 'a')
+                        CurrKey--;
+                    return null;
+                case InventoryInput.Open:
+                    return HandleOpen();
+                case InventoryInput.OpenLetter:
+                    char charKey = key.ToChar();
+                    if (Game.Player.Inventory.HasKey(charKey))
+                    {
+                        CurrKey = charKey;
+                        goto case InventoryInput.Open;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                default:
+                    return null;
             }
-
-            return ResolveInput(item);
         }
 
         public virtual ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            // TODO do stuff and get the item selected
+            if (leftClick)
+                return HandleOpen();
+
+            CurrKey = (char)(y + 'a' - 1);
+            if (CurrKey < 'a')
+                CurrKey = 'a';
+            else if (CurrKey > Game.Player.Inventory.LastKey)
+                CurrKey = Game.Player.Inventory.LastKey;
+
             return null;
+        }
+
+        private ICommand HandleOpen()
+        {
+            if (Game.Player.Inventory.IsStacked(CurrKey))
+            {
+                ItemGroup group = Game.Player.Inventory.GetStack(CurrKey);
+                Game.StateHandler.PushState(new SubinvState(group, CurrKey));
+                return null;
+            }
+            else
+            {
+                return ResolveInput(Game.Player.Inventory.GetItem(CurrKey));
+            }
         }
 
         protected abstract ICommand ResolveInput(Item item);
@@ -62,6 +109,16 @@ namespace Roguelike.State
             });
             layer.Print(-1, $"{Constants.HEADER_LEFT}[color=white]INVENTORY{Constants.HEADER_SEP}" +
                 $"[color=grass]EQUIPMENT[/color]{Constants.HEADER_RIGHT}");
+
+            Terminal.Color(Colors.DimText);
+            Terminal.Layer(layer.Z - 1);
+
+            for (int x = 0; x < layer.Width; x++)
+            {
+                layer.Put(x, Line, '█');
+            }
+
+            Terminal.Layer(layer.Z);
         }
     }
 }

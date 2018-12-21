@@ -1,9 +1,8 @@
-﻿using BearLib;
-using Roguelike.Commands;
+﻿using Roguelike.Commands;
 using Roguelike.Core;
+using Roguelike.Input;
 using Roguelike.Items;
 using Roguelike.Utils;
-using System;
 
 namespace Roguelike.State
 {
@@ -11,75 +10,74 @@ namespace Roguelike.State
     {
         private readonly char _subKey;
         private readonly ItemGroup _subinv;
-        private int _currIndex;
-        private int _row => 2 + _subKey - 'a' + _currIndex;
+        private int _currIndex => CurrKey - 'a';
+        protected override int Line => 2 + _subKey - 'a' + _currIndex;
 
         public SubinvState(ItemGroup group, char key)
         {
-            _subKey = key;
+            CurrKey = 'a';
             _subinv = group;
-            _currIndex = 0;
+            _subKey = key;
         }
 
         public override ICommand HandleKeyInput(int key)
         {
-            if (key == Terminal.TK_DOWN)
+            switch (InputMapping.GetInventoryInput(key))
             {
-                if (_currIndex < _subinv.TypeCount - 1)
-                    _currIndex++;
+                case InventoryInput.MoveDown:
+                    if (_currIndex < _subinv.TypeCount - 1)
+                        CurrKey++;
+                    return null;
+                case InventoryInput.MoveUp:
+                    if (_currIndex > 0)
+                        CurrKey--;
+                    return null;
+                case InventoryInput.Open:
+                    Item it = _subinv.GetItem(_currIndex);
+                    return (it != null) ? ResolveInput(it) : null;
+                case InventoryInput.OpenLetter:
+                    char charKey = key.ToChar();
+                    if (_subinv.HasIndex(charKey))
+                    {
+                        CurrKey = charKey;
+                        goto case InventoryInput.Open;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                default:
+                    return null;
             }
-            else if (key == Terminal.TK_UP)
-            {
-                if (_currIndex > 0)
-                    _currIndex--;
-            }
-            else if (key == Terminal.TK_ENTER || key == Terminal.TK_SPACE)
-            {
-                OpenItemMenu();
-            }
-            else
-            {
-                char charKey = key.ToChar();
-                if (_subinv.HasIndex(charKey))
-                    _currIndex = charKey - 'a';
-                OpenItemMenu();
-            }
-
-            return null;
-        }
-
-        private void OpenItemMenu()
-        {
-            Item it = _subinv.GetItem(_currIndex);
-            if (it != null)
-                Game.StateHandler.PushState(new ItemMenuState(it, _row));
         }
 
         public override ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            return base.HandleMouseInput(x, y, leftClick, rightClick);
+            if (leftClick)
+            {
+                Item it = _subinv.GetItem(_currIndex);
+                return (it != null) ? ResolveInput(it) : null;
+            }
+
+            CurrKey = (char)(y + _subKey - 2);
+            if (CurrKey < 'a')
+                CurrKey = 'a';
+            else if (_currIndex >= _subinv.TypeCount)
+                CurrKey = (char)('a' + _subinv.TypeCount - 1);
+
+            return null;
         }
 
         protected override ICommand ResolveInput(Item item)
         {
-            throw new NotImplementedException();
+            Game.StateHandler.PushState(new ItemMenuState(item, Line));
+            return null;
         }
 
         public override void Draw(LayerInfo layer)
         {
             base.Draw(layer);
-
             Game.Player.Inventory.DrawItemStack(layer, _subKey);
-
-            Terminal.Color(Colors.DimText);
-            Terminal.Layer(layer.Z - 1);
-
-            for (int x = 0; x < layer.Width; x++)
-            {
-                layer.Put(x, _row, '█');
-            }
-
-            Terminal.Layer(layer.Z);
         }
     }
 }

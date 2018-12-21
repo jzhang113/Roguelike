@@ -22,6 +22,8 @@ namespace Roguelike.Core
             Height = height;
         }
 
+        public bool PointInside(int x, int y) => x > X && y > Y && x <= X + Width && y <= y + Height;
+
         public void Put(int x, int y, int code)
         {
             if (x <= Width && y <= Height)

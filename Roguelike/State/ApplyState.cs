@@ -27,8 +27,9 @@ namespace Roguelike.State
             IAction action = usableItem.ApplySkill;
             TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
             {
-                Game.Player.Inventory.Split(item, 1);
-                return new ApplyCommand(Game.Player, usableItem, returnTarget);
+                Item split = Game.Player.Inventory.Split(item, 1);
+                Game.StateHandler.PopState(); // exit targetting state
+                return new ApplyCommand(Game.Player, split as IUsable, returnTarget);
             });
             Game.StateHandler.PushState(state);
             return null;
@@ -37,7 +38,7 @@ namespace Roguelike.State
         public override void Draw(LayerInfo layer)
         {
             base.Draw(layer);
-            // highlight equippable items
+            // highlight appliable items
             Game.Player.Inventory.DrawSelected(layer, x => x is IUsable);
         }
     }

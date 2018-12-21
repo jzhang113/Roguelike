@@ -105,5 +105,17 @@
             "Enter": "Fire",
             "KeypadEnter": "Fire"
         }
+    },
+    "inventoryMap": {
+        "none": {
+            "Space": "Open",
+            "Enter": "Open",
+            "KeypadEnter": "Open",
+            "Right": "Open",
+            "Up": "MoveUp",
+            "Keypad8": "MoveUp",
+            "Down": "MoveDown",
+            "Keypad2": "MoveDown"
+        }
     }
 }

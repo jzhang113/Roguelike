@@ -33,8 +33,9 @@ namespace Roguelike.State
                     IAction action = usableItem.ApplySkill;
                     TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
                     {
-                        Game.Player.Inventory.Split(_item, 1);
-                        return new ApplyCommand(Game.Player, usableItem, returnTarget);
+                        Item usable = Game.Player.Inventory.Split(_item, 1);
+                        Game.StateHandler.PopState();
+                        return new ApplyCommand(Game.Player, usable as IUsable, returnTarget);
                     });
                     Game.StateHandler.PushState(state);
                     return null;
