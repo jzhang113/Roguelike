@@ -162,18 +162,11 @@ namespace Roguelike.Systems
         {
             int line = 1;
             char letter = 'a';
-            Terminal.Color(Colors.HighlightColor);
 
             foreach (ItemGroup group in _inventory)
             {
-                foreach (Item item in group)
-                {
-                    if (selected(item))
-                    {
-                        layer.Print(line, $"{letter} - {group}");
-                        break;
-                    }
-                }
+                Terminal.Color(group.Any(selected) ? Colors.HighlightColor : Colors.DimText);
+                layer.Print(line, $"{letter} - {group}");
 
                 line++;
                 letter++;

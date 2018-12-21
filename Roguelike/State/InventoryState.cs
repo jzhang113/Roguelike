@@ -15,7 +15,7 @@ namespace Roguelike.State
 
         protected override ICommand ResolveInput(Item item)
         {
-            Game.StateHandler.PushState(new ItemMenuState(item, Line));
+            Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, '\0'));
             return null;
         }
     }

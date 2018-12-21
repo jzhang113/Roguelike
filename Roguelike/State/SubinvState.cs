@@ -37,7 +37,7 @@ namespace Roguelike.State
                     return (it != null) ? ResolveInput(it) : null;
                 case InventoryInput.OpenLetter:
                     char charKey = key.ToChar();
-                    if (_subinv.HasIndex(charKey))
+                    if (_subinv.HasIndex(charKey - 'a'))
                     {
                         CurrKey = charKey;
                         goto case InventoryInput.Open;
@@ -70,7 +70,7 @@ namespace Roguelike.State
 
         protected override ICommand ResolveInput(Item item)
         {
-            Game.StateHandler.PushState(new ItemMenuState(item, Line));
+            Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, _subKey));
             return null;
         }
 

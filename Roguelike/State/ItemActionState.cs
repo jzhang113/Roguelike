@@ -110,7 +110,7 @@ namespace Roguelike.State
             layer.Print(-1, $"{Constants.HEADER_LEFT}[color=white]INVENTORY{Constants.HEADER_SEP}" +
                 $"[color=grass]EQUIPMENT[/color]{Constants.HEADER_RIGHT}");
 
-            Terminal.Color(Colors.DimText);
+            Terminal.Color(Colors.RowHighlight);
             Terminal.Layer(layer.Z - 1);
 
             for (int x = 0; x < layer.Width; x++)

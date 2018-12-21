@@ -11,12 +11,31 @@ namespace Roguelike.State
     internal class ItemMenuState : ItemActionState
     {
         private readonly Item _item;
-        private readonly int _line;
+        private readonly bool _fromSubinv;
+        private readonly char _subinvKey;
 
-        public ItemMenuState(Item item, int line)
+        private readonly bool _usable;
+        private readonly bool _equippable;
+
+        protected override int Line => _fromSubinv ? base.Line + 1 : base.Line;
+
+        public ItemMenuState(Item item, char prevKey, char subinvKey)
         {
+            CurrKey = prevKey;
             _item = item;
-            _line = line;
+
+            if (subinvKey != '\0')
+            {
+                _fromSubinv = true;
+                _subinvKey = subinvKey;
+            }
+            else
+            {
+                _fromSubinv = false;
+            }
+
+            _usable = item is IUsable;
+            _equippable = item is IEquippable;
         }
 
         public override ICommand HandleKeyInput(int key)
@@ -24,13 +43,13 @@ namespace Roguelike.State
             switch (key)
             {
                 case Terminal.TK_A:
-                    if (!(_item is IUsable usableItem))
+                    if (!_usable)
                     {
                         Game.MessageHandler.AddMessage($"Cannot apply {_item}.");
                         return null;
                     }
 
-                    IAction action = usableItem.ApplySkill;
+                    IAction action = ((IUsable)_item).ApplySkill;
                     TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
                     {
                         Item usable = Game.Player.Inventory.Split(_item, 1);
@@ -43,7 +62,7 @@ namespace Roguelike.State
                 case Terminal.TK_T:
                     return null;
                 case Terminal.TK_W:
-                    if (!(_item is IEquippable))
+                    if (!_equippable)
                     {
                         Game.MessageHandler.AddMessage($"Cannot equip {_item}.");
                         return null;
@@ -71,8 +90,12 @@ namespace Roguelike.State
         {
             base.Draw(layer);
 
-            LayerInfo itemMenu = new LayerInfo("Item menu", layer.Z + 1, layer.X + 0, layer.Y + _line + 2, 9, 4);
+            if (_fromSubinv)
+                Game.Player.Inventory.DrawItemStack(layer, _subinvKey);
+
+            LayerInfo itemMenu = new LayerInfo("Item menu", layer.Z + 1, layer.X + 0, layer.Y + Line + 2, 9, 4);
             itemMenu.Clear();
+            Terminal.Color(Colors.HighlightColor);
             itemMenu.DrawBorders(new BorderInfo
             {
                 TopLeftChar = '╠', // 204
@@ -85,11 +108,33 @@ namespace Roguelike.State
                 RightChar = '║'
             });
 
-            Terminal.Color(Colors.HighlightColor);
-            itemMenu.Print(0, 0, "(a)[color=white]pply");
+            if (_usable)
+            {
+                Terminal.Color(Colors.HighlightColor);
+                itemMenu.Print(0, 0, "(a)[color=white]pply");
+            }
+            else
+            {
+                Terminal.Color(Colors.DimText);
+                itemMenu.Print(0, 0, "(a)pply");
+            }
+            
+            // TODO: check edibility
             itemMenu.Print(0, 1, "(c)[color=white]onsume");
+
+            Terminal.Color(Colors.HighlightColor);
             itemMenu.Print(0, 2, "(t)[color=white]hrow");
-            itemMenu.Print(0, 3, "(w)[color=white]ear");
+
+            if (_equippable)
+            {
+                Terminal.Color(Colors.HighlightColor);
+                itemMenu.Print(0, 3, "(w)[color=white]ear");
+            }
+            else
+            {
+                Terminal.Color(Colors.DimText);
+                itemMenu.Print(0, 3, "(w)ear");
+            }
         }
     }
 }
