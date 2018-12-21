@@ -23,10 +23,10 @@ namespace Roguelike.Actions
             if (target == null)
                 return;
 
-            if (!Game.Map.TryGetItem(target.X, target.Y, out ItemCount itemCount))
+            if (!Game.Map.TryGetItem(target.X, target.Y, out Item item))
                 return;
 
-            itemCount.Item.Enchantment++;
+            item.Enchantment++;
         }
     }
 }

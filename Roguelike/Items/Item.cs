@@ -3,6 +3,7 @@ using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using Roguelike.Utils;
 using System;
 using System.Drawing;
 
@@ -12,7 +13,8 @@ namespace Roguelike.Items
     public class Item
     {
         public int Enchantment { get; set; }
-        public bool Burning { get; set; }
+        public bool Burning { get; set; } // TODO: do something with this
+        public int Count { get; private set; }
 
         public ItemParameter Parameters { get; }
         public Drawable DrawingComponent { get; }
@@ -24,10 +26,11 @@ namespace Roguelike.Items
 
         public string Name => Parameters.Name;
 
-        public Item(ItemParameter parameters, Color color, char symbol)
+        public Item(ItemParameter parameters, Color color, char symbol, int count = 1)
         {
             Parameters = parameters;
             DrawingComponent = new Drawable(color, symbol, true);
+            Count = count;
 
             Moveset = new MovesetHandler(new ActionNode(
                 null, null,
@@ -38,11 +41,13 @@ namespace Roguelike.Items
         }
 
         // copy constructor
-        public Item(Item other)
+        public Item(Item other, int count)
         {
             Enchantment = other.Enchantment;
+            Count = count;
 
             Parameters = other.Parameters;
+            Moveset = other.Moveset;
             DrawingComponent = new Drawable(
                 other.DrawingComponent.Color, other.DrawingComponent.Symbol, true);
         }
@@ -59,9 +64,9 @@ namespace Roguelike.Items
                 Parameters.Damage, new TargetZone(TargetShape.Range, Parameters.ThrowRange));
         }
 
-        public virtual Item DeepClone()
+        public virtual Item Clone(int count)
         {
-            return new Item(this);
+            return new Item(this, count);
         }
         #endregion
 
@@ -71,9 +76,22 @@ namespace Roguelike.Items
 
         public void AttackReset() => Moveset.Reset();
 
-        public override string ToString()
+        public void Merge(Item other)
         {
-            return $"{Enchantment:+0;-#} {Parameters.Name}";
+            if (!SameAs(other))
+                return;
+
+            Count += other.Count;
+            other.Count = 0;
+        }
+
+        public Item Split(int count)
+        {
+            if (count > Count)
+                count = Count;
+
+            Count -= count;
+            return Clone(count);
         }
 
         // Helper method for merging hard stacks.
@@ -87,6 +105,13 @@ namespace Roguelike.Items
         internal bool SimilarTo(Item other)
         {
             return Name == other.Name;
+        }
+
+        public override string ToString()
+        {
+            // TODO: implement identification
+            string name = $"{Enchantment:+0;-#} {Parameters.Name}";
+            return (Count == 1) ? name : $"{Count} {name.Pluralize()}";
         }
     }
 }

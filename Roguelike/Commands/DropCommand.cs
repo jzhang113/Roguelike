@@ -13,14 +13,14 @@ namespace Roguelike.Commands
 
         public string Input { get; set; }
 
-        private readonly ItemCount _itemCount;
+        private readonly Item _item;
         private int _dropAmount;
 
-        public DropCommand(Actor source, ItemCount itemCount, int dropAmount)
+        public DropCommand(Actor source, Item item, int dropAmount)
         {
             Source = source;
 
-            _itemCount = itemCount;
+            _item = item;
             _dropAmount = dropAmount;
         }
 
@@ -32,16 +32,12 @@ namespace Roguelike.Commands
         public void Execute()
         {
             System.Diagnostics.Debug.Assert(_dropAmount > 0);
-            if (_dropAmount > _itemCount.Count)
-                _dropAmount = _itemCount.Count;
+            if (_dropAmount > _item.Count)
+                _dropAmount = _item.Count;
 
-            ItemCount dropped = Source.Inventory.Split(new ItemCount
-            {
-                Item = _itemCount.Item,
-                Count = _dropAmount
-            });
-            dropped.Item.X = Source.X;
-            dropped.Item.Y = Source.Y;
+            Item dropped = Source.Inventory.Split(_item, _dropAmount);
+            dropped.X = Source.X;
+            dropped.Y = Source.Y;
             Game.Map.AddItem(dropped);
             Game.MessageHandler.AddMessage($"You drop {dropped}.");
         }

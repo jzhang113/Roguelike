@@ -4,7 +4,6 @@ using Roguelike.Core;
 using Roguelike.Data;
 using Roguelike.Items;
 using Roguelike.Utils;
-using System.Linq;
 
 namespace Roguelike.State
 {
@@ -15,14 +14,16 @@ namespace Roguelike.State
         public virtual ICommand HandleKeyInput(int key)
         {
             char keyChar = key.ToChar();
-            if (!Game.Player.Inventory.TryGetKey(keyChar, out ItemStack stack))
+            Item item = Game.Player.Inventory.GetItem(keyChar);
+
+            // TODO: what about stacks
+            if (item == null)
             {
                 Game.MessageHandler.AddMessage("No such item.");
                 return null;
             }
-            
-            System.Diagnostics.Debug.Assert(stack.Count > 0);
-            return ResolveInput(stack.First());
+
+            return ResolveInput(item);
         }
 
         public virtual ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
@@ -31,7 +32,7 @@ namespace Roguelike.State
             return null;
         }
 
-        protected abstract ICommand ResolveInput(ItemCount itemCount);
+        protected abstract ICommand ResolveInput(Item item);
 
         public virtual void Update(ICommand command)
         {

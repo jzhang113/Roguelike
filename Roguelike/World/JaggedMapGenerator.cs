@@ -45,7 +45,7 @@ namespace Roguelike.World
             int[,] occupied = new int[Width, Height];
 
             // Set up the initial placement of the map. Include special features, if any.
-            int counter = InitialPlacement("map.xp", initialRooms, openPoints, ref occupied);
+            int counter = InitialPlacement(null, initialRooms, openPoints, ref occupied);
             IList<Room> allRooms = new List<Room>(initialRooms);
 
             while (openPoints.Count > 0)

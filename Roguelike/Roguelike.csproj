@@ -144,9 +144,8 @@
     <Compile Include="Input\TargettingInput.cs" />
     <Compile Include="Interfaces\AnimatedDrawable.cs" />
     <Compile Include="Interfaces\IEquipped.cs" />
-    <Compile Include="Items\ItemCount.cs" />
     <Compile Include="Items\ItemParameter.cs" />
-    <Compile Include="Items\ItemStack.cs" />
+    <Compile Include="Items\ItemGroup.cs" />
     <Compile Include="State\AnimationState.cs" />
     <Compile Include="State\ApplyState.cs" />
     <Compile Include="State\AutoexploreState.cs" />

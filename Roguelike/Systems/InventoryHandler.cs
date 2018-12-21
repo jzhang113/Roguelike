@@ -11,9 +11,9 @@ namespace Roguelike.Systems
 {
     // Handles all stacks of items in the game, such as the player inventory and piles of loot.
     [Serializable]
-    public class InventoryHandler : ICollection<ItemCount>
+    public class InventoryHandler : ICollection<Item>
     {
-        private readonly IList<ItemStack> _inventory;
+        private readonly IList<ItemGroup> _inventory;
 
         public int Count => _inventory.Count;
 
@@ -25,44 +25,38 @@ namespace Roguelike.Systems
 
         public InventoryHandler()
         {
-            _inventory = new List<ItemStack>();
+            _inventory = new List<ItemGroup>();
         }
 
         // Increments the item stack if it already exists or adds the item to inventory.
-        public void Add(ItemCount item)
+        public void Add(Item item)
         {
-            if (item?.Item == null)
-                return;
+            System.Diagnostics.Debug.Assert(item != null);
 
-            bool found = false;
-            foreach (ItemStack itemStack in _inventory)
+            foreach (ItemGroup group in _inventory)
             {
-                if (itemStack.Contains(item.Item, out _))
+                if (group.Contains(item))
                 {
-                    found = true;
-                    itemStack.Add(item.Item, item.Count);
-                    break;
+                    group.Add(item);
+                    return;
                 }
             }
 
-            if (!found)
-                _inventory.Add(new ItemStack(item.Item, item.Count));
+            _inventory.Add(new ItemGroup(item));
         }
 
         // Deregister an Item from the Inventory.
-        public bool Remove(ItemCount item)
+        public bool Remove(Item item)
         {
-            if (item?.Item == null)
-                return false;
+            System.Diagnostics.Debug.Assert(item != null);
 
-            foreach (ItemStack itemStack in _inventory)
+            foreach (ItemGroup group in _inventory)
             {
-                if (itemStack.Contains(item.Item, out Item key))
+                if (group.Contains(item))
                 {
-                    itemStack.Remove(key);
-
-                    if (itemStack.IsEmpty())
-                        _inventory.Remove(itemStack);
+                    group.Remove(item);
+                    if (group.IsEmpty())
+                        _inventory.Remove(group);
 
                     return true;
                 }
@@ -72,28 +66,27 @@ namespace Roguelike.Systems
         }
 
         // Returns a new ItemCount containing the split amount.
-        public ItemCount Split(ItemCount itemCount)
+        public Item Split(Item item, int count)
         {
-            System.Diagnostics.Debug.Assert(itemCount?.Item != null);
+            System.Diagnostics.Debug.Assert(item != null);
 
-            foreach (ItemStack itemStack in _inventory)
+            foreach (ItemGroup group in _inventory)
             {
-                if (itemStack.Contains(itemCount.Item, out Item key))
+                if (group.Contains(item))
                 {
-                    ItemCount split = itemStack.Split(key, itemCount.Count);
-
-                    if (itemStack.IsEmpty())
-                        _inventory.Remove(itemStack);
+                    Item split = group.Split(item, count);
+                    if (group.IsEmpty())
+                        _inventory.Remove(group);
 
                     return split;
                 }
             }
 
             Game.MessageHandler.AddMessage(
-                $"{itemCount.Item.Name} not found, can't split it",
+                $"{item.Name} not found, can't split it",
                 MessageLevel.Verbose);
             System.Diagnostics.Debug.Fail(
-                $"Cannot split non-existant item, {itemCount.Item.Name}, from inventory");
+                $"Cannot split non-existant item, {item.Name}, from inventory");
             return null;
         }
 
@@ -102,46 +95,32 @@ namespace Roguelike.Systems
             _inventory.Clear();
         }
 
-        public bool Contains(ItemCount item)
-        {
-            if (item?.Item == null)
-                return false;
+        public bool Contains(Item item) => _inventory.Any(group => group.Contains(item));
 
-            return _inventory.Any(itemStack => itemStack.Contains(item.Item, out _));
-        }
-
-        public void CopyTo(ItemCount[] array, int arrayIndex)
+        public void CopyTo(Item[] array, int arrayIndex)
         {
-            _inventory.SelectMany(itemStack => itemStack).ToList().CopyTo(array, arrayIndex);
+            _inventory.SelectMany(group => group).ToList().CopyTo(array, arrayIndex);
         }
 
         public bool HasKey(char key) => key >= 'a' && key <= LastKey;
 
-        // Attempts to returns the item at position key. Does not remove the item from inventory.
-        // Returns false if the item does not exist.
-        public bool TryGetKey(char key, out ItemStack item)
-        {
-            if (!HasKey(key))
-            {
-                item = null;
-                return false;
-            }
+        // Attempts to returns the item at position key. Does not return a stack of items
+        public Item GetItem(char key) => (HasKey(key) && !IsStacked(key)) ? _inventory[key - 'a'].First() : null;
 
-            item = _inventory[key - 'a'];
-            return true;
-        }
+        // Attempts to return the stack at position key
+        public ItemGroup GetStack(char key) => (HasKey(key) && IsStacked(key)) ? _inventory[key - 'a'] : null;
 
         public bool IsStacked(char key)
         {
             System.Diagnostics.Debug.Assert(HasKey(key));
 
-            ItemStack itemStack = _inventory[key - 'a'];
+            ItemGroup itemStack = _inventory[key - 'a'];
             return itemStack.TypeCount > 1;
         }
 
         public void SetFire()
         {
-            foreach (ItemStack stack in _inventory.ToList())
+            foreach (ItemGroup stack in _inventory.ToList())
             {
                 stack.SetFire();
                 if (stack.IsEmpty())
@@ -170,7 +149,7 @@ namespace Roguelike.Systems
             char letter = 'a';
             Terminal.Color(Colors.Text);
 
-            foreach (ItemStack itemStack in _inventory)
+            foreach (ItemGroup itemStack in _inventory)
             {
                 layer.Print(line, $"{letter} - {itemStack}");
                 line++;
@@ -185,13 +164,13 @@ namespace Roguelike.Systems
             char letter = 'a';
             Terminal.Color(Colors.HighlightColor);
 
-            foreach (ItemStack itemStack in _inventory)
+            foreach (ItemGroup group in _inventory)
             {
-                foreach (ItemCount itemCount in itemStack)
+                foreach (Item item in group)
                 {
-                    if (selected(itemCount.Item))
+                    if (selected(item))
                     {
-                        layer.Print(line, $"{letter} - {itemStack}");
+                        layer.Print(line, $"{letter} - {group}");
                         break;
                     }
                 }
@@ -212,7 +191,7 @@ namespace Roguelike.Systems
             Terminal.Color(Colors.WallBackground);
             layer.Clear();
 
-            foreach (ItemStack itemStack in _inventory)
+            foreach (ItemGroup itemStack in _inventory)
             {
                 layer.Print(line++, $"{letter} - {itemStack}");
 
@@ -220,9 +199,9 @@ namespace Roguelike.Systems
                 {
                     Terminal.Color(Colors.HighlightColor);
 
-                    foreach (ItemCount itemCount in _inventory[key - 'a'])
+                    foreach (Item item in _inventory[key - 'a'])
                     {
-                        layer.Print(line++, $"  {subletter} - {itemCount}");
+                        layer.Print(line++, $"  {subletter} - {item}");
                         subletter++;
                     }
 
@@ -233,9 +212,9 @@ namespace Roguelike.Systems
             }
         }
 
-        public IEnumerator<ItemCount> GetEnumerator()
+        public IEnumerator<Item> GetEnumerator()
         {
-            return _inventory.SelectMany(itemStack => itemStack).GetEnumerator();
+            return _inventory.SelectMany(group => group).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

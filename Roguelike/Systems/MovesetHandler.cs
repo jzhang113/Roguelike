@@ -11,8 +11,6 @@ namespace Roguelike.Systems
         private ActionNode Root { get; }
         private ActionNode Current { get; set; }
 
-        private static int _printLine; // helper variable for RecursivePrint
-
         public MovesetHandler(ActionNode starter)
         {
             Root = starter;
@@ -42,29 +40,28 @@ namespace Roguelike.Systems
 
         public void Draw(LayerInfo layer)
         {
-            _printLine = 0;
-            RecursivePrint(layer, Root, 0);
+            RecursivePrint(layer, Root, 0, 0);
         }
 
-        private void RecursivePrint(LayerInfo layer, ActionNode action, int depth)
+        private void RecursivePrint(LayerInfo layer, ActionNode action, int depth, int line)
         {
             if (action == null)
                 return;
 
-            string line;
+            string text;
 
             if (action == Current.Left)
-                line = "z-";
+                text = "z-";
             else if (action == Current.Right)
-                line = "x-";
+                text = "x-";
             else
-                line = depth > 0 ? "+-" : "  ";
+                text = depth > 0 ? "+-" : "  ";
 
             Terminal.Color(action == Current ? Swatch.DbBlood : Colors.Text);
-            layer.Print(2 * depth - 2, _printLine++, line + action.Name);
+            layer.Print(2 * depth - 2, line, text + action.Name);
 
-            RecursivePrint(layer, action.Left, depth + 1);
-            RecursivePrint(layer, action.Right, depth + 1);
+            RecursivePrint(layer, action.Left, depth + 1, line + 1);
+            RecursivePrint(layer, action.Right, depth + 1, line + 1);
         }
     }
 

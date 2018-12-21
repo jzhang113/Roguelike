@@ -16,20 +16,16 @@ namespace Roguelike.State
         {
         }
 
-        protected override ICommand ResolveInput(ItemCount itemCount)
+        protected override ICommand ResolveInput(Item item)
         {
-            if (itemCount.Item is IEquippable)
+            if (item is IEquippable)
             {
-                ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount
-                {
-                    Item = itemCount.Item,
-                    Count = 1
-                });
-                IEquippable equipable = splitCount.Item as IEquippable;
+                Item split = Game.Player.Inventory.Split(item, 1);
+                IEquippable equipable = split as IEquippable;
                 return new UnequipCommand(Game.Player, equipable);
             }
 
-            Game.MessageHandler.AddMessage($"Cannot unequip {itemCount.Item}.");
+            Game.MessageHandler.AddMessage($"Cannot unequip {item}.");
             return null;
         }
 

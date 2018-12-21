@@ -186,7 +186,7 @@ namespace Roguelike.World
                 X = Game.Player.X - 1,
                 Y = Game.Player.Y - 1
             };
-            Map.AddItem(new ItemCount { Item = spear, Count = 1 });
+            Map.AddItem(spear);
 
             spear.Moveset = new Systems.MovesetHandler(new Systems.ActionNode(
                 new Systems.ActionNode(
@@ -220,11 +220,9 @@ namespace Roguelike.World
                 X = Game.Player.X - 2,
                 Y = Game.Player.Y - 3
             };
-            Map.AddItem(new ItemCount { Item = ha, Count = 1 });
+            Map.AddItem(ha);
 
-            Map.AddItem(new ItemCount
-            {
-                Item = new Scroll(
+            Map.AddItem(new Scroll(
                     new ItemParameter("scroll of magic missile", MaterialType.Paper),
                     new DamageAction(
                         200,
@@ -233,9 +231,7 @@ namespace Roguelike.World
                 {
                     X = Game.Player.X - 1,
                     Y = Game.Player.Y - 2
-                },
-                Count = 1
-            });
+                });
 
             Scroll healing = new Scroll(
                 new ItemParameter("scroll of healing", MaterialType.Paper), heal, Swatch.DbGrass)
@@ -243,11 +239,9 @@ namespace Roguelike.World
                 X = Game.Player.X + 1,
                 Y = Game.Player.Y + 1
             };
-            Map.AddItem(new ItemCount { Item = healing, Count = 1 });
+            Map.AddItem(healing);
 
-            Map.AddItem(new ItemCount
-            {
-                Item = new Scroll(
+            Map.AddItem(new Scroll(
                     new ItemParameter("scroll of enchantment", MaterialType.Paper),
                     new EnchantAction(
                         new TargetZone(TargetShape.Range, range: 10)),
@@ -255,13 +249,9 @@ namespace Roguelike.World
                 {
                     X = Game.Player.X - 1,
                     Y = Game.Player.Y
-                },
-                Count = 1
-            });
+                });
 
-            Map.AddItem(new ItemCount
-            {
-                Item = new Scroll(
+            Map.AddItem(new Scroll(
                     new ItemParameter("scroll of fireball", MaterialType.Paper),
                     new DamageAction(
                         200,
@@ -270,23 +260,21 @@ namespace Roguelike.World
                 {
                     X = Game.Player.X - 2,
                     Y = Game.Player.Y - 2
-                },
-                Count = 1
-            });
+                });
 
             Item planks = new Item(
-                    new ItemParameter("plank", MaterialType.Wood), Swatch.DbWood, '\\')
+                    new ItemParameter("plank", MaterialType.Wood), Swatch.DbWood, '\\', 10)
             {
                 X = Game.Player.X + 2,
                 Y = Game.Player.Y + 2,
             };
-            Item planks2 = new Item(planks) { X = Game.Player.X + 3 };
-            Item planks3 = new Item(planks) { Y = Game.Player.Y + 3 };
-            Item planks4 = new Item(planks) { X = Game.Player.X + 3, Y = Game.Player.Y + 3 };
-            Map.AddItem(new ItemCount { Item = planks, Count = 10 });
-            Map.AddItem(new ItemCount { Item = planks2, Count = 10 });
-            Map.AddItem(new ItemCount { Item = planks3, Count = 10 });
-            Map.AddItem(new ItemCount { Item = planks4, Count = 10 });
+            Item planks2 = new Item(planks, 10) { X = Game.Player.X + 3 };
+            Item planks3 = new Item(planks, 10) { Y = Game.Player.Y + 3 };
+            Item planks4 = new Item(planks, 10) { X = Game.Player.X + 3, Y = Game.Player.Y + 3 };
+            Map.AddItem(planks);
+            Map.AddItem(planks2);
+            Map.AddItem(planks3);
+            Map.AddItem(planks4);
         }
 
         // HACK: ad-hoc placement code

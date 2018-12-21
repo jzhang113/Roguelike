@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BearLib;
+﻿using BearLib;
 using Roguelike.Actions;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
+using System;
 
 namespace Roguelike.State
 {
     internal class ItemMenuState : ItemActionState
     {
-        private readonly ItemCount _item;
+        private readonly Item _item;
         private readonly int _line;
 
-        public ItemMenuState(char curr)
+        public ItemMenuState(Item item, int line)
         {
-            Game.Player.Inventory.TryGetKey(curr, out ItemStack stack);
-            _item = stack.First();
-            _line = 1 + curr - 'a';
+            _item = item;
+            _line = line;
         }
 
         public override ICommand HandleKeyInput(int key)
@@ -29,16 +24,16 @@ namespace Roguelike.State
             switch (key)
             {
                 case Terminal.TK_A:
-                    if (!(_item.Item is IUsable usableItem))
+                    if (!(_item is IUsable usableItem))
                     {
-                        Game.MessageHandler.AddMessage($"Cannot apply {_item.Item}.");
+                        Game.MessageHandler.AddMessage($"Cannot apply {_item}.");
                         return null;
                     }
 
                     IAction action = usableItem.ApplySkill;
                     TargettingState state = new TargettingState(Game.Player, action.Area, returnTarget =>
                     {
-                        Game.Player.Inventory.Split(new ItemCount { Item = _item.Item, Count = 1 });
+                        Game.Player.Inventory.Split(_item, 1);
                         return new ApplyCommand(Game.Player, usableItem, returnTarget);
                     });
                     Game.StateHandler.PushState(state);
@@ -47,18 +42,14 @@ namespace Roguelike.State
                 case Terminal.TK_T:
                     return null;
                 case Terminal.TK_W:
-                    if (!(_item.Item is IEquippable))
+                    if (!(_item is IEquippable))
                     {
-                        Game.MessageHandler.AddMessage($"Cannot equip {_item.Item}.");
+                        Game.MessageHandler.AddMessage($"Cannot equip {_item}.");
                         return null;
                     }
 
-                    ItemCount splitCount = Game.Player.Inventory.Split(new ItemCount
-                    {
-                        Item = _item.Item,
-                        Count = 1
-                    });
-                    IEquippable equipable = splitCount.Item as IEquippable;
+                    Item split = Game.Player.Inventory.Split(_item, 1);
+                    IEquippable equipable = split as IEquippable;
                     return new EquipCommand(Game.Player, equipable);
                 default:
                     return null;
@@ -70,7 +61,7 @@ namespace Roguelike.State
             return base.HandleMouseInput(x, y, leftClick, rightClick);
         }
 
-        protected override ICommand ResolveInput(ItemCount itemCount)
+        protected override ICommand ResolveInput(Item item)
         {
             throw new NotImplementedException();
         }
@@ -80,6 +71,7 @@ namespace Roguelike.State
             base.Draw(layer);
 
             LayerInfo itemMenu = new LayerInfo("Item menu", layer.Z + 1, layer.X + 0, layer.Y + _line + 2, 9, 4);
+            itemMenu.Clear();
             itemMenu.DrawBorders(new BorderInfo
             {
                 TopLeftChar = '╠', // 204

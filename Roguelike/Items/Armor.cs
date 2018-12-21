@@ -15,7 +15,7 @@ namespace Roguelike.Items
             Type = type;
         }
 
-        public Armor(Armor other) : base(other)
+        public Armor(Armor other, int count) : base(other, count)
         {
             Type = other.Type;
         }
@@ -43,9 +43,9 @@ namespace Roguelike.Items
             Game.MessageHandler.AddMessage($"You take off the {Name}.");
         }
 
-        public override Item DeepClone()
+        public override Item Clone(int count)
         {
-            return new Armor(this);
+            return new Armor(this, count);
         }
     }
 }

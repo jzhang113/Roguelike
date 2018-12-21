@@ -18,7 +18,7 @@ namespace Roguelike.Items
             ApplySkill = action;
         }
 
-        public Scroll(Scroll other) : base(other)
+        public Scroll(Scroll other, int count) : base(other, count)
         {
             ApplySkill = other.ApplySkill;
         }
@@ -31,9 +31,9 @@ namespace Roguelike.Items
             }
         }
 
-        public override Item DeepClone()
+        public override Item Clone(int count)
         {
-            return new Scroll(this);
+            return new Scroll(this, count);
         }
     }
 }

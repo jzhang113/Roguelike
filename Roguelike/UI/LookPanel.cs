@@ -22,9 +22,9 @@ namespace Roguelike.UI
             _showItemInfo = false;
         }
 
-        public static void DisplayItem(ItemCount itemCount)
+        public static void DisplayItem(Item item)
         {
-            _displayItem = itemCount.Item;
+            _displayItem = item;
             _showItemInfo = true;
             _showActorInfo = false;
         }

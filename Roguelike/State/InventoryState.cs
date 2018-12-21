@@ -13,6 +13,7 @@ namespace Roguelike.State
         public static InventoryState Instance => _instance.Value;
 
         private char _currKey;
+        private int _row => 1 + _currKey - 'a';
 
         private InventoryState()
         {
@@ -37,41 +38,49 @@ namespace Roguelike.State
             else if (key == Terminal.TK_ENTER || key == Terminal.TK_SPACE)
             {
                 System.Diagnostics.Debug.Assert(inv.HasKey(_currKey));
-                if (Game.Player.Inventory.IsStacked(_currKey))
-                {
-                    Game.StateHandler.PushState(new SubinvState(_currKey));
-                }
-                else
-                {
-                    Game.StateHandler.PushState(new ItemMenuState(_currKey));
-                }
+                OpenItemMenu();
             }
             else
             {
                 char charKey = key.ToChar();
                 if (inv.HasKey(charKey))
                     _currKey = charKey;
+                OpenItemMenu();
             }
 
             return null;
         }
 
-        protected override ICommand ResolveInput(ItemCount itemCount)
+        private void OpenItemMenu()
         {
-            throw new NotImplementedException();
+            if (Game.Player.Inventory.IsStacked(_currKey))
+            {
+                ItemGroup group = Game.Player.Inventory.GetStack(_currKey);
+                Game.StateHandler.PushState(new SubinvState(group, _currKey));
+            }
+            else
+            {
+                Item item = Game.Player.Inventory.GetItem(_currKey);
+                Game.StateHandler.PushState(new ItemMenuState(item, _row));
+            }
+        }
+
+        protected override ICommand ResolveInput(Item item)
+        {
+            // nothing to do here
+            return null;
         }
 
         public override void Draw(LayerInfo layer)
         {
             base.Draw(layer);
 
-            int row = 1 + _currKey - 'a';
             Terminal.Color(Colors.DimText);
             Terminal.Layer(layer.Z - 1);
 
             for (int x = 0; x < layer.Width; x++)
             {
-                layer.Put(x, row, '█');
+                layer.Put(x, _row, '█');
             }
 
             Terminal.Layer(layer.Z);

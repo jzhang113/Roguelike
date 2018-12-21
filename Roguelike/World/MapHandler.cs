@@ -193,32 +193,32 @@ namespace Roguelike.World
         #endregion
 
         #region Item Methods
-        public void AddItem(ItemCount itemCount)
+        public void AddItem(Item item)
         {
-            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
+            int index = ToIndex(item.X, item.Y);
             if (Items.TryGetValue(index, out InventoryHandler stack))
             {
-                stack.Add(itemCount);
+                stack.Add(item);
             }
             else
             {
                 Items.Add(index, new InventoryHandler
                 {
-                    itemCount
+                    item
                 });
             }
         }
 
-        public bool TryGetItem(int x, int y, out ItemCount itemCount)
+        public bool TryGetItem(int x, int y, out Item item)
         {
             bool success = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
             if (!success || stack.Count == 0)
             {
-                itemCount = null;
+                item = null;
                 return false;
             }
 
-            itemCount = stack.First();
+            item = stack.First();
             return true;
         }
 
@@ -242,20 +242,20 @@ namespace Roguelike.World
         }
 
         // Take items off of the map.
-        public ItemCount SplitItem(ItemCount itemCount)
+        public Item SplitItem(Item item)
         {
-            int index = ToIndex(itemCount.Item.X, itemCount.Item.Y);
+            int index = ToIndex(item.X, item.Y);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
             {
-                System.Diagnostics.Debug.Fail($"Could not split {itemCount.Item.Name} on the map.");
+                System.Diagnostics.Debug.Fail($"Could not split {item.Name} on the map.");
                 return null;
             }
 
             System.Diagnostics.Debug.Assert(
-                stack.Contains(itemCount),
-                $"Map does not contain {itemCount.Item.Name}.");
+                stack.Contains(item),
+                $"Map does not contain {item.Name}.");
 
-            ItemCount split = stack.Split(itemCount);
+            Item split = stack.Split(item, item.Count);
             if (stack.IsEmpty())
                 Items.Remove(index);
             return split;
@@ -746,7 +746,7 @@ namespace Roguelike.World
 
             foreach (InventoryHandler stack in Items.Values)
             {
-                Item topItem = stack.First().Item;
+                Item topItem = stack.First();
                 topItem.DrawingComponent.Draw(layer, Field[topItem.X, topItem.Y]);
             }
 

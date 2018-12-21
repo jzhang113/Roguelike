@@ -11,7 +11,7 @@ namespace Roguelike.Items
         {
         }
 
-        public Weapon(Weapon other) : base(other)
+        public Weapon(Weapon other, int count) : base(other, count)
         {
         }
 
@@ -38,9 +38,9 @@ namespace Roguelike.Items
             Game.MessageHandler.AddMessage($"You unwield a {Name}.");
         }
 
-        public override Item DeepClone()
+        public override Item Clone(int count)
         {
-            return new Weapon(this);
+            return new Weapon(this, count);
         }
     }
 }

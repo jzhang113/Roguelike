@@ -89,7 +89,7 @@ namespace Roguelike.State
                             Tile tile = enumerable[0];
                             weapon.X = tile.X;
                             weapon.Y = tile.Y;
-                            Game.Map.AddItem(new ItemCount { Item = weapon, Count = 1 });
+                            Game.Map.AddItem(weapon);
 
                             return new ActionCommand(player, thrown, enumerable);
                         }));
@@ -204,7 +204,7 @@ namespace Roguelike.State
             {
                 LookPanel.DisplayActor(displayActor);
             }
-            else if (Game.Map.TryGetItem(current.X, current.Y, out ItemCount displayItem)
+            else if (Game.Map.TryGetItem(current.X, current.Y, out Item displayItem)
                 && displayItem.Count > 0)
             {
                 LookPanel.DisplayItem(displayItem);

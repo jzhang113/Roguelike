@@ -37,37 +37,33 @@ namespace Roguelike.Commands
 
         public void Execute()
         {
-            ItemCount itemCount;
+            Item item, split;
 
             switch(_itemStack.Count)
             {
                 case 1:
-                    itemCount = _itemStack.First();
-                    Source.Inventory.Add(itemCount);
-
-                    Game.Map.SplitItem(itemCount);
-                    Game.MessageHandler.AddMessage($"You pick up {itemCount}.");
+                    item = _itemStack.First();
+                    split = Game.Map.SplitItem(item);
+                    Source.Inventory.Add(split);
+                    Game.MessageHandler.AddMessage($"You pick up {split}.");
                     break;
                 default:
                     if (Source is Player)
                     {
                         // HACK: handle pickup menu - this placeholder at least lets you pick up the top item
-                        itemCount = _itemStack.First();
-                        Source.Inventory.Add(itemCount);
-
-                        Game.Map.SplitItem(itemCount);
-                        Game.MessageHandler.AddMessage($"You pick up {itemCount}.");
+                        item = _itemStack.First();
+                        split = Game.Map.SplitItem(item);
+                        Source.Inventory.Add(split);
+                        Game.MessageHandler.AddMessage($"You pick up {split}.");
                     }
                     else
                     {
                         // HACK: Monsters will simply grab the top item off of a pile if they try to pick stuff up.
-                        itemCount = _itemStack.First();
-                        Source.Inventory.Add(itemCount);
-
-                        Game.Map.SplitItem(itemCount);
-
+                        item = _itemStack.First();
+                        split = Game.Map.SplitItem(item);
+                        Source.Inventory.Add(split);
                         // TODO: Tell the player only if they can see / notice this
-                        Game.MessageHandler.AddMessage($"{Source} picks up {itemCount}.");
+                        Game.MessageHandler.AddMessage($"{Source} picks up {split}.");
                     }
                     break;
             }

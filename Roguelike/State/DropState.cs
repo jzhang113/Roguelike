@@ -14,15 +14,15 @@ namespace Roguelike.State
         {
         }
 
-        protected override ICommand ResolveInput(ItemCount itemCount)
+        protected override ICommand ResolveInput(Item item)
         {
-            if (itemCount.Count == 1)
-                return new DropCommand(Game.Player, itemCount, 1);
+            if (item.Count == 1)
+                return new DropCommand(Game.Player, item, 1);
 
             Game.StateHandler.PushState(new TextInputState(input =>
             {
                 if (int.TryParse(input, out int dropAmount) && dropAmount > 0)
-                    return new DropCommand(Game.Player, itemCount, dropAmount);
+                    return new DropCommand(Game.Player, item, dropAmount);
 
                 Game.MessageHandler.AddMessage($"Unknown amount: {input}");
                 return null;
