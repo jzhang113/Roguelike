@@ -17,11 +17,12 @@ namespace Roguelike.State
         private readonly bool _usable;
         private readonly bool _equippable;
 
-        protected override int Line => _fromSubinv ? base.Line + 1 : base.Line;
+        protected override int Line => _fromSubinv ? base.Line + _subinvKey - 'a' + 1 : base.Line;
 
-        public ItemMenuState(Item item, char prevKey, char subinvKey)
+        public ItemMenuState(Item item, char prevKey, char subinvKey, Func<Item, bool> selected)
         {
             CurrKey = prevKey;
+            Selected = selected;
             _item = item;
 
             if (subinvKey != '\0')
@@ -91,7 +92,7 @@ namespace Roguelike.State
             base.Draw(layer);
 
             if (_fromSubinv)
-                Game.Player.Inventory.DrawItemStack(layer, _subinvKey);
+                Game.Player.Inventory.DrawStackSelected(layer, _subinvKey, Selected);
 
             LayerInfo itemMenu = new LayerInfo("Item menu", layer.Z + 1, layer.X + 0, layer.Y + Line + 2, 9, 4);
             itemMenu.Clear();
@@ -118,9 +119,10 @@ namespace Roguelike.State
                 Terminal.Color(Colors.DimText);
                 itemMenu.Print(0, 0, "(a)pply");
             }
-            
+
             // TODO: check edibility
-            itemMenu.Print(0, 1, "(c)[color=white]onsume");
+            Terminal.Color(Colors.DimText);
+            itemMenu.Print(0, 1, "(c)onsume");
 
             Terminal.Color(Colors.HighlightColor);
             itemMenu.Print(0, 2, "(t)[color=white]hrow");

@@ -174,14 +174,14 @@ namespace Roguelike.Systems
         }
 
         // redraw inventory with opened item stack
-        internal void DrawItemStack(LayerInfo layer, char key)
+        internal void DrawStackSelected(LayerInfo layer, char key, Func<Item, bool> selected)
         {
             System.Diagnostics.Debug.Assert(IsStacked(key));
 
             int line = 1;
             char letter = 'a';
             char subletter = 'a';
-            Terminal.Color(Colors.WallBackground);
+            Terminal.Color(Colors.DimText);
             layer.Clear();
 
             foreach (ItemGroup itemStack in _inventory)
@@ -190,15 +190,14 @@ namespace Roguelike.Systems
 
                 if (letter == key)
                 {
-                    Terminal.Color(Colors.HighlightColor);
-
                     foreach (Item item in _inventory[key - 'a'])
                     {
+                        Terminal.Color(selected(item) ? Colors.HighlightColor : Colors.DimText);
                         layer.Print(line++, $"  {subletter} - {item}");
                         subletter++;
                     }
 
-                    Terminal.Color(Colors.WallBackground);
+                    Terminal.Color(Colors.DimText);
                 }
 
                 letter++;

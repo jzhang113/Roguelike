@@ -1,6 +1,5 @@
 ﻿using Roguelike.Actions;
 using Roguelike.Commands;
-using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using System;
@@ -14,6 +13,7 @@ namespace Roguelike.State
 
         private ApplyState()
         {
+            Selected = x => x is IUsable;
         }
 
         protected override ICommand ResolveInput(Item item)
@@ -33,13 +33,6 @@ namespace Roguelike.State
             });
             Game.StateHandler.PushState(state);
             return null;
-        }
-
-        public override void Draw(LayerInfo layer)
-        {
-            base.Draw(layer);
-            // highlight appliable items
-            Game.Player.Inventory.DrawSelected(layer, x => x is IUsable);
         }
     }
 }

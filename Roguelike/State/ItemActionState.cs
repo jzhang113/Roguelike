@@ -5,6 +5,7 @@ using Roguelike.Data;
 using Roguelike.Input;
 using Roguelike.Items;
 using Roguelike.Utils;
+using System;
 
 namespace Roguelike.State
 {
@@ -13,11 +14,13 @@ namespace Roguelike.State
         public bool Nonblocking => false;
 
         protected virtual char CurrKey { get; set; }
+        protected virtual Func<Item, bool> Selected { get; set; }
 
         protected virtual int Line => 1 + CurrKey - 'a';
 
         protected ItemActionState()
         {
+            Selected = _ => true;
             CurrKey = 'a';
         }
 
@@ -70,7 +73,7 @@ namespace Roguelike.State
             if (Game.Player.Inventory.IsStacked(CurrKey))
             {
                 ItemGroup group = Game.Player.Inventory.GetStack(CurrKey);
-                Game.StateHandler.PushState(new SubinvState(group, CurrKey));
+                Game.StateHandler.PushState(new SubinvState(group, CurrKey, Selected));
                 return null;
             }
             else
@@ -119,6 +122,7 @@ namespace Roguelike.State
             }
 
             Terminal.Layer(layer.Z);
+            Game.Player.Inventory.DrawSelected(layer, Selected);
         }
     }
 }

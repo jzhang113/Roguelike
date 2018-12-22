@@ -1,5 +1,4 @@
 ﻿using Roguelike.Commands;
-using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Items;
 using System;
@@ -13,6 +12,7 @@ namespace Roguelike.State
 
         private EquipState()
         {
+            Selected = x => x is IEquippable;
         }
 
         protected override ICommand ResolveInput(Item item)
@@ -26,13 +26,6 @@ namespace Roguelike.State
             Item split = Game.Player.Inventory.Split(item, 1);
             IEquippable equipable = split as IEquippable;
             return new EquipCommand(Game.Player, equipable);
-        }
-
-        public override void Draw(LayerInfo layer)
-        {
-            base.Draw(layer);
-            // highlight equippable items
-            Game.Player.Inventory.DrawSelected(layer, x => x is IEquippable);
         }
     }
 }

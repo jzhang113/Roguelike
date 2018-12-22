@@ -3,6 +3,7 @@ using Roguelike.Core;
 using Roguelike.Input;
 using Roguelike.Items;
 using Roguelike.Utils;
+using System;
 
 namespace Roguelike.State
 {
@@ -13,9 +14,10 @@ namespace Roguelike.State
         private int _currIndex => CurrKey - 'a';
         protected override int Line => 2 + _subKey - 'a' + _currIndex;
 
-        public SubinvState(ItemGroup group, char key)
+        public SubinvState(ItemGroup group, char key, Func<Item, bool> selected)
         {
             CurrKey = 'a';
+            Selected = selected;
             _subinv = group;
             _subKey = key;
         }
@@ -70,14 +72,14 @@ namespace Roguelike.State
 
         protected override ICommand ResolveInput(Item item)
         {
-            Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, _subKey));
+            Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, _subKey, Selected));
             return null;
         }
 
         public override void Draw(LayerInfo layer)
         {
             base.Draw(layer);
-            Game.Player.Inventory.DrawItemStack(layer, _subKey);
+            Game.Player.Inventory.DrawStackSelected(layer, _subKey, Selected);
         }
     }
 }
