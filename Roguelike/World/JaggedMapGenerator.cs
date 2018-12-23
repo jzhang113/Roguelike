@@ -486,7 +486,7 @@ namespace Roguelike.World
                     }
                 }
             }
-            
+
             foreach (int index in endSet)
             {
                 int adjNode = minAdj[index].First();

@@ -59,7 +59,7 @@ namespace Roguelike.Systems
             return Identify(parts, flags);
         }
 
-        public static Actor Create(ActorType type)
+        public static Actor Create(in ActorType type)
         {
             // TODO: create actors with stats
             return new Actor(type.Parameters, type.Color, type.Symbol);

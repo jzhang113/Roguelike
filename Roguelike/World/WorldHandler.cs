@@ -29,12 +29,12 @@ namespace Roguelike.World
             Map = CreateLevel(CurrentLevel);
         }
 
-        public bool IsValidLevel(LevelId id)
+        public bool IsValidLevel(in LevelId id)
         {
             return _levels.ContainsKey(id);
         }
 
-        public void ChangeLevel(LevelId id)
+        public void ChangeLevel(in LevelId id)
         {
             if (!IsValidLevel(id))
             {
@@ -220,7 +220,7 @@ namespace Roguelike.World
             return default;
         }
 
-        private MapHandler CreateLevel(LevelId id)
+        private MapHandler CreateLevel(in LevelId id)
         {
             System.Diagnostics.Debug.Assert(IsValidLevel(id), $"unknown level: {id}");
             if (!IsValidLevel(id))
@@ -245,7 +245,7 @@ namespace Roguelike.World
         }
 
         #region IO Operations
-        private void SaveLevel(LevelId id)
+        private void SaveLevel(in LevelId id)
         {
             using (Stream saveFile = File.OpenWrite($"{id}.dat"))
             {
@@ -254,7 +254,7 @@ namespace Roguelike.World
             }
         }
 
-        private static MapHandler LoadLevel(LevelId id)
+        private static MapHandler LoadLevel(in LevelId id)
         {
             using (Stream saveFile = File.OpenRead($"{id}.dat"))
             {

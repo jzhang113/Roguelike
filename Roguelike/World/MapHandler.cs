@@ -296,7 +296,7 @@ namespace Roguelike.World
             return Exits.TryGetValue(ToIndex(x, y), out exit);
         }
 
-        public bool TryGetExit(LevelId levelId, out Exit exit)
+        public bool TryGetExit(in LevelId levelId, out Exit exit)
         {
             foreach (Exit ex in Exits.Values)
             {
@@ -577,7 +577,7 @@ namespace Roguelike.World
         }
 
         // Sweep across a row and update the set of unblocked angles for the next row.
-        private static void CheckFovInRange(AngleRange range, IEnumerable<Tile> row, double delta,
+        private static void CheckFovInRange(in AngleRange range, IEnumerable<Tile> row, double delta,
             Queue<AngleRange> queue, double lightDecay, bool setVisible)
         {
             double currentAngle = 0;

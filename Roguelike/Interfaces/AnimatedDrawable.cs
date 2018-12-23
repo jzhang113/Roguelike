@@ -12,7 +12,7 @@ namespace Roguelike.Interfaces
         private readonly ColorInterval _background;
         private readonly bool _drawBackground;
 
-        public AnimatedDrawable(ColorInterval foreground, ColorInterval? background, char symbol)
+        public AnimatedDrawable(in ColorInterval foreground, ColorInterval? background, char symbol)
             : base(foreground.Primary, symbol, false)
         {
             _foreground = foreground;

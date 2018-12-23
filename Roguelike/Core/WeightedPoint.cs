@@ -45,12 +45,12 @@ namespace Roguelike.Core
             return hashCode * -1521134295 + Weight.GetHashCode();
         }
 
-        public static bool operator ==(WeightedPoint w1, WeightedPoint w2) =>
+        public static bool operator ==(in WeightedPoint w1, in WeightedPoint w2) =>
             w1.X == w2.X &&
             w1.Y == w2.Y &&
             Math.Abs(w1.Weight - w2.Weight) < 0.001;
 
-        public static bool operator !=(WeightedPoint w1, WeightedPoint w2) => !(w1 == w2);
+        public static bool operator !=(in WeightedPoint w1, in WeightedPoint w2) => !(w1 == w2);
         #endregion
     }
 }

@@ -166,7 +166,7 @@ namespace Roguelike.State
             return InputMapping.GetTargettingInput(key) == TargettingInput.Fire ? _callback(targets) : null;
         }
 
-        private void MoveTarget(Dir direction)
+        private void MoveTarget(in Dir direction)
         {
             (int dx, int dy) = direction;
 
@@ -178,7 +178,7 @@ namespace Roguelike.State
             }
         }
 
-        private void JumpTarget(Dir direction)
+        private void JumpTarget(in Dir direction)
         {
             (int dx, int dy) = direction;
 

@@ -25,7 +25,7 @@ namespace Roguelike.Core
             NW
         };
 
-        public static Dir Right(this Dir dir)
+        public static Dir Right(this in Dir dir)
         {
             if (dir == N)
                 return NE;
@@ -47,7 +47,7 @@ namespace Roguelike.Core
                 return Center;
         }
 
-        public static Dir Left(this Dir dir)
+        public static Dir Left(this in Dir dir)
         {
             if (dir == N)
                 return NW;
@@ -111,11 +111,11 @@ namespace Roguelike.Core
             return hashCode * -1521134295 + Y.GetHashCode();
         }
 
-        public static bool operator ==(Dir dir1, Dir dir2) =>
+        public static bool operator ==(in Dir dir1, in Dir dir2) =>
             dir1.X == dir2.X &&
             dir1.Y == dir2.Y;
 
-        public static bool operator !=(Dir dir1, Dir dir2) => !(dir1 == dir2);
+        public static bool operator !=(in Dir dir1, in Dir dir2) => !(dir1 == dir2);
         #endregion
     }
 }

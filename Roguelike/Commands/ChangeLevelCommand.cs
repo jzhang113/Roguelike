@@ -11,7 +11,7 @@ namespace Roguelike.Commands
 
         private readonly LevelId _newLevel;
 
-        public ChangeLevelCommand(LevelId newLevel)
+        public ChangeLevelCommand(in LevelId newLevel)
         {
             _newLevel = newLevel;
         }
