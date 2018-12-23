@@ -7,8 +7,8 @@ namespace Roguelike.Core
         public static Color FloorBackground =   Swatch.SecondaryDarkest;
         public static Color Floor =             Swatch.Secondary;
 
-        public static Color WallBackground =    Swatch.AlternateDarkest;
-        public static Color Wall =              Swatch.Alternate;
+        public static Color WallBackground =    Swatch.SecondaryDarkest;
+        public static Color Wall =              Swatch.DbStone;
 
         // Units
         public static Color Player =            Swatch.DbLight;
@@ -19,15 +19,15 @@ namespace Roguelike.Core
         public static Color TargetBackground =  Swatch.Secondary;
         public static Color Cursor =            Swatch.PrimaryDarkest;
 
-        public static Color Text =              Swatch.DbLight;
-        public static Color DimText =           Swatch.AlternateDarkest;
-        public static Color RowHighlight =      Swatch.SecondaryDarkest;
-        public static Color ButtonBackground =  Swatch.Primary;
+        public static Color Text =              Swatch.Primary;
+        public static Color DimText =           Swatch.SecondaryDarkest;
+        public static Color RowHighlight =      Swatch.ComplimentDarkest;
+        public static Color ButtonBackground =  Swatch.Alternate;
         public static Color ButtonBorder =      Swatch.Secondary;
-        public static Color ButtonHover =       Swatch.Alternate;
+        public static Color ButtonHover =       Swatch.AlternateDarker;
 
-        public static Color BorderColor =       Swatch.DbGrass;
-        public static Color HighlightColor =    Swatch.DbSun;
+        public static Color BorderColor =       Swatch.Primary;
+        public static Color HighlightColor =    Swatch.Secondary;
 
         // Terrain
         public static Color Grass =             Swatch.DbGrass;

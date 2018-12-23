@@ -4,29 +4,29 @@ namespace Roguelike.Core
 {
     internal static class Swatch
     {
-        public static Color PrimaryLightest =       Color.FromArgb(110, 121, 119);
-        public static Color PrimaryLighter =        Color.FromArgb(88, 100, 98);
-        public static Color Primary =               Color.FromArgb(68, 82, 79);
-        public static Color PrimaryDarker =         Color.FromArgb(48, 61, 59);
-        public static Color PrimaryDarkest =        Color.FromArgb(29, 45, 42);
+        public static Color PrimaryLightest =       Color.FromArgb( 65,134,  7);
+        public static Color PrimaryLighter =        Color.FromArgb( 95,209,  1);
+        public static Color Primary =               Color.FromArgb( 81,166, 10);
+        public static Color PrimaryDarker =         Color.FromArgb( 43, 94,  0);
+        public static Color PrimaryDarkest =        Color.FromArgb( 25, 55,  0);
 
-        public static Color SecondaryLightest =     Color.FromArgb(116, 120, 126);
-        public static Color SecondaryLighter =      Color.FromArgb(93, 97, 105);
-        public static Color Secondary =             Color.FromArgb(72, 77, 85);
-        public static Color SecondaryDarker =       Color.FromArgb(51, 56, 64);
-        public static Color SecondaryDarkest =      Color.FromArgb(31, 38, 47);
+        public static Color SecondaryLightest =     Color.FromArgb(151, 135, 8);
+        public static Color SecondaryLighter =      Color.FromArgb(235,208,  2);
+        public static Color Secondary =             Color.FromArgb(186,166, 11);
+        public static Color SecondaryDarker =       Color.FromArgb(105, 93,  0);
+        public static Color SecondaryDarkest =      Color.FromArgb( 62, 55,  0);
 
-        public static Color AlternateLightest =     Color.FromArgb(190, 184, 174);
-        public static Color AlternateLighter =      Color.FromArgb(158, 151, 138);
-        public static Color Alternate =             Color.FromArgb(129, 121, 107);
-        public static Color AlternateDarker =       Color.FromArgb(97, 89, 75);
-        public static Color AlternateDarkest =      Color.FromArgb(71, 62, 45);
+        public static Color AlternateLightest =     Color.FromArgb( 12, 54, 98);
+        public static Color AlternateLighter =      Color.FromArgb( 13, 81,153);
+        public static Color Alternate =             Color.FromArgb( 16, 68,121);
+        public static Color AlternateDarker =       Color.FromArgb(  5, 36, 69);
+        public static Color AlternateDarkest =      Color.FromArgb(  3, 21, 40);
 
-        public static Color ComplimentLightest =    Color.FromArgb(190, 180, 174);
-        public static Color ComplimentLighter =     Color.FromArgb(158, 147, 138);
-        public static Color Compliment =            Color.FromArgb(129, 116, 107);
-        public static Color ComplimentDarker =      Color.FromArgb(97, 84, 75);
-        public static Color ComplimentDarkest =     Color.FromArgb(71, 56, 45);
+        public static Color ComplimentLightest =    Color.FromArgb(135,  7, 46);
+        public static Color ComplimentLighter =     Color.FromArgb(210,  1, 64);
+        public static Color Compliment =            Color.FromArgb(166, 10, 57);
+        public static Color ComplimentDarker =      Color.FromArgb( 94,  0, 29);
+        public static Color ComplimentDarkest =     Color.FromArgb( 56,  0, 17);
 
         public static Color DbDark =                Color.FromArgb(20, 12, 28);
         public static Color DbOldBlood =            Color.FromArgb(68, 36, 52);
