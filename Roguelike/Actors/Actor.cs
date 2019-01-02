@@ -68,13 +68,14 @@ namespace Roguelike.Actors
 
         public ICommand Act()
         {
-            ICommand command = GetAction();
-            if (command == null)
-                return null;
-
+            // TODO: need to decouple status effects from actor turns
             StatusHandler.Process();
             if (IsDead)
                 TriggerDeath();
+
+            ICommand command = GetAction();
+            if (command == null)
+                return null;
 
             return command;
         }
@@ -82,6 +83,11 @@ namespace Roguelike.Actors
         public virtual ICommand GetAction()
         {
             return SimpleAI.GetAction(this);
+        }
+
+        public virtual ICommand GetReaction()
+        {
+            return null;
         }
 
         // TODO: basic attack depends on available body parts

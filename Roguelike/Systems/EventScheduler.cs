@@ -71,7 +71,7 @@ namespace Roguelike.Systems
         }
 
         // Perform a specified action immediately. Support to queue actions may be added as needed.
-        private static bool Execute(ISchedulable current, ICommand action)
+        internal static bool Execute(ISchedulable current, ICommand action)
         {
             // Break the event loop when there is no Action.
             // This should only happen with input handling for the Player's Actions. Note that even

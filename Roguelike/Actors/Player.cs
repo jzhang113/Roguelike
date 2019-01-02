@@ -27,6 +27,12 @@ namespace Roguelike.Actors
             return action;
         }
 
+        public override ICommand GetReaction()
+        {
+            // TODO: what here? need to force a state change and wait for nextcommand to get set
+            return null;
+        }
+
         public override void TriggerDeath() => Game.GameOver();
     }
 }
