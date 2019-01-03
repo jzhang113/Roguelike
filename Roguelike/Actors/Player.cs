@@ -3,6 +3,7 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System;
+using System.Linq;
 
 namespace Roguelike.Actors
 {
@@ -27,10 +28,19 @@ namespace Roguelike.Actors
             return action;
         }
 
-        public override ICommand GetReaction()
+        public override ReactionMessage GetReaction()
         {
-            // TODO: what here? need to force a state change and wait for nextcommand to get set
-            return null;
+            Game.MessageHandler.AddMessage("You dodge");
+
+            Game.StateHandler.PushState(new State.TargettingState(Game.Player, new TargetZone(TargetShape.Range),
+                returnTarget => new MoveCommand(this, returnTarget.First().X, returnTarget.First().Y)));
+
+            return new ReactionMessage
+            {
+                Command = null,
+                Delayed = true,
+                Negating = true
+            };
         }
 
         public override void TriggerDeath() => Game.GameOver();

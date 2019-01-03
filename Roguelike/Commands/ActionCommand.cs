@@ -41,12 +41,29 @@ namespace Roguelike.Commands
         {
             foreach (Tile tile in _targets)
             {
-                if (Game.Map.TryGetActor(tile.X, tile.Y, out Actors.Actor actor) && actor == Game.Player)
+                bool activate = true;
+
+                if (Game.Map.TryGetActor(tile.X, tile.Y, out Actors.Actor actor))
                 {
-                    // TODO: implement a general reaction system
+                    Actors.ReactionMessage reaction = actor.GetReaction();
+                    if (reaction.Command != null)
+                    {
+                        // HACK: eww, this reaches into what should be a private method
+                        // TODO: should reactions be free / cheaper than a full action
+                        // TODO: what about reactions that negate damage?
+                        EventScheduler.Execute(actor, reaction.Command);
+                    }
+                    else if (reaction.Delayed)
+                    {
+                        Game.EventScheduler.Stop();
+                    }
+
+                    if (reaction.Negating)
+                        activate = false;
                 }
 
-                _action.Activate(Source, tile);
+                if (activate)
+                    _action.Activate(Source, tile);
             }
         }
     }

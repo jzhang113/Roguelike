@@ -50,8 +50,6 @@ namespace Roguelike
         {
             Config = configs;
             Option = options;
-            Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
-            VisualRandom = new PcgRandom(Random.Next());
 
             if (!Terminal.Open())
             {
@@ -158,14 +156,17 @@ namespace Roguelike
                     BinaryFormatter deserializer = new BinaryFormatter();
                     World = (WorldHandler)deserializer.Deserialize(saveFile);
                 }
-
-                StateHandler.Reset();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Load failed: {ex.Message}");
                 NewGame();
             }
+
+            // TODO: restore rng to saved position
+            Random = new PcgRandom(Option.FixedSeed ? Option.Seed : (int)DateTime.Now.Ticks);
+            VisualRandom = new PcgRandom(Random.Next());
+            StateHandler.Reset();
         }
 
         private static void SaveGame()
@@ -197,9 +198,13 @@ namespace Roguelike
             _exiting = true;
         }
 
-        internal static void GameOver() => MessageHandler.AddMessage("Game Over.", MessageLevel.Minimal);
+        internal static void GameOver()
+        {
+            MessageHandler.AddMessage("Game Over.", MessageLevel.Minimal);
+            // TODO: dump character stats, return to main menu
+        }
 
-        internal static void Render()
+        private static void Render()
         {
             Terminal.Clear();
             Terminal.Layer(1);

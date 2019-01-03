@@ -13,11 +13,13 @@ namespace Roguelike.Systems
     {
         private readonly ICollection<ISchedulable> _entities;
         private readonly MaxHeap<ISchedulable> _eventSet;
+        private bool _stopping;
 
         public EventScheduler(int size)
         {
             _entities = new HashSet<ISchedulable>();
             _eventSet = new MaxHeap<ISchedulable>(size);
+            _stopping = false;
         }
 
         public void AddActor(ISchedulable schedulable) => _entities.Add(schedulable);
@@ -28,7 +30,12 @@ namespace Roguelike.Systems
         public void Clear()
         {
             _entities.Clear();
-            _eventSet.Clear();
+            _stopping = true;
+        }
+
+        public void Stop()
+        {
+            _stopping = true;
         }
 
         // Run updates for all actors until it is the Player's turn to act again.
@@ -58,6 +65,13 @@ namespace Roguelike.Systems
             // Dequeue and execute the handler for each entities in the turn queue until empty.
             while (_eventSet.Count > 0)
             {
+                if (_stopping)
+                {
+                    _eventSet.Clear();
+                    _stopping = false;
+                    return false;
+                }
+
                 ISchedulable current = _eventSet.Peek();
                 ICommand action = current.Act();
 

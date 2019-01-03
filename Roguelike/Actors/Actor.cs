@@ -8,6 +8,13 @@ using System;
 
 namespace Roguelike.Actors
 {
+    public struct ReactionMessage
+    {
+        public ICommand Command { get; set; }
+        public bool Delayed { get; set; }
+        public bool Negating { get; set; }
+    }
+
     [Serializable]
     public class Actor : ISchedulable
     {
@@ -73,11 +80,7 @@ namespace Roguelike.Actors
             if (IsDead)
                 TriggerDeath();
 
-            ICommand command = GetAction();
-            if (command == null)
-                return null;
-
-            return command;
+            return GetAction();
         }
 
         public virtual ICommand GetAction()
@@ -85,9 +88,14 @@ namespace Roguelike.Actors
             return SimpleAI.GetAction(this);
         }
 
-        public virtual ICommand GetReaction()
+        public virtual ReactionMessage GetReaction()
         {
-            return null;
+            return new ReactionMessage
+            {
+                Command = null,
+                Delayed = false,
+                Negating = false
+            };
         }
 
         // TODO: basic attack depends on available body parts
