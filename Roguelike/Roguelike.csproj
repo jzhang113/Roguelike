@@ -118,6 +118,7 @@
     <Compile Include="Animations\SpinAnimation.cs" />
     <Compile Include="Animations\TrailAnimation.cs" />
     <Compile Include="BearLibTerminal.cs" />
+    <Compile Include="Commands\DelayActionCommand.cs" />
     <Compile Include="Commands\ActionCommand.cs" />
     <Compile Include="Commands\ApplyCommand.cs" />
     <Compile Include="Commands\ChangeLevelCommand.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\BorderInfo.cs" />
     <Compile Include="Core\ColorInterval.cs" />
+    <Compile Include="Core\DelayAttack.cs" />
     <Compile Include="Core\LayerInfo.cs" />
     <Compile Include="Core\Exit.cs" />
     <Compile Include="Core\Fire.cs" />

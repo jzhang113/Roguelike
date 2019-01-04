@@ -18,6 +18,7 @@ namespace Roguelike.Core
         public string Name => "Fire";
         public int Energy { get; set; }
         public int RefreshRate => Constants.DEFAULT_REFRESH_RATE;
+        public int Lifetime => -1; // Fires extinguish when out of fuel, not automatically
 
         public Fire(int x, int y)
         {
@@ -44,7 +45,7 @@ namespace Roguelike.Core
 
             if (Game.Map.TryGetActor(X, Y, out _))
             {
-                return new ActionCommand(this,
+                return new DelayActionCommand(this,
                    new IgniteAction(new TargetZone(TargetShape.Self)),
                    Game.Map.Field[X, Y]);
             }

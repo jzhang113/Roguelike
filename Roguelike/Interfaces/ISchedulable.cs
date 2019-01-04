@@ -15,6 +15,10 @@ namespace Roguelike.Interfaces
         // How much energy the entity regains per game turn. 120 Energy is a standard tick.
         int RefreshRate { get; }
 
+        // How many more turns an entity will exist for before expiring. If entities do not expire,
+        // they have lifetime -1.
+        int Lifetime { get; }
+
         // The Action to be scheduled.
         ICommand Act();
     }

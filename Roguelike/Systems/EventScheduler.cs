@@ -3,6 +3,7 @@ using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Utils;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Roguelike.Systems
 {
@@ -47,10 +48,13 @@ namespace Roguelike.Systems
                 // system, until the queue has at least one entity to execute.
                 while (_eventSet.Count == 0)
                 {
-                    foreach (ISchedulable entity in _entities)
+                    foreach (ISchedulable entity in _entities.ToList())
                     {
+                        if (entity.Lifetime == 0) // -1 is used as nonexpiring
+                            _entities.Remove(entity);
+
                         // Entities with sufficient energy are placed into the turn queue.
-                        if (entity.Energy > Data.Constants.MIN_TURN_ENERGY)
+                        if (entity.Energy >= Data.Constants.MIN_TURN_ENERGY)
                             _eventSet.Add(entity);
 
                         // and everyone gains some energy

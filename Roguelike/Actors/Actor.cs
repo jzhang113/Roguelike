@@ -31,6 +31,7 @@ namespace Roguelike.Actors
 
         public int Energy { get; set; }
         public int RefreshRate { get; set; }
+        public int Lifetime => -1;
 
         public InventoryHandler Inventory { get; }
         public Drawable DrawingComponent { get; }

@@ -32,10 +32,7 @@ namespace Roguelike.Commands
         public ActionCommand(ISchedulable source, IAction action, Tile target) :
             this(source, action, new[] { target }) { }
 
-        public RedirectMessage Validate()
-        {
-            return new RedirectMessage(true);
-        }
+        public RedirectMessage Validate() => new RedirectMessage(true);
 
         public void Execute()
         {

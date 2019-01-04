@@ -31,7 +31,7 @@ namespace Roguelike.Actors
 
         public override ICommand GetAction()
         {
-            ICommand command = new ActionCommand(this, _attacks[_current], Game.Map.Field[X + Facing.X, Y + Facing.Y]);
+            ICommand command = new DelayActionCommand(this, _attacks[_current], Game.Map.Field[X + Facing.X, Y + Facing.Y]);
 
             if (++_current >= _attacks.Count)
                 _current = 0;

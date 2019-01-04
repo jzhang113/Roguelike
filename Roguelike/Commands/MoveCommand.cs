@@ -65,7 +65,7 @@ namespace Roguelike.Commands
 
                 IAction attack = Source.GetBasicAttack();
                 IEnumerable<Tile> targets = attack.Area.GetTilesInRange(Source, _tile.X, _tile.Y);
-                return new RedirectMessage(false, new ActionCommand(Source, attack, targets));
+                return new RedirectMessage(false, new DelayActionCommand(Source, attack, targets));
             }
 
             return new RedirectMessage(true);

@@ -91,7 +91,7 @@ namespace Roguelike.State
                             weapon.Y = tile.Y;
                             Game.Map.AddItem(weapon);
 
-                            return new ActionCommand(player, thrown, enumerable);
+                            return new DelayActionCommand(player, thrown, enumerable);
                         }));
                     return null;
                 case NormalInput.ChangeLevel:
@@ -134,7 +134,7 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new TargettingState(
                     player,
                     hookAction.Area,
-                    returnTarget => new ActionCommand(player, hookAction, returnTarget)));
+                    returnTarget => new DelayActionCommand(player, hookAction, returnTarget)));
                 return null;
             }
 
@@ -170,7 +170,7 @@ namespace Roguelike.State
                 Game.StateHandler.PushState(new TargettingState(
                     player,
                     action.Area,
-                    target => new ActionCommand(player, action, target)));
+                    target => new DelayActionCommand(player, action, target)));
                 return null;
             }
             else
@@ -180,7 +180,7 @@ namespace Roguelike.State
                     player,
                     player.X + dx,
                     player.Y + dy);
-                return new ActionCommand(player, action, target);
+                return new DelayActionCommand(player, action, target);
             }
         }
 
