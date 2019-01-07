@@ -39,6 +39,7 @@ namespace Roguelike.Commands
             foreach (Tile tile in _targets)
             {
                 bool activate = true;
+                Game.Threatened.Unset(tile.X, tile.Y);
 
                 if (Game.Map.TryGetActor(tile.X, tile.Y, out Actors.Actor actor))
                 {

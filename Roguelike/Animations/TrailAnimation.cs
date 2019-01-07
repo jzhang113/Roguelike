@@ -39,7 +39,7 @@ namespace Roguelike.Animations
             if (_path.Count == 0)
                 return;
 
-            Game.OverlayHandler.ClearForeground();
+            Game.OverlayHandler.Clear();
             Tile tile = _path[_counter];
             Game.OverlayHandler.Set(tile.X, tile.Y, _color);
             Game.OverlayHandler.Draw(layer);

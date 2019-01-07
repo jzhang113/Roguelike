@@ -80,8 +80,7 @@ namespace Roguelike.Systems
 
         public void PopState()
         {
-            Game.OverlayHandler.ClearBackground();
-            Game.OverlayHandler.ClearForeground();
+            Game.OverlayHandler.Clear();
             _states.Pop();
         }
 

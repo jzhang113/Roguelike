@@ -9,7 +9,7 @@ namespace Roguelike.Commands
 {
     internal class DelayActionCommand : ICommand
     {
-        public int EnergyCost => 0;
+        public int EnergyCost => _action.Speed;
         public IAnimation Animation => _action.Animation;
 
         private readonly ISchedulable _source;
@@ -32,6 +32,15 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate() => new RedirectMessage(true);
 
-        public void Execute() => Game.EventScheduler.AddActor(new DelayAttack(_source, _action, _targets));
+        public void Execute()
+        {
+            foreach (Tile tile in _targets)
+            {
+                Game.Threatened.Set(tile.X, tile.Y,
+                    _source is Actors.Player ? Colors.PlayerThreat : Colors.EnemyThreat);
+            }
+
+            Game.EventScheduler.AddActor(new DelayAttack(_source, _action, _targets));
+        }
     }
 }

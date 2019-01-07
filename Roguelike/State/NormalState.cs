@@ -228,6 +228,7 @@ namespace Roguelike.State
 
         public void Draw(LayerInfo layer)
         {
+            Game.Threatened.Draw(layer);
             Game.Map.Draw(layer);
         }
     }

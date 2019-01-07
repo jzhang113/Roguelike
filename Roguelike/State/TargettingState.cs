@@ -32,8 +32,7 @@ namespace Roguelike.State
             _targettableActors = new List<Actor>();
 
             Game.OverlayHandler.DisplayText = "targetting mode";
-            Game.OverlayHandler.ClearBackground();
-            Game.OverlayHandler.ClearForeground();
+            Game.OverlayHandler.Clear();
 
             ICollection<Tile> tempRange = new HashSet<Tile>();
             _inRange = Game.Map.GetTilesInRadius(_source.X, _source.Y, (int)_targetZone.Range).ToList();
@@ -52,7 +51,7 @@ namespace Roguelike.State
                     }
                 }
 
-                Game.OverlayHandler.Set(collision.X, collision.Y, Colors.TargetBackground, true);
+                Game.OverlayHandler.Set(collision.X, collision.Y, Colors.TargetBackground);
                 tempRange.Add(collision);
             }
 
@@ -66,7 +65,7 @@ namespace Roguelike.State
 
             // Add the current tile into the targettable range as well.
             tempRange.Add(Game.Map.Field[source.X, source.Y]);
-            Game.OverlayHandler.Set(source.X, source.Y, Colors.TargetBackground, true);
+            Game.OverlayHandler.Set(source.X, source.Y, Colors.TargetBackground);
             _inRange = tempRange;
 
             // Initialize the targetting to an interesting target.
@@ -229,7 +228,7 @@ namespace Roguelike.State
 
         private IEnumerable<Tile> DrawTargettedTiles()
         {
-            Game.OverlayHandler.ClearForeground();
+            Game.OverlayHandler.Clear();
             IEnumerable<Tile> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
 
             // Draw the projectile path if any.

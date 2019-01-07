@@ -29,6 +29,9 @@ namespace Roguelike.Core
         public static Color BorderColor =       Swatch.Primary;
         public static Color HighlightColor =    Swatch.Secondary;
 
+        public static Color PlayerThreat =      Swatch.Primary;
+        public static Color EnemyThreat =       Swatch.Compliment;
+
         // Terrain
         public static Color Grass =             Swatch.DbGrass;
         public static Color Stone =             Swatch.DbStone;

@@ -36,7 +36,7 @@ namespace Roguelike.Animations
 
         public void Draw(LayerInfo layer)
         {
-            Game.OverlayHandler.ClearForeground();
+            Game.OverlayHandler.Clear();
             foreach (Tile tile in Game.Map.GetTilesInRadius(_x, _y, _counter))
             {
                 Game.OverlayHandler.Set(tile.X, tile.Y, _color);

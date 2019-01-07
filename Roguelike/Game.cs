@@ -29,6 +29,7 @@ namespace Roguelike
         public static MessagePanel MessageHandler { get; private set; }
         public static EventScheduler EventScheduler { get; private set; }
         public static OverlayHandler OverlayHandler { get; private set; }
+        public static OverlayHandler Threatened { get; private set; }
 
         public static MapHandler Map => World.Map;
 
@@ -111,7 +112,8 @@ namespace Roguelike
 
             MessageHandler = new MessagePanel(Config.MessageMaxCount);
             EventScheduler = new EventScheduler(16);
-            OverlayHandler = new OverlayHandler(_highlightLayer.Width, _highlightLayer.Height);
+            OverlayHandler = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
+            Threatened = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
             _exiting = false;
             ShowEquip = false;
@@ -135,8 +137,8 @@ namespace Roguelike
             StateHandler.Reset();
             MessageHandler.Clear();
             EventScheduler.Clear();
-            OverlayHandler.ClearBackground();
-            OverlayHandler.ClearForeground();
+            OverlayHandler.Clear();
+            Threatened.Clear();
 
             WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
             World = new WorldHandler(worldParameter);

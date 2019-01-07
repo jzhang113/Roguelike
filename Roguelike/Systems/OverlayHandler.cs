@@ -8,45 +8,46 @@ namespace Roguelike.Systems
     {
         public string DisplayText { private get; set; }
 
-        private Color[,] Background { get; }
-        private Color[,] Foreground { get; }
-        private bool[,] SetBackground { get; }
-        private bool[,] SetForeground { get; }
+        private Color[,] TileColor { get; }
+        private bool[,] IsSet { get; }
 
-        private readonly int _viewWidth;
-        private readonly int _viewHeight;
+        private readonly int _width;
+        private readonly int _height;
 
         public OverlayHandler(int width, int height)
         {
-            _viewWidth = width + 1;
-            _viewHeight = height + 1;
+            _width = width;
+            _height = height;
 
-            Foreground = new Color[_viewWidth, _viewHeight];
-            Background = new Color[_viewWidth, _viewHeight];
-            SetBackground = new bool[_viewWidth, _viewHeight];
-            SetForeground = new bool[_viewWidth, _viewHeight];
+            TileColor = new Color[_width, _height];
+            IsSet = new bool[_width, _height];
         }
 
-        public void Set(int x, int y, Color color, bool background = false)
+        public void Set(int x, int y, Color color)
         {
-            int xPos = x - Camera.X;
-            int yPos = y - Camera.Y;
-
-            if (xPos >= _viewWidth || yPos >= _viewHeight
-                || xPos < 0 || yPos < 0)
-            {
+            if (x >= _width || y >= _height || x < 0 || y < 0)
                 return;
-            }
 
-            if (background)
+            TileColor[x, y] = color;
+            IsSet[x, y] = true;
+        }
+
+        public void Unset(int x, int y)
+        {
+            if (x >= _width || y >= _height || x < 0 || y < 0)
+                return;
+
+            IsSet[x, y] = false;
+        }
+
+        public void Clear()
+        {
+            for (int i = 0; i < _width; i++)
             {
-                Background[xPos, yPos] = color;
-                SetBackground[xPos, yPos] = true;
-            }
-            else
-            {
-                Foreground[xPos, yPos] = color;
-                SetForeground[xPos, yPos] = true;
+                for (int j = 0; j < _height; j++)
+                {
+                    IsSet[i, j] = false;
+                }
             }
         }
 
@@ -59,43 +60,18 @@ namespace Roguelike.Systems
             {
                 for (int j = 0; j <= layer.Height; j++)
                 {
-                    if (SetBackground[i, j])
-                    {
-                        Terminal.Color(Background[i, j]);
-                        layer.Put(i, j, '█');
-                    }
+                    int viewX = i + Camera.X;
+                    int viewY = j + Camera.Y;
 
-                    if (SetForeground[i, j])
+                    if (IsSet[viewX, viewY])
                     {
-                        Terminal.Color(Foreground[i, j]);
+                        Terminal.Color(TileColor[viewX, viewY]);
                         layer.Put(i, j, '█');
                     }
                 }
             }
 
             Terminal.Composition(false);
-        }
-
-        public void ClearBackground()
-        {
-            for (int i = 0; i < _viewWidth; i++)
-            {
-                for (int j = 0; j < _viewHeight; j++)
-                {
-                    SetBackground[i, j] = false;
-                }
-            }
-        }
-
-        public void ClearForeground()
-        {
-            for (int i = 0; i < _viewWidth; i++)
-            {
-                for (int j = 0; j < _viewHeight; j++)
-                {
-                    SetForeground[i, j] = false;
-                }
-            }
         }
     }
 }
