@@ -54,11 +54,11 @@ namespace Roguelike.Systems
                             _entities.Remove(entity);
 
                         // Entities with sufficient energy are placed into the turn queue.
-                        if (entity.Energy >= Data.Constants.MIN_TURN_ENERGY)
+                        if (entity.Energy >= entity.ActivationEnergy)
                             _eventSet.Add(entity);
 
                         // and everyone gains some energy
-                        entity.Energy += entity.RefreshRate;
+                        entity.Energy += Data.Constants.DEFAULT_REFRESH_RATE;
                     }
                 }
             } while (Update());

@@ -9,7 +9,7 @@ namespace Roguelike.Commands
 {
     internal class DelayActionCommand : ICommand
     {
-        public int EnergyCost => _action.Speed;
+        public int EnergyCost => _action.EnergyCost;
         public IAnimation Animation => _action.Animation;
 
         private readonly ISchedulable _source;

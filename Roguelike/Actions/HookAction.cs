@@ -10,7 +10,8 @@ namespace Roguelike.Actions
     internal class HookAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed => Data.Constants.FULL_TURN;
+        public int Speed => Data.Constants.HALF_TURN;
+        public int EnergyCost => Data.Constants.FULL_TURN;
         public IAnimation Animation { get; private set; }
 
         public HookAction(int range)

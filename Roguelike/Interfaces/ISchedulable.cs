@@ -12,8 +12,10 @@ namespace Roguelike.Interfaces
         // How much energy the entity has. May act when energy > 0.
         int Energy { get; set; }
 
-        // How much energy the entity regains per game turn. 120 Energy is a standard tick.
-        int RefreshRate { get; }
+        // How much energy an entity must be at before it can act. This adds a delay to an entity's
+        // first activation, which doesn't matter for persisting entities, but does affect one-shot
+        // delayed effects.
+        int ActivationEnergy { get; }
 
         // How many more turns an entity will exist for before expiring. If entities do not expire,
         // they have lifetime -1.

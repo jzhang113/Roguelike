@@ -1,6 +1,5 @@
 ﻿using Roguelike.Actors;
 using Roguelike.Animations;
-using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using System;
@@ -11,14 +10,18 @@ namespace Roguelike.Actions
     internal class DamageAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed => Data.Constants.FULL_TURN;
+        public int Speed { get; }
+        public int EnergyCost { get; }
         public IAnimation Animation => null;
 
         private readonly int _power;
 
-        public DamageAction(int power, TargetZone targetZone)
+        public DamageAction(int power, TargetZone targetZone,
+            int speed = Data.Constants.HALF_TURN, int energy = Data.Constants.FULL_TURN)
         {
             _power = power;
+            Speed = speed;
+            EnergyCost = energy;
             Area = targetZone;
         }
 

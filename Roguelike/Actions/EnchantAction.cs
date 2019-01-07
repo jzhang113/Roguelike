@@ -10,7 +10,8 @@ namespace Roguelike.Actions
     internal class EnchantAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed => Data.Constants.FULL_TURN;
+        public int Speed => 0;
+        public int EnergyCost => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
         public EnchantAction(TargetZone area)

@@ -17,7 +17,7 @@ namespace Roguelike.Core
 
         public string Name => "Fire";
         public int Energy { get; set; }
-        public int RefreshRate => Constants.DEFAULT_REFRESH_RATE;
+        public int ActivationEnergy => 0;
         public int Lifetime => -1; // Fires extinguish when out of fuel, not automatically
 
         public Fire(int x, int y)

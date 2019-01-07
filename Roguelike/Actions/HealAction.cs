@@ -10,7 +10,8 @@ namespace Roguelike.Actions
     internal class HealAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed => Data.Constants.FULL_TURN;
+        public int Speed => Data.Constants.HALF_TURN;
+        public int EnergyCost => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
 
         private readonly int _power;

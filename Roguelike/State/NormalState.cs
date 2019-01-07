@@ -221,7 +221,6 @@ namespace Roguelike.State
 
         public void Update(ICommand command)
         {
-            // Game.OverlayHandler.ClearForeground();
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
         }

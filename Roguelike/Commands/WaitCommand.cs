@@ -14,7 +14,7 @@ namespace Roguelike.Commands
         public WaitCommand(ISchedulable source)
         {
             Source = source;
-            EnergyCost = source.RefreshRate;
+            EnergyCost = 1;
         }
 
         public WaitCommand(ISchedulable source, int waitTime)

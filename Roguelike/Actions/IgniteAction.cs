@@ -8,8 +8,10 @@ namespace Roguelike.Actions
     internal class IgniteAction : IAction
     {
         public TargetZone Area { get; }
-        public int Speed => Data.Constants.FULL_TURN;
+        public int Speed => 0;
+        public int EnergyCost => Data.Constants.FULL_TURN;
         public IAnimation Animation => null;
+
 
         public IgniteAction(TargetZone targetZone)
         {

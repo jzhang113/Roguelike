@@ -130,7 +130,6 @@ namespace Roguelike
             {
                 Awareness = 10,
                 MaxHp = 100,
-                MaxMp = 50,
                 MaxSp = 50
             });
 

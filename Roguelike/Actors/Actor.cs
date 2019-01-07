@@ -22,7 +22,6 @@ namespace Roguelike.Actors
         public bool BlocksLight { get; set; }
 
         public int Hp { get; set; }
-        public int Mp { get; set; }
         public int Sp { get; set; }
         public int Armor { get; set; }
 
@@ -30,7 +29,7 @@ namespace Roguelike.Actors
         public Dir Facing { get; set; }
 
         public int Energy { get; set; }
-        public int RefreshRate { get; set; }
+        public int ActivationEnergy => 0;
         public int Lifetime => -1;
 
         public InventoryHandler Inventory { get; }
@@ -48,12 +47,10 @@ namespace Roguelike.Actors
             Parameters = parameters;
             Hp = Parameters.MaxHp;
             Sp = Parameters.MaxSp;
-            Mp = Parameters.MaxMp;
             // TODO: calculate armor from equipment
             Armor = 30;
 
             Energy = 0;
-            RefreshRate = Data.Constants.DEFAULT_REFRESH_RATE;
             Inventory = new InventoryHandler();
             StatusHandler = new StatusHandler(this);
             StatusHandler.AddStatus(StatusType.Phasing, 10);

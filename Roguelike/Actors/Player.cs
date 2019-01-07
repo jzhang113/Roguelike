@@ -30,6 +30,9 @@ namespace Roguelike.Actors
 
         public override ReactionMessage GetReaction()
         {
+            if (Game.Random.Next(100) < 50)
+                return base.GetReaction();
+
             Game.MessageHandler.AddMessage("You dodge");
 
             Game.StateHandler.PushState(new State.TargettingState(Game.Player, new TargetZone(TargetShape.Range),

@@ -13,6 +13,9 @@ namespace Roguelike.Actions
         TargetZone Area { get; }
 
         // Energy cost to perform
+        int EnergyCost { get; }
+
+        // Delay before activation
         int Speed { get; }
 
         // Any visual effects to display.

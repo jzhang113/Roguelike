@@ -36,11 +36,11 @@ namespace Roguelike.UI
             int hpFilled = hpWidth * player.Hp / player.Parameters.MaxHp;
             string health = $" {player.Hp}/{player.Parameters.MaxHp}";
 
-            Terminal.Color(Swatch.DbBlood);
+            Terminal.Color(Swatch.Compliment);
             for (int i = 0; i <= hpFilled; i++)
                 layer.Put(i, yPos, '█');
 
-            Terminal.Color(Swatch.DbOldBlood);
+            Terminal.Color(Swatch.ComplimentDarkest);
             for (int i = hpFilled + 1; i <= hpWidth; i++)
                 layer.Put(i, yPos, '█');
 
@@ -53,21 +53,21 @@ namespace Roguelike.UI
             for (int i = 0; i <= armorWidth; i++)
                 layer.Put(i + hpWidth + 2, yPos, '█');
 
-            // MP bar
-            int mpWidth = player.Parameters.MaxMp / stepSize;
-            int mpFilled = mpWidth * player.Mp / player.Parameters.MaxMp;
-            string mana = $"{player.Mp}/{player.Parameters.MaxMp} ";
+            // SP bar
+            int spWidth = player.Parameters.MaxSp / stepSize;
+            int spFilled = spWidth * player.Sp / player.Parameters.MaxSp;
+            string stamina = $"{player.Sp}/{player.Parameters.MaxSp} ";
 
-            Terminal.Color(Swatch.DbWater);
-            for (int i = 0; i <= mpFilled; i++)
+            Terminal.Color(Swatch.Secondary);
+            for (int i = 0; i <= spFilled; i++)
                 layer.Put(layer.Width - i - 1, yPos, '█');
 
-            Terminal.Color(Swatch.DbDeepWater);
-            for (int i = mpFilled + 1; i <= mpWidth; i++)
+            Terminal.Color(Swatch.SecondaryDarkest);
+            for (int i = spFilled + 1; i <= spWidth; i++)
                 layer.Put(layer.Width - i - 1, yPos, '█');
 
             Terminal.Color(Colors.Text);
-            layer.Print(yPos, mana, System.Drawing.ContentAlignment.TopRight);
+            layer.Print(yPos, stamina, System.Drawing.ContentAlignment.TopRight);
 
             Terminal.Composition(false);
 

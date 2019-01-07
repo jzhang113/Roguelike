@@ -66,10 +66,9 @@ namespace Roguelike.UI
             {
                 layer.Print(1, _displayActor.Name);
                 layer.Print(2, $"HP: {_displayActor.Hp} / {_displayActor.Parameters.MaxHp}");
-                layer.Print(3, $"MP: {_displayActor.Mp} / {_displayActor.Parameters.MaxMp}");
-                layer.Print(4, $"SP: {_displayActor.Sp} / {_displayActor.Parameters.MaxSp}");
-                layer.Print(5, $"Energy: {_displayActor.Energy}");
-                layer.Print(6, $"State: {_displayActor.State}");
+                layer.Print(3, $"SP: {_displayActor.Sp} / {_displayActor.Parameters.MaxSp}");
+                layer.Print(4, $"Energy: {_displayActor.Energy}");
+                layer.Print(5, $"State: {_displayActor.State}");
             }
 
             if (_showTile)

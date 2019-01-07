@@ -2,10 +2,9 @@
 {
     internal static class Constants
     {
-        public const int DEFAULT_REFRESH_RATE = 120;
-        public const int MIN_TURN_ENERGY = 0;
+        public const int DEFAULT_REFRESH_RATE = 10;
 
-        public const int FULL_TURN = DEFAULT_REFRESH_RATE;
+        public const int FULL_TURN = 120;
         public const int HALF_TURN = FULL_TURN / 2;
         public const int DOUBLE_TURN = FULL_TURN * 2;
 

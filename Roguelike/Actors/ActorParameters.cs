@@ -18,7 +18,6 @@ namespace Roguelike.Actors
         public int Int { get; set; }
 
         public int MaxHp { get; set; }
-        public int MaxMp { get; set; }
         public int MaxSp { get; set; }
 
         public int Awareness { get; set; }

@@ -23,7 +23,7 @@ namespace Roguelike.Commands
             System.Diagnostics.Debug.Assert(targets != null);
 
             Source = source;
-            EnergyCost = action.Speed;
+            EnergyCost = action.EnergyCost;
 
             _action = action;
             _targets = targets;

@@ -8,7 +8,7 @@ namespace Roguelike.Core
     internal class DelayAttack : ISchedulable
     {
         public int Energy { get; set; }
-        public int RefreshRate { get; }
+        public int ActivationEnergy { get; }
 
         public string Name => "attack";
         public int Lifetime { get; private set; } = 1;
@@ -20,7 +20,7 @@ namespace Roguelike.Core
         public DelayAttack(ISchedulable source, IAction action, IEnumerable<Tile> targets)
         {
             Energy = 0;
-            RefreshRate = action.Speed;
+            ActivationEnergy = action.Speed;
             _source = source;
             _action = action;
             _targets = targets;

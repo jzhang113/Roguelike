@@ -56,9 +56,9 @@ namespace Roguelike.Systems
             Terminal.Color(Colors.Text);
             Terminal.Composition(true);
 
-            for (int i = 0; i <= layer.Width; i++)
+            for (int i = 0; i < layer.Width; i++)
             {
-                for (int j = 0; j <= layer.Height; j++)
+                for (int j = 0; j < layer.Height; j++)
                 {
                     int viewX = i + Camera.X;
                     int viewY = j + Camera.Y;
