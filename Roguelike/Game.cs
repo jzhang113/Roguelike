@@ -1,6 +1,7 @@
 ﻿using BearLib;
 using Pcg;
 using Roguelike.Actors;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Data;
 using Roguelike.State;
@@ -24,40 +25,32 @@ namespace Roguelike
 
         public static WorldHandler World { get; private set; }
         public static Player Player { get; internal set; }
-
-        public static StateHandler StateHandler { get; private set; }
-        public static MessagePanel MessageHandler { get; private set; }
-        public static EventScheduler EventScheduler { get; private set; }
-        public static OverlayHandler OverlayHandler { get; private set; }
-        public static OverlayHandler Threatened { get; private set; }
-
         public static MapHandler Map => World.Map;
+
+        public static StateHandler StateHandler { get; }
+        public static MessagePanel MessageHandler { get; }
+        public static EventScheduler EventScheduler { get; }
+        public static OverlayHandler Overlay { get; }
+        public static OverlayHandler Threatened { get; }
 
         internal static bool ShowEquip { get; set; }
         internal static bool ShowInfo { get; set; }
-        internal static bool ShowQte { get; set; }
 
-        private static LayerInfo _highlightLayer;
-        private static LayerInfo _mapLayer;
-        private static LayerInfo _rightLayer;
-        private static LayerInfo _fullConsole;
-        private static LayerInfo _messageLayer;
-        private static LayerInfo _statLayer;
-        private static LayerInfo _leftLayer;
+        internal static ICollection<IAnimation> CurrentAnimations { get; }
+        private static ICollection<IAnimation> FinishedAnimations { get; }
+
+        private static readonly LayerInfo _highlightLayer;
+        private static readonly LayerInfo _mapLayer;
+        private static readonly LayerInfo _rightLayer;
+        private static readonly LayerInfo _fullConsole;
+        private static readonly LayerInfo _messageLayer;
+        private static readonly LayerInfo _statLayer;
+        private static readonly LayerInfo _leftLayer;
 
         private static bool _exiting;
 
-        public static void Initialize(Configuration configs, Options options)
+        static Game()
         {
-            Config = configs;
-            Option = options;
-
-            if (!Terminal.Open())
-            {
-                System.Diagnostics.Debug.WriteLine("Failed to initialize terminal");
-                return;
-            }
-
             // main UI elements
             _statLayer = new LayerInfo("Stats", 1,
                 Constants.SIDEBAR_WIDTH + 2, 1,
@@ -87,36 +80,51 @@ namespace Roguelike
             _fullConsole = new LayerInfo("Full", 11, 0, 0,
                 Constants.SCREEN_WIDTH + 2, Constants.SCREEN_HEIGHT + 2);
 
+            StateHandler = new StateHandler(new Dictionary<Type, LayerInfo>
+            {
+                [typeof(ApplyState)] = _rightLayer,
+                [typeof(AutoexploreState)] = _mapLayer,
+                [typeof(DropState)] = _rightLayer,
+                [typeof(EquipState)] = _rightLayer,
+                [typeof(InventoryState)] = _rightLayer,
+                [typeof(SubinvState)] = _rightLayer,
+                [typeof(ItemMenuState)] = _rightLayer,
+                [typeof(MenuState)] = _fullConsole,
+                [typeof(NormalState)] = _mapLayer,
+                [typeof(TargettingState)] = _mapLayer,
+                [typeof(TextInputState)] = _mapLayer,
+                [typeof(UnequipState)] = _rightLayer
+            });
+
+            MessageHandler = new MessagePanel(Config.MessageMaxCount);
+            EventScheduler = new EventScheduler(16);
+            Overlay = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
+            Threatened = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
+
+            CurrentAnimations = new List<IAnimation>();
+            FinishedAnimations = new List<IAnimation>();
+        }
+
+        public static void Initialize(Configuration configs, Options options)
+        {
+            Config = configs;
+            Option = options;
+
+            if (!Terminal.Open())
+            {
+                System.Diagnostics.Debug.WriteLine("Failed to initialize terminal");
+                return;
+            }
+
             Terminal.Set($"window: size={Constants.SCREEN_WIDTH + 2}x{Constants.SCREEN_HEIGHT + 2}," +
                 $"cellsize=auto, title='{Config.GameName}';");
             Terminal.Set($"font: {Config.FontName}, size = {Config.FontSize};");
             Terminal.Set("palette.grass: #6daa2c");
             Terminal.Set("input: filter = [keyboard, mouse]");
 
-            StateHandler = new StateHandler(new Dictionary<Type, LayerInfo>
-            {
-                [typeof(AnimationState)]   = _mapLayer,
-                [typeof(ApplyState)]       = _rightLayer,
-                [typeof(AutoexploreState)] = _mapLayer,
-                [typeof(DropState)]        = _rightLayer,
-                [typeof(EquipState)]       = _rightLayer,
-                [typeof(InventoryState)]   = _rightLayer,
-                [typeof(SubinvState)]      = _rightLayer,
-                [typeof(ItemMenuState)]    = _rightLayer,
-                [typeof(MenuState)]        = _fullConsole,
-                [typeof(NormalState)]      = _mapLayer,
-                [typeof(TargettingState)]  = _mapLayer,
-                [typeof(TextInputState)]   = _mapLayer,
-                [typeof(UnequipState)]     = _rightLayer
-            });
-
-            MessageHandler = new MessagePanel(Config.MessageMaxCount);
-            EventScheduler = new EventScheduler(16);
-            OverlayHandler = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
-            Threatened = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
-
-            _exiting = false;
             ShowEquip = false;
+            ShowInfo = false;
+            _exiting = false;
 
             Render();
         }
@@ -136,8 +144,10 @@ namespace Roguelike
             StateHandler.Reset();
             MessageHandler.Clear();
             EventScheduler.Clear();
-            OverlayHandler.Clear();
+            Overlay.Clear();
             Threatened.Clear();
+            CurrentAnimations.Clear();
+            FinishedAnimations.Clear();
 
             WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
             World = new WorldHandler(worldParameter);
@@ -187,7 +197,21 @@ namespace Roguelike
             while (!_exiting)
             {
                 StateHandler.Update();
+
+                foreach (IAnimation animation in CurrentAnimations)
+                {
+                    if (animation.Update())
+                        FinishedAnimations.Add(animation);
+                }
+
                 Render();
+
+                foreach (IAnimation animation in FinishedAnimations)
+                {
+                    CurrentAnimations.Remove(animation);
+                }
+
+                FinishedAnimations.Clear();
             }
 
             Terminal.Close();
@@ -228,6 +252,12 @@ namespace Roguelike
             }
 
             StateHandler.Draw();
+
+            foreach (IAnimation animation in CurrentAnimations)
+            {
+                animation.Draw();
+            }
+
             Terminal.Refresh();
         }
     }

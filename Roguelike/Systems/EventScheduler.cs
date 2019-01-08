@@ -89,13 +89,13 @@ namespace Roguelike.Systems
         }
 
         // Perform a specified action immediately. Support to queue actions may be added as needed.
-        internal static bool Execute(ISchedulable current, ICommand action)
+        internal static bool Execute(ISchedulable current, ICommand command)
         {
             // Break the event loop when there is no Action.
             // This should only happen with input handling for the Player's Actions. Note that even
             // though we never explicitly pass null for Player Actions, if a player gets to move
             // twice, we need to pass control back to let the player move
-            if (action == null)
+            if (command == null)
             {
                 System.Diagnostics.Debug.Assert(current is Actors.Player);
                 return false;
@@ -103,11 +103,11 @@ namespace Roguelike.Systems
 
             // Check that the action can succeed before executing it. If there are potential
             // alternative actions, try them as well.
-            RedirectMessage status = action.Validate();
+            RedirectMessage status = command.Validate();
             while (!status.Success && status.Alternative != null)
             {
-                action = status.Alternative;
-                status = action.Validate();
+                command = status.Alternative;
+                status = command.Validate();
             }
 
             // If we still don't succeed, the action is bad and should be cancelled. Otherwise,
@@ -129,8 +129,10 @@ namespace Roguelike.Systems
             }
             else
             {
-                action.Execute();
-                current.Energy -= action.EnergyCost;
+                command.Execute();
+                if (command.Animation != null)
+                    Game.CurrentAnimations.Add(command.Animation);
+                current.Energy -= command.EnergyCost;
             }
 
             return true;

@@ -89,10 +89,6 @@ namespace Roguelike.State
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
             Game.StateHandler.PopState();
-
-            //Q: can any item action events even have animations?
-            if (command.Animation != null)
-                Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
         public virtual void Draw(LayerInfo layer)

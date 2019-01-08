@@ -5,10 +5,13 @@ namespace Roguelike.Animations
 {
     public interface IAnimation
     {
-        bool Done { get; }
+        LayerInfo Layer { get; }
 
-        void Update();
-        void Draw(LayerInfo layer);
+        // Returns true when an animation is done updating
+        bool Update();
+
+        // Draw the animation to Layer
+        void Draw();
 
         event EventHandler Complete;
     }

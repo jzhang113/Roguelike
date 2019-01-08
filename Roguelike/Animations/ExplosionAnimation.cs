@@ -6,7 +6,7 @@ namespace Roguelike.Animations
 {
     internal class ExplosionAnimation : IAnimation
     {
-        public bool Done { get; private set; }
+        public LayerInfo Layer { get; }
 
         private readonly int _x;
         private readonly int _y;
@@ -14,34 +14,37 @@ namespace Roguelike.Animations
         private readonly Color _color;
         private int _counter;
 
-        public ExplosionAnimation(int x, int y, int radius, Color color)
+        public ExplosionAnimation(LayerInfo layer, int x, int y, int radius, Color color)
         {
+            Layer = layer;
             _x = x;
             _y = y;
             _radius = radius;
             _color = color;
         }
 
-        public void Update()
+        public bool Update()
         {
-            System.Diagnostics.Debug.Assert(!Done);
-
-            _counter++;
             if (_counter >= _radius)
             {
-                Done = true;
                 OnComplete(EventArgs.Empty);
+                return true;
+            }
+            else
+            {
+                _counter++;
+                return false;
             }
         }
 
-        public void Draw(LayerInfo layer)
+        public void Draw()
         {
-            Game.OverlayHandler.Clear();
+            Game.Overlay.Clear();
             foreach (Tile tile in Game.Map.GetTilesInRadius(_x, _y, _counter))
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, _color);
+                Game.Overlay.Set(tile.X, tile.Y, _color);
             }
-            Game.OverlayHandler.Draw(layer);
+            Game.Overlay.Draw(Layer);
         }
 
         public event EventHandler Complete;

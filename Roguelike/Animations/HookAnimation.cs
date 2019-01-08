@@ -9,7 +9,7 @@ namespace Roguelike.Animations
 {
     internal class HookAnimation : IAnimation
     {
-        public bool Done { get; private set; }
+        public LayerInfo Layer { get; }
 
         private readonly Actor _source;
         private readonly Actor _target;
@@ -19,23 +19,22 @@ namespace Roguelike.Animations
         private bool _hit;
         private Tile _prevPos;
 
-        public HookAnimation(Actor source, IEnumerable<Tile> path, bool retract, Actor target = null)
+        public HookAnimation(LayerInfo layer, Actor source, IEnumerable<Tile> path, bool retract, Actor target = null)
         {
+            Layer = layer;
             _source = source;
             _path = path.ToList();
             _retract = retract;
             _target = target;
 
             _prevPos = Game.Map.Field[_source.X, _source.Y];
-            Done = _path.Count == 0;
         }
 
-        public void Update()
+        public bool Update()
         {
-            System.Diagnostics.Debug.Assert(!Done);
-
             if (!_hit)
             {
+                // Hook is still extending up to maximum range (_path.Count).
                 _counter += 2;
                 if (_counter > _path.Count - 1)
                 {
@@ -48,25 +47,31 @@ namespace Roguelike.Animations
                     else if (_target != null)
                         _target.DrawingComponent.Activated = false;
                 }
+
+                return false;
+            }
+            else if (_counter <= 0)
+            {
+                // Hook length is now 0, reactivate Actors.
+                _source.DrawingComponent.Activated = true;
+                if (_target != null)
+                    _target.DrawingComponent.Activated = true;
+
+                OnComplete(EventArgs.Empty);
+                return true;
             }
             else
             {
+                // Hook is still retracting back.
                 _counter -= 2;
-                if (--_counter <= 0)
-                {
-                    // Reactivate Actors.
-                    _source.DrawingComponent.Activated = true;
-                    if (_target != null)
-                        _target.DrawingComponent.Activated = true;
-
+                if (_counter < 0)
                     _counter = 0;
-                    Done = true;
-                    OnComplete(EventArgs.Empty);
-                }
+
+                return false;
             }
         }
 
-        public void Draw(LayerInfo layer)
+        public void Draw()
         {
             if (!_hit)
             {
@@ -76,7 +81,7 @@ namespace Roguelike.Animations
                     Tile tile = _path[i];
 
                     Terminal.Color(Colors.Hook);
-                    layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                    Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                 }
             }
             else
@@ -89,13 +94,13 @@ namespace Roguelike.Animations
                         Tile tile = _path[i];
 
                         Terminal.Color(Colors.Hook);
-                        layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                        Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                     }
 
                     if (_target != null && _counter > 0)
                     {
                         _prevPos = _path[_counter - 1];
-                        _target.DrawingComponent.Draw(layer, _prevPos);
+                        _target.DrawingComponent.Draw(Layer, _prevPos);
                     }
                 }
                 else
@@ -106,13 +111,13 @@ namespace Roguelike.Animations
                         Tile tile = _path[i];
 
                         Terminal.Color(Colors.Hook);
-                        layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                        Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                     }
 
                     if (_counter > 1)
                     {
                         _prevPos = _path[_path.Count - _counter + 1];
-                        _source.DrawingComponent.Draw(layer, _prevPos);
+                        _source.DrawingComponent.Draw(Layer, _prevPos);
                     }
                 }
             }

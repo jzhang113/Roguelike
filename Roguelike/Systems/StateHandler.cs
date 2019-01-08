@@ -10,6 +10,8 @@ namespace Roguelike.Systems
 {
     public class StateHandler
     {
+        public LayerInfo CurrentLayer => _consoles[_states.Peek().GetType()];
+
         private readonly Stack<IState> _states;
         private readonly IDictionary<Type, LayerInfo> _consoles;
 
@@ -80,7 +82,7 @@ namespace Roguelike.Systems
 
         public void PopState()
         {
-            Game.OverlayHandler.Clear();
+            Game.Overlay.Clear();
             _states.Pop();
         }
 
@@ -94,15 +96,16 @@ namespace Roguelike.Systems
             if (_states.Count == 0)
             {
                 Game.Exit();
+                return;
             }
-            else
-            {
-                IState currentState = _states.Peek();
-                ICommand command = HandleInput();
 
-                if (command != null || currentState.Nonblocking)
-                    currentState.Update(command);
-            }
+            IState currentState = _states.Peek();
+            ICommand command = HandleInput();
+
+            if (command == null && !currentState.Nonblocking)
+                return;
+
+            currentState.Update(command);
         }
 
         public void Draw()

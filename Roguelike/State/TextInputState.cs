@@ -19,7 +19,7 @@ namespace Roguelike.State
             _inputBuffer = new StringBuilder();
             _createCommand = func;
 
-            Game.OverlayHandler.DisplayText = "Drop how many?";
+            Game.Overlay.DisplayText = "Drop how many?";
         }
 
         public ICommand HandleKeyInput(int key)
@@ -38,7 +38,7 @@ namespace Roguelike.State
                     break;
             }
 
-            Game.OverlayHandler.DisplayText = $"Drop how many? {_inputBuffer}";
+            Game.Overlay.DisplayText = $"Drop how many? {_inputBuffer}";
             return null;
         }
 
@@ -56,7 +56,7 @@ namespace Roguelike.State
 
         public void Draw(LayerInfo layer)
         {
-            Game.OverlayHandler.Draw(layer);
+            Game.Overlay.Draw(layer);
         }
     }
 }

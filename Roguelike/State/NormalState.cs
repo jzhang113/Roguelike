@@ -138,6 +138,12 @@ namespace Roguelike.State
                 return null;
             }
 
+            if (key == Terminal.TK_1)
+            {
+                Game.CurrentAnimations.Add(new Animations.SpinAnimation(Game.StateHandler.CurrentLayer, Game.Player.X, Game.Player.Y));
+                return new WaitCommand(player);
+            }
+
             // TODO: Create a debug menu for test commands
             if (key == Terminal.TK_GRAVE)
             {
@@ -194,10 +200,10 @@ namespace Roguelike.State
             foreach (WeightedPoint p in path)
             {
                 if (Game.Map.Field[p.X, p.Y].IsExplored)
-                    Game.OverlayHandler.Set(p.X, p.Y, Colors.Path);
+                    Game.Overlay.Set(p.X, p.Y, Colors.Path);
             }
 
-            Game.OverlayHandler.Set(current.X, current.Y, Colors.Cursor);
+            Game.Overlay.Set(current.X, current.Y, Colors.Cursor);
 
             if (Game.Map.Field[current.X, current.Y].IsVisible
                 && Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))

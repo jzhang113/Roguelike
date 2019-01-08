@@ -8,41 +8,44 @@ namespace Roguelike.Animations
 {
     internal class TrailAnimation : IAnimation
     {
-        public bool Done { get; private set; }
+        public LayerInfo Layer { get; }
 
         private readonly IList<Tile> _path;
         private readonly Color _color;
         private int _counter;
 
-        public TrailAnimation(IEnumerable<Tile> path, Color color)
+        public TrailAnimation(LayerInfo layer, IEnumerable<Tile> path, Color color)
         {
+            Layer = layer;
             _path = path.ToList();
             _color = color;
             _counter = 0;
         }
 
-        public void Update()
+        public bool Update()
         {
-            System.Diagnostics.Debug.Assert(!Done);
-
-            _counter += 2;
             if (_counter > _path.Count - 1)
             {
                 _counter = _path.Count - 1;
-                Done = true;
                 OnComplete(EventArgs.Empty);
+                return true;
+            }
+            else
+            {
+                _counter += 2;
+                return false;
             }
         }
 
-        public void Draw(LayerInfo layer)
+        public void Draw()
         {
             if (_path.Count == 0)
                 return;
 
-            Game.OverlayHandler.Clear();
+            Game.Overlay.Clear();
             Tile tile = _path[_counter];
-            Game.OverlayHandler.Set(tile.X, tile.Y, _color);
-            Game.OverlayHandler.Draw(layer);
+            Game.Overlay.Set(tile.X, tile.Y, _color);
+            Game.Overlay.Draw(Layer);
         }
 
         public event EventHandler Complete;

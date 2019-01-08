@@ -31,8 +31,8 @@ namespace Roguelike.State
             _callback = callback;
             _targettableActors = new List<Actor>();
 
-            Game.OverlayHandler.DisplayText = "targetting mode";
-            Game.OverlayHandler.Clear();
+            Game.Overlay.DisplayText = "targetting mode";
+            Game.Overlay.Clear();
 
             ICollection<Tile> tempRange = new HashSet<Tile>();
             _inRange = Game.Map.GetTilesInRadius(_source.X, _source.Y, (int)_targetZone.Range).ToList();
@@ -51,7 +51,7 @@ namespace Roguelike.State
                     }
                 }
 
-                Game.OverlayHandler.Set(collision.X, collision.Y, Colors.TargetBackground);
+                Game.Overlay.Set(collision.X, collision.Y, Colors.TargetBackground);
                 tempRange.Add(collision);
             }
 
@@ -65,7 +65,7 @@ namespace Roguelike.State
 
             // Add the current tile into the targettable range as well.
             tempRange.Add(Game.Map.Field[source.X, source.Y]);
-            Game.OverlayHandler.Set(source.X, source.Y, Colors.TargetBackground);
+            Game.Overlay.Set(source.X, source.Y, Colors.TargetBackground);
             _inRange = tempRange;
 
             // Initialize the targetting to an interesting target.
@@ -228,22 +228,22 @@ namespace Roguelike.State
 
         private IEnumerable<Tile> DrawTargettedTiles()
         {
-            Game.OverlayHandler.Clear();
+            Game.Overlay.Clear();
             IEnumerable<Tile> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
 
             // Draw the projectile path if any.
             foreach (Tile tile in _targetZone.Trail)
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.Path);
+                Game.Overlay.Set(tile.X, tile.Y, Colors.Path);
             }
 
             // Draw the targetted tiles.
             foreach (Tile tile in targets)
             {
-                Game.OverlayHandler.Set(tile.X, tile.Y, Colors.Target);
+                Game.Overlay.Set(tile.X, tile.Y, Colors.Target);
             }
 
-            Game.OverlayHandler.Set(_targetX, _targetY, Colors.Cursor);
+            Game.Overlay.Set(_targetX, _targetY, Colors.Cursor);
             return targets;
         }
 
@@ -252,14 +252,11 @@ namespace Roguelike.State
             Game.Player.NextCommand = command;
             Game.EventScheduler.Run();
             Game.StateHandler.PopState();
-
-            if (command.Animation != null)
-                Game.StateHandler.PushState(new AnimationState(command.Animation));
         }
 
         public void Draw(LayerInfo layer)
         {
-            Game.OverlayHandler.Draw(layer);
+            Game.Overlay.Draw(layer);
             Game.World.Map.Draw(layer);
         }
     }
