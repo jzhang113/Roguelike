@@ -14,7 +14,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost => Data.Constants.FULL_TURN;
-        public IAnimation Animation => null;
+        public IAnimation Animation { get; private set; }
 
         private readonly int _newX;
         private readonly int _newY;
@@ -98,7 +98,10 @@ namespace Roguelike.Commands
                 }
             }
 
+            int prevX = Source.X;
+            int prevY = Source.Y;
             Game.Map.SetActorPosition(Source, _newX, _newY);
+            Animation = new MoveAnimation(Game.StateHandler.CurrentLayer, Source, prevX, prevY);
 
             if (Source is Player)
                 Game.Map.Refresh();

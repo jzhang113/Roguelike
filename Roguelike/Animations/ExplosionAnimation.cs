@@ -26,15 +26,10 @@ namespace Roguelike.Animations
         public bool Update()
         {
             if (_counter >= _radius)
-            {
-                OnComplete(EventArgs.Empty);
                 return true;
-            }
-            else
-            {
-                _counter++;
-                return false;
-            }
+
+            _counter++;
+            return false;
         }
 
         public void Draw()
@@ -46,8 +41,5 @@ namespace Roguelike.Animations
             }
             Game.Overlay.Draw(Layer);
         }
-
-        public event EventHandler Complete;
-        private void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
     }
 }

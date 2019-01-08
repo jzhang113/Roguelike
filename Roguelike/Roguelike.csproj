@@ -115,6 +115,7 @@
     <Compile Include="Animations\ExplosionAnimation.cs" />
     <Compile Include="Animations\HookAnimation.cs" />
     <Compile Include="Animations\IAnimation.cs" />
+    <Compile Include="Animations\MoveAnimation.cs" />
     <Compile Include="Animations\SpinAnimation.cs" />
     <Compile Include="Animations\TrailAnimation.cs" />
     <Compile Include="BearLibTerminal.cs" />

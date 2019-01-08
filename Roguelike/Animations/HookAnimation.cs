@@ -15,6 +15,7 @@ namespace Roguelike.Animations
         private readonly Actor _target;
         private readonly IList<Tile> _path;
         private readonly bool _retract;
+
         private int _counter;
         private bool _hit;
         private Tile _prevPos;
@@ -27,7 +28,8 @@ namespace Roguelike.Animations
             _retract = retract;
             _target = target;
 
-            _prevPos = Game.Map.Field[_source.X, _source.Y];
+            _counter = 0;
+            _hit = false;
         }
 
         public bool Update()
@@ -57,7 +59,6 @@ namespace Roguelike.Animations
                 if (_target != null)
                     _target.DrawingComponent.Activated = true;
 
-                OnComplete(EventArgs.Empty);
                 return true;
             }
             else
@@ -84,46 +85,40 @@ namespace Roguelike.Animations
                     Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                 }
             }
+            else if (_retract)
+            {
+                // Animating the hook pulling the _target.
+                for (int i = 0; i < _counter - 1; i++)
+                {
+                    Tile tile = _path[i];
+
+                    Terminal.Color(Colors.Hook);
+                    Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                }
+
+                if (_target != null && _counter > 0)
+                {
+                    _prevPos = _path[_counter - 1];
+                    _target.DrawingComponent.Draw(Layer, _prevPos);
+                }
+            }
             else
             {
-                if (_retract)
+                // Animating the hook pulling the _source along.
+                for (int i = _path.Count - 1; i > _path.Count - _counter; i--)
                 {
-                    // Animating the hook pulling the _target.
-                    for (int i = 0; i < _counter - 1; i++)
-                    {
-                        Tile tile = _path[i];
+                    Tile tile = _path[i];
 
-                        Terminal.Color(Colors.Hook);
-                        Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
-                    }
-
-                    if (_target != null && _counter > 0)
-                    {
-                        _prevPos = _path[_counter - 1];
-                        _target.DrawingComponent.Draw(Layer, _prevPos);
-                    }
+                    Terminal.Color(Colors.Hook);
+                    Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
                 }
-                else
+
+                if (_counter > 1)
                 {
-                    // Animating the hook pulling the _source along.
-                    for (int i = _path.Count - 1; i > _path.Count - _counter; i--)
-                    {
-                        Tile tile = _path[i];
-
-                        Terminal.Color(Colors.Hook);
-                        Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
-                    }
-
-                    if (_counter > 1)
-                    {
-                        _prevPos = _path[_path.Count - _counter + 1];
-                        _source.DrawingComponent.Draw(Layer, _prevPos);
-                    }
+                    _prevPos = _path[_path.Count - _counter + 1];
+                    _source.DrawingComponent.Draw(Layer, _prevPos);
                 }
             }
         }
-
-        public event EventHandler Complete;
-        private void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
     }
 }

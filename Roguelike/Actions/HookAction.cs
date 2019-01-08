@@ -52,25 +52,21 @@ namespace Roguelike.Actions
                 if (Game.Map.TryGetActor(collisionTile.X, collisionTile.Y, out Actor actor))
                 {
                     // If an Actor is hit, pull the target in.
+                    Tile depositTile = collisionPath[0];
+                    int prevX = actor.X;
+                    int prevY = actor.Y;
+                    Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
                     Animation = new HookAnimation(currentLayer, sourceActor, collisionPath, true, actor);
-                    Animation.Complete += (sender, args) =>
-                    {
-                        Tile depositTile = collisionPath[0];
-                        Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
-                        Game.Map.Refresh();
-                    };
                 }
                 else
                 {
                     // If something else got hit, it must be a wall or door. In either case, pull
                     // the source towards the target.
+                    Tile depositTile = collisionPath.Last();
+                    int prevX = sourceActor.X;
+                    int prevY = sourceActor.Y;
+                    Game.Map.SetActorPosition(sourceActor, depositTile.X, depositTile.Y);
                     Animation = new HookAnimation(currentLayer, sourceActor, collisionPath, false);
-                    Animation.Complete += (sender, arg) =>
-                    {
-                        Tile depositTile = collisionPath.Last();
-                        Game.Map.SetActorPosition(sourceActor, depositTile.X, depositTile.Y);
-                        Game.Map.Refresh();
-                    };
                 }
             }
             else

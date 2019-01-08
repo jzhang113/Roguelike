@@ -23,15 +23,10 @@ namespace Roguelike.Animations
         public bool Update()
         {
             if (_frame >= 8)
-            {
-                OnComplete(EventArgs.Empty);
                 return true;
-            }
-            else
-            {
-                _frame++;
-                return false;
-            }
+
+            _frame++;
+            return false;
         }
 
         public void Draw()
@@ -49,8 +44,5 @@ namespace Roguelike.Animations
                 case 8: Layer.Put(_x     - Camera.X, _y - 1 - Camera.Y, '|'); break;
             }
         }
-
-        public event EventHandler Complete;
-        private void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
     }
 }

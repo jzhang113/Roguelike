@@ -12,7 +12,5 @@ namespace Roguelike.Animations
 
         // Draw the animation to Layer
         void Draw();
-
-        event EventHandler Complete;
     }
 }

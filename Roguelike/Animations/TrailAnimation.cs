@@ -27,7 +27,6 @@ namespace Roguelike.Animations
             if (_counter > _path.Count - 1)
             {
                 _counter = _path.Count - 1;
-                OnComplete(EventArgs.Empty);
                 return true;
             }
             else
@@ -47,8 +46,5 @@ namespace Roguelike.Animations
             Game.Overlay.Set(tile.X, tile.Y, _color);
             Game.Overlay.Draw(Layer);
         }
-
-        public event EventHandler Complete;
-        private void OnComplete(EventArgs e) => Complete?.Invoke(this, e);
     }
 }
