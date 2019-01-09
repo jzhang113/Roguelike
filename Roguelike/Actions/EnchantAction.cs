@@ -1,7 +1,7 @@
-﻿using Roguelike.Animations;
+﻿using Optional;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
-using Roguelike.Items;
 using System;
 
 namespace Roguelike.Actions
@@ -12,22 +12,14 @@ namespace Roguelike.Actions
         public TargetZone Area { get; }
         public int Speed => 0;
         public int EnergyCost => Data.Constants.FULL_TURN;
-        public IAnimation Animation => null;
+        public Option<IAnimation> Animation => Option.None<IAnimation>();
 
         public EnchantAction(TargetZone area)
         {
             Area = area;
         }
 
-        public void Activate(ISchedulable source, Tile target)
-        {
-            if (target == null)
-                return;
-
-            if (!Game.Map.TryGetItem(target.X, target.Y, out Item item))
-                return;
-
-            item.Enchantment++;
-        }
+        public void Activate(ISchedulable source, Tile target) =>
+            Game.Map.GetItem(target.X, target.Y).MatchSome(item => item.Enchantment++);
     }
 }

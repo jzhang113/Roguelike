@@ -1,4 +1,5 @@
-﻿using Roguelike.Actions;
+﻿using Optional;
+using Roguelike.Actions;
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
@@ -10,7 +11,7 @@ namespace Roguelike.Commands
     internal class DelayActionCommand : ICommand
     {
         public int EnergyCost => _action.EnergyCost;
-        public IAnimation Animation => _action.Animation;
+        public Option<IAnimation> Animation => _action.Animation;
 
         private readonly ISchedulable _source;
         private readonly IAction _action;

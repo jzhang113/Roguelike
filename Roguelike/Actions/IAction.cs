@@ -1,4 +1,5 @@
-﻿using Roguelike.Animations;
+﻿using Optional;
+using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 
@@ -19,7 +20,7 @@ namespace Roguelike.Actions
         int Speed { get; }
 
         // Any visual effects to display.
-        IAnimation Animation { get; }
+        Option<IAnimation> Animation { get; }
 
         // Execute the Action. This takes a Terrain as it may have additional environmental effects.
         void Activate(ISchedulable source, Tile target);

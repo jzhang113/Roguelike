@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
@@ -11,7 +12,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost => Data.Constants.FULL_TURN;
-        public IAnimation Animation => _usableItem?.ApplySkill?.Animation;
+        public Option<IAnimation> Animation => _usableItem.ApplySkill.Animation;
 
         private readonly IUsable _usableItem;
         private readonly IEnumerable<Tile> _target;
@@ -19,7 +20,6 @@ namespace Roguelike.Commands
         public ApplyCommand(Actor source, IUsable item, IEnumerable<Tile> targets)
         {
             Source = source;
-
             _usableItem = item;
             _target = targets;
         }

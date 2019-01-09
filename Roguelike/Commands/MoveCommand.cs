@@ -1,4 +1,5 @@
-﻿using Roguelike.Actions;
+﻿using Optional;
+using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
@@ -14,7 +15,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost => Data.Constants.FULL_TURN;
-        public IAnimation Animation { get; private set; }
+        public Option<IAnimation> Animation { get; private set; }
 
         private readonly int _newX;
         private readonly int _newY;
@@ -58,17 +59,17 @@ namespace Roguelike.Commands
             }
 
             // Check if the destination is already occupied.
-            if (Game.Map.TryGetActor(_tile.X, _tile.Y, out Actor target))
-            {
-                if (target == Source)
-                    return new RedirectMessage(false, new WaitCommand(Source));
+            return Game.Map.GetActor(_tile.X, _tile.Y).Match(
+                some: target =>
+                {
+                    if (target == Source)
+                        return new RedirectMessage(false, new WaitCommand(Source));
 
-                IAction attack = Source.GetBasicAttack();
-                IEnumerable<Tile> targets = attack.Area.GetTilesInRange(Source, _tile.X, _tile.Y);
-                return new RedirectMessage(false, new DelayActionCommand(Source, attack, targets));
-            }
-
-            return new RedirectMessage(true);
+                    IAction attack = Source.GetBasicAttack();
+                    IEnumerable<Tile> targets = attack.Area.GetTilesInRange(Source, _tile.X, _tile.Y);
+                    return new RedirectMessage(false, new DelayActionCommand(Source, attack, targets));
+                },
+                none: () => new RedirectMessage(true));
         }
 
         public void Execute()
@@ -92,16 +93,14 @@ namespace Roguelike.Commands
                         : "You see several items here.");
                 }
 
-                if (Game.Map.TryGetExit(_newX, _newY, out Exit exit))
-                {
-                    Game.MessageHandler.AddMessage($"You see an exit to {exit.Destination}.");
-                }
+                Game.Map.GetExit(_newX, _newY)
+                    .MatchSome(exit => Game.MessageHandler.AddMessage($"You see an exit to {exit.Destination}."));
             }
 
             int prevX = Source.X;
             int prevY = Source.Y;
             Game.Map.SetActorPosition(Source, _newX, _newY);
-            Animation = new MoveAnimation(Game.StateHandler.CurrentLayer, Source, prevX, prevY);
+            Animation = Option.Some<IAnimation>(new MoveAnimation(Game.StateHandler.CurrentLayer, Source, prevX, prevY));
 
             if (Source is Player)
                 Game.Map.Refresh();

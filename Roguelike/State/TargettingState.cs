@@ -59,8 +59,8 @@ namespace Roguelike.State
             // TODO: select items for item targetting spells
             foreach (Tile tile in tempRange)
             {
-                if (Game.Map.TryGetActor(tile.X, tile.Y, out Actor actor))
-                    _targettableActors.Add(actor);
+                Game.Map.GetActor(tile.X, tile.Y)
+                    .MatchSome(actor => _targettableActors.Add(actor));
             }
 
             // Add the current tile into the targettable range as well.

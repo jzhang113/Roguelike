@@ -1,4 +1,5 @@
 ﻿using BearLib;
+using Optional;
 using Roguelike.Actors;
 using Roguelike.Core;
 using Roguelike.Data;
@@ -141,10 +142,8 @@ namespace Roguelike.World
             return true;
         }
 
-        public bool TryGetActor(int x, int y, out Actor actor)
-        {
-            return Units.TryGetValue(ToIndex(x, y), out actor);
-        }
+        public Option<Actor> GetActor(int x, int y) =>
+            Units.TryGetValue(ToIndex(x, y), out Actor actor) ? Option.Some(actor) : Option.None<Actor>();
 
         public bool RemoveActor(Actor unit)
         {
@@ -209,17 +208,10 @@ namespace Roguelike.World
             }
         }
 
-        public bool TryGetItem(int x, int y, out Item item)
+        public Option<Item> GetItem(int x, int y)
         {
             bool success = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
-            if (!success || stack.Count == 0)
-            {
-                item = null;
-                return false;
-            }
-
-            item = stack.First();
-            return true;
+            return (success && stack.Count > 0) ? Option.Some(stack.First()) : Option.None<Item>();
         }
 
         public bool TryGetStack(int x, int y, out InventoryHandler stack)
@@ -291,25 +283,11 @@ namespace Roguelike.World
             return true;
         }
 
-        public bool TryGetExit(int x, int y, out Exit exit)
-        {
-            return Exits.TryGetValue(ToIndex(x, y), out exit);
-        }
+        public Option<Exit> GetExit(int x, int y) =>
+            Exits.TryGetValue(ToIndex(x, y), out Exit exit) ? Option.Some(exit) : Option.None<Exit>();
 
-        public bool TryGetExit(in LevelId levelId, out Exit exit)
-        {
-            foreach (Exit ex in Exits.Values)
-            {
-                if (ex.Destination == levelId)
-                {
-                    exit = ex;
-                    return true;
-                }
-            }
-
-            exit = null;
-            return false;
-        }
+        public IEnumerable<Exit> GetExits(LevelId levelId) =>
+            Exits.Values.Where(ex => ex.Destination == levelId);
 
         public bool SetFire(int x, int y)
         {

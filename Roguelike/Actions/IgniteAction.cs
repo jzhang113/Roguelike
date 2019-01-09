@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
@@ -10,26 +11,21 @@ namespace Roguelike.Actions
         public TargetZone Area { get; }
         public int Speed => 0;
         public int EnergyCost => Data.Constants.FULL_TURN;
-        public IAnimation Animation => null;
-
+        public Option<IAnimation> Animation => Option.None<IAnimation>();
 
         public IgniteAction(TargetZone targetZone)
         {
             Area = targetZone;
         }
 
-        public void Activate(ISchedulable source, Tile target)
-        {
-            System.Diagnostics.Debug.Assert(target != null);
+        public void Activate(ISchedulable source, Tile target) =>
+            Game.Map.GetActor(target.X, target.Y).MatchSome(targetUnit =>
+            {
+                targetUnit.StatusHandler.AddStatus(Statuses.StatusType.Burning, 10);
 
-            if (!Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
-                return;
-
-            targetUnit.StatusHandler.AddStatus(Statuses.StatusType.Burning, 10);
-
-            Game.MessageHandler.AddMessage(source is Fire
-                ? $"{targetUnit.Name} caught on fire!"
-                : $"{source.Name} set {targetUnit.Name} on fire!");
-        }
+                Game.MessageHandler.AddMessage(source is Fire
+                    ? $"{targetUnit.Name} caught on fire!"
+                    : $"{source.Name} set {targetUnit.Name} on fire!");
+            });
     }
 }

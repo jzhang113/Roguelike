@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
@@ -9,7 +10,7 @@ namespace Roguelike.Commands
     {
         public ISchedulable Source { get; }
         public int EnergyCost { get; }
-        public IAnimation Animation => null;
+        public Option<IAnimation> Animation => Option.None<IAnimation>();
 
         public WaitCommand(ISchedulable source)
         {

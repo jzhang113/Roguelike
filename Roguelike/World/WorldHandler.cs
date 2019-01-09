@@ -1,4 +1,5 @@
 ﻿using Pcg;
+using Roguelike.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,8 +56,9 @@ namespace Roguelike.World
             bool seen = _levels[id].Seen;
             Map = seen ? LoadLevel(id) : CreateLevel(id);
 
-            if (Map.TryGetExit(CurrentLevel, out Core.Exit exit))
-                Map.SetActorPosition(Game.Player, exit.X, exit.Y);
+            // TODO: what about teleporting? Levels without entrances?
+            Exit exit = Map.GetExits(CurrentLevel).First();
+            Map.SetActorPosition(Game.Player, exit.X, exit.Y);
 
             Map.Refresh();
             CurrentLevel = id;

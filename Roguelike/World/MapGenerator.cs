@@ -312,10 +312,16 @@ namespace Roguelike.World
                     symbol = id.Depth > current.Depth ? '>' : '<';
 
                 Exit exit = new Exit(id, symbol);
-                while (!Map.Field[exit.X, exit.Y].IsWalkable && !Map.TryGetExit(exit.X, exit.Y, out _))
+                bool done = false;
+                while (!Map.Field[exit.X, exit.Y].IsWalkable && !done)
                 {
-                    exit.X = Rand.Next(1, Width - 1);
-                    exit.Y = Rand.Next(1, Height - 1);
+                    Map.GetExit(exit.X, exit.Y).Match(
+                        some: _ =>
+                        {
+                            exit.X = Rand.Next(1, Width - 1);
+                            exit.Y = Rand.Next(1, Height - 1);
+                        },
+                        none: () => done = true);
                 }
 
                 Map.AddExit(exit);

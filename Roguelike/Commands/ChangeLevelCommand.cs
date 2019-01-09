@@ -1,4 +1,5 @@
-﻿using Roguelike.Animations;
+﻿using Optional;
+using Roguelike.Animations;
 using Roguelike.Systems;
 using Roguelike.World;
 
@@ -7,7 +8,7 @@ namespace Roguelike.Commands
     internal class ChangeLevelCommand : ICommand
     {
         public int EnergyCost => 0;
-        public IAnimation Animation => null;
+        public Option<IAnimation> Animation => Option.None<IAnimation>();
 
         private readonly LevelId _newLevel;
 

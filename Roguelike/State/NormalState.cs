@@ -205,15 +205,10 @@ namespace Roguelike.State
 
             Game.Overlay.Set(current.X, current.Y, Colors.Cursor);
 
-            if (Game.Map.Field[current.X, current.Y].IsVisible
-                && Game.Map.TryGetActor(current.X, current.Y, out Actor displayActor))
+            if (Game.Map.Field[current.X, current.Y].IsVisible)
             {
-                LookPanel.DisplayActor(displayActor);
-            }
-            else if (Game.Map.TryGetItem(current.X, current.Y, out Item displayItem)
-                && displayItem.Count > 0)
-            {
-                LookPanel.DisplayItem(displayItem);
+                Game.Map.GetItem(current.X, current.Y).MatchSome(LookPanel.DisplayItem);
+                Game.Map.GetActor(current.X, current.Y).MatchSome(LookPanel.DisplayActor);
             }
             else
             {

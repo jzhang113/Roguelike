@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
@@ -12,7 +13,7 @@ namespace Roguelike.Actions
         public TargetZone Area { get; }
         public int Speed { get; }
         public int EnergyCost { get; }
-        public IAnimation Animation => null;
+        public Option<IAnimation> Animation => Option.None<IAnimation>();
 
         private readonly int _power;
 
@@ -26,21 +27,16 @@ namespace Roguelike.Actions
         }
 
         // Deals tamage to the target.
-        public void Activate(ISchedulable source, Tile target)
-        {
-            if (target == null)
-                return;
+        public void Activate(ISchedulable source, Tile target) =>
+            Game.Map.GetActor(target.X, target.Y).MatchSome(targetUnit =>
+            {
+                int damage = targetUnit.TakeDamage(_power);
 
-            if (!Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
-                return;
+                if (targetUnit.IsDead)
+                    targetUnit.State = ActorState.Dead;
 
-            int damage = targetUnit.TakeDamage(_power);
-
-            if (targetUnit.IsDead)
-                targetUnit.State = ActorState.Dead;
-
-            Game.MessageHandler.AddMessage(
-                $"{source.Name} hits {targetUnit.Name} for {damage} damage");
-        }
+                Game.MessageHandler.AddMessage(
+                    $"{source.Name} hits {targetUnit.Name} for {damage} damage");
+            });
     }
 }

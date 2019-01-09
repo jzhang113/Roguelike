@@ -130,8 +130,7 @@ namespace Roguelike.Systems
             else
             {
                 command.Execute();
-                if (command.Animation != null)
-                    Game.CurrentAnimations.Add(command.Animation);
+                command.Animation.MatchSome(animation => Game.CurrentAnimations.Add(animation));
                 current.Energy -= command.EnergyCost;
             }
 

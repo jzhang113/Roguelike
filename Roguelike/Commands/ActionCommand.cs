@@ -1,4 +1,5 @@
-﻿using Roguelike.Actions;
+﻿using Optional;
+using Roguelike.Actions;
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
@@ -11,7 +12,7 @@ namespace Roguelike.Commands
     {
         public ISchedulable Source { get; }
         public int EnergyCost { get; }
-        public IAnimation Animation => _action.Animation;
+        public Option<IAnimation> Animation => _action.Animation;
 
         private readonly IAction _action;
         private readonly IEnumerable<Tile> _targets;
@@ -41,7 +42,7 @@ namespace Roguelike.Commands
                 bool activate = true;
                 Game.Threatened.Unset(tile.X, tile.Y);
 
-                if (Game.Map.TryGetActor(tile.X, tile.Y, out Actors.Actor actor))
+                Game.Map.GetActor(tile.X, tile.Y).MatchSome(actor =>
                 {
                     Actors.ReactionMessage reaction = actor.GetReaction();
                     if (reaction.Command != null)
@@ -58,7 +59,7 @@ namespace Roguelike.Commands
 
                     if (reaction.Negating)
                         activate = false;
-                }
+                });
 
                 if (activate)
                     _action.Activate(Source, tile);

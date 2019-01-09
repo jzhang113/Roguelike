@@ -43,14 +43,11 @@ namespace Roguelike.Core
 
             ProcessFire(Game.Map);
 
-            if (Game.Map.TryGetActor(X, Y, out _))
-            {
-                return new DelayActionCommand(this,
+            return Game.Map.GetActor(X, Y).Match<ICommand>(
+                some: _ => new ActionCommand(this,
                    new IgniteAction(new TargetZone(TargetShape.Self)),
-                   Game.Map.Field[X, Y]);
-            }
-
-            return new WaitCommand(this);
+                   Game.Map.Field[X, Y]),
+                none: () => new WaitCommand(this));
         }
 
         // Flammable objects have a chance to get set on fire. Fire also produces light.

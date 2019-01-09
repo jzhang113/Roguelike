@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
@@ -12,7 +13,7 @@ namespace Roguelike.Actions
         public TargetZone Area { get; }
         public int Speed => Data.Constants.HALF_TURN;
         public int EnergyCost => Data.Constants.FULL_TURN;
-        public IAnimation Animation { get; private set; }
+        public Option<IAnimation> Animation { get; private set; }
 
         public HookAction(int range)
         {
@@ -49,30 +50,31 @@ namespace Roguelike.Actions
             LayerInfo currentLayer = Game.StateHandler.CurrentLayer;
             if (collisionTile != null)
             {
-                if (Game.Map.TryGetActor(collisionTile.X, collisionTile.Y, out Actor actor))
-                {
-                    // If an Actor is hit, pull the target in.
-                    Tile depositTile = collisionPath[0];
-                    int prevX = actor.X;
-                    int prevY = actor.Y;
-                    Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
-                    Animation = new HookAnimation(currentLayer, sourceActor, collisionPath, true, actor);
-                }
-                else
-                {
-                    // If something else got hit, it must be a wall or door. In either case, pull
-                    // the source towards the target.
-                    Tile depositTile = collisionPath.Last();
-                    int prevX = sourceActor.X;
-                    int prevY = sourceActor.Y;
-                    Game.Map.SetActorPosition(sourceActor, depositTile.X, depositTile.Y);
-                    Animation = new HookAnimation(currentLayer, sourceActor, collisionPath, false);
-                }
+                Game.Map.GetActor(collisionTile.X, collisionTile.Y).Match(
+                    some: actor =>
+                    {
+                        // If an Actor is hit, pull the target in.
+                        Tile depositTile = collisionPath[0];
+                        int prevX = actor.X;
+                        int prevY = actor.Y;
+                        Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
+                        Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, true, actor));
+                    },
+                    none: () =>
+                    {
+                        // If something else got hit, it must be a wall or door. In either case, pull
+                        // the source towards the target.
+                        Tile depositTile = collisionPath.Last();
+                        int prevX = sourceActor.X;
+                        int prevY = sourceActor.Y;
+                        Game.Map.SetActorPosition(sourceActor, depositTile.X, depositTile.Y);
+                        Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, false));
+                    });
             }
             else
             {
                 // Otherwise don't do anything.
-                Animation = new HookAnimation(currentLayer, sourceActor, collisionPath, true);
+                Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, true));
             }
         }
     }

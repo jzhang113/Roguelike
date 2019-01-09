@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
@@ -12,7 +13,7 @@ namespace Roguelike.Actions
         public TargetZone Area { get; }
         public int Speed => Data.Constants.HALF_TURN;
         public int EnergyCost => Data.Constants.FULL_TURN;
-        public IAnimation Animation => null;
+        public Option<IAnimation> Animation => Option.None<IAnimation>();
 
         private readonly int _power;
 
@@ -23,17 +24,12 @@ namespace Roguelike.Actions
         }
 
         // Heals the target by amount up to its maximum health.
-        public void Activate(ISchedulable source, Tile target)
-        {
-            if (target == null)
-                return;
-
-            if (!Game.Map.TryGetActor(target.X, target.Y, out Actor targetUnit))
-                return;
-
-            int healing = targetUnit.TakeHealing(_power);
-            Game.MessageHandler.AddMessage(
-                $"{source.Name} healed {targetUnit.Name} by {healing} damage");
-        }
+        public void Activate(ISchedulable source, Tile target) =>
+            Game.Map.GetActor(target.X, target.Y).MatchSome(targetUnit =>
+            {
+                int healing = targetUnit.TakeHealing(_power);
+                Game.MessageHandler.AddMessage(
+                    $"{source.Name} healed {targetUnit.Name} by {healing} damage");
+            });
     }
 }

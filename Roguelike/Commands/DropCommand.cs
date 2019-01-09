@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Animations;
 using Roguelike.Items;
 using Roguelike.Systems;
@@ -9,7 +10,7 @@ namespace Roguelike.Commands
     {
         public Actor Source { get; }
         public int EnergyCost => 0;
-        public IAnimation Animation => null;
+        public Option<IAnimation> Animation => Option.None<IAnimation>();
 
         public string Input { get; set; }
 

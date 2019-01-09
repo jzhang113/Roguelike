@@ -17,14 +17,17 @@ namespace Roguelike.State
 
         public ICommand HandleKeyInput(int key)
         {
+            bool breaking = false;
             foreach (Tile tile in Game.Map.Discovered)
             {
-                if (Game.Map.TryGetExit(tile.X, tile.Y, out Exit exit))
-                {
+                Game.Map.GetExit(tile.X, tile.Y).MatchSome(exit => {
                     Game.MessageHandler.AddMessage($"You see an exit to {exit.Destination}");
                     Game.StateHandler.PopState();
+                    breaking = true;
+                });
+
+                if (breaking)
                     return null;
-                }
 
                 if (Game.Map.TryGetStack(tile.X, tile.Y, out Systems.InventoryHandler stack))
                 {
@@ -32,17 +35,25 @@ namespace Roguelike.State
                     Game.StateHandler.PopState();
                     return null;
                 }
+
+                if (breaking)
+                    return null;
             }
 
-            Actor actor = null;
-            if (Game.Map.Field.Any(tile =>
-                    tile.IsVisible &&
-                    Game.Map.TryGetActor(tile.X, tile.Y, out actor) &&
-                    !(actor is Player)))
+            breaking = false;
+            foreach (Tile tile in Game.Map.Field.Where(t => t.IsVisible))
             {
-                Game.MessageHandler.AddMessage($"You see a {actor.Name}");
-                Game.StateHandler.PopState();
-                return null;
+                Game.Map.GetActor(tile.X, tile.Y)
+                    .Filter(actor => !(actor is Player))
+                    .MatchSome(actor =>
+                    {
+                        Game.MessageHandler.AddMessage($"You see a {actor.Name}");
+                        Game.StateHandler.PopState();
+                        breaking = true;
+                    });
+
+                if (breaking)
+                    return null;
             }
 
             WeightedPoint move = Game.Map.MoveTowardsTarget(
