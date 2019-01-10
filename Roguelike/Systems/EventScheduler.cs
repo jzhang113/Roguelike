@@ -1,4 +1,5 @@
-﻿using Roguelike.Commands;
+﻿using Roguelike.Animations;
+using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Utils;
@@ -23,8 +24,38 @@ namespace Roguelike.Systems
             _stopping = false;
         }
 
-        public void AddActor(ISchedulable schedulable) => _entities.Add(schedulable);
-        public void RemoveActor(ISchedulable schedulable) => _entities.Remove(schedulable);
+        public void AddActor(ISchedulable schedulable)
+        {
+            if (schedulable is DelayAttack attack)
+            {
+                int attackActivation = attack.ActivationEnergy;
+                int playerActivation = Game.Player.ActivationEnergy - Game.Player.Energy;
+                int timeTilAttack = attackActivation - playerActivation;
+                var targetColor = Colors.EnemyThreat;
+                if (timeTilAttack > 0)
+                    targetColor = targetColor.Blend(Colors.Floor, (double)(attackActivation - timeTilAttack) / attackActivation);
+
+                foreach (Tile tile in attack.Targets)
+                {
+                    Game.CurrentAnimations.Add(new FlashAnimation(Game.StateHandler.CurrentLayer, tile.X, tile.Y, targetColor));
+                }
+            }
+
+            _entities.Add(schedulable);
+        }
+
+        public void RemoveActor(ISchedulable schedulable)
+        {
+            if (schedulable is DelayAttack attack)
+            {
+                foreach (Tile tile in attack.Targets)
+                {
+                    Game.Threatened.Unset(tile.X, tile.Y);
+                }
+            }
+
+            _entities.Remove(schedulable);
+        }
 
         // Instead of clearing everything immediately, give everything on the level a chance to
         // finish processing, then clear it before the next cycle begins.
@@ -51,7 +82,7 @@ namespace Roguelike.Systems
                     foreach (ISchedulable entity in _entities.ToList())
                     {
                         if (entity.Lifetime == 0) // -1 is used as nonexpiring
-                            _entities.Remove(entity);
+                            RemoveActor(entity);
 
                         // Entities with sufficient energy are placed into the turn queue.
                         if (entity.Energy >= entity.ActivationEnergy)

@@ -19,10 +19,6 @@ namespace Roguelike.Commands
 
         public ActionCommand(ISchedulable source, IAction action, IEnumerable<Tile> targets)
         {
-            System.Diagnostics.Debug.Assert(source != null);
-            System.Diagnostics.Debug.Assert(action != null);
-            System.Diagnostics.Debug.Assert(targets != null);
-
             Source = source;
             EnergyCost = action.EnergyCost;
 
@@ -40,7 +36,6 @@ namespace Roguelike.Commands
             foreach (Tile tile in _targets)
             {
                 bool activate = true;
-                Game.Threatened.Unset(tile.X, tile.Y);
 
                 Game.Map.GetActor(tile.X, tile.Y).MatchSome(actor =>
                 {

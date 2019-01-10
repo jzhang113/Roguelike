@@ -4,7 +4,9 @@ using Roguelike.Animations;
 using Roguelike.Core;
 using Roguelike.Interfaces;
 using Roguelike.Systems;
+using Roguelike.Utils;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Roguelike.Commands
 {
@@ -29,15 +31,6 @@ namespace Roguelike.Commands
 
         public RedirectMessage Validate() => new RedirectMessage(true);
 
-        public void Execute()
-        {
-            foreach (Tile tile in _targets)
-            {
-                Game.Threatened.Set(tile.X, tile.Y,
-                    _source is Actors.Player ? Colors.PlayerThreat : Colors.EnemyThreat);
-            }
-
-            Game.EventScheduler.AddActor(new DelayAttack(_source, _action, _targets));
-        }
+        public void Execute() => Game.EventScheduler.AddActor(new DelayAttack(_source, _action, _targets));
     }
 }

@@ -13,9 +13,10 @@ namespace Roguelike.Core
         public string Name => "attack";
         public int Lifetime { get; private set; } = 1;
 
+        public IEnumerable<Tile> Targets { get; }
+
         private readonly ISchedulable _source;
         private readonly IAction _action;
-        private readonly IEnumerable<Tile> _targets;
 
         public DelayAttack(ISchedulable source, IAction action, IEnumerable<Tile> targets)
         {
@@ -23,13 +24,13 @@ namespace Roguelike.Core
             ActivationEnergy = action.Speed;
             _source = source;
             _action = action;
-            _targets = targets;
+            Targets = targets;
         }
 
         public ICommand Act()
         {
             Lifetime = 0;
-            return new ActionCommand(_source, _action, _targets);
+            return new ActionCommand(_source, _action, Targets);
         }
 
         public int CompareTo(ISchedulable other) => Energy - other.Energy;
