@@ -1,4 +1,5 @@
 ﻿using BearLib;
+using Optional;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Utils;
@@ -9,8 +10,6 @@ namespace Roguelike.State
 {
     internal class TextInputState : IState
     {
-        public bool Nonblocking => false;
-
         private readonly StringBuilder _inputBuffer;
         private readonly Func<string, ICommand> _createCommand;
 
@@ -22,7 +21,7 @@ namespace Roguelike.State
             Game.Overlay.DisplayText = "Drop how many?";
         }
 
-        public ICommand HandleKeyInput(int key)
+        public Option<ICommand> HandleKeyInput(int key)
         {
             // TODO: replace with read_str
             switch (key)
@@ -32,19 +31,19 @@ namespace Roguelike.State
                     break;
                 case Terminal.TK_ENTER:
                 case Terminal.TK_KP_ENTER:
-                    return _createCommand(_inputBuffer.ToString());
+                    return Option.Some(_createCommand(_inputBuffer.ToString()));
                 default:
                     _inputBuffer.Append(key.ToChar());
                     break;
             }
 
             Game.Overlay.DisplayText = $"Drop how many? {_inputBuffer}";
-            return null;
+            return Option.None<ICommand>();
         }
 
-        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        public Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            return null;
+            return Option.None<ICommand>();
         }
 
         public void Update(ICommand command)

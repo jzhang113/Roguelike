@@ -1,4 +1,5 @@
-﻿using Roguelike.Commands;
+﻿using Optional;
+using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Items;
 using System;
@@ -14,10 +15,10 @@ namespace Roguelike.State
         {
         }
 
-        protected override ICommand ResolveInput(Item item)
+        protected override Option<ICommand> ResolveInput(Item item)
         {
             if (item.Count == 1)
-                return new DropCommand(Game.Player, item, 1);
+                return Option.Some<ICommand>(new DropCommand(Game.Player, item, 1));
 
             Game.StateHandler.PushState(new TextInputState(input =>
             {
@@ -27,7 +28,7 @@ namespace Roguelike.State
                 Game.MessageHandler.AddMessage($"Unknown amount: {input}");
                 return null;
             }));
-            return null;
+            return Option.None<ICommand>();
         }
 
         public override void Draw(LayerInfo layer)

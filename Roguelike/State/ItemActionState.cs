@@ -1,4 +1,5 @@
 ﻿using BearLib;
+using Optional;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Data;
@@ -11,8 +12,6 @@ namespace Roguelike.State
 {
     internal abstract class ItemActionState : IState
     {
-        public bool Nonblocking => false;
-
         protected virtual char CurrKey { get; set; }
         protected virtual Func<Item, bool> Selected { get; set; }
 
@@ -24,18 +23,18 @@ namespace Roguelike.State
             CurrKey = 'a';
         }
 
-        public virtual ICommand HandleKeyInput(int key)
+        public virtual Option<ICommand> HandleKeyInput(int key)
         {
             switch (InputMapping.GetInventoryInput(key))
             {
                 case InventoryInput.MoveDown:
                     if (CurrKey < Game.Player.Inventory.LastKey)
                         CurrKey++;
-                    return null;
+                    return Option.None<ICommand>();
                 case InventoryInput.MoveUp:
                     if (CurrKey > 'a')
                         CurrKey--;
-                    return null;
+                    return Option.None<ICommand>();
                 case InventoryInput.Open:
                     return HandleOpen();
                 case InventoryInput.OpenLetter:
@@ -47,14 +46,14 @@ namespace Roguelike.State
                     }
                     else
                     {
-                        return null;
+                        return Option.None<ICommand>();
                     }
                 default:
-                    return null;
+                    return Option.None<ICommand>();
             }
         }
 
-        public virtual ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        public virtual Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             if (leftClick)
                 return HandleOpen();
@@ -65,24 +64,27 @@ namespace Roguelike.State
             else if (CurrKey > Game.Player.Inventory.LastKey)
                 CurrKey = Game.Player.Inventory.LastKey;
 
-            return null;
+            return Option.None<ICommand>();
         }
 
-        private ICommand HandleOpen()
+        private Option<ICommand> HandleOpen()
         {
             if (Game.Player.Inventory.IsStacked(CurrKey))
             {
-                ItemGroup group = Game.Player.Inventory.GetStack(CurrKey);
-                Game.StateHandler.PushState(new SubinvState(group, CurrKey, Selected));
-                return null;
+                Game.Player.Inventory.GetStack(CurrKey).MatchSome(group =>
+                    Game.StateHandler.PushState(new SubinvState(group, CurrKey, Selected)));
+                
+                return Option.None<ICommand>();
             }
             else
             {
-                return ResolveInput(Game.Player.Inventory.GetItem(CurrKey));
+                return Game.Player.Inventory.GetItem(CurrKey).Match(
+                    some: ResolveInput,
+                    none: Option.None<ICommand>);
             }
         }
 
-        protected abstract ICommand ResolveInput(Item item);
+        protected abstract Option<ICommand> ResolveInput(Item item);
 
         public virtual void Update(ICommand command)
         {

@@ -86,12 +86,10 @@ namespace Roguelike.Commands
             if (Source is Player)
             {
                 // TODO: better handling of move over popups
-                if (Game.Map.TryGetStack(_newX, _newY, out InventoryHandler stack) && !stack.IsEmpty())
-                {
+                Game.Map.GetStack(_newX, _newY).MatchSome(stack =>
                     Game.MessageHandler.AddMessage(stack.Count == 1
                         ? $"You see {stack.First()} here."
-                        : "You see several items here.");
-                }
+                        : "You see several items here."));
 
                 Game.Map.GetExit(_newX, _newY)
                     .MatchSome(exit => Game.MessageHandler.AddMessage($"You see an exit to {exit.Destination}."));

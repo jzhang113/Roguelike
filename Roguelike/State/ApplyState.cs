@@ -1,4 +1,5 @@
-﻿using Roguelike.Actions;
+﻿using Optional;
+using Roguelike.Actions;
 using Roguelike.Commands;
 using Roguelike.Interfaces;
 using Roguelike.Items;
@@ -16,12 +17,12 @@ namespace Roguelike.State
             Selected = x => x is IUsable;
         }
 
-        protected override ICommand ResolveInput(Item item)
+        protected override Option<ICommand> ResolveInput(Item item)
         {
             if (!(item is IUsable usableItem))
             {
                 Game.MessageHandler.AddMessage($"Cannot apply {item}.");
-                return null;
+                return Option.None<ICommand>();
             }
 
             IAction action = usableItem.ApplySkill;
@@ -32,7 +33,7 @@ namespace Roguelike.State
                 return new ApplyCommand(Game.Player, split as IUsable, returnTarget);
             });
             Game.StateHandler.PushState(state);
-            return null;
+            return Option.None<ICommand>();
         }
     }
 }

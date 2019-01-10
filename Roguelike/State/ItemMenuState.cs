@@ -1,4 +1,5 @@
 ﻿using BearLib;
+using Optional;
 using Roguelike.Actions;
 using Roguelike.Commands;
 using Roguelike.Core;
@@ -39,7 +40,7 @@ namespace Roguelike.State
             _equippable = item is IEquippable;
         }
 
-        public override ICommand HandleKeyInput(int key)
+        public override Option<ICommand> HandleKeyInput(int key)
         {
             switch (key)
             {
@@ -47,7 +48,7 @@ namespace Roguelike.State
                     if (!_usable)
                     {
                         Game.MessageHandler.AddMessage($"Cannot apply {_item}.");
-                        return null;
+                        return Option.None<ICommand>();
                     }
 
                     IAction action = ((IUsable)_item).ApplySkill;
@@ -58,33 +59,33 @@ namespace Roguelike.State
                         return new ApplyCommand(Game.Player, usable as IUsable, returnTarget);
                     });
                     Game.StateHandler.PushState(state);
-                    return null;
+                    return Option.None<ICommand>();
                 case Terminal.TK_C:
                 case Terminal.TK_T:
-                    return null;
+                    return Option.None<ICommand>();
                 case Terminal.TK_W:
                     if (!_equippable)
                     {
                         Game.MessageHandler.AddMessage($"Cannot equip {_item}.");
-                        return null;
+                        return Option.None<ICommand>();
                     }
 
                     Item split = Game.Player.Inventory.Split(_item, 1);
                     IEquippable equipable = split as IEquippable;
-                    return new EquipCommand(Game.Player, equipable);
+                    return Option.Some<ICommand>(new EquipCommand(Game.Player, equipable));
                 default:
-                    return null;
+                    return Option.None<ICommand>();
             }
         }
 
-        public override ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        public override Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             return base.HandleMouseInput(x, y, leftClick, rightClick);
         }
 
-        protected override ICommand ResolveInput(Item item)
+        protected override Option<ICommand> ResolveInput(Item item)
         {
-            throw new NotImplementedException();
+            return Option.None<ICommand>();
         }
 
         public override void Draw(LayerInfo layer)

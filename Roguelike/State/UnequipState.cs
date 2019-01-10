@@ -1,4 +1,5 @@
-﻿using Roguelike.Commands;
+﻿using Optional;
+using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Data;
 using Roguelike.Interfaces;
@@ -16,17 +17,17 @@ namespace Roguelike.State
         {
         }
 
-        protected override ICommand ResolveInput(Item item)
+        protected override Option<ICommand> ResolveInput(Item item)
         {
             if (item is IEquippable)
             {
                 Item split = Game.Player.Inventory.Split(item, 1);
                 IEquippable equipable = split as IEquippable;
-                return new UnequipCommand(Game.Player, equipable);
+                return Option.Some<ICommand>(new UnequipCommand(Game.Player, equipable));
             }
 
             Game.MessageHandler.AddMessage($"Cannot unequip {item}.");
-            return null;
+            return Option.None<ICommand>();
         }
 
         public override void Draw(LayerInfo layer)

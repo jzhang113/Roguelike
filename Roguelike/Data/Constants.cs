@@ -37,5 +37,8 @@
         public const char HEADER_LEFT = '╡';  // 181
         public const char HEADER_RIGHT = '╞'; // 198
         public const char HEADER_SEP = '│';   // 179
+
+        // Misc constants
+        public const int MESSAGE_HISTORY_COUNT = 100;
     }
 }

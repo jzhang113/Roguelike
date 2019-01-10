@@ -1,4 +1,5 @@
-﻿using Roguelike.Commands;
+﻿using Optional;
+using Roguelike.Commands;
 using Roguelike.Core;
 using System.Collections.Generic;
 
@@ -6,8 +7,6 @@ namespace Roguelike.State
 {
     internal class MenuState : IState
     {
-        public bool Nonblocking => false;
-
         private readonly IEnumerable<MenuButton> _buttons;
 
         public MenuState(IEnumerable<MenuButton> buttons)
@@ -15,12 +14,12 @@ namespace Roguelike.State
             _buttons = buttons;
         }
 
-        public ICommand HandleKeyInput(int key)
+        public Option<ICommand> HandleKeyInput(int key)
         {
-            return null;
+            return Option.None<ICommand>();
         }
 
-        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        public Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             foreach (MenuButton button in _buttons)
             {
@@ -29,7 +28,7 @@ namespace Roguelike.State
                     button.Callback();
             }
 
-            return null;
+            return Option.None<ICommand>();
         }
 
         public void Update(ICommand command)

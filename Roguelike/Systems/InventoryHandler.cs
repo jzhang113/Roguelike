@@ -1,4 +1,5 @@
 ﻿using BearLib;
+using Optional;
 using Roguelike.Core;
 using Roguelike.Data;
 using Roguelike.Items;
@@ -31,8 +32,6 @@ namespace Roguelike.Systems
         // Increments the item stack if it already exists or adds the item to inventory.
         public void Add(Item item)
         {
-            System.Diagnostics.Debug.Assert(item != null);
-
             foreach (ItemGroup group in _inventory)
             {
                 if (group.Contains(item))
@@ -48,8 +47,6 @@ namespace Roguelike.Systems
         // Deregister an Item from the Inventory.
         public bool Remove(Item item)
         {
-            System.Diagnostics.Debug.Assert(item != null);
-
             foreach (ItemGroup group in _inventory)
             {
                 if (group.Contains(item))
@@ -68,8 +65,6 @@ namespace Roguelike.Systems
         // Returns a new ItemCount containing the split amount.
         public Item Split(Item item, int count)
         {
-            System.Diagnostics.Debug.Assert(item != null);
-
             foreach (ItemGroup group in _inventory)
             {
                 if (group.Contains(item))
@@ -105,10 +100,12 @@ namespace Roguelike.Systems
         public bool HasKey(char key) => key >= 'a' && key <= LastKey;
 
         // Attempts to returns the item at position key. Does not return a stack of items
-        public Item GetItem(char key) => (HasKey(key) && !IsStacked(key)) ? _inventory[key - 'a'].First() : null;
+        public Option<Item> GetItem(char key) =>
+            (HasKey(key) && !IsStacked(key)) ? Option.Some(_inventory[key - 'a'].First()) : Option.None<Item>();
 
         // Attempts to return the stack at position key
-        public ItemGroup GetStack(char key) => (HasKey(key) && IsStacked(key)) ? _inventory[key - 'a'] : null;
+        public Option<ItemGroup> GetStack(char key) =>
+            (HasKey(key) && IsStacked(key)) ? Option.Some(_inventory[key - 'a']) : Option.None<ItemGroup>();
 
         public bool IsStacked(char key)
         {

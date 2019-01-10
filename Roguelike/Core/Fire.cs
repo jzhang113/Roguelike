@@ -62,11 +62,11 @@ namespace Roguelike.Core
                     door.Open();
             }
 
-            if (map.TryGetStack(X, Y, out InventoryHandler stack))
+            map.GetStack(X, Y).MatchSome(stack =>
             {
                 stack.SetFire();
                 map.RemoveStackIfEmpty(X, Y);
-            }
+            });
 
             map.ComputeFov(X, Y, Constants.LIGHT_DECAY, false);
         }

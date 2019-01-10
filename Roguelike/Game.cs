@@ -96,7 +96,7 @@ namespace Roguelike
                 [typeof(UnequipState)] = _rightLayer
             });
 
-            MessageHandler = new MessagePanel(Config.MessageMaxCount);
+            MessageHandler = new MessagePanel(Constants.MESSAGE_HISTORY_COUNT);
             EventScheduler = new EventScheduler(16);
             Overlay = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
             Threatened = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);

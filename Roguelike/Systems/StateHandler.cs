@@ -1,4 +1,5 @@
 ﻿using BearLib;
+using Optional;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Data;
@@ -35,22 +36,21 @@ namespace Roguelike.Systems
             _states.Push(NormalState.Instance);
         }
 
-        private ICommand HandleInput()
+        private Option<ICommand> HandleInput()
         {
             IState currentState = _states.Peek();
-
             if (!Terminal.HasInput())
             {
-                return currentState.Nonblocking
+                return (currentState is AutoexploreState)
                    ? currentState.HandleKeyInput(Terminal.TK_INPUT_NONE)
-                   : null;
+                   : Option.None<ICommand>();
             }
 
             int key = Terminal.Read();
             if (key == Terminal.TK_CLOSE)
             {
                 Game.Exit();
-                return null;
+                return Option.None<ICommand>();
             }
 
             bool left = key == Terminal.TK_MOUSE_LEFT;
@@ -62,10 +62,9 @@ namespace Roguelike.Systems
                 int y = Terminal.State(Terminal.TK_MOUSE_Y);
                 LayerInfo layer = _consoles[currentState.GetType()];
 
-                if (layer.PointInside(x, y))
-                    return currentState.HandleMouseInput(x - layer.X, y - layer.Y, left, right);
-                else
-                    return null;
+                return layer.PointInside(x, y)
+                    ? currentState.HandleMouseInput(x - layer.X, y - layer.Y, left, right)
+                    : Option.None<ICommand>();
             }
 
             if (key == Terminal.TK_ESCAPE)
@@ -74,7 +73,7 @@ namespace Roguelike.Systems
                 if (_states.Count == 0)
                     Game.Exit();
 
-                return null;
+                return Option.None<ICommand>();
             }
 
             return currentState.HandleKeyInput(key);
@@ -100,12 +99,7 @@ namespace Roguelike.Systems
             }
 
             IState currentState = _states.Peek();
-            ICommand command = HandleInput();
-
-            if (command == null && !currentState.Nonblocking)
-                return;
-
-            currentState.Update(command);
+            HandleInput().MatchSome(command => currentState.Update(command));
         }
 
         public void Draw()

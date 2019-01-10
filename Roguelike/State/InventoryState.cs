@@ -1,4 +1,5 @@
-﻿using Roguelike.Commands;
+﻿using Optional;
+using Roguelike.Commands;
 using Roguelike.Items;
 using System;
 
@@ -13,10 +14,10 @@ namespace Roguelike.State
         {
         }
 
-        protected override ICommand ResolveInput(Item item)
+        protected override Option<ICommand> ResolveInput(Item item)
         {
             Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, '\0', Selected));
-            return null;
+            return Option.None<ICommand>();
         }
     }
 }

@@ -19,10 +19,6 @@ namespace Roguelike.Commands
 
         public DelayActionCommand(ISchedulable source, IAction action, IEnumerable<Tile> targets)
         {
-            System.Diagnostics.Debug.Assert(source != null);
-            System.Diagnostics.Debug.Assert(action != null);
-            System.Diagnostics.Debug.Assert(targets != null);
-
             _source = source;
             _action = action;
             _targets = targets;

@@ -1,4 +1,5 @@
-﻿using Roguelike.Actors;
+﻿using Optional;
+using Roguelike.Actors;
 using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Input;
@@ -10,8 +11,6 @@ namespace Roguelike.State
 {
     internal class TargettingState : IState
     {
-        public bool Nonblocking => false;
-
         private readonly Actor _source;
         private readonly TargetZone _targetZone;
         private readonly Func<IEnumerable<Tile>, ICommand> _callback;
@@ -88,12 +87,12 @@ namespace Roguelike.State
         }
 
         // ReSharper disable once CyclomaticComplexity
-        public ICommand HandleKeyInput(int key)
+        public Option<ICommand> HandleKeyInput(int key)
         {
             switch (InputMapping.GetTargettingInput(key))
             {
                 case TargettingInput.None:
-                    return null;
+                    return Option.None<ICommand>();
                 case TargettingInput.JumpW:
                     JumpTarget(Direction.W);
                     break;
@@ -162,7 +161,9 @@ namespace Roguelike.State
             }
 
             IEnumerable<Tile> targets = DrawTargettedTiles();
-            return InputMapping.GetTargettingInput(key) == TargettingInput.Fire ? _callback(targets) : null;
+            return (InputMapping.GetTargettingInput(key) == TargettingInput.Fire)
+                ? Option.Some(_callback(targets))
+                : Option.None<ICommand>();
         }
 
         private void MoveTarget(in Dir direction)
@@ -189,13 +190,13 @@ namespace Roguelike.State
             }
         }
 
-        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        public Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             // Handle clicks before checking for movement.
             if (leftClick)
             {
                 IEnumerable<Tile> targets = DrawTargettedTiles();
-                return _callback(targets);
+                return Option.Some(_callback(targets));
             }
 
             int adjustedX = x + Camera.X;
@@ -203,7 +204,7 @@ namespace Roguelike.State
 
             // If the mouse didn't get moved, don't do anything.
             if (adjustedX == _prevMouseX && adjustedY == _prevMouseY)
-                return null;
+                return Option.None<ICommand>();
 
             _prevMouseX = adjustedX;
             _prevMouseY = adjustedY;
@@ -223,7 +224,7 @@ namespace Roguelike.State
             }
 
             DrawTargettedTiles();
-            return null;
+            return Option.None<ICommand>();
         }
 
         private IEnumerable<Tile> DrawTargettedTiles()

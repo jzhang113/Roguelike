@@ -177,18 +177,10 @@ namespace Roguelike.World
             return true;
         }
 
-        public bool TryChangeLocation(Actor actor, out LevelId destination)
-        {
-            if (Exits.TryGetValue(ToIndex(actor.X, actor.Y), out Exit exit))
-            {
-                destination = exit.Destination;
-                return true;
-            }
-
-            destination = Game.World.CurrentLevel;
-            return false;
-        }
-
+        public Option<LevelId> TryChangeLocation(Actor actor) =>
+            Exits.TryGetValue(ToIndex(actor.X, actor.Y), out Exit exit)
+                ? Option.Some(exit.Destination)
+                : Option.None<LevelId>();
         #endregion
 
         #region Item Methods
@@ -210,13 +202,14 @@ namespace Roguelike.World
 
         public Option<Item> GetItem(int x, int y)
         {
-            bool success = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
-            return (success && stack.Count > 0) ? Option.Some(stack.First()) : Option.None<Item>();
+            bool found = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
+            return (found && stack.Count > 0) ? Option.Some(stack.First()) : Option.None<Item>();
         }
 
-        public bool TryGetStack(int x, int y, out InventoryHandler stack)
+        public Option<InventoryHandler> GetStack(int x, int y)
         {
-            return Items.TryGetValue(ToIndex(x, y), out stack);
+            bool found = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
+            return (found && stack.Count > 0) ? Option.Some(stack) : Option.None<InventoryHandler>();
         }
 
         // Clean up the items list by removing empty stacks.
@@ -234,23 +227,26 @@ namespace Roguelike.World
         }
 
         // Take items off of the map.
-        public Item SplitItem(Item item)
+        public Option<Item> SplitItem(Item item)
         {
             int index = ToIndex(item.X, item.Y);
-            if (!Items.TryGetValue(index, out InventoryHandler stack))
+            if (Items.TryGetValue(index, out InventoryHandler stack))
+            {
+                System.Diagnostics.Debug.Assert(
+                    stack.Contains(item),
+                    $"Map does not contain {item.Name}.");
+
+                Item split = stack.Split(item, item.Count);
+                if (stack.IsEmpty())
+                    Items.Remove(index);
+
+                return Option.Some(split);
+            }
+            else
             {
                 System.Diagnostics.Debug.Fail($"Could not split {item.Name} on the map.");
-                return null;
+                return Option.None<Item>();
             }
-
-            System.Diagnostics.Debug.Assert(
-                stack.Contains(item),
-                $"Map does not contain {item.Name}.");
-
-            Item split = stack.Split(item, item.Count);
-            if (stack.IsEmpty())
-                Items.Remove(index);
-            return split;
         }
         #endregion
 

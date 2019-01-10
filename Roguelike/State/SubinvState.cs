@@ -1,4 +1,5 @@
-﻿using Roguelike.Commands;
+﻿using Optional;
+using Roguelike.Commands;
 using Roguelike.Core;
 using Roguelike.Input;
 using Roguelike.Items;
@@ -22,21 +23,21 @@ namespace Roguelike.State
             _subKey = key;
         }
 
-        public override ICommand HandleKeyInput(int key)
+        public override Option<ICommand> HandleKeyInput(int key)
         {
             switch (InputMapping.GetInventoryInput(key))
             {
                 case InventoryInput.MoveDown:
                     if (_currIndex < _subinv.TypeCount - 1)
                         CurrKey++;
-                    return null;
+                    return Option.None<ICommand>();
                 case InventoryInput.MoveUp:
                     if (_currIndex > 0)
                         CurrKey--;
-                    return null;
+                    return Option.None<ICommand>();
                 case InventoryInput.Open:
-                    Item it = _subinv.GetItem(_currIndex);
-                    return (it != null) ? ResolveInput(it) : null;
+                    Item item = _subinv.GetItem(_currIndex);
+                    return ResolveInput(item);
                 case InventoryInput.OpenLetter:
                     char charKey = key.ToChar();
                     if (_subinv.HasIndex(charKey - 'a'))
@@ -46,19 +47,19 @@ namespace Roguelike.State
                     }
                     else
                     {
-                        return null;
+                        return Option.None<ICommand>();
                     }
                 default:
-                    return null;
+                    return Option.None<ICommand>();
             }
         }
 
-        public override ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        public override Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             if (leftClick)
             {
-                Item it = _subinv.GetItem(_currIndex);
-                return (it != null) ? ResolveInput(it) : null;
+                Item item = _subinv.GetItem(_currIndex);
+                return ResolveInput(item);
             }
 
             CurrKey = (char)(y + _subKey - 2);
@@ -67,13 +68,14 @@ namespace Roguelike.State
             else if (_currIndex >= _subinv.TypeCount)
                 CurrKey = (char)('a' + _subinv.TypeCount - 1);
 
-            return null;
+            return Option.None<ICommand>();
         }
 
-        protected override ICommand ResolveInput(Item item)
+        protected override Option<ICommand> ResolveInput(Item item)
         {
-            Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, _subKey, Selected));
-            return null;
+            if (item != null)
+                Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, _subKey, Selected));
+            return Option.None<ICommand>();
         }
 
         public override void Draw(LayerInfo layer)

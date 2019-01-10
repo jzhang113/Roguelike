@@ -1,4 +1,5 @@
 ﻿using BearLib;
+using Optional;
 using Roguelike.Actions;
 using Roguelike.Actors;
 using Roguelike.Commands;
@@ -18,14 +19,12 @@ namespace Roguelike.State
         private static readonly Lazy<NormalState> _instance = new Lazy<NormalState>(() => new NormalState());
         public static NormalState Instance => _instance.Value;
 
-        public bool Nonblocking => false;
-
         private NormalState()
         {
         }
 
         // ReSharper disable once CyclomaticComplexity
-        public ICommand HandleKeyInput(int key)
+        public Option<ICommand> HandleKeyInput(int key)
         {
             Player player = Game.Player;
             Weapon weapon = player.Equipment.PrimaryWeapon;
@@ -37,38 +36,33 @@ namespace Roguelike.State
 
                 #region Movement Keys
                 case NormalInput.MoveW:
-                    return new MoveCommand(player, player.X + Direction.W.X, player.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.W.X, player.Y));
                 case NormalInput.MoveS:
-                    return new MoveCommand(player, player.X, player.Y + Direction.S.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X, player.Y + Direction.S.Y));
                 case NormalInput.MoveN:
-                    return new MoveCommand(player, player.X, player.Y + Direction.N.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X, player.Y + Direction.N.Y));
                 case NormalInput.MoveE:
-                    return new MoveCommand(player, player.X + Direction.E.X, player.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.E.X, player.Y));
                 case NormalInput.MoveNW:
-                    return new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y));
                 case NormalInput.MoveNE:
-                    return new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y));
                 case NormalInput.MoveSW:
-                    return new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y));
                 case NormalInput.MoveSE:
-                    return new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y);
+                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y));
                 case NormalInput.Wait:
-                    return new WaitCommand(player);
+                    return Option.Some<ICommand>(new WaitCommand(player));
                 #endregion
 
                 case NormalInput.Get:
-                    // TODO: only grabs top item
-                    if (Game.Map.TryGetStack(player.X, player.Y, out InventoryHandler stack))
-                        return new PickupCommand(player, stack);
-                    else
-                        Game.MessageHandler.AddMessage("Nothing to pick up here.");
-                    return null;
+                    return Option.Some<ICommand>(new PickupCommand(player, Game.Map.GetStack(player.X, player.Y)));
                 case NormalInput.Throw:
                     // TODO: Add ability to throw without wielding
                     if (weapon == null)
                     {
                         Game.MessageHandler.AddMessage("Nothing to throw.");
-                        return null;
+                        return Option.None<ICommand>();
                     }
 
                     IAction thrown = weapon.Throw();
@@ -93,35 +87,30 @@ namespace Roguelike.State
 
                             return new DelayActionCommand(player, thrown, enumerable);
                         }));
-                    return null;
+                    return Option.None<ICommand>();
                 case NormalInput.ChangeLevel:
-                    // HACK: Ad-hoc input handling
-                    if (Game.Map.TryChangeLocation(player, out World.LevelId destination))
-                        return new ChangeLevelCommand(destination);
-                    else
-                        Game.MessageHandler.AddMessage("There are no exits here.");
-                    return null;
+                    return Option.Some<ICommand>(new ChangeLevelCommand(Game.Map.TryChangeLocation(player)));
                 case NormalInput.OpenApply:
                     Game.StateHandler.PushState(ApplyState.Instance);
-                    return null;
+                    return Option.None<ICommand>();
                 case NormalInput.OpenDrop:
                     Game.StateHandler.PushState(DropState.Instance);
-                    return null;
+                    return Option.None<ICommand>();
                 case NormalInput.OpenEquip:
                     Game.StateHandler.PushState(EquipState.Instance);
-                    return null;
+                    return Option.None<ICommand>();
                 case NormalInput.OpenInventory:
                     Game.StateHandler.PushState(InventoryState.Instance);
-                    return null;
+                    return Option.None<ICommand>();
                 case NormalInput.OpenUnequip:
                     Game.StateHandler.PushState(UnequipState.Instance);
-                    return null;
+                    return Option.None<ICommand>();
                 case NormalInput.AutoExplore:
                     Game.StateHandler.PushState(AutoexploreState.Instance);
-                    return null;
+                    return Option.None<ICommand>();
                 case NormalInput.OpenMenu:
                     Game.Exit();
-                    return null;
+                    return Option.None<ICommand>();
             }
 
             // HACK: debugging commands
@@ -135,13 +124,7 @@ namespace Roguelike.State
                     player,
                     hookAction.Area,
                     returnTarget => new DelayActionCommand(player, hookAction, returnTarget)));
-                return null;
-            }
-
-            if (key == Terminal.TK_1)
-            {
-                Game.CurrentAnimations.Add(new Animations.SpinAnimation(Game.StateHandler.CurrentLayer, Game.Player.X, Game.Player.Y));
-                return new WaitCommand(player);
+                return Option.None<ICommand>();
             }
 
             // TODO: Create a debug menu for test commands
@@ -149,7 +132,7 @@ namespace Roguelike.State
             {
                 Game.EventScheduler.Clear();
                 Game.NewGame();
-                return new WaitCommand(player);
+                return Option.Some<ICommand>(new WaitCommand(player));
             }
 
             // TODO: Use weapon's attack sequence if equipped???
@@ -168,7 +151,7 @@ namespace Roguelike.State
                 // TODO: Should attacks update facing?
                 player.Facing = player.Facing.Right();
                 Game.Map.Refresh();
-                return null;
+                return Option.None<ICommand>();
             }
 
             if (Terminal.Check(Terminal.TK_SHIFT))
@@ -177,7 +160,7 @@ namespace Roguelike.State
                     player,
                     action.Area,
                     target => new DelayActionCommand(player, action, target)));
-                return null;
+                return Option.None<ICommand>();
             }
             else
             {
@@ -186,15 +169,15 @@ namespace Roguelike.State
                     player,
                     player.X + dx,
                     player.Y + dy);
-                return new DelayActionCommand(player, action, target);
+                return Option.Some<ICommand>(new DelayActionCommand(player, action, target));
             }
         }
 
-        public ICommand HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
+        public Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
             Tile current = Game.Map.Field[x, y];
             if (!current.IsExplored || current.IsWall)
-                return null;
+                return Option.None<ICommand>();
 
             IEnumerable<WeightedPoint> path = Game.Map.GetPathToPlayer(x, y).Reverse();
             foreach (WeightedPoint p in path)
@@ -217,7 +200,7 @@ namespace Roguelike.State
 
             LookPanel.DisplayTerrain(Game.Map.Field[current.X, current.Y]);
 
-            return null;
+            return Option.None<ICommand>();
         }
 
         public void Update(ICommand command)
