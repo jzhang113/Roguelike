@@ -12,13 +12,16 @@ namespace Roguelike.State
     {
         private readonly char _subKey;
         private readonly ItemGroup _subinv;
+        private readonly ItemActionState _prevState;
+
         private int _currIndex => CurrKey - 'a';
         protected override int Line => 2 + _subKey - 'a' + _currIndex;
 
-        public SubinvState(ItemGroup group, char key, Func<Item, bool> selected)
+        public SubinvState(ItemGroup group, char key, ItemActionState prevState)
         {
             CurrKey = 'a';
-            Selected = selected;
+            Selected = prevState.Selected;
+            _prevState = prevState;
             _subinv = group;
             _subKey = key;
         }
@@ -71,10 +74,16 @@ namespace Roguelike.State
             return Option.None<ICommand>();
         }
 
-        protected override Option<ICommand> ResolveInput(Item item)
+        internal override Option<ICommand> ResolveInput(Item item)
         {
             if (item != null)
-                Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, _subKey, Selected));
+            {
+                if (_prevState is InventoryState)
+                    Game.StateHandler.PushState(new ItemMenuState(item, CurrKey, _subKey, Selected));
+                else
+                    return _prevState.ResolveInput(item);
+            }
+
             return Option.None<ICommand>();
         }
 

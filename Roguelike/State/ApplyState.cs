@@ -17,7 +17,7 @@ namespace Roguelike.State
             Selected = x => x is IUsable;
         }
 
-        protected override Option<ICommand> ResolveInput(Item item)
+        internal override Option<ICommand> ResolveInput(Item item)
         {
             if (!(item is IUsable usableItem))
             {

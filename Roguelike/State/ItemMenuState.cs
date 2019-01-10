@@ -83,7 +83,7 @@ namespace Roguelike.State
             return base.HandleMouseInput(x, y, leftClick, rightClick);
         }
 
-        protected override Option<ICommand> ResolveInput(Item item)
+        internal override Option<ICommand> ResolveInput(Item item)
         {
             return Option.None<ICommand>();
         }

@@ -16,7 +16,7 @@ namespace Roguelike.State
             Selected = x => x is IEquippable;
         }
 
-        protected override Option<ICommand> ResolveInput(Item item)
+        internal override Option<ICommand> ResolveInput(Item item)
         {
             if (!(item is IEquippable))
             {

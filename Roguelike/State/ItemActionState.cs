@@ -13,7 +13,7 @@ namespace Roguelike.State
     internal abstract class ItemActionState : IState
     {
         protected virtual char CurrKey { get; set; }
-        protected virtual Func<Item, bool> Selected { get; set; }
+        internal virtual Func<Item, bool> Selected { get; set; }
 
         protected virtual int Line => 1 + CurrKey - 'a';
 
@@ -72,7 +72,7 @@ namespace Roguelike.State
             if (Game.Player.Inventory.IsStacked(CurrKey))
             {
                 Game.Player.Inventory.GetStack(CurrKey).MatchSome(group =>
-                    Game.StateHandler.PushState(new SubinvState(group, CurrKey, Selected)));
+                    Game.StateHandler.PushState(new SubinvState(group, CurrKey, this)));
                 
                 return Option.None<ICommand>();
             }
@@ -84,7 +84,7 @@ namespace Roguelike.State
             }
         }
 
-        protected abstract Option<ICommand> ResolveInput(Item item);
+        internal abstract Option<ICommand> ResolveInput(Item item);
 
         public virtual void Update(ICommand command)
         {

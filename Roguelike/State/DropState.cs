@@ -15,7 +15,7 @@ namespace Roguelike.State
         {
         }
 
-        protected override Option<ICommand> ResolveInput(Item item)
+        internal override Option<ICommand> ResolveInput(Item item)
         {
             if (item.Count == 1)
                 return Option.Some<ICommand>(new DropCommand(Game.Player, item, 1));
