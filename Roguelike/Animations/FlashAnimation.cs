@@ -1,6 +1,5 @@
 ﻿using BearLib;
 using Roguelike.Core;
-using Roguelike.Interfaces;
 using Roguelike.Utils;
 using System.Drawing;
 
@@ -10,7 +9,7 @@ namespace Roguelike.Animations
     {
         public LayerInfo Layer { get; }
 
-        private const int _MAX_FRAME = 6;
+        private const int _MAX_FRAME = 4;
 
         private readonly int _x;
         private readonly int _y;
@@ -30,7 +29,6 @@ namespace Roguelike.Animations
         {
             if (_frame >= _MAX_FRAME)
             {
-                Game.Threatened.Set(_x, _y, _color);
                 return true;
             }
             else
@@ -45,7 +43,7 @@ namespace Roguelike.Animations
             Color between = _color.Blend(Colors.Floor, (double)_frame / _MAX_FRAME);
             Terminal.Color(between);
             Terminal.Layer(Layer.Z + 1);
-            Layer.Put(_x - Camera.X, _y - Camera.Y, '█');
+            Layer.Put(_x - Camera.X, _y - Camera.Y, '▓');
             Terminal.Layer(Layer.Z);
         }
     }

@@ -24,25 +24,7 @@ namespace Roguelike.Systems
             _stopping = false;
         }
 
-        public void AddActor(ISchedulable schedulable)
-        {
-            if (schedulable is DelayAttack attack)
-            {
-                int attackActivation = attack.ActivationEnergy;
-                int playerActivation = Game.Player.ActivationEnergy - Game.Player.Energy;
-                int timeTilAttack = attackActivation - playerActivation;
-                var targetColor = Colors.EnemyThreat;
-                if (timeTilAttack > 0)
-                    targetColor = targetColor.Blend(Colors.Floor, (double)(attackActivation - timeTilAttack) / attackActivation);
-
-                foreach (Tile tile in attack.Targets)
-                {
-                    Game.CurrentAnimations.Add(new FlashAnimation(Game.StateHandler.CurrentLayer, tile.X, tile.Y, targetColor));
-                }
-            }
-
-            _entities.Add(schedulable);
-        }
+        public void AddActor(ISchedulable schedulable) => _entities.Add(schedulable);
 
         public void RemoveActor(ISchedulable schedulable)
         {
@@ -81,15 +63,26 @@ namespace Roguelike.Systems
                 {
                     foreach (ISchedulable entity in _entities.ToList())
                     {
-                        if (entity.Lifetime == 0) // -1 is used as nonexpiring
-                            RemoveActor(entity);
+                        // Everyone gains some energy
+                        entity.Energy += Data.Constants.DEFAULT_REFRESH_RATE;
 
                         // Entities with sufficient energy are placed into the turn queue.
                         if (entity.Energy >= entity.ActivationEnergy)
                             _eventSet.Add(entity);
+                    }
+                }
 
-                        // and everyone gains some energy
-                        entity.Energy += Data.Constants.DEFAULT_REFRESH_RATE;
+                foreach (ISchedulable entity in _entities)
+                {
+                    // Manage other stuff tied to Actor speeds
+                    if (entity is DelayAttack attack && attack.Lifetime > 0)
+                    {
+                        var blend = Colors.EnemyThreat.Blend(Colors.FloorBackground, (double)attack.Energy / attack.ActivationEnergy);
+                        foreach (Tile tile in attack.Targets)
+                        {
+                            Game.Threatened.Set(tile.X, tile.Y, blend);
+                            Game.CurrentAnimations.Add(new FlashAnimation(Game.StateHandler.CurrentLayer, tile.X, tile.Y, blend));
+                        }
                     }
                 }
             } while (Update());
@@ -111,9 +104,18 @@ namespace Roguelike.Systems
                 ICommand action = current.Act();
 
                 if (Execute(current, action))
+                {
                     _eventSet.PopMax();
+
+                    if (current.Lifetime == 0) // -1 is used as nonexpiring
+                    {
+                        RemoveActor(current);
+                    }
+                }
                 else
+                {
                     return false;
+                }
             }
 
             return true;

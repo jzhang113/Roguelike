@@ -24,7 +24,7 @@ namespace Roguelike.Actors
             {
                 new DamageAction(50, new TargetZone(TargetShape.Range)),
                 new DamageAction(50, new TargetZone(TargetShape.Range)),
-                new DamageAction(100, new TargetZone(TargetShape.Self, 2), 120, 240),
+                new DamageAction(100, new TargetZone(TargetShape.Self, 2), 240, 240),
             };
             _current = 0;
         }

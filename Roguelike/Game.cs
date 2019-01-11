@@ -196,8 +196,7 @@ namespace Roguelike
         {
             while (!_exiting)
             {
-                if (CurrentAnimations.Count == 0)
-                    StateHandler.Update();
+                StateHandler.Update();
 
                 foreach (IAnimation animation in CurrentAnimations)
                 {

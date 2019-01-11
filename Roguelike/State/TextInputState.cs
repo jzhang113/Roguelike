@@ -37,7 +37,6 @@ namespace Roguelike.State
                     break;
             }
 
-            Game.Overlay.DisplayText = $"Drop how many? {_inputBuffer}";
             return Option.None<ICommand>();
         }
 
@@ -55,6 +54,8 @@ namespace Roguelike.State
 
         public void Draw(LayerInfo layer)
         {
+            Game.Overlay.Clear();
+            Game.Overlay.DisplayText = $"Drop how many? {_inputBuffer}";
             Game.Overlay.Draw(layer);
         }
     }
