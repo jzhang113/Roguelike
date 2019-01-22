@@ -144,7 +144,6 @@
     <Compile Include="Statuses\StatusInfo.cs" />
     <Compile Include="Statuses\StatusType.cs" />
     <Compile Include="Statuses\StatusHandler.cs" />
-    <Compile Include="Systems\ActorGenerator.cs" />
     <Compile Include="Systems\MovesetHandler.cs" />
     <Compile Include="UI\InfoPanel.cs" />
     <Compile Include="UI\StatPanel.cs" />
