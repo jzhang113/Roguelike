@@ -83,7 +83,7 @@ namespace Roguelike.Actors
 
         public virtual ICommand GetAction()
         {
-            return SimpleAI.GetAction(this);
+            return new WaitCommand(this);
         }
 
         public virtual ReactionMessage GetReaction()

@@ -182,7 +182,6 @@
     <Compile Include="World\MapHandler.cs" />
     <Compile Include="Core\Direction.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
-    <Compile Include="Core\SimpleAI.cs" />
     <Compile Include="Data\Materials.cs" />
     <Compile Include="Systems\InventoryHandler.cs" />
     <Compile Include="UI\LookPanel.cs" />
