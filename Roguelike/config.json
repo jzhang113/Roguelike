@@ -1,6 +1,6 @@
 ﻿{
     "gameName": "Steel Carnation",
-    "fontName": "ccc12x12.png",
-    "fontSize": "12x12",
+    "fontName": "square.ttf",
+    "fontSize": 14,
     "messageMaxCount": 100
 }

@@ -60,6 +60,15 @@ namespace Roguelike.Systems
         {
             do
             {
+                // TODO: Not certain if this is a correct implementation. However, it fixes an issue
+                // where the first input after Game.NewGame() is "eaten" since Clear() is called, but
+                // _stopping doesn't get set to false until Update() - which forces it to return false
+                if (_stopping)
+                {
+                    _eventSet.Clear();
+                    _stopping = false;
+                }
+
                 // No one is currently ready, so continually apply energy recovery to all entities in the
                 // system, until the queue has at least one entity to execute.
                 while (_eventSet.Count == 0)

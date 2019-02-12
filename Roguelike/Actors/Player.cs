@@ -12,7 +12,13 @@ namespace Roguelike.Actors
     {
         public EquipmentHandler Equipment { get; }
 
-        public ICommand NextCommand { private get; set; }
+        public ICommand NextCommand
+        {
+            set => _nextCommand = value;
+        }
+
+        [NonSerialized]
+        private ICommand _nextCommand;
 
         public Player(ActorParameters parameters) : base(parameters, Colors.Player, '@')
         {
@@ -23,8 +29,8 @@ namespace Roguelike.Actors
         // NextCommand once it has been sent.
         public override ICommand GetAction()
         {
-            ICommand action = NextCommand;
-            NextCommand = null;
+            ICommand action = _nextCommand;
+            _nextCommand = null;
             return action;
         }
 

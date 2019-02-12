@@ -4,7 +4,7 @@
     {
         public string GameName { get; set; }
         public string FontName { get; set; }
-        public string FontSize { get; set; }
+        public int FontSize { get; set; }
         public int AnimationSpeed { get; set; }
     }
 }

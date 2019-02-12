@@ -209,9 +209,6 @@
     <Compile Include="World\WorldParameters.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="extra.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="App.config" />
     <Content Include="BearLibTerminal.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -237,6 +234,9 @@
     <Content Include="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="conthrax-sb.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="map.xp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -244,14 +244,14 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Roguelike.ruleset" />
+    <None Include="square.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="whitrabt.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ccc12x12.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Ddw10x10.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="design.txt" />
   </ItemGroup>
   <ItemGroup>

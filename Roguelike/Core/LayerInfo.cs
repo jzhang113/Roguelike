@@ -35,13 +35,13 @@ namespace Roguelike.Core
         public void Print(Rectangle layout, string text, ContentAlignment alignment)
         {
             layout.Offset(X, Y);
-            Terminal.Print(layout, alignment, text);
+            Terminal.Print(layout, alignment, $"[font=text]{text}");
         }
 
         public void Print(int y, string text, ContentAlignment alignment = ContentAlignment.TopLeft)
         {
             if (y < Height)
-                Terminal.Print(new Rectangle(X, Y + y, Width, 1), alignment, text);
+                Terminal.Print(new Rectangle(X, Y + y, Width, 1), alignment, $"[font=text]{text}");
             else
                 System.Diagnostics.Debug.WriteLine($"Warning: line {y} out of bounds on layer {Name}");
         }
@@ -49,7 +49,7 @@ namespace Roguelike.Core
         public void Print(int x, int y, string text)
         {
             if (y < Height)
-                Terminal.Print(X + x, Y + y, text);
+                Terminal.Print(X + x, Y + y, $"[font=text]{text}");
             else
                 System.Diagnostics.Debug.WriteLine($"Warning: line {y} out of bounds on layer {Name}");
         }

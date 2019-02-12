@@ -118,7 +118,9 @@ namespace Roguelike
 
             Terminal.Set($"window: size={Constants.SCREEN_WIDTH + 2}x{Constants.SCREEN_HEIGHT + 2}," +
                 $"cellsize=auto, title='{Config.GameName}';");
-            Terminal.Set($"font: {Config.FontName}, size = {Config.FontSize};");
+            Terminal.Set($"font: {Config.FontName}, size = {Config.FontSize}x{Config.FontSize};");
+            Terminal.Set($"text font: whitrabt.ttf, size = 12x12;");
+            Terminal.Set($"0x1000: {Config.FontName}, size = {Config.FontSize*2}x{Config.FontSize*2}, spacing = 2x2;");
             Terminal.Set("palette.grass: #6daa2c");
             Terminal.Set("input: filter = [keyboard, mouse]");
 
@@ -204,13 +206,12 @@ namespace Roguelike
                         FinishedAnimations.Add(animation);
                 }
 
-                Render();
-
                 foreach (IAnimation animation in FinishedAnimations)
                 {
                     CurrentAnimations.Remove(animation);
                 }
 
+                Render();
                 FinishedAnimations.Clear();
             }
 

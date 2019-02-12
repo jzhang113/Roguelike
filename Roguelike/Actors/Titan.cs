@@ -16,7 +16,7 @@ namespace Roguelike.Actors
         private readonly IList<IAction> _attacks;
         private int _current;
 
-        public Titan(ActorParameters parameters) : base(parameters, Swatch.DbBlood, 'T')
+        public Titan(ActorParameters parameters) : base(parameters, Swatch.DbBlood, (char)0x1054)
         {
             Equipment = new EquipmentHandler();
             Facing = Direction.SE;
