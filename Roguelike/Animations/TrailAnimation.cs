@@ -1,5 +1,4 @@
 ﻿using Roguelike.Core;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,6 +8,7 @@ namespace Roguelike.Animations
     internal class TrailAnimation : IAnimation
     {
         public LayerInfo Layer { get; }
+        public int Turn { get; } = Systems.EventScheduler.Turn;
 
         private readonly IList<Tile> _path;
         private readonly Color _color;

@@ -8,6 +8,7 @@ namespace Roguelike.Animations
     internal class FlashAnimation : IAnimation
     {
         public LayerInfo Layer { get; }
+        public int Turn { get; } = Systems.EventScheduler.Turn;
 
         private const int _MAX_FRAME = 4;
 

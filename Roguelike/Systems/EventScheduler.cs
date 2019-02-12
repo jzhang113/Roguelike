@@ -13,12 +13,15 @@ namespace Roguelike.Systems
     // handling is managed by the States.
     public class EventScheduler
     {
+        public static int Turn { get; private set; }
+
         private readonly ICollection<ISchedulable> _entities;
         private readonly MaxHeap<ISchedulable> _eventSet;
         private bool _stopping;
 
         public EventScheduler(int size)
         {
+            Turn = 0;
             _entities = new HashSet<ISchedulable>();
             _eventSet = new MaxHeap<ISchedulable>(size);
             _stopping = false;
@@ -162,6 +165,9 @@ namespace Roguelike.Systems
             }
             else
             {
+                if (current is Actors.Player)
+                    Turn++;
+
                 command.Execute();
                 command.Animation.MatchSome(animation => Game.CurrentAnimations.Add(animation));
                 current.Energy -= command.EnergyCost;

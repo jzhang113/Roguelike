@@ -1,5 +1,4 @@
 ﻿using Roguelike.Core;
-using System;
 using System.Drawing;
 
 namespace Roguelike.Animations
@@ -7,6 +6,7 @@ namespace Roguelike.Animations
     internal class ExplosionAnimation : IAnimation
     {
         public LayerInfo Layer { get; }
+        public int Turn { get; } = Systems.EventScheduler.Turn;
 
         private readonly int _x;
         private readonly int _y;

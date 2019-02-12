@@ -1,7 +1,6 @@
 ﻿using BearLib;
 using Roguelike.Actors;
 using Roguelike.Core;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +9,7 @@ namespace Roguelike.Animations
     internal class HookAnimation : IAnimation
     {
         public LayerInfo Layer { get; }
+        public int Turn { get; } = Systems.EventScheduler.Turn;
 
         private readonly Actor _source;
         private readonly Actor _target;

@@ -200,7 +200,7 @@ namespace Roguelike
 
                 foreach (IAnimation animation in CurrentAnimations)
                 {
-                    if (animation.Update())
+                    if (animation.Update() || EventScheduler.Turn > animation.Turn)
                         FinishedAnimations.Add(animation);
                 }
 

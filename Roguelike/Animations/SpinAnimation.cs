@@ -1,12 +1,12 @@
 ﻿using BearLib;
 using Roguelike.Core;
-using System;
 
 namespace Roguelike.Animations
 {
     internal class SpinAnimation : IAnimation
     {
         public LayerInfo Layer { get; }
+        public int Turn { get; } = Systems.EventScheduler.Turn;
 
         private readonly int _x;
         private readonly int _y;
