@@ -36,27 +36,27 @@ namespace Roguelike.State
 
                 #region Movement Keys
                 case NormalInput.MoveW:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.W.X, player.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.W));
                 case NormalInput.MoveS:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X, player.Y + Direction.S.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.S));
                 case NormalInput.MoveN:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X, player.Y + Direction.N.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.N));
                 case NormalInput.MoveE:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.E.X, player.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.E));
                 case NormalInput.MoveNW:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.NW.X, player.Y + Direction.NW.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.NW));
                 case NormalInput.MoveNE:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.NE.X, player.Y + Direction.NE.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.NE));
                 case NormalInput.MoveSW:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.SW.X, player.Y + Direction.SW.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.SW));
                 case NormalInput.MoveSE:
-                    return Option.Some<ICommand>(new MoveCommand(player, player.X + Direction.SE.X, player.Y + Direction.SE.Y));
+                    return Option.Some<ICommand>(new MoveCommand(player, player.Loc + Direction.SE));
                 case NormalInput.Wait:
                     return Option.Some<ICommand>(new WaitCommand(player));
                 #endregion
 
                 case NormalInput.Get:
-                    return Option.Some<ICommand>(new PickupCommand(player, Game.Map.GetStack(player.X, player.Y)));
+                    return Option.Some<ICommand>(new PickupCommand(player, Game.Map.GetStack(player.Loc)));
                 case NormalInput.Throw:
                     // TODO: Add ability to throw without wielding
                     if (weapon == null)
@@ -81,8 +81,7 @@ namespace Roguelike.State
                             // TODO: Handle case of multiple thrown at once?
                             Loc[] enumerable = returnTarget as Loc[] ?? returnTarget.ToArray();
                             Loc point = enumerable[0];
-                            weapon.X = point.X;
-                            weapon.Y = point.Y;
+                            weapon.Loc = point;
                             Game.Map.AddItem(weapon);
 
                             return new DelayActionCommand(player, thrown, enumerable);
@@ -167,37 +166,37 @@ namespace Roguelike.State
                 (int dx, int dy) = player.Facing;
                 IEnumerable<Loc> target = action.Area.GetTilesInRange(
                     player,
-                    new Loc(player.X + dx, player.Y + dy));
+                    player.Loc + player.Facing);
                 return Option.Some<ICommand>(new DelayActionCommand(player, action, target));
             }
         }
 
         public Option<ICommand> HandleMouseInput(int x, int y, bool leftClick, bool rightClick)
         {
-            Tile current = Game.Map.Field[x, y];
+            Loc pos = new Loc(x, y);
+            Tile current = Game.Map.Field[pos];
             if (!current.IsExplored || current.IsWall)
                 return Option.None<ICommand>();
 
-            IEnumerable<WeightedPoint> path = Game.Map.GetPathToPlayer(x, y).Reverse();
-            foreach (WeightedPoint p in path)
+            foreach (LocCost next in Game.Map.GetPathToPlayer(pos).Reverse())
             {
-                if (Game.Map.Field[p.X, p.Y].IsExplored)
-                    Game.Overlay.Set(p.X, p.Y, Colors.Path);
+                if (Game.Map.Field[next.Loc].IsExplored)
+                    Game.Overlay.Set(next.Loc.X, next.Loc.Y, Colors.Path);
             }
 
-            Game.Overlay.Set(current.X, current.Y, Colors.Cursor);
+            Game.Overlay.Set(pos.X, pos.Y, Colors.Cursor);
 
-            if (Game.Map.Field[current.X, current.Y].IsVisible)
+            if (current.IsVisible)
             {
-                Game.Map.GetItem(current.X, current.Y).MatchSome(LookPanel.DisplayItem);
-                Game.Map.GetActor(current.X, current.Y).MatchSome(LookPanel.DisplayActor);
+                Game.Map.GetItem(pos).MatchSome(LookPanel.DisplayItem);
+                Game.Map.GetActor(pos).MatchSome(LookPanel.DisplayActor);
             }
             else
             {
                 LookPanel.Clear();
             }
 
-            LookPanel.DisplayTerrain(Game.Map.Field[current.X, current.Y]);
+            LookPanel.DisplayTerrain(current);
 
             return Option.None<ICommand>();
         }

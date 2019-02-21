@@ -26,7 +26,7 @@ namespace Roguelike.Actors
         public int Armor { get; set; }
 
         public ActorState State { get; set; }
-        public Dir Facing { get; set; }
+        public Loc Facing { get; set; }
 
         public int Energy { get; set; }
         public int ActivationEnergy => 0;
@@ -40,6 +40,8 @@ namespace Roguelike.Actors
         public Loc Loc { get; set; }
 
         public bool IsDead => Hp < 0;
+
+        public virtual int Size { get; } = 1;
 
         public Actor(ActorParameters parameters, System.Drawing.Color color, char symbol)
         {

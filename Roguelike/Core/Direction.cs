@@ -4,17 +4,17 @@ namespace Roguelike.Core
 {
     internal static class Direction
     {
-        public static readonly Dir N = new Dir(0, -1);
-        public static readonly Dir E = new Dir(1, 0);
-        public static readonly Dir S = new Dir(0, 1);
-        public static readonly Dir W = new Dir(-1, 0);
-        public static readonly Dir NE = new Dir(1, -1);
-        public static readonly Dir SE = new Dir(1, 1);
-        public static readonly Dir SW = new Dir(-1, 1);
-        public static readonly Dir NW = new Dir(-1, -1);
-        public static readonly Dir Center = new Dir(0, 0);
+        public static readonly Loc N = new Loc(0, -1);
+        public static readonly Loc E = new Loc(1, 0);
+        public static readonly Loc S = new Loc(0, 1);
+        public static readonly Loc W = new Loc(-1, 0);
+        public static readonly Loc NE = new Loc(1, -1);
+        public static readonly Loc SE = new Loc(1, 1);
+        public static readonly Loc SW = new Loc(-1, 1);
+        public static readonly Loc NW = new Loc(-1, -1);
+        public static readonly Loc Center = new Loc(0, 0);
 
-        public static readonly Dir[] DirectionList = {
+        public static readonly Loc[] DirectionList = {
             N,
             E,
             S,
@@ -25,7 +25,7 @@ namespace Roguelike.Core
             NW
         };
 
-        public static Dir Right(this Dir dir)
+        public static Loc Right(this Loc dir)
         {
             if (dir == N)
                 return NE;
@@ -47,7 +47,7 @@ namespace Roguelike.Core
                 return Center;
         }
 
-        public static Dir Left(this Dir dir)
+        public static Loc Left(this Loc dir)
         {
             if (dir == N)
                 return NW;
@@ -68,54 +68,5 @@ namespace Roguelike.Core
             else
                 return Center;
         }
-    }
-
-    [Serializable]
-    public readonly struct Dir
-    {
-        public int X { get; }
-        public int Y { get; }
-
-        public Dir(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public void Deconstruct(out int x, out int y)
-        {
-            x = X;
-            y = Y;
-        }
-
-        public override string ToString() => $"({X}, {Y})";
-
-        #region equality
-        public override bool Equals(object obj)
-        {
-            if (!(obj is Dir))
-            {
-                return false;
-            }
-
-            var dir = (Dir)obj;
-            return X == dir.X &&
-                   Y == dir.Y;
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = 1861411795;
-            hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + X.GetHashCode();
-            return hashCode * -1521134295 + Y.GetHashCode();
-        }
-
-        public static bool operator ==(in Dir dir1, in Dir dir2) =>
-            dir1.X == dir2.X &&
-            dir1.Y == dir2.Y;
-
-        public static bool operator !=(in Dir dir1, in Dir dir2) => !(dir1 == dir2);
-        #endregion
     }
 }

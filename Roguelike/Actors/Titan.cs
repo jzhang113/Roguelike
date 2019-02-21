@@ -16,6 +16,8 @@ namespace Roguelike.Actors
         private readonly IList<IAction> _attacks;
         private int _current;
 
+        public override int Size { get; } = 2;
+
         public Titan(ActorParameters parameters) : base(parameters, Swatch.DbBlood, (char)0x1054)
         {
             Equipment = new EquipmentHandler();
@@ -35,9 +37,9 @@ namespace Roguelike.Actors
             {
                 // in attack range
                 // TODO: better decision of when to use large attacks
-                Dir dir = Utils.Distance.GetNearestDirection(Game.Player.Loc, Loc);
+                Loc dir = Utils.Distance.GetNearestDirection(Game.Player.Loc, Loc);
                 IAction action = _attacks[_current];
-                IEnumerable<Loc> targets = action.Area.GetTilesInRange(this, new Loc(Loc.X + dir.X, Loc.Y + dir.Y));
+                IEnumerable<Loc> targets = action.Area.GetTilesInRange(this, Loc + dir);
                 ICommand command = new DelayActionCommand(this, action, targets);
 
                 if (++_current >= _attacks.Count)

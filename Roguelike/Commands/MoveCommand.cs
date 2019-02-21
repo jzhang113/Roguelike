@@ -33,9 +33,7 @@ namespace Roguelike.Commands
 
             // Don't walk into walls, unless the Actor is currently phasing or we are already
             // inside a wall (to prevent getting stuck).
-            if (Game.Map.Field[_nextPos].IsWall
-                && !Source.StatusHandler.TryGetStatus(StatusType.Phasing, out _)
-                && !Game.Map.Field[Source.Loc].IsWall)
+            if (!Game.Map.IsWalkable(Source, _nextPos))
             {
                 // Don't penalize the player for walking into walls, but monsters should wait if 
                 // they will walk into a wall.

@@ -186,6 +186,27 @@ namespace Roguelike.World
             Exits.TryGetValue(ToIndex(actor.Loc), out Exit exit)
                 ? Option.Some(exit.Destination)
                 : Option.None<LevelId>();
+
+        // Calculate walkability, based on Actor size and status
+        public bool IsWalkable(Actor actor, Loc pos)
+        {
+            // check phasing
+            if (actor.StatusHandler.TryGetStatus(Statuses.StatusType.Phasing, out _))
+                return true;
+
+            // check clearance
+            if (actor.Size > Clearance[pos.X, pos.Y])
+                return false;
+
+            // check all spaces are unoccupied
+            foreach (Loc point in GetPointsInRect(pos, actor.Size, actor.Size))
+            {
+                if (Field[point].IsOccupied)
+                    return false;
+            }
+
+            return true;
+        }
         #endregion
 
         #region Item Methods
@@ -355,7 +376,7 @@ namespace Roguelike.World
 
             foreach (Loc newPos in GetPointsInRadius(current, 1))
             {
-                if (Field.IsValid(newPos) && goalMap[newPos.X, newPos.Y] < nearest)
+                if (goalMap[newPos.X, newPos.Y] != -1 && goalMap[newPos.X, newPos.Y] < nearest)
                 {
                     //if (Field[newX, newY].IsWalkable || Math.Abs(goalMap[newX, newY]) < 0.001f)
                     {
@@ -432,11 +453,11 @@ namespace Roguelike.World
             }
         }
 
-        public IEnumerable<Loc> GetPointsInRect(int x, int y, int width, int height)
+        public IEnumerable<Loc> GetPointsInRect(Loc origin, int width, int height)
         {
-            for (int i = x; i <= x + width; i++)
+            for (int i = origin.X; i < origin.X + width; i++)
             {
-                for (int j = y; j <= y + height; j++)
+                for (int j = origin.Y; j < origin.Y + height; j++)
                 {
                     if (Field.IsValid(i, j))
                         yield return new Loc(i, j);
@@ -467,7 +488,7 @@ namespace Roguelike.World
 
         // Octants are identified by the direction of the right edge. Returns a row starting from
         // the straight edge.
-        private IEnumerable<Tile> GetRowInOctant(int x, int y, int distance, Dir dir)
+        private IEnumerable<Tile> GetRowInOctant(int x, int y, int distance, Loc dir)
         {
             if (dir == Direction.Center)
                 yield break;
@@ -529,7 +550,7 @@ namespace Roguelike.World
         #region FOV Methods
         public void ComputeFov(Loc pos, double lightDecay, bool setVisible)
         {
-            foreach (Dir dir in Direction.DirectionList)
+            foreach (Loc dir in Direction.DirectionList)
             {
                 Queue<AngleRange> visibleRange = new Queue<AngleRange>();
                 visibleRange.Enqueue(new AngleRange(1, 0, 1, 1));
@@ -832,7 +853,7 @@ namespace Roguelike.World
                     Tile tile = Field[next];
 
                     if (!tile.IsWall && tile.IsExplored &&
-                        (mapWeights[next.X, next.Y] >= 0 || newCost < mapWeights[next.X, next.Y]))
+                        (mapWeights[next.X, next.Y] == -1 || newCost < mapWeights[next.X, next.Y]))
                     {
                         mapWeights[next.X, next.Y] = newCost;
                         goals.Enqueue(new LocCost(next, newCost));

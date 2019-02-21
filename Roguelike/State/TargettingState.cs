@@ -158,7 +158,7 @@ namespace Roguelike.State
                 : Option.None<ICommand>();
         }
 
-        private void MoveTarget(in Dir direction)
+        private void MoveTarget(in Loc direction)
         {
             (int dx, int dy) = direction;
             Loc next = new Loc(_target.X + dx, _target.Y + dy);
@@ -169,7 +169,7 @@ namespace Roguelike.State
             }
         }
 
-        private void JumpTarget(in Dir direction)
+        private void JumpTarget(in Loc direction)
         {
             (int dx, int dy) = direction;
             Loc next = new Loc(_target.X + dx, _target.Y + dy);

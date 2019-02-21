@@ -20,6 +20,14 @@ namespace Roguelike.Core
         public static Loc operator -(Loc current, (int X, int Y) offset) =>
             new Loc(current.X - offset.X, current.Y - offset.Y);
 
+        public static Loc operator +(Loc a, Loc b) => new Loc(a.X + b.X, a.Y + b.Y);
+
+        public void Deconstruct(out int x, out int y)
+        {
+            x = X;
+            y = Y;
+        }
+
         #region equality
         public override bool Equals(object obj)
         {
