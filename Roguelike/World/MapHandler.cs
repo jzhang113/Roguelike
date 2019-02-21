@@ -19,6 +19,7 @@ namespace Roguelike.World
         public int Height { get; }
 
         internal Field Field { get; }
+        internal int[,] Clearance { get; }
 
         // internal transient helper structures
         internal float[,] PlayerMap { get; }
@@ -47,6 +48,7 @@ namespace Roguelike.World
             Height = height;
 
             Field = new Field(width, height);
+            Clearance = new int[width, height];
             PlayerMap = new float[width, height];
             AutoexploreMap = new float[width, height];
             Discovered = new List<Tile>();
@@ -64,6 +66,7 @@ namespace Roguelike.World
             Width = info.GetInt32(nameof(Width));
             Height = info.GetInt32(nameof(Height));
             Field = (Field)info.GetValue(nameof(Field), typeof(Field));
+            Clearance = (int[,])info.GetValue(nameof(Clearance), typeof(int[,]));
 
             _tempUnits = new KeyValueHelper<int, Actor>
             {
@@ -852,6 +855,7 @@ namespace Roguelike.World
             info.AddValue(nameof(Width), Width);
             info.AddValue(nameof(Height), Height);
             info.AddValue(nameof(Field), Field);
+            info.AddValue(nameof(Clearance), Clearance);
             info.AddValue(nameof(Fires), Fires);
 
             // Can't serialize Dictionary or KeyCollection, have to make it a list.

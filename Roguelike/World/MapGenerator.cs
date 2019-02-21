@@ -32,6 +32,7 @@ namespace Roguelike.World
         public MapHandler Generate()
         {
             CreateMap();
+            ComputeClearance();
 
             PlaceActors();
             PlaceItems();
@@ -41,6 +42,31 @@ namespace Roguelike.World
         }
 
         protected abstract void CreateMap();
+
+        // Calculate and save how much space is around each square
+        private void ComputeClearance()
+        {
+            for (int y = 0; y < Map.Height; y++)
+            {
+                for (int x = 0; x < Map.Width; x++)
+                {
+                    int d = 0;
+                    while (true)
+                    {
+                        for (int c = 0; c <= d; c++)
+                        {
+                            if (Map.Field[x + c, y].IsWall || Map.Field[x, y + c].IsWall)
+                                goto done;
+                        }
+
+                        d++;
+                    }
+
+                    done:
+                    Map.Clearance[x, y] = d;
+                }
+            }
+        }
 
         protected void CreateRoom(Room room)
         {
