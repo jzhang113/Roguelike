@@ -23,59 +23,65 @@ namespace Roguelike.Actions
         public void Activate(ISchedulable source, Tile target)
         {
             if (!(source is Actor sourceActor))
+            {
                 return;
+            }
 
             // Relies on GetTilesInRange being called in the targetting phase.
             // Also requires the hook to be considered a projectile so that the trail is saved.
-            IEnumerable<Tile> path = Area.Trail;
-            List<Tile> collisionPath = new List<Tile>();
+            IEnumerable<Loc> path = Area.Trail;
+            List<Loc> collisionPath = new List<Loc>();
 
             // Walk along the path, stopping when something is hit and save the collision tile.
-            Tile collisionTile = null;
-            foreach (Tile tile in path)
+            Option<Loc> collision = Option.None<Loc>();
+            foreach (Loc point in path)
             {
-                if (!tile.IsWalkable)
+                if (!Game.Map.Field[point].IsWalkable)
                 {
-                    collisionTile = tile;
+                    collision = Option.Some(point);
                     break;
                 }
 
-                collisionPath.Add(tile);
+                collisionPath.Add(point);
             }
 
             // Don't do anything if we target a blocked square next to us.
             if (collisionPath.Count == 0)
+            {
                 return;
+            }
 
             LayerInfo currentLayer = Game.StateHandler.CurrentLayer;
-            if (collisionTile != null)
-            {
-                Game.Map.GetActor(collisionTile.X, collisionTile.Y).Match(
-                    some: actor =>
-                    {
-                        // If an Actor is hit, pull the target in.
-                        Tile depositTile = collisionPath[0];
-                        int prevX = actor.X;
-                        int prevY = actor.Y;
-                        Game.Map.SetActorPosition(actor, depositTile.X, depositTile.Y);
-                        Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, true, actor));
-                    },
-                    none: () =>
-                    {
-                        // If something else got hit, it must be a wall or door. In either case, pull
-                        // the source towards the target.
-                        Tile depositTile = collisionPath.Last();
-                        int prevX = sourceActor.X;
-                        int prevY = sourceActor.Y;
-                        Game.Map.SetActorPosition(sourceActor, depositTile.X, depositTile.Y);
-                        Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, false));
-                    });
-            }
-            else
-            {
-                // Otherwise don't do anything.
-                Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, true));
-            }
+
+            collision.Match(
+                some: pos =>
+                {
+                    Game.Map.GetActor(pos.X, pos.Y).Match(
+                        some: actor =>
+                        {
+                            // If an Actor is hit, pull the target in.
+                            Loc deposit = collisionPath[0];
+                            int prevX = actor.X;
+                            int prevY = actor.Y;
+                            Game.Map.SetActorPosition(actor, deposit.X, deposit.Y);
+                            Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, true, actor));
+                        },
+                        none: () =>
+                        {
+                            // If something else got hit, it must be a wall or door. In either case, pull
+                            // the source towards the target.
+                            Loc deposit = collisionPath.Last();
+                            int prevX = sourceActor.X;
+                            int prevY = sourceActor.Y;
+                            Game.Map.SetActorPosition(sourceActor, deposit.X, deposit.Y);
+                            Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, false));
+                        });
+                },
+                none: () =>
+                {
+                    // Otherwise don't do anything.
+                    Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, true));
+                });
         }
     }
 }

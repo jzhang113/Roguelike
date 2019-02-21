@@ -35,9 +35,9 @@ namespace Roguelike.Actors
             {
                 // in attack range
                 // TODO: better decision of when to use large attacks
-                Dir dir = Utils.Distance.GetNearestDirection(Game.Player.X, Game.Player.Y, X, Y);
+                Dir dir = Utils.Distance.GetNearestDirection(Game.Player.Loc, Loc);
                 IAction action = _attacks[_current];
-                IEnumerable<Tile> targets = action.Area.GetTilesInRange(this, X + dir.X, Y + dir.Y);
+                IEnumerable<Loc> targets = action.Area.GetTilesInRange(this, new Loc(X + dir.X, Y + dir.Y));
                 ICommand command = new DelayActionCommand(this, action, targets);
 
                 if (++_current >= _attacks.Count)

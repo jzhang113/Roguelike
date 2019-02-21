@@ -39,6 +39,7 @@ namespace Roguelike.Actors
 
         public int X { get; set; }
         public int Y { get; set; }
+        public Loc Loc => new Loc(X, Y);
 
         public bool IsDead => Hp < 0;
 

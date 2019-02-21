@@ -108,6 +108,9 @@
     <Compile Include="Actors\Actor.cs" />
     <Compile Include="Core\ActorFlag.cs" />
     <Compile Include="Core\ActorState.cs" />
+    <Compile Include="Core\Loc.cs" />
+    <Compile Include="Core\LocCost.cs" />
+    <Compile Include="Utils\AnnAStar.cs" />
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\BorderInfo.cs" />
     <Compile Include="Core\ColorInterval.cs" />

@@ -25,7 +25,7 @@ namespace Roguelike.Core
             NW
         };
 
-        public static Dir Right(this Dir dir)
+        public static Dir Right(this in Dir dir)
         {
             if (dir == N)
                 return NE;
@@ -47,7 +47,7 @@ namespace Roguelike.Core
                 return Center;
         }
 
-        public static Dir Left(this Dir dir)
+        public static Dir Left(this in Dir dir)
         {
             if (dir == N)
                 return NW;

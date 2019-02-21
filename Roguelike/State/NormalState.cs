@@ -79,10 +79,10 @@ namespace Roguelike.State
                             // Drop the item on the map.
                             // TODO: Add possibility of weapon stuck / breaking
                             // TODO: Handle case of multiple thrown at once?
-                            Tile[] enumerable = returnTarget as Tile[] ?? returnTarget.ToArray();
-                            Tile tile = enumerable[0];
-                            weapon.X = tile.X;
-                            weapon.Y = tile.Y;
+                            Loc[] enumerable = returnTarget as Loc[] ?? returnTarget.ToArray();
+                            Loc point = enumerable[0];
+                            weapon.X = point.X;
+                            weapon.Y = point.Y;
                             Game.Map.AddItem(weapon);
 
                             return new DelayActionCommand(player, thrown, enumerable);
@@ -165,10 +165,9 @@ namespace Roguelike.State
             else
             {
                 (int dx, int dy) = player.Facing;
-                IEnumerable<Tile> target = action.Area.GetTilesInRange(
+                IEnumerable<Loc> target = action.Area.GetTilesInRange(
                     player,
-                    player.X + dx,
-                    player.Y + dy);
+                    new Loc(player.X + dx, player.Y + dy));
                 return Option.Some<ICommand>(new DelayActionCommand(player, action, target));
             }
         }

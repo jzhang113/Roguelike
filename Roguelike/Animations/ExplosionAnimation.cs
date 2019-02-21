@@ -8,17 +8,15 @@ namespace Roguelike.Animations
         public LayerInfo Layer { get; }
         public int Turn { get; } = Systems.EventScheduler.Turn;
 
-        private readonly int _x;
-        private readonly int _y;
+        private readonly Loc _pos;
         private readonly int _radius;
         private readonly Color _color;
         private int _counter;
 
-        public ExplosionAnimation(LayerInfo layer, int x, int y, int radius, Color color)
+        public ExplosionAnimation(LayerInfo layer, in Loc pos, int radius, Color color)
         {
             Layer = layer;
-            _x = x;
-            _y = y;
+            _pos = pos;
             _radius = radius;
             _color = color;
         }
@@ -35,9 +33,9 @@ namespace Roguelike.Animations
         public void Draw()
         {
             Game.Overlay.Clear();
-            foreach (Tile tile in Game.Map.GetTilesInRadius(_x, _y, _counter))
+            foreach (Loc point in Game.Map.GetPointsInRadius(_pos, _counter))
             {
-                Game.Overlay.Set(tile.X, tile.Y, _color);
+                Game.Overlay.Set(point.X, point.Y, _color);
             }
             Game.Overlay.Draw(Layer);
         }

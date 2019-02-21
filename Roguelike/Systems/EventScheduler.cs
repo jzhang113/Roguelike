@@ -33,9 +33,9 @@ namespace Roguelike.Systems
         {
             if (schedulable is DelayAttack attack)
             {
-                foreach (Tile tile in attack.Targets)
+                foreach (Loc point in attack.Targets)
                 {
-                    Game.Threatened.Unset(tile.X, tile.Y);
+                    Game.Threatened.Unset(point.X, point.Y);
                 }
             }
 
@@ -90,10 +90,10 @@ namespace Roguelike.Systems
                     if (entity is DelayAttack attack && attack.Lifetime > 0)
                     {
                         var blend = Colors.EnemyThreat.Blend(Colors.FloorBackground, (double)attack.Energy / attack.ActivationEnergy);
-                        foreach (Tile tile in attack.Targets)
+                        foreach (Loc point in attack.Targets)
                         {
-                            Game.Threatened.Set(tile.X, tile.Y, blend);
-                            Game.CurrentAnimations.Add(new FlashAnimation(Game.StateHandler.CurrentLayer, tile.X, tile.Y, blend));
+                            Game.Threatened.Set(point.X, point.Y, blend);
+                            Game.CurrentAnimations.Add(new FlashAnimation(Game.StateHandler.CurrentLayer, point.X, point.Y, blend));
                         }
                     }
                 }

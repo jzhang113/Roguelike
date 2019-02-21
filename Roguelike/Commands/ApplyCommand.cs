@@ -15,9 +15,9 @@ namespace Roguelike.Commands
         public Option<IAnimation> Animation => _usableItem.ApplySkill.Animation;
 
         private readonly IUsable _usableItem;
-        private readonly IEnumerable<Tile> _target;
+        private readonly IEnumerable<Loc> _target;
 
-        public ApplyCommand(Actor source, IUsable item, IEnumerable<Tile> targets)
+        public ApplyCommand(Actor source, IUsable item, IEnumerable<Loc> targets)
         {
             Source = source;
             _usableItem = item;

@@ -46,7 +46,7 @@ namespace Roguelike.Core
             return Game.Map.GetActor(X, Y).Match<ICommand>(
                 some: _ => new ActionCommand(this,
                    new IgniteAction(new TargetZone(TargetShape.Self)),
-                   Game.Map.Field[X, Y]),
+                   new Loc(X, Y)),
                 none: () => new WaitCommand(this));
         }
 

@@ -6,10 +6,10 @@ namespace Roguelike.Utils
     // Helper methods for calculating distances
     public static class Distance
     {
-        public static Dir GetNearestDirection(int x1, int y1, int x2, int y2)
+        public static Dir GetNearestDirection(in Loc a, in Loc b)
         {
-            int dx = x1 - x2;
-            int dy = y1 - y2;
+            int dx = a.X - b.X;
+            int dy = a.Y - b.Y;
             int ax = Math.Abs(dx);
             int ay = Math.Abs(dy);
             bool straight = Math.Abs(ax - ay) > Math.Max(ax / 2, ay / 2);

@@ -40,7 +40,7 @@ namespace Roguelike.World
         private readonly KeyValueHelper<int, Fire> _tempFires;
 
         // keep queue to prevent unnecessary allocations
-        private readonly Queue<WeightedPoint> _goals = new Queue<WeightedPoint>();
+        private readonly Queue<LocCost> _goals = new Queue<LocCost>();
 
         public MapHandler(int width, int height)
         {
@@ -378,88 +378,94 @@ namespace Roguelike.World
             return new WeightedPoint(nextX, nextY, nearest);
         }
 
-        public IEnumerable<Tile> GetStraightPathToPlayer(int x, int y)
+        public IEnumerable<Loc> GetStraightPathToPlayer(in Loc pos)
         {
-            System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
-            return Field[x, y].IsVisible
-                ? GetStraightLinePath(x, y, Game.Player.X, Game.Player.Y)
-                : new List<Tile>();
+            System.Diagnostics.Debug.Assert(Field.IsValid(pos));
+            return Field[pos].IsVisible
+                ? GetStraightLinePath(pos, Game.Player.Loc)
+                : new List<Loc>();
         }
 
         // Returns a straight line from the source to target. Does not check if the path is actually
         // walkable.
-        public IEnumerable<Tile> GetStraightLinePath(int sourceX, int sourceY, int targetX, int targetY)
+        public IEnumerable<Loc> GetStraightLinePath(Loc source, Loc target)
         {
-            int dx = Math.Abs(targetX - sourceX);
-            int dy = Math.Abs(targetY - sourceY);
-            int sx = (targetX < sourceX) ? -1 : 1;
-            int sy = (targetY < sourceY) ? -1 : 1;
+            int dx = Math.Abs(target.X - source.X);
+            int dy = Math.Abs(target.Y - source.Y);
+            int sx = (target.X < source.X) ? -1 : 1;
+            int sy = (target.Y < source.Y) ? -1 : 1;
             int err = dx - dy;
 
             // Skip initial position?
             // yield return Field[sourceX, sourceY];
 
             // Take a step towards the target and return the new position.
-            while (sourceX != targetX || sourceY != targetY)
+            int xCurr = source.X;
+            int xEnd = target.X;
+            int yCurr = source.Y;
+            int yEnd = target.Y;
+
+            while (xCurr != xEnd|| yCurr != yEnd)
             {
                 int e2 = 2 * err;
                 if (e2 > -dy)
                 {
                     err -= dy;
-                    sourceX += sx;
+                    xCurr += sx;
                 }
                 if (e2 < dx)
                 {
                     err += dx;
-                    sourceY += sy;
+                    yCurr += sy;
                 }
 
-                yield return Field[sourceX, sourceY];
+                yield return new Loc(xCurr, yCurr);
             }
         }
 
-        public IEnumerable<Tile> GetTilesInRadius(int x, int y, int radius)
+        public IEnumerable<Loc> GetPointsInRadius(Loc origin, int radius)
         {
             // square circles
-            for (int i = x - radius; i <= x + radius; i++)
+            for (int i = origin.X - radius; i <= origin.X + radius; i++)
             {
-                for (int j = y - radius; j <= y + radius; j++)
+                for (int j = origin.Y - radius; j <= origin.Y + radius; j++)
                 {
                     if (Field.IsValid(i, j))
-                        yield return Field[i, j];
+                        yield return new Loc(i, j);
                 }
             }
         }
 
-        public IEnumerable<Tile> GetTilesInRectangle(int x, int y, int width, int height)
+        public IEnumerable<Loc> GetPointsInRect(int x, int y, int width, int height)
         {
             for (int i = x; i <= x + width; i++)
             {
                 for (int j = y; j <= y + height; j++)
                 {
-                    yield return Field[i, j];
+                    if (Field.IsValid(i, j))
+                        yield return new Loc(i, j);
                 }
             }
         }
 
-        public IEnumerable<Tile> GetTilesInRectangleBorder(int x, int y, int width, int height)
+        public IEnumerable<Loc> GetPointsInRectBorder(int x, int y, int width, int height)
         {
             for (int i = x + 1; i < x + width; i++)
             {
                 if (Field.IsValid(i, y))
-                    yield return Field[i, y];
+                    yield return new Loc(i, y);
 
                 if (Field.IsValid(i, y + height))
-                    yield return Field[i, y + height];
+                    yield return new Loc(i, y + height);
             }
 
             for (int j = y; j <= y + height; j++)
             {
                 if (Field.IsValid(x, j))
-                    yield return Field[x, j];
+                    yield return new Loc(x, j);
 
                 if (Field.IsValid(x + width, j))
-                    yield return Field[x + width, j];
+                    yield return new Loc(x + width, j);
             }
         }
 
@@ -781,7 +787,7 @@ namespace Roguelike.World
         private void UpdatePlayerMaps()
         {
             _goals.Clear();
-            _goals.Enqueue(new WeightedPoint(Game.Player.X, Game.Player.Y));
+            _goals.Enqueue(new LocCost(Game.Player.Loc, 0));
 
             for (int x = 0; x < Width; x++)
             {
@@ -809,7 +815,7 @@ namespace Roguelike.World
                     }
                     else
                     {
-                        _goals.Enqueue(new WeightedPoint(x, y));
+                        _goals.Enqueue(new LocCost(new Loc(x, y), 0));
                         AutoexploreMap[x, y] = 0;
                     }
                 }
@@ -818,28 +824,22 @@ namespace Roguelike.World
             ProcessDijkstraMaps(_goals, AutoexploreMap);
         }
 
-        private void ProcessDijkstraMaps(Queue<WeightedPoint> goals, float[,] mapWeights)
+        private void ProcessDijkstraMaps(Queue<LocCost> goals, float[,] mapWeights)
         {
             while (goals.Count > 0)
             {
-                WeightedPoint p = goals.Dequeue();
+                LocCost p = goals.Dequeue();
 
-                foreach ((int dx, int dy) in Direction.DirectionList)
+                foreach (Loc next in GetPointsInRadius(p.Loc, 1))
                 {
-                    int newX = p.X + dx;
-                    int newY = p.Y + dy;
-                    float newWeight = p.Weight + 1;
-
-                    if (!Field.IsValid(newX, newY))
-                        continue;
-
-                    Tile tile = Field[newX, newY];
+                    int newCost = p.Cost + 1;
+                    Tile tile = Field[next];
 
                     if (!tile.IsWall && tile.IsExplored &&
-                        (double.IsNaN(mapWeights[newX, newY]) || newWeight < mapWeights[newX, newY]))
+                        (double.IsNaN(mapWeights[next.X, next.Y]) || newCost < mapWeights[next.X, next.Y]))
                     {
-                        mapWeights[newX, newY] = newWeight;
-                        goals.Enqueue(new WeightedPoint(newX, newY, newWeight));
+                        mapWeights[next.X, next.Y] = newCost;
+                        goals.Enqueue(new LocCost(next, newCost));
                     }
                 }
             }

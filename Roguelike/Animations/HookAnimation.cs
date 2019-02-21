@@ -13,14 +13,14 @@ namespace Roguelike.Animations
 
         private readonly Actor _source;
         private readonly Actor _target;
-        private readonly IList<Tile> _path;
+        private readonly IList<Loc> _path;
         private readonly bool _retract;
 
         private int _counter;
         private bool _hit;
-        private Tile _prevPos;
+        private Loc _prevPos;
 
-        public HookAnimation(LayerInfo layer, Actor source, IEnumerable<Tile> path, bool retract, Actor target = null)
+        public HookAnimation(LayerInfo layer, Actor source, IEnumerable<Loc> path, bool retract, Actor target = null)
         {
             Layer = layer;
             _source = source;
@@ -79,10 +79,10 @@ namespace Roguelike.Animations
                 // Animating the hook going out.
                 for (int i = 0; i < _counter; i++)
                 {
-                    Tile tile = _path[i];
+                    Loc point = _path[i];
 
                     Terminal.Color(Colors.Hook);
-                    Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                    Layer.Put(point.X - Camera.X, point.Y - Camera.Y, '~');
                 }
             }
             else if (_retract)
@@ -90,16 +90,16 @@ namespace Roguelike.Animations
                 // Animating the hook pulling the _target.
                 for (int i = 0; i < _counter - 1; i++)
                 {
-                    Tile tile = _path[i];
+                    Loc point = _path[i];
 
                     Terminal.Color(Colors.Hook);
-                    Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                    Layer.Put(point.X - Camera.X, point.Y - Camera.Y, '~');
                 }
 
                 if (_target != null && _counter > 0)
                 {
                     _prevPos = _path[_counter - 1];
-                    _target.DrawingComponent.Draw(Layer, _prevPos);
+                    _target.DrawingComponent.Draw(Layer, Game.Map.Field[_prevPos]);
                 }
             }
             else
@@ -107,16 +107,16 @@ namespace Roguelike.Animations
                 // Animating the hook pulling the _source along.
                 for (int i = _path.Count - 1; i > _path.Count - _counter; i--)
                 {
-                    Tile tile = _path[i];
+                    Loc point = _path[i];
 
                     Terminal.Color(Colors.Hook);
-                    Layer.Put(tile.X - Camera.X, tile.Y - Camera.Y, '~');
+                    Layer.Put(point.X - Camera.X, point.Y - Camera.Y, '~');
                 }
 
                 if (_counter > 1)
                 {
                     _prevPos = _path[_path.Count - _counter + 1];
-                    _source.DrawingComponent.Draw(Layer, _prevPos);
+                    _source.DrawingComponent.Draw(Layer, Game.Map.Field[_prevPos]);
                 }
             }
         }

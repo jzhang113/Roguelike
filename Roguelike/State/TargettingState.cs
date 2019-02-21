@@ -13,17 +13,15 @@ namespace Roguelike.State
     {
         private readonly Actor _source;
         private readonly TargetZone _targetZone;
-        private readonly Func<IEnumerable<Tile>, ICommand> _callback;
-        private readonly IEnumerable<Tile> _inRange;
+        private readonly Func<IEnumerable<Loc>, ICommand> _callback;
+        private readonly IEnumerable<Loc> _inRange;
         private readonly IList<Actor> _targettableActors;
 
         private int _index;
-        private int _targetX;
-        private int _targetY;
-        private int _prevMouseX;
-        private int _prevMouseY;
+        private Loc _target;
+        private Loc _prevMouse;
 
-        public TargettingState(Actor source, TargetZone zone, Func<IEnumerable<Tile>, ICommand> callback)
+        public TargettingState(Actor source, TargetZone zone, Func<IEnumerable<Loc>, ICommand> callback)
         {
             _source = source;
             _targetZone = zone;
@@ -33,17 +31,16 @@ namespace Roguelike.State
             Game.Overlay.DisplayText = "targetting mode";
             Game.Overlay.Clear();
 
-            ICollection<Tile> tempRange = new HashSet<Tile>();
-            _inRange = Game.Map.GetTilesInRadius(_source.X, _source.Y, (int)_targetZone.Range).ToList();
+            ICollection<Loc> tempRange = new HashSet<Loc>();
+            _inRange = Game.Map.GetPointsInRadius(_source.Loc, _targetZone.Range).ToList();
 
             // Filter the targettable range down to only the tiles we have a direct line on.
-            foreach (Tile tile in _inRange)
+            foreach (Loc point in _inRange)
             {
-                Tile collision = tile;
-                foreach (Tile current in
-                    Game.Map.GetStraightLinePath(_source.X, _source.Y, tile.X, tile.Y))
+                Loc collision = point;
+                foreach (Loc current in Game.Map.GetStraightLinePath(_source.Loc, point))
                 {
-                    if (!current.IsWalkable)
+                    if (!Game.Map.Field[current].IsWalkable)
                     {
                         collision = current;
                         break;
@@ -56,14 +53,14 @@ namespace Roguelike.State
 
             // Pick out the interesting targets.
             // TODO: select items for item targetting spells
-            foreach (Tile tile in tempRange)
+            foreach (Loc point in tempRange)
             {
-                Game.Map.GetActor(tile.X, tile.Y)
+                Game.Map.GetActor(point.X, point.Y)
                     .MatchSome(actor => _targettableActors.Add(actor));
             }
 
             // Add the current tile into the targettable range as well.
-            tempRange.Add(Game.Map.Field[source.X, source.Y]);
+            tempRange.Add(source.Loc);
             Game.Overlay.Set(source.X, source.Y, Colors.TargetBackground);
             _inRange = tempRange;
 
@@ -71,19 +68,16 @@ namespace Roguelike.State
             Actor firstActor = _targettableActors.FirstOrDefault();
             if (firstActor == null)
             {
-                _targetX = source.X;
-                _targetY = source.Y;
+                _target = source.Loc;
             }
             else
             {
-                _targetX = firstActor.X;
-                _targetY = firstActor.Y;
+                _target = firstActor.Loc;
             }
             DrawTargettedTiles();
 
             // Initialize the saved mouse position as well.
-            _prevMouseX = _targetX;
-            _prevMouseY = _targetY;
+            _prevMouse = _target;
         }
 
         // ReSharper disable once CyclomaticComplexity
@@ -149,18 +143,16 @@ namespace Roguelike.State
                     if (_targettableActors.Count > 0)
                     {
                         Actor nextActor = _targettableActors[++_index % _targettableActors.Count];
-                        _targetX = nextActor.X;
-                        _targetY = nextActor.Y;
+                        _target = nextActor.Loc;
                     }
                     else
                     {
-                        _targetX = _source.X;
-                        _targetY = _source.Y;
+                        _target = _source.Loc;
                     }
                     break;
             }
 
-            IEnumerable<Tile> targets = DrawTargettedTiles();
+            IEnumerable<Loc> targets = DrawTargettedTiles();
             return (InputMapping.GetTargettingInput(key) == TargettingInput.Fire)
                 ? Option.Some(_callback(targets))
                 : Option.None<ICommand>();
@@ -169,24 +161,23 @@ namespace Roguelike.State
         private void MoveTarget(in Dir direction)
         {
             (int dx, int dy) = direction;
+            Loc next = new Loc(_target.X + dx, _target.Y + dy);
 
-            if (Game.Map.Field.IsValid(_targetX + dx, _targetY + dy)
-                && _inRange.Contains(Game.Map.Field[_targetX + dx, _targetY + dy]))
+            if (Game.Map.Field.IsValid(next) && _inRange.Contains(next))
             {
-                _targetX += dx;
-                _targetY += dy;
+                _target = next;
             }
         }
 
         private void JumpTarget(in Dir direction)
         {
             (int dx, int dy) = direction;
+            Loc next = new Loc(_target.X + dx, _target.Y + dy);
 
-            while (Game.Map.Field.IsValid(_targetX + dx, _targetY + dy)
-                   && _inRange.Contains(Game.Map.Field[_targetX + dx, _targetY + dy]))
+            while (Game.Map.Field.IsValid(next) && _inRange.Contains(next))
             {
-                _targetX += dx;
-                _targetY += dx;
+                _target = next;
+                next = new Loc(next.X + dx, next.Y + dx);
             }
         }
 
@@ -195,56 +186,49 @@ namespace Roguelike.State
             // Handle clicks before checking for movement.
             if (leftClick)
             {
-                IEnumerable<Tile> targets = DrawTargettedTiles();
+                IEnumerable<Loc> targets = DrawTargettedTiles();
                 return Option.Some(_callback(targets));
             }
 
-            int adjustedX = x + Camera.X;
-            int adjustedY = y + Camera.Y;
-
             // If the mouse didn't get moved, don't do anything.
-            if (adjustedX == _prevMouseX && adjustedY == _prevMouseY)
+            if (x + Camera.X == _prevMouse.X && y + Camera.Y == _prevMouse.Y)
                 return Option.None<ICommand>();
 
-            _prevMouseX = adjustedX;
-            _prevMouseY = adjustedY;
+            _prevMouse = new Loc(x + Camera.X, y+ Camera.Y);
 
             // Adjust the targetting position so it remains in the targetting range.
-            _targetX = _source.X;
-            _targetY = _source.Y;
+            _target = _source.Loc;
 
-            foreach (Tile highlight in
-                Game.Map.GetStraightLinePath(_source.X, _source.Y, _prevMouseX, _prevMouseY))
+            foreach (Loc highlight in Game.Map.GetStraightLinePath(_source.Loc, _prevMouse))
             {
                 if (!_inRange.Contains(highlight))
                     break;
 
-                _targetX = highlight.X;
-                _targetY = highlight.Y;
+                _target = highlight;
             }
 
             DrawTargettedTiles();
             return Option.None<ICommand>();
         }
 
-        private IEnumerable<Tile> DrawTargettedTiles()
+        private IEnumerable<Loc> DrawTargettedTiles()
         {
             Game.Overlay.Clear();
-            IEnumerable<Tile> targets = _targetZone.GetTilesInRange(_source, _targetX, _targetY).ToList();
+            IEnumerable<Loc> targets = _targetZone.GetTilesInRange(_source, _target).ToList();
 
             // Draw the projectile path if any.
-            foreach (Tile tile in _targetZone.Trail)
+            foreach (Loc point in _targetZone.Trail)
             {
-                Game.Overlay.Set(tile.X, tile.Y, Colors.Path);
+                Game.Overlay.Set(point.X, point.Y, Colors.Path);
             }
 
             // Draw the targetted tiles.
-            foreach (Tile tile in targets)
+            foreach (Loc point in targets)
             {
-                Game.Overlay.Set(tile.X, tile.Y, Colors.Target);
+                Game.Overlay.Set(point.X, point.Y, Colors.Target);
             }
 
-            Game.Overlay.Set(_targetX, _targetY, Colors.Cursor);
+            Game.Overlay.Set(_target.X, _target.Y, Colors.Cursor);
             return targets;
         }
 

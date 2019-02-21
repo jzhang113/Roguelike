@@ -23,11 +23,11 @@ namespace Roguelike.Items
             ApplySkill = other.ApplySkill;
         }
 
-        public void Apply(Actor source, IEnumerable<Tile> targets)
+        public void Apply(Actor source, IEnumerable<Loc> targets)
         {
-            foreach (Tile tile in targets)
+            foreach (Loc point in targets)
             {
-                ApplySkill.Activate(source, tile);
+                ApplySkill.Activate(source, Game.Map.Field[point]);
             }
         }
 

@@ -15,9 +15,9 @@ namespace Roguelike.Commands
         public Option<IAnimation> Animation => _action.Animation;
 
         private readonly IAction _action;
-        private readonly IEnumerable<Tile> _targets;
+        private readonly IEnumerable<Loc> _targets;
 
-        public ActionCommand(ISchedulable source, IAction action, IEnumerable<Tile> targets)
+        public ActionCommand(ISchedulable source, IAction action, IEnumerable<Loc> targets)
         {
             Source = source;
             EnergyCost = action.EnergyCost;
@@ -26,18 +26,18 @@ namespace Roguelike.Commands
             _targets = targets;
         }
 
-        public ActionCommand(ISchedulable source, IAction action, Tile target) :
+        public ActionCommand(ISchedulable source, IAction action, in Loc target) :
             this(source, action, new[] { target }) { }
 
         public RedirectMessage Validate() => new RedirectMessage(true);
 
         public void Execute()
         {
-            foreach (Tile tile in _targets)
+            foreach (Loc point in _targets)
             {
                 bool activate = true;
 
-                Game.Map.GetActor(tile.X, tile.Y).MatchSome(actor =>
+                Game.Map.GetActor(point.X, point.Y).MatchSome(actor =>
                 {
                     Actors.ReactionMessage reaction = actor.GetReaction();
                     if (reaction.Command != null)
@@ -57,7 +57,7 @@ namespace Roguelike.Commands
                 });
 
                 if (activate)
-                    _action.Activate(Source, tile);
+                    _action.Activate(Source, Game.Map.Field[point]);
             }
         }
     }

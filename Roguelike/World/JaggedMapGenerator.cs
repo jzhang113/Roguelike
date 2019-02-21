@@ -209,10 +209,10 @@ namespace Roguelike.World
             int y0 = Rand.Next(r1.Top + 1, r1.Bottom);
             int x1 = Rand.Next(r2.Left + 1, r2.Right);
             int y1 = Rand.Next(r2.Top + 1, r2.Bottom);
-            IEnumerable<Tile> path = Map.GetStraightLinePath(x0, y0, x1, y1);
 
-            foreach (Tile tile in path)
+            foreach (Loc point in Map.GetStraightLinePath(new Loc(x0, y0), new Loc(x1, y1)))
             {
+                Tile tile = Map.Field[point];
                 if (!tile.IsWall)
                     continue;
 

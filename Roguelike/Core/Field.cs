@@ -26,7 +26,12 @@ namespace Roguelike.Core
 
         public Tile this[int i, int j] => _field[i + _width * j];
 
+        public Tile this[Loc point] => _field[point.X + _width * point.Y];
+
         public bool IsValid(int i, int j) => i >= 0 && i < _width && j >= 0 && j < _height;
+
+        public bool IsValid(in Loc point) =>
+            point.X >= 0 && point.X < _width && point.Y >= 0 && point.Y < _height;
 
         public IEnumerator<Tile> GetEnumerator()
         {

@@ -73,7 +73,7 @@ namespace Roguelike.State
             {
                 Game.Player.Inventory.GetStack(CurrKey).MatchSome(group =>
                     Game.StateHandler.PushState(new SubinvState(group, CurrKey, this)));
-                
+
                 return Option.None<ICommand>();
             }
             else

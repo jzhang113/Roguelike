@@ -19,9 +19,9 @@ namespace Roguelike.Core
         public int Range { get; }
         public int Radius { get; }
         public bool Projectile { get; }
-        public ICollection<Tile> Trail { get; }
+        public ICollection<Loc> Trail { get; }
 
-        private ICollection<Tile> Targets { get; }
+        private ICollection<Loc> Targets { get; }
 
         public TargetZone(TargetShape shape, int range = 1, int radius = 0, bool projectile = true)
         {
@@ -29,69 +29,64 @@ namespace Roguelike.Core
             Range = range;
             Radius = radius;
             Projectile = projectile;
-            Trail = new List<Tile>();
-            Targets = new List<Tile>();
+            Trail = new List<Loc>();
+            Targets = new List<Loc>();
         }
 
-        public IEnumerable<Tile> GetTilesInRange(Actor current, int targetX, int targetY)
+        public IEnumerable<Loc> GetTilesInRange(Actor current, in Loc target)
         {
             Targets.Clear();
 
             switch (Shape)
             {
                 case TargetShape.Self:
-                    foreach (Tile tile in Game.Map.GetTilesInRadius(current.X, current.Y, Radius))
+                    foreach (Loc point in Game.Map.GetPointsInRadius(current.Loc, Radius))
                     {
-                        if (InRange(current, tile.X, tile.Y))
-                            Targets.Add(Game.Map.Field[tile.X, tile.Y]);
+                        if (InRange(current, point))
+                            Targets.Add(point);
                     }
                     return Targets;
                 case TargetShape.Range:
-                    int collisionX = targetX;
-                    int collisionY = targetY;
+                    Loc collision = target;
 
                     // for simplicity, assume that the travel path is only 1 tile wide
                     // TODO: trail should be as wide as the Radius
                     if (Projectile)
                     {
-                        collisionX = current.X;
-                        collisionY = current.Y;
+                        collision = current.Loc;
                         Trail.Clear();
 
-                        foreach (Tile tile in
-                            Game.Map.GetStraightLinePath(current.X, current.Y, targetX, targetY))
+                        foreach (Loc point in Game.Map.GetStraightLinePath(current.Loc, target))
                         {
-                            Trail.Add(tile);
-                            collisionX = tile.X;
-                            collisionY = tile.Y;
+                            Trail.Add(point);
+                            collision = point;
 
-                            if (!tile.IsWalkable)
+                            if (!Game.Map.Field[point.X, point.Y].IsWalkable)
                                 break;
                         }
                     }
 
-                    foreach (Tile tile in Game.Map.GetTilesInRadius(collisionX, collisionY, Radius))
+                    foreach (Loc point in Game.Map.GetPointsInRadius(collision, Radius))
                     {
                         // TODO: prevent large radius spells from hitting past walls.
-                        Targets.Add(Game.Map.Field[tile.X, tile.Y]);
+                        Targets.Add(point);
                     }
                     return Targets;
                 case TargetShape.Ray:
-                    IEnumerable<Tile> path = Game.Map.GetStraightLinePath(
-                        current.X, current.Y, targetX, targetY);
+                    IEnumerable<Loc> path = Game.Map.GetStraightLinePath(current.Loc, target);
                     if (Projectile)
                     {
-                        foreach (Tile tile in path)
+                        foreach (Loc point in path)
                         {
                             // since each step takes us farther away, we can stop checking as soon
                             // as one tile falls out of range
-                            if (!InRange(current, tile.X, tile.Y))
+                            if (!InRange(current, point))
                                 break;
 
-                            Targets.Add(tile);
+                            Targets.Add(point);
 
                             // projectiles stop at the first blocked tile
-                            if (!tile.IsWalkable)
+                            if (!Game.Map.Field[point].IsWalkable)
                                 break;
                         }
 
@@ -102,24 +97,22 @@ namespace Roguelike.Core
                         return path;
                     }
                 case TargetShape.Directional:
-                    var (dx, dy) = Utils.Distance.GetNearestDirection(targetX, targetY, current.X, current.Y);
-                    int limit = Math.Max(Math.Abs(targetX - current.X), Math.Abs(targetY - current.Y));
+                    var (dx, dy) = Utils.Distance.GetNearestDirection(target, current.Loc);
+                    int limit = Math.Max(Math.Abs(target.X - current.X), Math.Abs(target.Y - current.Y));
 
                     for (int i = 1; i <= limit; i++)
                     {
-                        int x = current.X + i * dx;
-                        int y = current.Y + i * dy;
+                        Loc posInDir = new Loc(current.X + i * dx, current.Y + i * dy);
 
                         // since each step takes us farther away, we can stop checking as soon as one
                         // tile falls out of range
-                        if (!InRange(current, x, y))
+                        if (!InRange(current, posInDir))
                             break;
 
-                        Tile tile = Game.Map.Field[x, y];
-                        Targets.Add(tile);
+                        Targets.Add(posInDir);
 
                         // projectiles stop at the first blocked tile
-                        if (Projectile && !tile.IsWalkable)
+                        if (Projectile && !Game.Map.Field[posInDir].IsWalkable)
                             break;
                     }
                     return Targets;
@@ -128,10 +121,10 @@ namespace Roguelike.Core
             }
         }
 
-        private bool InRange(Actor actor, int x, int y)
+        private bool InRange(Actor actor, in Loc target)
         {
             // square ranges
-            int distance = Math.Max(Math.Abs(actor.X - x), Math.Abs(actor.Y - y));
+            int distance = Math.Max(Math.Abs(actor.X - target.X), Math.Abs(actor.Y - target.Y));
             return distance <= Range;
         }
     }

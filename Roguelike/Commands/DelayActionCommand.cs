@@ -17,16 +17,16 @@ namespace Roguelike.Commands
 
         private readonly ISchedulable _source;
         private readonly IAction _action;
-        private readonly IEnumerable<Tile> _targets;
+        private readonly IEnumerable<Loc> _targets;
 
-        public DelayActionCommand(ISchedulable source, IAction action, IEnumerable<Tile> targets)
+        public DelayActionCommand(ISchedulable source, IAction action, IEnumerable<Loc> targets)
         {
             _source = source;
             _action = action;
             _targets = targets;
         }
 
-        public DelayActionCommand(ISchedulable source, IAction action, Tile target) :
+        public DelayActionCommand(ISchedulable source, IAction action, in Loc target) :
             this(source, action, new[] { target }) { }
 
         public RedirectMessage Validate() => new RedirectMessage(true);
