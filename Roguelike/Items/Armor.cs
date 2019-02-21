@@ -10,7 +10,7 @@ namespace Roguelike.Items
     {
         public ArmorType Type { get; }
 
-        public Armor(ItemParameter parameters, Color color, ArmorType type) : base(parameters, color, '[')
+        public Armor(ItemParameter parameters, Color color, Loc loc, ArmorType type) : base(parameters, color, '[', loc)
         {
             Type = type;
         }

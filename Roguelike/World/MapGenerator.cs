@@ -136,20 +136,12 @@ namespace Roguelike.World
 
                 if (room.Top > 1 && IsDoorLocation(i, room.Top - 1))
                 {
-                    Map.AddDoor(new Door
-                    {
-                        X = i,
-                        Y = room.Top - 1
-                    });
+                    Map.AddDoor(new Door(new Loc(i, room.Top - 1)));
                 }
 
                 if (room.Bottom < Height - 1 && IsDoorLocation(i, room.Bottom))
                 {
-                    Map.AddDoor(new Door
-                    {
-                        X = i,
-                        Y = room.Bottom
-                    });
+                    Map.AddDoor(new Door(new Loc(i, room.Bottom)));
                 }
             }
 
@@ -160,20 +152,12 @@ namespace Roguelike.World
 
                 if (room.Left > 1 && IsDoorLocation(room.Left - 1, j))
                 {
-                    Map.AddDoor(new Door
-                    {
-                        X = room.Left - 1,
-                        Y = j
-                    });
+                    Map.AddDoor(new Door(new Loc(room.Left - 1, j)));
                 }
 
                 if (room.Right < Width - 1 && IsDoorLocation(room.Right, j))
                 {
-                    Map.AddDoor(new Door
-                    {
-                        X = room.Right,
-                        Y = j
-                    });
+                    Map.AddDoor(new Door(new Loc(room.Right, j)));
                 }
             }
         }
@@ -207,11 +191,8 @@ namespace Roguelike.World
                     AttackSpeed = 240,
                     Damage = 200,
                     ThrowRange = 7
-                }, Swatch.DbBlood)
-            {
-                X = Game.Player.X - 1,
-                Y = Game.Player.Y - 1
-            };
+                }, Swatch.DbBlood,
+                Game.Player.Loc - (1, 1));
             Map.AddItem(spear);
 
             spear.Moveset = new Systems.MovesetHandler(new Systems.ActionNode(
@@ -241,62 +222,46 @@ namespace Roguelike.World
                     Damage = 100,
                     MeleeRange = 1,
                     ThrowRange = 3
-                }, Swatch.DbMetal, ArmorType.Armor)
-            {
-                X = Game.Player.X - 2,
-                Y = Game.Player.Y - 3
-            };
+                },
+                Swatch.DbMetal, Game.Player.Loc - (2, 3), ArmorType.Armor);
             Map.AddItem(ha);
 
             Map.AddItem(new Scroll(
-                    new ItemParameter("scroll of magic missile", MaterialType.Paper),
-                    new DamageAction(
-                        200,
-                        new TargetZone(TargetShape.Directional, range: 10)),
-                    Swatch.DbSun)
-                {
-                    X = Game.Player.X - 1,
-                    Y = Game.Player.Y - 2
-                });
-
-            Scroll healing = new Scroll(
-                new ItemParameter("scroll of healing", MaterialType.Paper), heal, Swatch.DbGrass)
-            {
-                X = Game.Player.X + 1,
-                Y = Game.Player.Y + 1
-            };
-            Map.AddItem(healing);
+                new ItemParameter("scroll of magic missile", MaterialType.Paper),
+                Swatch.DbSun,
+                Game.Player.Loc - (1, 2),
+                new DamageAction(
+                    200,
+                    new TargetZone(TargetShape.Directional, range: 10))));
 
             Map.AddItem(new Scroll(
-                    new ItemParameter("scroll of enchantment", MaterialType.Paper),
-                    new EnchantAction(
-                        new TargetZone(TargetShape.Range, range: 10)),
-                    System.Drawing.Color.LightGreen)
-                {
-                    X = Game.Player.X - 1,
-                    Y = Game.Player.Y
-                });
+                new ItemParameter("scroll of healing", MaterialType.Paper),
+                Swatch.DbGrass,
+                Game.Player.Loc + (1, 1),
+                heal));
 
             Map.AddItem(new Scroll(
-                    new ItemParameter("scroll of fireball", MaterialType.Paper),
-                    new DamageAction(
-                        200,
-                        new TargetZone(TargetShape.Range, range: 10, radius: 3)),
-                    Swatch.DbBlood)
-                {
-                    X = Game.Player.X - 2,
-                    Y = Game.Player.Y - 2
-                });
+                new ItemParameter("scroll of enchantment", MaterialType.Paper),
+                System.Drawing.Color.LightGreen,
+                Game.Player.Loc - (1, 0),
+                new EnchantAction(
+                    new TargetZone(TargetShape.Range, range: 10))));
+
+            Map.AddItem(new Scroll(
+                new ItemParameter("scroll of fireball", MaterialType.Paper),
+                Swatch.DbBlood,
+                Game.Player.Loc - (2, 2),
+                new DamageAction(
+                    200,
+                    new TargetZone(TargetShape.Range, range: 10, radius: 3))));
 
             Item planks = new Item(
-                    new ItemParameter("plank", MaterialType.Wood), Swatch.DbWood, '\\', 10)
-            {
-                X = Game.Player.X + 2,
-                Y = Game.Player.Y + 2,
-            };
-            Item planks2 = new Item(planks, 10) { X = Game.Player.X + 3 };
-            Item planks3 = new Item(planks, 10) { Y = Game.Player.Y + 3 };
-            Item planks4 = new Item(planks, 10) { X = Game.Player.X + 3, Y = Game.Player.Y + 3 };
+                new ItemParameter("plank", MaterialType.Wood),
+                Swatch.DbWood, '\\', Game.Player.Loc + (2, 2), 10);
+
+            Item planks2 = new Item(planks, 10) { Loc = Game.Player.Loc + (3, 0) };
+            Item planks3 = new Item(planks, 10) { Loc = Game.Player.Loc + (0, 3) };
+            Item planks4 = new Item(planks, 10) { Loc = Game.Player.Loc + (3, 3) };
             Map.AddItem(planks);
             Map.AddItem(planks2);
             Map.AddItem(planks3);
@@ -308,10 +273,9 @@ namespace Roguelike.World
         {
             do
             {
-                Game.Player.X = Rand.Next(1, Width - 1);
-                Game.Player.Y = Rand.Next(1, Height - 1);
+                Game.Player.Loc = new Loc(Rand.Next(1, Width - 1), Rand.Next(1, Height - 1));
             }
-            while (!Map.Field[Game.Player.X, Game.Player.Y].IsWalkable);
+            while (!Map.Field[Game.Player.Loc].IsWalkable);
             Map.AddActor(Game.Player);
 
             Actors.Titan titan = new Actors.Titan(new Actors.ActorParameters("Bob")
@@ -320,12 +284,11 @@ namespace Roguelike.World
                 MaxHp = 250
             })
             {
-                X = Game.Player.X - 4,
-                Y = Game.Player.Y - 4
+                Loc = Game.Player.Loc - (4, 4)
             };
             Map.AddActor(titan);
 
-            Map.SetFire(Game.Player.X + 3, Game.Player.Y + 3);
+            Map.SetFire(Game.Player.Loc + (3, 3));
         }
 
         private void PlaceStairs()
@@ -339,14 +302,10 @@ namespace Roguelike.World
 
                 Exit exit = new Exit(id, symbol);
                 bool done = false;
-                while (!Map.Field[exit.X, exit.Y].IsWalkable && !done)
+                while (!Map.Field[exit.Loc].IsWalkable && !done)
                 {
-                    Map.GetExit(exit.X, exit.Y).Match(
-                        some: _ =>
-                        {
-                            exit.X = Rand.Next(1, Width - 1);
-                            exit.Y = Rand.Next(1, Height - 1);
-                        },
+                    Map.GetExit(exit.Loc).Match(
+                        some: _ => exit.Loc = new Loc(Rand.Next(1, Width - 1), Rand.Next(1, Height - 1)),
                         none: () => done = true);
                 }
 

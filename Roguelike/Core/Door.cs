@@ -9,9 +9,10 @@ namespace Roguelike.Core
     {
         public bool IsOpen { get; set; }
 
-        public Door(bool open = false) : base(new ActorParameters("Door"), Colors.Door, '+')
+        public Door(Loc pos) : base(new ActorParameters("Door"), Colors.Door, '+')
         {
-            IsOpen = open;
+            Loc = pos;
+            IsOpen = false;
         }
 
         public override ICommand GetAction()
@@ -24,8 +25,9 @@ namespace Roguelike.Core
             DrawingComponent.Symbol = '-';
             IsOpen = true;
 
-            Game.Map.Field[X, Y].IsOccupied = false;
-            Game.Map.Field[X, Y].BlocksLight = false;
+            Tile tile = Game.Map.Field[Loc];
+            tile.IsOccupied = false;
+            tile.BlocksLight = false;
 
             // reflect that the door is open immediately
             Game.Map.UpdatePlayerFov();

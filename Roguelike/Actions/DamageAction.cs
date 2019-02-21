@@ -27,8 +27,8 @@ namespace Roguelike.Actions
         }
 
         // Deals tamage to the target.
-        public void Activate(ISchedulable source, Tile target) =>
-            Game.Map.GetActor(target.X, target.Y).MatchSome(targetUnit =>
+        public void Activate(ISchedulable source, Loc target) =>
+            Game.Map.GetActor(target).MatchSome(targetUnit =>
             {
                 int damage = targetUnit.TakeDamage(_power);
 

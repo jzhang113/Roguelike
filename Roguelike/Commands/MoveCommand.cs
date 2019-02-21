@@ -19,10 +19,10 @@ namespace Roguelike.Commands
 
         private readonly Loc _nextPos;
 
-        public MoveCommand(Actor source, int x, int y)
+        public MoveCommand(Actor source, Loc loc)
         {
             Source = source;
-            _nextPos = new Loc(x, y);
+            _nextPos = loc;
         }
 
         public RedirectMessage Validate()
@@ -35,7 +35,7 @@ namespace Roguelike.Commands
             // inside a wall (to prevent getting stuck).
             if (Game.Map.Field[_nextPos].IsWall
                 && !Source.StatusHandler.TryGetStatus(StatusType.Phasing, out _)
-                && !Game.Map.Field[Source.X, Source.Y].IsWall)
+                && !Game.Map.Field[Source.Loc].IsWall)
             {
                 // Don't penalize the player for walking into walls, but monsters should wait if 
                 // they will walk into a wall.
@@ -45,7 +45,7 @@ namespace Roguelike.Commands
                     return new RedirectMessage(false, new WaitCommand(Source));
             }
 
-            if (Game.Map.TryGetDoor(_nextPos.X, _nextPos.Y, out Door door))
+            if (Game.Map.TryGetDoor(_nextPos, out Door door))
             {
                 // HACK: need an open door command
                 if (!door.IsOpen)
@@ -56,7 +56,7 @@ namespace Roguelike.Commands
             }
 
             // Check if the destination is already occupied.
-            return Game.Map.GetActor(_nextPos.X, _nextPos.Y).Match(
+            return Game.Map.GetActor(_nextPos).Match(
                 some: target =>
                 {
                     if (target == Source)
@@ -83,19 +83,18 @@ namespace Roguelike.Commands
             if (Source is Player)
             {
                 // TODO: better handling of move over popups
-                Game.Map.GetStack(_nextPos.X, _nextPos.Y).MatchSome(stack =>
+                Game.Map.GetStack(_nextPos).MatchSome(stack =>
                     Game.MessageHandler.AddMessage(stack.Count == 1
                         ? $"You see {stack.First()} here."
                         : "You see several items here."));
 
-                Game.Map.GetExit(_nextPos.X, _nextPos.Y)
+                Game.Map.GetExit(_nextPos)
                     .MatchSome(exit => Game.MessageHandler.AddMessage($"You see an exit to {exit.Destination}."));
             }
 
-            int prevX = Source.X;
-            int prevY = Source.Y;
-            Game.Map.SetActorPosition(Source, _nextPos.X, _nextPos.Y);
-            Animation = Option.Some<IAnimation>(new MoveAnimation(Game.StateHandler.CurrentLayer, Source, prevX, prevY));
+            Loc prevLoc = Source.Loc;
+            Game.Map.SetActorPosition(Source, _nextPos);
+            Animation = Option.Some<IAnimation>(new MoveAnimation(Game.StateHandler.CurrentLayer, Source, prevLoc));
 
             if (Source is Player)
                 Game.Map.Refresh();

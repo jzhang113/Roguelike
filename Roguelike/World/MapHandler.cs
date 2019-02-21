@@ -22,9 +22,9 @@ namespace Roguelike.World
         internal int[,] Clearance { get; }
 
         // internal transient helper structures
-        internal float[,] PlayerMap { get; }
-        internal float[,] AutoexploreMap { get; }
-        internal ICollection<Tile> Discovered { get; }
+        internal int[,] PlayerMap { get; }
+        internal int[,] AutoexploreMap { get; }
+        internal ICollection<Loc> Discovered { get; }
 
         // can't auto serialize these dictionaries
         private IDictionary<int, Actor> Units { get; set; }
@@ -49,9 +49,9 @@ namespace Roguelike.World
 
             Field = new Field(width, height);
             Clearance = new int[width, height];
-            PlayerMap = new float[width, height];
-            AutoexploreMap = new float[width, height];
-            Discovered = new List<Tile>();
+            PlayerMap = new int[width, height];
+            AutoexploreMap = new int[width, height];
+            Discovered = new List<Loc>();
 
             Units = new Dictionary<int, Actor>();
             Items = new Dictionary<int, InventoryHandler>();
@@ -94,9 +94,9 @@ namespace Roguelike.World
                 Value = (ICollection<Fire>)info.GetValue($"{nameof(Fires)}.values", typeof(ICollection<Fire>))
             };
 
-            PlayerMap = new float[Width, Height];
-            AutoexploreMap = new float[Width, Height];
-            Discovered = new List<Tile>();
+            PlayerMap = new int[Width, Height];
+            AutoexploreMap = new int[Width, Height];
+            Discovered = new List<Loc>();
         }
 
         [OnDeserialized]
@@ -137,23 +137,23 @@ namespace Roguelike.World
         #region Actor Methods
         public bool AddActor(Actor unit)
         {
-            if (!Field[unit.X, unit.Y].IsWalkable)
+            if (!Field[unit.Loc].IsWalkable)
                 return false;
 
-            SetActorPosition(unit, unit.X, unit.Y);
+            SetActorPosition(unit, unit.Loc);
             Game.EventScheduler.AddActor(unit);
             return true;
         }
 
-        public Option<Actor> GetActor(int x, int y) =>
-            Units.TryGetValue(ToIndex(x, y), out Actor actor) ? Option.Some(actor) : Option.None<Actor>();
+        public Option<Actor> GetActor(Loc pos) =>
+            Units.TryGetValue(ToIndex(pos), out Actor actor) ? Option.Some(actor) : Option.None<Actor>();
 
         public bool RemoveActor(Actor unit)
         {
-            if (!Units.Remove(ToIndex(unit.X, unit.Y)))
+            if (!Units.Remove(ToIndex(unit.Loc)))
                 return false;
 
-            Tile unitTile = Field[unit.X, unit.Y];
+            Tile unitTile = Field[unit.Loc];
             unitTile.IsOccupied = false;
             unitTile.BlocksLight = false;
 
@@ -162,26 +162,28 @@ namespace Roguelike.World
             return true;
         }
 
-        public bool SetActorPosition(Actor actor, int x, int y)
+        public bool SetActorPosition(Actor actor, Loc pos)
         {
             //if (!Field[x, y].IsWalkable)
             //    return false;
 
-            Field[actor.X, actor.Y].IsOccupied = false;
-            Field[actor.X, actor.Y].BlocksLight = false;
-            Units.Remove(ToIndex(actor.X, actor.Y));
+            Tile tile = Field[actor.Loc];
+            Tile newTile = Field[pos];
 
-            actor.X = x;
-            actor.Y = y;
-            Field[x, y].IsOccupied = true;
-            Field[x, y].BlocksLight = actor.BlocksLight;
-            Units.Add(ToIndex(x, y), actor);
+            tile.IsOccupied = false;
+            tile.BlocksLight = false;
+            Units.Remove(ToIndex(actor.Loc));
+
+            actor.Loc = pos;
+            newTile.IsOccupied = true;
+            newTile.BlocksLight = actor.BlocksLight;
+            Units.Add(ToIndex(pos), actor);
 
             return true;
         }
 
         public Option<LevelId> TryChangeLocation(Actor actor) =>
-            Exits.TryGetValue(ToIndex(actor.X, actor.Y), out Exit exit)
+            Exits.TryGetValue(ToIndex(actor.Loc), out Exit exit)
                 ? Option.Some(exit.Destination)
                 : Option.None<LevelId>();
         #endregion
@@ -189,7 +191,7 @@ namespace Roguelike.World
         #region Item Methods
         public void AddItem(Item item)
         {
-            int index = ToIndex(item.X, item.Y);
+            int index = ToIndex(item.Loc);
             if (Items.TryGetValue(index, out InventoryHandler stack))
             {
                 stack.Add(item);
@@ -203,22 +205,22 @@ namespace Roguelike.World
             }
         }
 
-        public Option<Item> GetItem(int x, int y)
+        public Option<Item> GetItem(Loc pos)
         {
-            bool found = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
+            bool found = Items.TryGetValue(ToIndex(pos), out InventoryHandler stack);
             return (found && stack.Count > 0) ? Option.Some(stack.First()) : Option.None<Item>();
         }
 
-        public Option<InventoryHandler> GetStack(int x, int y)
+        public Option<InventoryHandler> GetStack(Loc pos)
         {
-            bool found = Items.TryGetValue(ToIndex(x, y), out InventoryHandler stack);
+            bool found = Items.TryGetValue(ToIndex(pos), out InventoryHandler stack);
             return (found && stack.Count > 0) ? Option.Some(stack) : Option.None<InventoryHandler>();
         }
 
         // Clean up the items list by removing empty stacks.
-        internal bool RemoveStackIfEmpty(int x, int y)
+        internal bool RemoveStackIfEmpty(Loc pos)
         {
-            int index = ToIndex(x, y);
+            int index = ToIndex(pos);
             if (!Items.TryGetValue(index, out InventoryHandler stack))
                 return false;
 
@@ -232,7 +234,7 @@ namespace Roguelike.World
         // Take items off of the map.
         public Option<Item> SplitItem(Item item)
         {
-            int index = ToIndex(item.X, item.Y);
+            int index = ToIndex(item.Loc);
             if (Items.TryGetValue(index, out InventoryHandler stack))
             {
                 System.Diagnostics.Debug.Assert(
@@ -256,52 +258,53 @@ namespace Roguelike.World
         #region Door Methods
         public bool AddDoor(Door door)
         {
-            if (!Field[door.X, door.Y].IsWalkable)
+            if (!Field[door.Loc].IsWalkable)
                 return false;
 
-            Doors.Add(ToIndex(door.X, door.Y), door);
-            Field[door.X, door.Y].IsOccupied = true;
-            Field[door.X, door.Y].BlocksLight = door.BlocksLight;
+            Doors.Add(ToIndex(door.Loc), door);
+            Tile tile = Field[door.Loc];
+            tile.IsOccupied = true;
+            tile.BlocksLight = door.BlocksLight;
 
             return true;
         }
 
-        public bool TryGetDoor(int x, int y, out Door door)
+        public bool TryGetDoor(Loc pos, out Door door)
         {
-            return Doors.TryGetValue(ToIndex(x, y), out door);
+            return Doors.TryGetValue(ToIndex(pos), out door);
         }
         #endregion
 
         public bool AddExit(Exit exit)
         {
             // TODO: also check exit reachability
-            if (!Field[exit.X, exit.Y].IsWalkable)
+            if (!Field[exit.Loc].IsWalkable)
                 return false;
 
-            Exits.Add(ToIndex(exit.X, exit.Y), exit);
+            Exits.Add(ToIndex(exit.Loc), exit);
             return true;
         }
 
-        public Option<Exit> GetExit(int x, int y) =>
-            Exits.TryGetValue(ToIndex(x, y), out Exit exit) ? Option.Some(exit) : Option.None<Exit>();
+        public Option<Exit> GetExit(Loc pos) =>
+            Exits.TryGetValue(ToIndex(pos), out Exit exit) ? Option.Some(exit) : Option.None<Exit>();
 
         public IEnumerable<Exit> GetExits(LevelId levelId) =>
             Exits.Values.Where(ex => ex.Destination == levelId);
 
-        public bool SetFire(int x, int y)
+        public bool SetFire(Loc pos)
         {
-            int index = ToIndex(x, y);
+            int index = ToIndex(pos);
             if (Fires.TryGetValue(index, out _))
                 return false;
 
-            Tile tile = Field[x, y];
+            Tile tile = Field[pos];
             if (tile.IsWall)
                 return false;
 
             TerrainProperty terrain = tile.Type.ToProperty();
             if (Game.Random.NextDouble() < terrain.Flammability.ToIgniteChance())
             {
-                Fire fire = new Fire(x, y);
+                Fire fire = new Fire(pos);
                 Fires.Add(index, fire);
                 Game.EventScheduler.AddActor(fire);
                 return true;
@@ -314,7 +317,7 @@ namespace Roguelike.World
 
         public bool RemoveFire(Fire fire)
         {
-            if (!Fires.Remove(ToIndex(fire.X, fire.Y)))
+            if (!Fires.Remove(ToIndex(fire.Loc)))
                 return false;
 
             Game.EventScheduler.RemoveActor(fire);
@@ -322,18 +325,16 @@ namespace Roguelike.World
         }
 
         #region Tile Selection Methods
-        public IEnumerable<WeightedPoint> GetPathToPlayer(int x, int y)
+        public IEnumerable<LocCost> GetPathToPlayer(Loc pos)
         {
-            System.Diagnostics.Debug.Assert(Field.IsValid(x, y));
-            float nearest = PlayerMap[x, y];
-            float prev = nearest;
+            System.Diagnostics.Debug.Assert(Field.IsValid(pos));
+            int nearest = PlayerMap[pos.X, pos.Y];
+            int prev = nearest;
 
             while (nearest > 0)
             {
-                WeightedPoint nextMove = MoveTowardsTarget(x, y, PlayerMap);
-                x = nextMove.X;
-                y = nextMove.Y;
-                nearest = nextMove.Weight;
+                LocCost nextMove = MoveTowardsTarget(pos, PlayerMap);
+                nearest = nextMove.Cost;
 
                 if (Math.Abs(nearest - prev) < 0.001f || Math.Abs(nearest) < 0.01f)
                 {
@@ -347,24 +348,19 @@ namespace Roguelike.World
             }
         }
 
-        internal WeightedPoint MoveTowardsTarget(int currentX, int currentY, float[,] goalMap, bool openDoors = false)
+        internal LocCost MoveTowardsTarget(Loc current, int[,] goalMap, bool openDoors = false)
         {
-            int nextX = currentX;
-            int nextY = currentY;
-            float nearest = goalMap[currentX, currentY];
+            Loc next = current;
+            int nearest = goalMap[current.X, current.Y];
 
-            foreach ((int dx, int dy) in Direction.DirectionList)
+            foreach (Loc newPos in GetPointsInRadius(current, 1))
             {
-                int newX = currentX + dx;
-                int newY = currentY + dy;
-
-                if (Field.IsValid(newX, newY) && goalMap[newX, newY] < nearest)
+                if (Field.IsValid(newPos) && goalMap[newPos.X, newPos.Y] < nearest)
                 {
                     //if (Field[newX, newY].IsWalkable || Math.Abs(goalMap[newX, newY]) < 0.001f)
                     {
-                        nextX = newX;
-                        nextY = newY;
-                        nearest = goalMap[newX, newY];
+                        next = newPos;
+                        nearest = goalMap[newPos.X, newPos.Y];
                     }
                     //else if (openDoors && TryGetDoor(newX, newY, out _))
                     //{
@@ -375,7 +371,7 @@ namespace Roguelike.World
                 }
             }
 
-            return new WeightedPoint(nextX, nextY, nearest);
+            return new LocCost(next, nearest);
         }
 
         public IEnumerable<Loc> GetStraightPathToPlayer(in Loc pos)
@@ -531,7 +527,7 @@ namespace Roguelike.World
         #endregion
 
         #region FOV Methods
-        public void ComputeFov(int x, int y, double lightDecay, bool setVisible)
+        public void ComputeFov(Loc pos, double lightDecay, bool setVisible)
         {
             foreach (Dir dir in Direction.DirectionList)
             {
@@ -552,7 +548,7 @@ namespace Roguelike.World
                         continue;
 
                     double delta = 0.5 / range.Distance;
-                    IEnumerable<Tile> row = GetRowInOctant(x, y, range.Distance, dir);
+                    IEnumerable<Tile> row = GetRowInOctant(pos.X, pos.Y, range.Distance, dir);
 
                     CheckFovInRange(range, row, delta, visibleRange, lightDecay, setVisible);
                 }
@@ -724,36 +720,36 @@ namespace Roguelike.World
 
             foreach (Door door in Doors.Values)
             {
-                door.DrawingComponent.Draw(layer, Field[door.X, door.Y]);
+                door.DrawingComponent.Draw(layer, Field[door.Loc]);
             }
 
             foreach (InventoryHandler stack in Items.Values)
             {
                 Item topItem = stack.First();
-                topItem.DrawingComponent.Draw(layer, Field[topItem.X, topItem.Y]);
+                topItem.DrawingComponent.Draw(layer, Field[topItem.Loc]);
             }
 
             foreach (Exit exit in Exits.Values)
             {
-                exit.DrawingComponent.Draw(layer, Field[exit.X, exit.Y]);
+                exit.DrawingComponent.Draw(layer, Field[exit.Loc]);
             }
 
             foreach (Fire fire in Fires.Values)
             {
-                fire.DrawingComponent.Draw(layer, Field[fire.X, fire.Y]);
+                fire.DrawingComponent.Draw(layer, Field[fire.Loc]);
             }
 
             foreach (Actor unit in Units.Values)
             {
                 if (!unit.IsDead)
                 {
-                    unit.DrawingComponent.Draw(layer, Field[unit.X, unit.Y]);
+                    unit.DrawingComponent.Draw(layer, Field[unit.Loc]);
                 }
                 else
                 {
                     // HACK: draw some corpses
                     Terminal.Color(Swatch.DbOldBlood);
-                    layer.Put(unit.X - Camera.X, unit.Y - Camera.Y, '%');
+                    layer.Put(unit.Loc.X - Camera.X, unit.Loc.Y - Camera.Y, '%');
                 }
             }
         }
@@ -771,17 +767,17 @@ namespace Roguelike.World
 
             Discovered.Clear();
 
-            Tile origin = Field[Game.Player.X, Game.Player.Y];
+            Tile origin = Field[Game.Player.Loc];
             origin.Light = 1;
             origin.LosExists = true;
 
             if (!origin.IsExplored)
             {
                 origin.IsExplored = true;
-                Discovered.Add(origin);
+                Discovered.Add(Game.Player.Loc);
             }
 
-            ComputeFov(Game.Player.X, Game.Player.Y, Constants.LIGHT_DECAY, true);
+            ComputeFov(Game.Player.Loc, Constants.LIGHT_DECAY, true);
         }
 
         private void UpdatePlayerMaps()
@@ -793,11 +789,11 @@ namespace Roguelike.World
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    PlayerMap[x, y] = float.NaN;
+                    PlayerMap[x, y] = -1;
                 }
             }
 
-            PlayerMap[Game.Player.X, Game.Player.Y] = 0;
+            PlayerMap[Game.Player.Loc.X, Game.Player.Loc.Y] = 0;
 
             ProcessDijkstraMaps(_goals, PlayerMap);
         }
@@ -811,7 +807,7 @@ namespace Roguelike.World
                 {
                     if (Field[x, y].IsExplored)
                     {
-                        AutoexploreMap[x, y] = float.NaN;
+                        AutoexploreMap[x, y] = -1;
                     }
                     else
                     {
@@ -824,7 +820,7 @@ namespace Roguelike.World
             ProcessDijkstraMaps(_goals, AutoexploreMap);
         }
 
-        private void ProcessDijkstraMaps(Queue<LocCost> goals, float[,] mapWeights)
+        private void ProcessDijkstraMaps(Queue<LocCost> goals, int[,] mapWeights)
         {
             while (goals.Count > 0)
             {
@@ -836,7 +832,7 @@ namespace Roguelike.World
                     Tile tile = Field[next];
 
                     if (!tile.IsWall && tile.IsExplored &&
-                        (double.IsNaN(mapWeights[next.X, next.Y]) || newCost < mapWeights[next.X, next.Y]))
+                        (mapWeights[next.X, next.Y] >= 0 || newCost < mapWeights[next.X, next.Y]))
                     {
                         mapWeights[next.X, next.Y] = newCost;
                         goals.Enqueue(new LocCost(next, newCost));
@@ -845,10 +841,7 @@ namespace Roguelike.World
             }
         }
 
-        private int ToIndex(int x, int y)
-        {
-            return x + Width * y;
-        }
+        private int ToIndex(Loc pos) => pos.X + Width * pos.Y;
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {

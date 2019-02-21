@@ -12,22 +12,20 @@ namespace Roguelike.Animations
         private const int _MAX_FRAME = 4;
 
         private readonly Actor _source;
-        private readonly int _prevX;
-        private readonly int _prevY;
+        private readonly Loc _prev;
 
         private readonly int _dx;
         private readonly int _dy;
         private int _frame;
 
-        public MoveAnimation(LayerInfo layer, Actor source, int prevX, int prevY)
+        public MoveAnimation(LayerInfo layer, Actor source, Loc prev)
         {
             Layer = layer;
             _source = source;
-            _prevX = prevX;
-            _prevY = prevY;
+            _prev = prev;
 
-            _dx = source.X - prevX;
-            _dy = source.Y - prevY;
+            _dx = source.Loc.X - prev.X;
+            _dy = source.Loc.Y - prev.Y;
             _frame = 0;
 
             _source.DrawingComponent.Activated = false;
@@ -56,8 +54,8 @@ namespace Roguelike.Animations
             Terminal.Color(_source.DrawingComponent.Color);
             Terminal.Layer(Layer.Z + 1);
             Terminal.PutExt(
-                Layer.X + _prevX - Camera.X,
-                Layer.Y + _prevY - Camera.Y,
+                Layer.X + _prev.X - Camera.X,
+                Layer.Y + _prev.Y - Camera.Y,
                 xFrac, yFrac, _source.DrawingComponent.Symbol);
             Terminal.Layer(Layer.Z);
         }

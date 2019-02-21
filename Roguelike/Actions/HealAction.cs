@@ -24,8 +24,8 @@ namespace Roguelike.Actions
         }
 
         // Heals the target by amount up to its maximum health.
-        public void Activate(ISchedulable source, Tile target) =>
-            Game.Map.GetActor(target.X, target.Y).MatchSome(targetUnit =>
+        public void Activate(ISchedulable source, Loc target) =>
+            Game.Map.GetActor(target).MatchSome(targetUnit =>
             {
                 int healing = targetUnit.TakeHealing(_power);
                 Game.MessageHandler.AddMessage(

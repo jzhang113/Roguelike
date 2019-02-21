@@ -58,7 +58,7 @@ namespace Roguelike.World
 
             // TODO: what about teleporting? Levels without entrances?
             Exit exit = Map.GetExits(CurrentLevel).First();
-            Map.SetActorPosition(Game.Player, exit.X, exit.Y);
+            Map.SetActorPosition(Game.Player, exit.Loc);
 
             Map.Refresh();
             CurrentLevel = id;

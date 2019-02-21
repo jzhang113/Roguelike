@@ -19,7 +19,7 @@ namespace Roguelike.Actions
             Area = area;
         }
 
-        public void Activate(ISchedulable source, Tile target) =>
-            Game.Map.GetItem(target.X, target.Y).MatchSome(item => item.Enchantment++);
+        public void Activate(ISchedulable source, Loc target) =>
+            Game.Map.GetItem(target).MatchSome(item => item.Enchantment++);
     }
 }

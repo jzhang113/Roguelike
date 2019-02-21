@@ -13,8 +13,8 @@ namespace Roguelike.Core
             const int screenHeight = Data.Constants.MAPVIEW_HEIGHT;
 
             // set left and top limits for the camera
-            int startX = Math.Max(Game.Player.X - screenWidth / 2, 0);
-            int startY = Math.Max(Game.Player.Y - screenHeight / 2, 0);
+            int startX = Math.Max(Game.Player.Loc.X - screenWidth / 2, 0);
+            int startY = Math.Max(Game.Player.Loc.Y - screenHeight / 2, 0);
 
             // set right and bottom limits for the camera
             const int xDiff = Data.Constants.MAP_WIDTH - screenWidth;

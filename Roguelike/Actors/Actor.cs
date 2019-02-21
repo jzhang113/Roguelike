@@ -37,9 +37,7 @@ namespace Roguelike.Actors
         public ActorParameters Parameters { get; }
         public StatusHandler StatusHandler { get; }
 
-        public int X { get; set; }
-        public int Y { get; set; }
-        public Loc Loc => new Loc(X, Y);
+        public Loc Loc { get; set; }
 
         public bool IsDead => Hp < 0;
 
@@ -65,7 +63,7 @@ namespace Roguelike.Actors
             Game.Map.RemoveActor(this);
             Game.EventScheduler.RemoveActor(this);
 
-            if (Game.Map.Field[X, Y].IsVisible)
+            if (Game.Map.Field[Loc].IsVisible)
             {
                 Game.MessageHandler.AddMessage($"{Name} dies");
                 Game.Map.Refresh();
@@ -139,8 +137,8 @@ namespace Roguelike.Actors
             if (energyDiff != 0 || !(other is Actor otherActor))
                 return energyDiff;
 
-            float distPlayer = Game.Map.PlayerMap[X, Y];
-            float otherDistPlayer = Game.Map.PlayerMap[otherActor.X, otherActor.Y];
+            float distPlayer = Game.Map.PlayerMap[Loc.X, Loc.Y];
+            float otherDistPlayer = Game.Map.PlayerMap[otherActor.Loc.X, otherActor.Loc.Y];
 
             // if we haven't discovered one of the actors, don't change the order
             return float.IsNaN(distPlayer) || float.IsNaN(otherDistPlayer)

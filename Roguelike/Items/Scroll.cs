@@ -13,7 +13,7 @@ namespace Roguelike.Items
     {
         public IAction ApplySkill { get; }
 
-        public Scroll(ItemParameter parameters, IAction action, Color color) : base(parameters, color, '?')
+        public Scroll(ItemParameter parameters, Color color, Loc loc, IAction action) : base(parameters, color, '?', loc)
         {
             ApplySkill = action;
         }
@@ -27,7 +27,7 @@ namespace Roguelike.Items
         {
             foreach (Loc point in targets)
             {
-                ApplySkill.Activate(source, Game.Map.Field[point]);
+                ApplySkill.Activate(source, point);
             }
         }
 

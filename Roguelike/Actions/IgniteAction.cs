@@ -18,8 +18,8 @@ namespace Roguelike.Actions
             Area = targetZone;
         }
 
-        public void Activate(ISchedulable source, Tile target) =>
-            Game.Map.GetActor(target.X, target.Y).MatchSome(targetUnit =>
+        public void Activate(ISchedulable source, Loc target) =>
+            Game.Map.GetActor(target).MatchSome(targetUnit =>
             {
                 targetUnit.StatusHandler.AddStatus(Statuses.StatusType.Burning, 10);
 

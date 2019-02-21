@@ -31,13 +31,13 @@ namespace Roguelike.Actors
 
         public override ICommand GetAction()
         {
-            if (Game.Map.PlayerMap[X, Y] <= 2)
+            if (Game.Map.PlayerMap[Loc.X, Loc.Y] <= 2)
             {
                 // in attack range
                 // TODO: better decision of when to use large attacks
                 Dir dir = Utils.Distance.GetNearestDirection(Game.Player.Loc, Loc);
                 IAction action = _attacks[_current];
-                IEnumerable<Loc> targets = action.Area.GetTilesInRange(this, new Loc(X + dir.X, Y + dir.Y));
+                IEnumerable<Loc> targets = action.Area.GetTilesInRange(this, new Loc(Loc.X + dir.X, Loc.Y + dir.Y));
                 ICommand command = new DelayActionCommand(this, action, targets);
 
                 if (++_current >= _attacks.Count)
@@ -45,12 +45,12 @@ namespace Roguelike.Actors
 
                 return command;
             }
-            else if (Game.Map.PlayerMap[X, Y] < Parameters.Awareness)
+            else if (Game.Map.PlayerMap[Loc.X, Loc.Y] < Parameters.Awareness)
             {
                 // in range, chase
                 // TODO: don't chase if not alerted
-                WeightedPoint nextMove = Game.Map.MoveTowardsTarget(X, Y, Game.Map.PlayerMap);
-                return new MoveCommand(this, nextMove.X, nextMove.Y);
+                LocCost nextMove = Game.Map.MoveTowardsTarget(Loc, Game.Map.PlayerMap);
+                return new MoveCommand(this, nextMove.Loc);
             }
             else
             {

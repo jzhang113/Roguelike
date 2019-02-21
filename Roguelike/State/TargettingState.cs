@@ -55,13 +55,13 @@ namespace Roguelike.State
             // TODO: select items for item targetting spells
             foreach (Loc point in tempRange)
             {
-                Game.Map.GetActor(point.X, point.Y)
+                Game.Map.GetActor(point)
                     .MatchSome(actor => _targettableActors.Add(actor));
             }
 
             // Add the current tile into the targettable range as well.
             tempRange.Add(source.Loc);
-            Game.Overlay.Set(source.X, source.Y, Colors.TargetBackground);
+            Game.Overlay.Set(source.Loc.X, source.Loc.Y, Colors.TargetBackground);
             _inRange = tempRange;
 
             // Initialize the targetting to an interesting target.

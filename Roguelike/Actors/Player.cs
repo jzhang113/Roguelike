@@ -42,7 +42,7 @@ namespace Roguelike.Actors
             Game.MessageHandler.AddMessage("You dodge");
 
             Game.StateHandler.PushState(new State.TargettingState(Game.Player, new TargetZone(TargetShape.Range),
-                returnTarget => new MoveCommand(this, returnTarget.First().X, returnTarget.First().Y)));
+                returnTarget => new MoveCommand(this, returnTarget.First())));
 
             return new ReactionMessage
             {

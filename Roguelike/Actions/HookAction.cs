@@ -20,7 +20,7 @@ namespace Roguelike.Actions
             Area = new TargetZone(TargetShape.Range, range);
         }
 
-        public void Activate(ISchedulable source, Tile target)
+        public void Activate(ISchedulable source, Loc target)
         {
             if (!(source is Actor sourceActor))
             {
@@ -56,14 +56,12 @@ namespace Roguelike.Actions
             collision.Match(
                 some: pos =>
                 {
-                    Game.Map.GetActor(pos.X, pos.Y).Match(
+                    Game.Map.GetActor(pos).Match(
                         some: actor =>
                         {
                             // If an Actor is hit, pull the target in.
                             Loc deposit = collisionPath[0];
-                            int prevX = actor.X;
-                            int prevY = actor.Y;
-                            Game.Map.SetActorPosition(actor, deposit.X, deposit.Y);
+                            Game.Map.SetActorPosition(actor, deposit);
                             Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, true, actor));
                         },
                         none: () =>
@@ -71,9 +69,7 @@ namespace Roguelike.Actions
                             // If something else got hit, it must be a wall or door. In either case, pull
                             // the source towards the target.
                             Loc deposit = collisionPath.Last();
-                            int prevX = sourceActor.X;
-                            int prevY = sourceActor.Y;
-                            Game.Map.SetActorPosition(sourceActor, deposit.X, deposit.Y);
+                            Game.Map.SetActorPosition(sourceActor, deposit);
                             Animation = Option.Some<IAnimation>(new HookAnimation(currentLayer, sourceActor, collisionPath, false));
                         });
                 },

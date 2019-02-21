@@ -37,8 +37,7 @@ namespace Roguelike.Commands
                 _dropAmount = _item.Count;
 
             Item dropped = Source.Inventory.Split(_item, _dropAmount);
-            dropped.X = Source.X;
-            dropped.Y = Source.Y;
+            dropped.Loc = Source.Loc;
             Game.Map.AddItem(dropped);
             Game.MessageHandler.AddMessage($"You drop {dropped}.");
         }

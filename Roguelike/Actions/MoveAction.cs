@@ -20,14 +20,13 @@ namespace Roguelike.Actions
             Area = targetZone;
         }
 
-        public void Activate(ISchedulable source, Tile target)
+        public void Activate(ISchedulable source, Loc target)
         {
-            if (source is Actor actor && target.IsWalkable)
+            if (source is Actor actor && Game.Map.Field[target].IsWalkable)
             {
-                int prevX = actor.X;
-                int prevY = actor.Y;
-                Game.Map.SetActorPosition(actor, target.X, target.Y);
-                Animation = Option.Some<IAnimation>(new MoveAnimation(Game.StateHandler.CurrentLayer, actor, prevX, prevY));
+                Loc prevLoc = actor.Loc;
+                Game.Map.SetActorPosition(actor, target);
+                Animation = Option.Some<IAnimation>(new MoveAnimation(Game.StateHandler.CurrentLayer, actor, prevLoc));
             }
         }
     }

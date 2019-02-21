@@ -37,7 +37,7 @@ namespace Roguelike.Commands
             {
                 bool activate = true;
 
-                Game.Map.GetActor(point.X, point.Y).MatchSome(actor =>
+                Game.Map.GetActor(point).MatchSome(actor =>
                 {
                     Actors.ReactionMessage reaction = actor.GetReaction();
                     if (reaction.Command != null)
@@ -57,7 +57,7 @@ namespace Roguelike.Commands
                 });
 
                 if (activate)
-                    _action.Activate(Source, Game.Map.Field[point]);
+                    _action.Activate(Source, point);
             }
         }
     }

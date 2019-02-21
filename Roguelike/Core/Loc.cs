@@ -14,6 +14,12 @@ namespace Roguelike.Core
             Y = y;
         }
 
+        public static Loc operator +(Loc current, (int X, int Y) offset) =>
+            new Loc(current.X + offset.X, current.Y + offset.Y);
+
+        public static Loc operator -(Loc current, (int X, int Y) offset) =>
+            new Loc(current.X - offset.X, current.Y - offset.Y);
+
         #region equality
         public override bool Equals(object obj)
         {

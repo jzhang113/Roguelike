@@ -98,11 +98,11 @@ namespace Roguelike.Core
                     }
                 case TargetShape.Directional:
                     var (dx, dy) = Utils.Distance.GetNearestDirection(target, current.Loc);
-                    int limit = Math.Max(Math.Abs(target.X - current.X), Math.Abs(target.Y - current.Y));
+                    int limit = Math.Max(Math.Abs(target.X - current.Loc.X), Math.Abs(target.Y - current.Loc.Y));
 
                     for (int i = 1; i <= limit; i++)
                     {
-                        Loc posInDir = new Loc(current.X + i * dx, current.Y + i * dy);
+                        Loc posInDir = current.Loc + (i * dx, i * dy);
 
                         // since each step takes us farther away, we can stop checking as soon as one
                         // tile falls out of range
@@ -124,7 +124,7 @@ namespace Roguelike.Core
         private bool InRange(Actor actor, in Loc target)
         {
             // square ranges
-            int distance = Math.Max(Math.Abs(actor.X - target.X), Math.Abs(actor.Y - target.Y));
+            int distance = Math.Max(Math.Abs(actor.Loc.X - target.X), Math.Abs(actor.Loc.Y - target.Y));
             return distance <= Range;
         }
     }

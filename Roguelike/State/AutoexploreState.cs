@@ -17,9 +17,9 @@ namespace Roguelike.State
         public Option<ICommand> HandleKeyInput(int key)
         {
             bool breaking = false;
-            foreach (Tile tile in Game.Map.Discovered)
+            foreach (Loc pos in Game.Map.Discovered)
             {
-                Game.Map.GetExit(tile.X, tile.Y).MatchSome(exit => {
+                Game.Map.GetExit(pos).MatchSome(exit => {
                     Game.MessageHandler.AddMessage($"You see an exit to {exit.Destination}");
                     Game.StateHandler.PopState();
                     breaking = true;
@@ -28,7 +28,7 @@ namespace Roguelike.State
                 if (breaking)
                     return Option.None<ICommand>();
 
-                Game.Map.GetStack(tile.X, tile.Y).MatchSome(stack =>
+                Game.Map.GetStack(pos).MatchSome(stack =>
                 {
                     Game.MessageHandler.AddMessage($"You see {stack}");
                     Game.StateHandler.PopState();
@@ -42,7 +42,7 @@ namespace Roguelike.State
             breaking = false;
             foreach (Tile tile in Game.Map.Field.Where(t => t.IsVisible))
             {
-                Game.Map.GetActor(tile.X, tile.Y)
+                Game.Map.GetActor(new Loc(tile.X, tile.Y))
                     .Filter(actor => !(actor is Player))
                     .MatchSome(actor =>
                     {
@@ -55,10 +55,10 @@ namespace Roguelike.State
                     return Option.None<ICommand>();
             }
 
-            WeightedPoint move = Game.Map.MoveTowardsTarget(
-                Game.Player.X, Game.Player.Y, Game.Map.AutoexploreMap);
+            LocCost move = Game.Map.MoveTowardsTarget(
+                Game.Player.Loc, Game.Map.AutoexploreMap);
 
-            if (move.X == Game.Player.X && move.Y == Game.Player.Y)
+            if (move.Loc == Game.Player.Loc)
             {
                 // If the best move is to stay still, we must have explored everything reachable
                 // already, so we can end autoexplore.
@@ -68,7 +68,7 @@ namespace Roguelike.State
             }
             else
             {
-                return Option.Some<ICommand>(new MoveCommand(Game.Player, move.X, move.Y));
+                return Option.Some<ICommand>(new MoveCommand(Game.Player, move.Loc));
             }
         }
 

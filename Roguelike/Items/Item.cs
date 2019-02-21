@@ -19,17 +19,17 @@ namespace Roguelike.Items
         public ItemParameter Parameters { get; }
         public Drawable DrawingComponent { get; }
 
-        public int X { get; set; }
-        public int Y { get; set; }
+        public Loc Loc { get; set; }
 
         internal MovesetHandler Moveset { get; set; }
 
         public string Name => Parameters.Name;
 
-        public Item(ItemParameter parameters, Color color, char symbol, int count = 1)
+        public Item(ItemParameter parameters, Color color, char symbol, Loc loc, int count = 1)
         {
             Parameters = parameters;
             DrawingComponent = new Drawable(color, symbol, true);
+            Loc = loc;
             Count = count;
 
             Moveset = new MovesetHandler(new ActionNode(

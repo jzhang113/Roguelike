@@ -9,9 +9,7 @@ namespace Roguelike.Core
     {
         public LevelId Destination { get; }
         public Drawable DrawingComponent { get; }
-
-        public int X { get; set; }
-        public int Y { get; set; }
+        public Loc Loc { get; set; }
 
         public Exit(in LevelId destination, char symbol)
         {

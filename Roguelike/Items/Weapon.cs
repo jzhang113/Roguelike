@@ -1,4 +1,5 @@
-﻿using Roguelike.Interfaces;
+﻿using Roguelike.Core;
+using Roguelike.Interfaces;
 using System;
 using System.Drawing;
 
@@ -7,7 +8,7 @@ namespace Roguelike.Items
     [Serializable]
     public class Weapon : Item, IEquippable
     {
-        public Weapon(ItemParameter parameters, Color color) : base(parameters, color, '(')
+        public Weapon(ItemParameter parameters, Color color, Loc loc) : base(parameters, color, '(', loc)
         {
         }
 
