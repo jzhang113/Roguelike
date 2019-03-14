@@ -110,6 +110,7 @@
     <Compile Include="Core\ActorState.cs" />
     <Compile Include="Core\Loc.cs" />
     <Compile Include="Core\LocCost.cs" />
+    <Compile Include="Systems\AnimationSystem.cs" />
     <Compile Include="Utils\AnnAStar.cs" />
     <Compile Include="Core\ArmorType.cs" />
     <Compile Include="Core\BorderInfo.cs" />

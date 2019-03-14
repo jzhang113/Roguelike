@@ -93,7 +93,7 @@ namespace Roguelike.Systems
                         foreach (Loc point in attack.Targets)
                         {
                             Game.Threatened.Set(point.X, point.Y, blend);
-                            Game.CurrentAnimations.Add(new FlashAnimation(Game.StateHandler.CurrentLayer, point.X, point.Y, blend));
+                            Game.Animations.Add(new FlashAnimation(Game.StateHandler.CurrentLayer, point.X, point.Y, blend));
                         }
                     }
                 }
@@ -178,7 +178,7 @@ namespace Roguelike.Systems
                     Turn++;
 
                 command.Execute();
-                command.Animation.MatchSome(animation => Game.CurrentAnimations.Add(animation));
+                command.Animation.MatchSome(animation => Game.Animations.Add(animation));
                 current.Energy -= command.EnergyCost;
             }
 

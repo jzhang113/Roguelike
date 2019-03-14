@@ -32,12 +32,10 @@ namespace Roguelike
         public static EventScheduler EventScheduler { get; }
         public static OverlayHandler Overlay { get; }
         public static OverlayHandler Threatened { get; }
+        public static AnimationSystem Animations { get; }
 
         internal static bool ShowEquip { get; set; }
         internal static bool ShowInfo { get; set; }
-
-        internal static ICollection<IAnimation> CurrentAnimations { get; }
-        private static ICollection<IAnimation> FinishedAnimations { get; }
 
         private static readonly LayerInfo _highlightLayer;
         private static readonly LayerInfo _mapLayer;
@@ -100,9 +98,7 @@ namespace Roguelike
             EventScheduler = new EventScheduler(16);
             Overlay = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
             Threatened = new OverlayHandler(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
-
-            CurrentAnimations = new List<IAnimation>();
-            FinishedAnimations = new List<IAnimation>();
+            Animations = new AnimationSystem();
         }
 
         public static void Initialize(Configuration configs, Options options)
@@ -148,8 +144,7 @@ namespace Roguelike
             EventScheduler.Clear();
             Overlay.Clear();
             Threatened.Clear();
-            CurrentAnimations.Clear();
-            FinishedAnimations.Clear();
+            Animations.Clear();
 
             WorldParameter worldParameter = Program.LoadData<WorldParameter>("world");
             World = new WorldHandler(worldParameter);
@@ -199,20 +194,8 @@ namespace Roguelike
             while (!_exiting)
             {
                 StateHandler.Update();
-
-                foreach (IAnimation animation in CurrentAnimations)
-                {
-                    if (animation.Update() || EventScheduler.Turn > animation.Turn)
-                        FinishedAnimations.Add(animation);
-                }
-
-                foreach (IAnimation animation in FinishedAnimations)
-                {
-                    CurrentAnimations.Remove(animation);
-                }
-
+                Animations.Update();
                 Render();
-                FinishedAnimations.Clear();
             }
 
             Terminal.Close();
@@ -253,11 +236,7 @@ namespace Roguelike
             }
 
             StateHandler.Draw();
-
-            foreach (IAnimation animation in CurrentAnimations)
-            {
-                animation.Draw();
-            }
+            Animations.Draw();
 
             Terminal.Refresh();
         }
